@@ -35,12 +35,29 @@ namespace UKHO.ExchangeSetService.Common.Helpers.V2
             _essFulfilmentStorageconfig = essFulfilmentStorageconfig ?? throw new ArgumentNullException(nameof(essFulfilmentStorageconfig));
         }
 
+        /// <summary>
+        /// Stores the Sales Catalogue Service response in Azure Blob Storage and adds a message to the queue.
+        /// </summary>
+        /// <param name="containerName">The name of the Azure Blob Storage container.</param>
+        /// <param name="batchId">The batch ID for the current operation.</param>
+        /// <param name="salesCatalogueResponse">The response from the Sales Catalogue Service.</param>
+        /// <param name="callBackUri">The callback URI for the response.</param>
+        /// <param name="exchangeSetStandard">The exchange set standard.</param>
+        /// <param name="correlationId">The correlation ID for the current operation.</param>
+        /// <param name="cancellationToken">The cancellation token.</param>
+        /// <param name="expiryDate">The expiry date for the exchange set URL.</param>
+        /// <param name="scsRequestDateTime">The request date and time for the Sales Catalogue Service.</param>
+        /// <param name="isEmptyExchangeSet">Indicates whether the exchange set is empty.</param>
+        /// <param name="exchangeSetResponse">The response for the exchange set standard.</param>
+        /// <param name="apiVersion">The API version.</param>
+        /// <param name="productIdentifier">The product identifier (optional).</param>
+        /// <returns>Returns a boolean indicating whether the storage operation was successful.</returns>
         public async Task<bool> StoreSalesCatalogueServiceResponseAsync(string containerName, string batchId, V2SalesCatalogueProductResponse salesCatalogueResponse, string callBackUri, string exchangeSetStandard, string correlationId, CancellationToken cancellationToken, string expiryDate, DateTime scsRequestDateTime, bool isEmptyExchangeSet, ExchangeSetStandardResponse exchangeSetResponse, ApiVersion apiVersion, string productIdentifier = "")
         {
             var uploadFileName = string.Concat(batchId, ".json");
             var fileSize = salesCatalogueResponse.Products?.Sum(p => (long)p.FileSize) ?? 0;
             var fileSizeInMB = CommonHelper.ConvertBytesToMegabytes(fileSize);
-            var connectionString = GetStorageConnectionString(_essFulfilmentStorageconfig.Value.ExchangeSetStorageAccountName,_essFulfilmentStorageconfig.Value.ExchangeSetStorageAccountKey);
+            var connectionString = GetStorageConnectionString(_essFulfilmentStorageconfig.Value.ExchangeSetStorageAccountName, _essFulfilmentStorageconfig.Value.ExchangeSetStorageAccountKey);
             var blobClient = await _azureBlobStorageClient.GetBlobClient(uploadFileName, connectionString, containerName);
             var scsStorageSuccessful = await UploadSalesCatalogueServiceResponseToBlobAsync(blobClient, salesCatalogueResponse);
 
@@ -74,12 +91,24 @@ namespace UKHO.ExchangeSetService.Common.Helpers.V2
             return scsStorageSuccessful;
         }
 
+        /// <summary>
+        /// Adds a message to the Azure message queue.
+        /// </summary>
+        /// <param name="message">The message to be added to the queue.</param>
+        /// <param name="storageAccountConnectionString">The connection string for the Azure storage account.</param>
+        /// <returns>A task that represents the asynchronous operation.</returns>
         public async Task AddQueueMessage(ExchangeSetStandardQueueMessage message, string storageAccountConnectionString)
         {
             var scsResponseQueueMessageJSON = JsonConvert.SerializeObject(message);
             await _azureMessageQueueHelper.AddMessage(message.BatchId, storageAccountConnectionString, scsResponseQueueMessageJSON, message.CorrelationId);
         }
 
+        /// <summary>
+        /// Uploads the Sales Catalogue Service response to Azure Blob Storage.
+        /// </summary>
+        /// <param name="blobClient">The BlobClient instance used to interact with the blob storage.</param>
+        /// <param name="salesCatalogueResponse">The response from the Sales Catalogue Service.</param>
+        /// <returns>Returns a boolean indicating whether the upload operation was successful.</returns>
         public async Task<bool> UploadSalesCatalogueServiceResponseToBlobAsync(BlobClient blobClient, V2SalesCatalogueProductResponse salesCatalogueResponse)
         {
             var uploadSuccess = false;
@@ -99,6 +128,11 @@ namespace UKHO.ExchangeSetService.Common.Helpers.V2
             return uploadSuccess;
         }
 
+        /// <summary>
+        /// Loads a stream with a JSON representation of the provided object.
+        /// </summary>
+        /// <param name="ms">The stream to load with JSON data.</param>
+        /// <param name="obj">The object to serialize to JSON and load into the stream.</param>
         private void LoadStreamWithJson(Stream ms, object obj)
         {
             var writer = new StreamWriter(ms);
@@ -107,6 +141,12 @@ namespace UKHO.ExchangeSetService.Common.Helpers.V2
             ms.Position = 0;
         }
 
+        /// <summary>
+        /// Gets the value of the EnumMember attribute for a given enum value.
+        /// </summary>
+        /// <typeparam name="T">The type of the enum.</typeparam>
+        /// <param name="enumVal">The enum value.</param>
+        /// <returns>The value of the EnumMember attribute if it exists; otherwise, null.</returns>
         private string GetEnumMemberAttrValue<T>(T enumVal)
         {
             var enumType = typeof(T);
@@ -120,7 +160,13 @@ namespace UKHO.ExchangeSetService.Common.Helpers.V2
             return null;
         }
 
-        private string GetStorageConnectionString(string accountName,string accountKey )
+        /// <summary>
+        /// Gets the storage connection string for the specified account name and key.
+        /// </summary>
+        /// <param name="accountName">The name of the storage account.</param>
+        /// <param name="accountKey">The key for the storage account.</param>
+        /// <returns>The storage connection string.</returns>
+        private string GetStorageConnectionString(string accountName, string accountKey)
         {
             return $"DefaultEndpointsProtocol=https;AccountName={accountName};AccountKey={accountKey};EndpointSuffix=core.windows.net";
         }
