@@ -57,6 +57,8 @@ module "key_vault" {
     "AzureWebJobsStorage"                                       = module.storage.storage_connection_string
     "CacheConfiguration--CacheStorageAccountName"               = module.storage.storage_account_name
     "CacheConfiguration--CacheStorageAccountKey"                = module.storage.storage_primary_access_key
+    "ESSFulfilmentConfiguration--ExchangeSetStorageAccountName" = module.storage.storage_account_name
+    "ESSFulfilmentConfiguration--ExchangeSetStorageAccountKey"  = module.storage.storage_primary_access_key
   }
   tags                                         = local.tags
 }
