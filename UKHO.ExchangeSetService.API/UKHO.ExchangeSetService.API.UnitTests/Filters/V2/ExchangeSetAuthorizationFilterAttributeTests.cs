@@ -1,4 +1,7 @@
-﻿using System.Collections.Generic;
+﻿// Licensed to the .NET Foundation under one or more agreements.
+// The .NET Foundation licenses this file to you under the MIT license.
+
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using FluentAssertions;
 using Microsoft.AspNetCore.Http;
@@ -9,7 +12,7 @@ using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Primitives;
 using NUnit.Framework;
 using UKHO.ExchangeSetService.API.Filters.V2;
-using ProductType = UKHO.ExchangeSetService.Common.Models.V2.Enums.ProductType;
+using ExchangeSetStandard = UKHO.ExchangeSetService.Common.Models.V2.Enums.ExchangeSetStandard;
 
 namespace UKHO.ExchangeSetService.API.UnitTests.Filters.V2
 {
@@ -19,7 +22,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Filters.V2
         private ExchangeSetAuthorizationFilterAttribute exchangeSetFilterAttribute;
         private ActionExecutingContext actionExecutingContext;
         private ActionExecutedContext actionExecutedContext;
-        private const string ProductTypeKey = "productType";
+        private const string ExchangeSetStandardKey = "exchangeSetStandard";
         private HttpContext httpContext;
 
         [SetUp]
@@ -46,7 +49,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Filters.V2
         [Test]
         public async Task WhenExchangeSetStandardParameterIsS100_ThenReturnNextRequest()
         {
-            httpContext.Request.RouteValues.Add(ProductTypeKey, ProductType.s100.ToString());
+            httpContext.Request.RouteValues.Add(ExchangeSetStandardKey, ExchangeSetStandard.s100.ToString());
             var actionContext = new ActionContext(httpContext, new RouteData(), new ActionDescriptor());
             actionExecutingContext = new ActionExecutingContext(actionContext, new List<IFilterMetadata>(), new Dictionary<string, object>(), exchangeSetFilterAttribute);
             actionExecutedContext = new ActionExecutedContext(actionContext, new List<IFilterMetadata>(), exchangeSetFilterAttribute);
@@ -54,7 +57,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Filters.V2
             await exchangeSetFilterAttribute.OnActionExecutionAsync(actionExecutingContext, () => Task.FromResult(actionExecutedContext));
 
             httpContext.Response.StatusCode.Should().Be(StatusCodes.Status200OK);
-            actionExecutingContext.ActionArguments[ProductTypeKey].Should().Be(ProductType.s100.ToString());
+            actionExecutingContext.ActionArguments[ExchangeSetStandardKey].Should().Be(ExchangeSetStandard.s100.ToString());
         }
 
         [Test]
@@ -65,7 +68,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Filters.V2
         [TestCase("s 100")]
         public async Task WhenExchangeSetStandardParameterIsInvalid_ThenReturnBadRequest(string exchangeSetStandard)
         {
-            httpContext.Request.RouteValues.Add(ProductTypeKey, exchangeSetStandard);
+            httpContext.Request.RouteValues.Add(ExchangeSetStandardKey, exchangeSetStandard);
             var actionContext = new ActionContext(httpContext, new RouteData(), new ActionDescriptor());
             actionExecutingContext = new ActionExecutingContext(actionContext, new List<IFilterMetadata>(), new Dictionary<string, object>(), exchangeSetFilterAttribute);
             actionExecutedContext = new ActionExecutedContext(actionContext, new List<IFilterMetadata>(), exchangeSetFilterAttribute);

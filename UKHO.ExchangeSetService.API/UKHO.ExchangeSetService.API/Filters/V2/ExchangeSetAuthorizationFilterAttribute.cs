@@ -1,4 +1,7 @@
-﻿using System;
+﻿// Licensed to the .NET Foundation under one or more agreements.
+// The .NET Foundation licenses this file to you under the MIT license.
+
+using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
@@ -9,45 +12,45 @@ namespace UKHO.ExchangeSetService.API.Filters.V2
 {
     public class ExchangeSetAuthorizationFilterAttribute : ActionFilterAttribute
     {
-        private const string ProductTypeKey = "productType";
+        private const string ExchangeSetStandardKey = "exchangeSetStandard";
 
         public override async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
         {
             if (!TryGetExchangeSetStandard(context, out var productType) ||
-                !TryParseExchangeSetStandard(productType, out ProductType parsedEnum) ||
+                !TryParseExchangeSetStandard(productType, out ExchangeSetStandard parsedEnum) ||
                 !IsValidExchangeSetStandard(parsedEnum))
             {
                 SetBadRequestResponse(context);
                 return;
             }
-            context.ActionArguments[ProductTypeKey] = parsedEnum.ToString();
+            context.ActionArguments[ExchangeSetStandardKey] = parsedEnum.ToString();
             await next();
         }
 
-        private static bool TryGetExchangeSetStandard(ActionExecutingContext context, out string productType)
+        private static bool TryGetExchangeSetStandard(ActionExecutingContext context, out string exchangeSetStandard)
         {
-            productType = null;
-            if (context.HttpContext.Request.RouteValues.TryGetValue(ProductTypeKey, out var queryStringValue))
+            exchangeSetStandard = null;
+            if (context.HttpContext.Request.RouteValues.TryGetValue(ExchangeSetStandardKey, out var queryStringValue))
             {
-                productType = Convert.ToString(queryStringValue);
+                exchangeSetStandard = Convert.ToString(queryStringValue);
                 return true;
             }
             return false;
         }
 
-        private static bool TryParseExchangeSetStandard<TEnum>(string productType, out TEnum result) where TEnum : struct, Enum
+        private static bool TryParseExchangeSetStandard<TEnum>(string exchangeSetStandard, out TEnum result) where TEnum : struct, Enum
         {
             result = default;
-            if (string.IsNullOrEmpty(productType) || productType.Any(char.IsWhiteSpace))
+            if (string.IsNullOrEmpty(exchangeSetStandard) || exchangeSetStandard.Any(char.IsWhiteSpace))
             {
                 return false;
             }
-            return Enum.TryParse(productType, true, out result);
+            return Enum.TryParse(exchangeSetStandard, true, out result);
         }
 
-        private static bool IsValidExchangeSetStandard(ProductType productType)
+        private static bool IsValidExchangeSetStandard(ExchangeSetStandard exchangeSetStandard)
         {
-            return productType == ProductType.s100;
+            return exchangeSetStandard == ExchangeSetStandard.s100;
         }
 
         private static void SetBadRequestResponse(ActionExecutingContext context)

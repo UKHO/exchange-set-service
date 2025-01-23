@@ -70,12 +70,12 @@ namespace UKHO.ExchangeSetService.API.Services.V2
         /// </summary>
         /// <param name="productNames">Array of product names to be processed.</param>
         /// <param name="apiVersion">The API version to be used.</param>
-        /// <param name="productType">The standard of the Exchange Set.</param>
+        /// <param name="exchangeSetStandard">The standard of the Exchange Set.</param>
         /// <param name="callbackUri">Optional callback URI for notification once the Exchange Set is ready.</param>
         /// <param name="correlationId">Guid based id for tracking the request.</param>
         /// <param name="cancellationToken">If true then notifies the underlying connection is aborted thus request operations should be cancelled.</param>
         /// <returns>Service response result containing the exchange set standard service response.</returns>
-        public async Task<ServiceResponseResult<ExchangeSetStandardServiceResponse>> ProcessProductNamesRequestAsync(string[] productNames, ApiVersion apiVersion, string productType, string callbackUri, string correlationId, CancellationToken cancellationToken)
+        public async Task<ServiceResponseResult<ExchangeSetStandardServiceResponse>> ProcessProductNamesRequestAsync(string[] productNames, ApiVersion apiVersion, string exchangeSetStandard, string callbackUri, string correlationId, CancellationToken cancellationToken)
         {
             productNames = SanitizeProductNames(productNames);
 
@@ -97,24 +97,24 @@ namespace UKHO.ExchangeSetService.API.Services.V2
                 return validationResult;
             }
 
-            var salesCatalogueServiceResponse = await _salesCatalogueService.PostProductNamesAsync(apiVersion, productType, productNamesRequest.ProductNames, correlationId, cancellationToken);
+            var salesCatalogueServiceResponse = await _salesCatalogueService.PostProductNamesAsync(apiVersion, exchangeSetStandard, productNamesRequest.ProductNames, correlationId, cancellationToken);
 
             if (salesCatalogueServiceResponse.IsSuccess)
             {
                 var fssBatchResponse = await CreateFssBatchAsync(_userIdentifier.UserIdentity, correlationId);
 
-                if(fssBatchResponse.ResponseCode != HttpStatusCode.Created)
+                if (fssBatchResponse.ResponseCode != HttpStatusCode.Created)
                 {
                     return ServiceResponseResult<ExchangeSetStandardServiceResponse>.InternalServerError();
                 }
-                
+
                 var essResponse = SetExchangeSetStandardResponse(productNamesRequest, salesCatalogueServiceResponse, fssBatchResponse);
 
                 var expiryDate = essResponse.Value.ExchangeSetStandardResponse.ExchangeSetUrlExpiryDateTime.Value.ToString("yyyy-MM-ddTHH:mm:ss.fffZ", CultureInfo.InvariantCulture);
 
                 CheckEmptyExchangeSet(essResponse.Value);
 
-                var success = await SaveSalesCatalogueStorageDetails(salesCatalogueServiceResponse.Value.ResponseBody, fssBatchResponse.ResponseBody.BatchId, callbackUri, productType, correlationId, expiryDate, salesCatalogueServiceResponse.Value.ScsRequestDateTime, isEmptyExchangeSet, essResponse.Value.ExchangeSetStandardResponse, apiVersion);
+                var success = await SaveSalesCatalogueStorageDetails(salesCatalogueServiceResponse.Value.ResponseBody, fssBatchResponse.ResponseBody.BatchId, callbackUri, exchangeSetStandard, correlationId, expiryDate, salesCatalogueServiceResponse.Value.ScsRequestDateTime, isEmptyExchangeSet, essResponse.Value.ExchangeSetStandardResponse, apiVersion);
                 if (!success)
                 {
                     _logger.LogInformation(EventIds.CreateProductNamesError.ToEventId(), "ProcessProductNamesRequestAsync failed for BatchId:{BatchId} | _X-Correlation-ID : {CorrelationId}", fssBatchResponse.ResponseBody.BatchId, correlationId);
@@ -122,7 +122,7 @@ namespace UKHO.ExchangeSetService.API.Services.V2
 
                 return essResponse;
             }
-            
+
             return SetExchangeSetStandardResponse(productNamesRequest, salesCatalogueServiceResponse);
         }
 
@@ -131,12 +131,12 @@ namespace UKHO.ExchangeSetService.API.Services.V2
         /// </summary>
         /// <param name="productVersionRequest">Enumerable of product version requests to be processed.</param>
         /// <param name="apiVersion">The API version to be used.</param>
-        /// <param name="productType">The standard of the Exchange Set.</param>
+        /// <param name="exchangeSetStandard">The standard of the Exchange Set.</param>
         /// <param name="callbackUri">Optional callback URI for notification once the Exchange Set is ready.</param>
         /// <param name="correlationId">Guid based id for tracking the request.</param>
         /// <param name="cancellationToken">If true then notifies the underlying connection is aborted thus request operations should be cancelled.</param>
         /// <returns>Service response result containing the exchange set standard service response.</returns>
-        public async Task<ServiceResponseResult<ExchangeSetStandardServiceResponse>> ProcessProductVersionsRequestAsync(IEnumerable<ProductVersionRequest> productVersionRequest, ApiVersion apiVersion, string productType, string callbackUri, string correlationId, CancellationToken cancellationToken)
+        public async Task<ServiceResponseResult<ExchangeSetStandardServiceResponse>> ProcessProductVersionsRequestAsync(IEnumerable<ProductVersionRequest> productVersionRequest, ApiVersion apiVersion, string exchangeSetStandard, string callbackUri, string correlationId, CancellationToken cancellationToken)
         {
             if (productVersionRequest == null || !productVersionRequest.Any() || productVersionRequest.Any(pv => pv == null))
             {
@@ -155,7 +155,7 @@ namespace UKHO.ExchangeSetService.API.Services.V2
                 return validationResult;
             }
 
-            var salesCatalogueServiceResponse = await _salesCatalogueService.PostProductVersionsAsync(apiVersion, productType, productVersionsRequest.ProductVersions, correlationId, cancellationToken);
+            var salesCatalogueServiceResponse = await _salesCatalogueService.PostProductVersionsAsync(apiVersion, exchangeSetStandard, productVersionsRequest.ProductVersions, correlationId, cancellationToken);
 
             if (salesCatalogueServiceResponse.Value?.ResponseCode == HttpStatusCode.NotModified)
             {
@@ -183,7 +183,7 @@ namespace UKHO.ExchangeSetService.API.Services.V2
 
                 CheckEmptyExchangeSet(essResponse.Value);
 
-                var success = await SaveSalesCatalogueStorageDetails(salesCatalogueServiceResponse.Value.ResponseBody, fssBatchResponse.ResponseBody.BatchId, callbackUri, productType, correlationId, expiryDate, salesCatalogueServiceResponse.Value.ScsRequestDateTime, isEmptyExchangeSet, essResponse.Value.ExchangeSetStandardResponse, apiVersion);
+                var success = await SaveSalesCatalogueStorageDetails(salesCatalogueServiceResponse.Value.ResponseBody, fssBatchResponse.ResponseBody.BatchId, callbackUri, exchangeSetStandard, correlationId, expiryDate, salesCatalogueServiceResponse.Value.ScsRequestDateTime, isEmptyExchangeSet, essResponse.Value.ExchangeSetStandardResponse, apiVersion);
                 if (!success)
                 {
                     _logger.LogInformation(EventIds.CreateProductVersionError.ToEventId(), "ProcessProductVersionsRequestAsync failed for BatchId:{BatchId} | _X-Correlation-ID : {CorrelationId}", fssBatchResponse.ResponseBody.BatchId, correlationId);
@@ -200,13 +200,13 @@ namespace UKHO.ExchangeSetService.API.Services.V2
         /// </summary>
         /// <param name="updatesSinceRequest">Request containing the sinceDateTime parameter.</param>
         /// <param name="apiVersion">The API version to be used.</param>
-        /// <param name="productType">The standard of the Exchange Set.</param>
+        /// <param name="exchangeSetStandard">The standard of the Exchange Set.</param>
         /// <param name="productIdentifier">Optional product identifier for filtering the updates.</param>
         /// <param name="callbackUri">Optional callback URI for notification once the Exchange Set is ready.</param>
         /// <param name="correlationId">Guid based id for tracking the request.</param>
         /// <param name="cancellationToken">If true then notifies the underlying connection is aborted thus request operations should be cancelled.</param>
         /// <returns>Service response result containing the exchange set standard service response.</returns>
-        public async Task<ServiceResponseResult<ExchangeSetStandardServiceResponse>> ProcessUpdatesSinceRequestAsync(UpdatesSinceRequest updatesSinceRequest, ApiVersion apiVersion, string productType, string productIdentifier, string callbackUri, string correlationId, CancellationToken cancellationToken)
+        public async Task<ServiceResponseResult<ExchangeSetStandardServiceResponse>> ProcessUpdatesSinceRequestAsync(UpdatesSinceRequest updatesSinceRequest, ApiVersion apiVersion, string exchangeSetStandard, string productIdentifier, string callbackUri, string correlationId, CancellationToken cancellationToken)
         {
             if (updatesSinceRequest?.SinceDateTime == null)
             {
@@ -222,7 +222,7 @@ namespace UKHO.ExchangeSetService.API.Services.V2
                 return validationResult;
             }
 
-            var salesCatalogueServiceResponse = await _salesCatalogueService.GetProductsFromUpdatesSinceAsync(apiVersion, productType, updatesSinceRequest, correlationId, cancellationToken);
+            var salesCatalogueServiceResponse = await _salesCatalogueService.GetProductsFromUpdatesSinceAsync(apiVersion, exchangeSetStandard, updatesSinceRequest, correlationId, cancellationToken);
 
             if (salesCatalogueServiceResponse.IsSuccess)
             {
@@ -238,7 +238,7 @@ namespace UKHO.ExchangeSetService.API.Services.V2
 
                 CheckEmptyExchangeSet(essResponse.Value);
 
-                var success = await SaveSalesCatalogueStorageDetails(salesCatalogueServiceResponse.Value.ResponseBody, fssBatchResponse.ResponseBody.BatchId, callbackUri, productType, correlationId, expiryDate, salesCatalogueServiceResponse.Value.ScsRequestDateTime, isEmptyExchangeSet, essResponse.Value.ExchangeSetStandardResponse, apiVersion, productIdentifier);
+                var success = await SaveSalesCatalogueStorageDetails(salesCatalogueServiceResponse.Value.ResponseBody, fssBatchResponse.ResponseBody.BatchId, callbackUri, exchangeSetStandard, correlationId, expiryDate, salesCatalogueServiceResponse.Value.ScsRequestDateTime, isEmptyExchangeSet, essResponse.Value.ExchangeSetStandardResponse, apiVersion, productIdentifier);
                 if (!success)
                 {
                     _logger.LogInformation(EventIds.CreateUpdateSinceError.ToEventId(), "ProcessUpdatesSinceRequestAsync failed for BatchId:{BatchId} | _X-Correlation-ID : {CorrelationId}", fssBatchResponse.ResponseBody.BatchId, correlationId);
