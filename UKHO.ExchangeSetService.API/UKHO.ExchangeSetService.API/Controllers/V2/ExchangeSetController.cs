@@ -19,7 +19,7 @@ namespace UKHO.ExchangeSetService.API.Controllers.V2
 {
     [Authorize]
     [ServiceFilter(typeof(ExchangeSetAuthorizationFilterAttribute))]
-    [Route("v2/productType/{productType}")]
+    [Route("v2/exchangeSet/{productType}")]
     public class ExchangeSetController : ExchangeSetBaseController<ExchangeSetController>
     {
         private readonly string _correlationId;
