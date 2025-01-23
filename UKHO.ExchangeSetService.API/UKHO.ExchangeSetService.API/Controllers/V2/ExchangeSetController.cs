@@ -19,7 +19,7 @@ namespace UKHO.ExchangeSetService.API.Controllers.V2
 {
     [Authorize]
     [ServiceFilter(typeof(ExchangeSetAuthorizationFilterAttribute))]
-    [Route("v2/exchangeSet/{exchangeSetStandard}")]
+    [Route("v2/productType/{productType}")]
     public class ExchangeSetController : ExchangeSetBaseController<ExchangeSetController>
     {
         private readonly string _correlationId;
@@ -45,7 +45,7 @@ namespace UKHO.ExchangeSetService.API.Controllers.V2
         /// <remarks>
         /// Given a list of product name, return all the versions of the products that are releasable and that are needed to bring the products up to date.
         /// </remarks>
-        /// <param name="exchangeSetStandard">The standard of the Exchange Set.</param>
+        /// <param name="productType">The standard of the Exchange Set.</param>
         /// <param name="productNames">The JSON body containing product names.</param>
         /// <param name="callbackUri">An optional callback URI for notification once the Exchange Set is ready.</param>
         /// <response code="202">A JSON body that indicates the URL that the Exchange Set will be available on as well as the number of cells in that Exchange Set.</response>
@@ -55,19 +55,19 @@ namespace UKHO.ExchangeSetService.API.Controllers.V2
         /// <response code="429">Too Many Requests - You have sent too many requests in a given amount of time. Please back-off for the time in the Retry-After header (in seconds) and try again.</response>
         /// <response code="500">Internal Server Error.</response>
         [HttpPost("productNames")]
-        public Task<IActionResult> PostProductNames(string exchangeSetStandard, [FromBody] string[] productNames, [FromQuery] string callbackUri)
+        public Task<IActionResult> PostProductNames(string productType, [FromBody] string[] productNames, [FromQuery] string callbackUri)
         {
             return _logger.LogStartEndAndElapsedTimeAsync(
                 EventIds.PostProductNamesRequestStart,
                 EventIds.PostProductNamesRequestCompleted,
-                "Product Names Endpoint request for _X-Correlation-ID:{correlationId} and ExchangeSetStandard:{exchangeSetStandard}",
+                "Product Names Endpoint request for _X-Correlation-ID:{correlationId} and ProductType:{productType}",
                 async () =>
                 {
-                    var result = await _exchangeSetStandardService.ProcessProductNamesRequestAsync(productNames, ApiVersion.V2, exchangeSetStandard, callbackUri, _correlationId, GetRequestCancellationToken());
+                    var result = await _exchangeSetStandardService.ProcessProductNamesRequestAsync(productNames, ApiVersion.V2, productType, callbackUri, _correlationId, GetRequestCancellationToken());
 
                     return result.ToActionResult(_httpContextAccessor, _correlationId);
                 },
-                _correlationId, exchangeSetStandard);
+                _correlationId, productType);
         }
 
         /// <summary>
@@ -76,7 +76,7 @@ namespace UKHO.ExchangeSetService.API.Controllers.V2
         /// <remarks>
         /// Given a list of product names and their edition and update numbers, return all the versions of the products that are releasable from that version onwards and that are needed to bring the products up to date.
         /// </remarks>
-        /// <param name="exchangeSetStandard">The standard of the Exchange Set.</param>
+        /// <param name="productType">The standard of the Exchange Set.</param>
         /// <param name="productVersionRequest">The JSON body containing product names and their edition and update numbers.</param>
         /// <param name="callbackUri">An optional callback URI for notification once the Exchange Set is ready.</param>
         /// <response code="202">A JSON body that indicates the URL that the Exchange Set will be available on as well as the number of cells in that Exchange Set.</response>
@@ -86,19 +86,19 @@ namespace UKHO.ExchangeSetService.API.Controllers.V2
         /// <response code="429">Too Many Requests - You have sent too many requests in a given amount of time. Please back-off for the time in the Retry-After header (in seconds) and try again.</response>
         /// <response code="500">Internal Server Error.</response>
         [HttpPost("productVersions")]
-        public Task<IActionResult> PostProductVersions(string exchangeSetStandard, [FromBody] IEnumerable<ProductVersionRequest> productVersionRequest, [FromQuery] string callbackUri)
+        public Task<IActionResult> PostProductVersions(string productType, [FromBody] IEnumerable<ProductVersionRequest> productVersionRequest, [FromQuery] string callbackUri)
         {
             return _logger.LogStartEndAndElapsedTimeAsync(
                 EventIds.ESSPostProductVersionsRequestStart,
                 EventIds.ESSPostProductVersionsRequestCompleted,
-                "ProductVersions V2 endpoint request for _X-Correlation-ID:{correlationId} and ExchangeSetStandard:{exchangeSetStandard}",
+                "ProductVersions V2 endpoint request for _X-Correlation-ID:{correlationId} and ProductType:{productType}",
                 async () =>
                 {
-                    var result = await _exchangeSetStandardService.ProcessProductVersionsRequestAsync(productVersionRequest, ApiVersion.V2, exchangeSetStandard, callbackUri, _correlationId, GetRequestCancellationToken());
+                    var result = await _exchangeSetStandardService.ProcessProductVersionsRequestAsync(productVersionRequest, ApiVersion.V2, productType, callbackUri, _correlationId, GetRequestCancellationToken());
 
                     return result.ToActionResult(_httpContextAccessor, _correlationId);
 
-                }, _correlationId, exchangeSetStandard);
+                }, _correlationId, productType);
         }
 
         /// <summary>
@@ -107,7 +107,7 @@ namespace UKHO.ExchangeSetService.API.Controllers.V2
         /// <remarks>
         /// Given a datetime, build an Exchange Set of all the releasable product versions that have been issued since that datetime.
         /// </remarks>
-        /// <param name="exchangeSetStandard">The standard of the Exchange Set.</param>
+        /// <param name="productType">The standard of the Exchange Set.</param>
         /// <param name="updatesSinceRequest" example="2024-12-20T11:51:00.000Z">The JSON body containing the sinceDateTime parameter. It returns all the releasable data after that date and time from which changes are requested. Any changes since the date will be returned. The date is in ISO 8601 format. The date and time must be within 28 days and cannot be future date.</param>
         /// <param name="productIdentifier">An optional product identifier for filtering the updates.</param>
         /// <param name="callbackUri">An optional callback URI for notification once the Exchange Set is ready.</param>
@@ -119,19 +119,19 @@ namespace UKHO.ExchangeSetService.API.Controllers.V2
         /// <response code="429">Too Many Requests - You have sent too many requests in a given amount of time. Please back-off for the time in the Retry-After header (in seconds) and try again.</response>
         /// <response code="500">Internal Server Error.</response>
         [HttpPost("updatesSince")]
-        public Task<IActionResult> PostUpdatesSince(string exchangeSetStandard, [FromBody] UpdatesSinceRequest updatesSinceRequest, [FromQuery] string productIdentifier, [FromQuery] string callbackUri)
+        public Task<IActionResult> PostUpdatesSince(string productType, [FromBody] UpdatesSinceRequest updatesSinceRequest, [FromQuery] string productIdentifier, [FromQuery] string callbackUri)
         {
             return _logger.LogStartEndAndElapsedTimeAsync(
                 EventIds.PostUpdatesSinceRequestStarted,
                 EventIds.PostUpdatesSinceRequestCompleted,
-                "UpdatesSince endpoint request for _X-Correlation-ID:{correlationId} and ExchangeSetStandard:{exchangeSetStandard}",
+                "UpdatesSince endpoint request for _X-Correlation-ID:{correlationId} and ProductType:{productType}",
                 async () =>
                 {
-                    var result = await _exchangeSetStandardService.ProcessUpdatesSinceRequestAsync(updatesSinceRequest, ApiVersion.V2, exchangeSetStandard, productIdentifier, callbackUri, _correlationId, GetRequestCancellationToken());
+                    var result = await _exchangeSetStandardService.ProcessUpdatesSinceRequestAsync(updatesSinceRequest, ApiVersion.V2, productType, productIdentifier, callbackUri, _correlationId, GetRequestCancellationToken());
 
                     return result.ToActionResult(_httpContextAccessor, _correlationId);
 
-                }, _correlationId, exchangeSetStandard);
+                }, _correlationId, productType);
         }
     }
 }

@@ -3,7 +3,7 @@
 
 namespace UKHO.ExchangeSetService.Common.Models.V2.Enums
 {
-    public enum ExchangeSetStandard
+    public enum ProductType
     {
         s100
     }
