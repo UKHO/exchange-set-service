@@ -419,19 +419,19 @@ namespace UKHO.ExchangeSetService.API.Services.V2
         /// <param name="correlationId">The correlation identifier.</param>
         /// <param name="expiryDate">The expiry date.</param>
         /// <param name="scsRequestDateTime">The SCS request date and time.</param>
-        /// <param name="isEmptyEncExchangeSet">if set to <c>true</c> [is empty ENC exchange set].</param>
+        /// <param name="isEmptyExchangeSet">if set to <c>true</c> [is empty ENC exchange set].</param>
         /// <param name="exchangeSetStandardResponse">The exchange set standard response.</param>
         /// <param name="apiVersion">The API version.</param>
         /// <param name="productIdentifier">The product identifier.</param>
         /// <returns>A task that represents the asynchronous save operation. The task result contains a boolean indicating success or failure.</returns>
-        private Task<bool> SaveSalesCatalogueStorageDetails(V2SalesCatalogueProductResponse salesCatalogueResponse, string batchId, string callBackUri, string exchangeSetStandard, string correlationId, string expiryDate, DateTime scsRequestDateTime, bool isEmptyEncExchangeSet, ExchangeSetStandardResponse exchangeSetStandardResponse, ApiVersion apiVersion, string productIdentifier = "")
+        private Task<bool> SaveSalesCatalogueStorageDetails(V2SalesCatalogueProductResponse salesCatalogueResponse, string batchId, string callBackUri, string exchangeSetStandard, string correlationId, string expiryDate, DateTime scsRequestDateTime, bool isEmptyExchangeSet, ExchangeSetStandardResponse exchangeSetStandardResponse, ApiVersion apiVersion, string productIdentifier = "")
         {
             return _logger.LogStartEndAndElapsedTimeAsync(EventIds.StoreResponseRequestStart,
                     EventIds.StoreResponseRequestCompleted,
                     "Response store request for BatchId:{batchId} and _X-Correlation-ID:{CorrelationId}",
                     async () =>
                     {
-                        bool result = await _exchangeSetServiceStorageProvider.SaveSalesCatalogueStorageDetails(salesCatalogueResponse, batchId, callBackUri, exchangeSetStandard, correlationId, expiryDate, scsRequestDateTime, isEmptyEncExchangeSet, exchangeSetStandardResponse, apiVersion, productIdentifier);
+                        bool result = await _exchangeSetServiceStorageProvider.SaveSalesCatalogueStorageDetails(salesCatalogueResponse, batchId, callBackUri, exchangeSetStandard, correlationId, expiryDate, scsRequestDateTime, isEmptyExchangeSet, exchangeSetStandardResponse, apiVersion, productIdentifier);
 
                         return result;
                     }, batchId, correlationId);
