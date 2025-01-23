@@ -97,9 +97,9 @@ namespace UKHO.ExchangeSetService.API.Services.V2
                 return validationResult;
             }
 
-            var salesCatalogServiceResponse = await _salesCatalogueService.PostProductNamesAsync(apiVersion, productType, productNamesRequest.ProductNames, correlationId, cancellationToken);
+            var salesCatalogueServiceResponse = await _salesCatalogueService.PostProductNamesAsync(apiVersion, productType, productNamesRequest.ProductNames, correlationId, cancellationToken);
 
-            if (salesCatalogServiceResponse.IsSuccess)
+            if (salesCatalogueServiceResponse.IsSuccess)
             {
                 var fssBatchResponse = await CreateFssBatchAsync(_userIdentifier.UserIdentity, correlationId);
 
@@ -108,13 +108,13 @@ namespace UKHO.ExchangeSetService.API.Services.V2
                     return ServiceResponseResult<ExchangeSetStandardServiceResponse>.InternalServerError();
                 }
                 
-                var essResponse = SetExchangeSetStandardResponse(productNamesRequest, salesCatalogServiceResponse, fssBatchResponse);
+                var essResponse = SetExchangeSetStandardResponse(productNamesRequest, salesCatalogueServiceResponse, fssBatchResponse);
 
                 var expiryDate = essResponse.Value.ExchangeSetStandardResponse.ExchangeSetUrlExpiryDateTime.Value.ToString("yyyy-MM-ddTHH:mm:ss.fffZ", CultureInfo.InvariantCulture);
 
                 CheckEmptyExchangeSet(essResponse.Value);
 
-                var success = await SaveSalesCatalogueStorageDetails(salesCatalogServiceResponse.Value.ResponseBody, fssBatchResponse.ResponseBody.BatchId, callbackUri, productType, correlationId, expiryDate, salesCatalogServiceResponse.Value.ScsRequestDateTime, isEmptyExchangeSet, essResponse.Value.ExchangeSetStandardResponse, apiVersion);
+                var success = await SaveSalesCatalogueStorageDetails(salesCatalogueServiceResponse.Value.ResponseBody, fssBatchResponse.ResponseBody.BatchId, callbackUri, productType, correlationId, expiryDate, salesCatalogueServiceResponse.Value.ScsRequestDateTime, isEmptyExchangeSet, essResponse.Value.ExchangeSetStandardResponse, apiVersion);
                 if (!success)
                 {
                     _logger.LogInformation(EventIds.CreateProductNamesError.ToEventId(), "ProcessProductNamesRequestAsync failed for BatchId:{BatchId} | _X-Correlation-ID : {CorrelationId}", fssBatchResponse.ResponseBody.BatchId, correlationId);
@@ -123,7 +123,7 @@ namespace UKHO.ExchangeSetService.API.Services.V2
                 return essResponse;
             }
             
-            return SetExchangeSetStandardResponse(productNamesRequest, salesCatalogServiceResponse);
+            return SetExchangeSetStandardResponse(productNamesRequest, salesCatalogueServiceResponse);
         }
 
         /// <summary>
@@ -155,21 +155,21 @@ namespace UKHO.ExchangeSetService.API.Services.V2
                 return validationResult;
             }
 
-            var salesCatalogServiceResponse = await _salesCatalogueService.PostProductVersionsAsync(apiVersion, productType, productVersionsRequest.ProductVersions, correlationId, cancellationToken);
+            var salesCatalogueServiceResponse = await _salesCatalogueService.PostProductVersionsAsync(apiVersion, productType, productVersionsRequest.ProductVersions, correlationId, cancellationToken);
 
-            if (salesCatalogServiceResponse.Value?.ResponseCode == HttpStatusCode.NotModified)
+            if (salesCatalogueServiceResponse.Value?.ResponseCode == HttpStatusCode.NotModified)
             {
-                salesCatalogServiceResponse.Value.ResponseBody = new V2SalesCatalogueProductResponse
+                salesCatalogueServiceResponse.Value.ResponseBody = new V2SalesCatalogueProductResponse
                 {
                     Products = [],
                     ProductCounts = new ProductCounts()
                 };
-                salesCatalogServiceResponse.Value.ResponseBody.ProductCounts.ReturnedProductCount = 0;
-                salesCatalogServiceResponse.Value.ResponseBody.ProductCounts.RequestedProductsNotReturned = [];
-                salesCatalogServiceResponse.Value.ResponseBody.ProductCounts.RequestedProductCount = salesCatalogServiceResponse.Value.ResponseBody.ProductCounts.RequestedProductsAlreadyUpToDateCount = productVersionsRequest.ProductVersions.Count();
+                salesCatalogueServiceResponse.Value.ResponseBody.ProductCounts.ReturnedProductCount = 0;
+                salesCatalogueServiceResponse.Value.ResponseBody.ProductCounts.RequestedProductsNotReturned = [];
+                salesCatalogueServiceResponse.Value.ResponseBody.ProductCounts.RequestedProductCount = salesCatalogueServiceResponse.Value.ResponseBody.ProductCounts.RequestedProductsAlreadyUpToDateCount = productVersionsRequest.ProductVersions.Count();
             }
 
-            if (salesCatalogServiceResponse.Value?.ResponseCode == HttpStatusCode.NotModified || salesCatalogServiceResponse.IsSuccess)
+            if (salesCatalogueServiceResponse.Value?.ResponseCode == HttpStatusCode.NotModified || salesCatalogueServiceResponse.IsSuccess)
             {
                 var fssBatchResponse = await CreateFssBatchAsync(_userIdentifier.UserIdentity, correlationId);
                 if (fssBatchResponse.ResponseCode != HttpStatusCode.Created)
@@ -177,13 +177,13 @@ namespace UKHO.ExchangeSetService.API.Services.V2
                     return ServiceResponseResult<ExchangeSetStandardServiceResponse>.InternalServerError();
                 }
 
-                var essResponse = SetExchangeSetStandardResponse(productVersionsRequest, salesCatalogServiceResponse, fssBatchResponse);
+                var essResponse = SetExchangeSetStandardResponse(productVersionsRequest, salesCatalogueServiceResponse, fssBatchResponse);
 
                 var expiryDate = essResponse.Value.ExchangeSetStandardResponse.ExchangeSetUrlExpiryDateTime.Value.ToString("yyyy-MM-ddTHH:mm:ss.fffZ", CultureInfo.InvariantCulture);
 
                 CheckEmptyExchangeSet(essResponse.Value);
 
-                var success = await SaveSalesCatalogueStorageDetails(salesCatalogServiceResponse.Value.ResponseBody, fssBatchResponse.ResponseBody.BatchId, callbackUri, productType, correlationId, expiryDate, salesCatalogServiceResponse.Value.ScsRequestDateTime, isEmptyExchangeSet, essResponse.Value.ExchangeSetStandardResponse, apiVersion);
+                var success = await SaveSalesCatalogueStorageDetails(salesCatalogueServiceResponse.Value.ResponseBody, fssBatchResponse.ResponseBody.BatchId, callbackUri, productType, correlationId, expiryDate, salesCatalogueServiceResponse.Value.ScsRequestDateTime, isEmptyExchangeSet, essResponse.Value.ExchangeSetStandardResponse, apiVersion);
                 if (!success)
                 {
                     _logger.LogInformation(EventIds.CreateProductVersionError.ToEventId(), "ProcessProductVersionsRequestAsync failed for BatchId:{BatchId} | _X-Correlation-ID : {CorrelationId}", fssBatchResponse.ResponseBody.BatchId, correlationId);
@@ -192,7 +192,7 @@ namespace UKHO.ExchangeSetService.API.Services.V2
                 return essResponse;
             }
 
-            return SetExchangeSetStandardResponse(productVersionsRequest, salesCatalogServiceResponse);
+            return SetExchangeSetStandardResponse(productVersionsRequest, salesCatalogueServiceResponse);
         }
 
         /// <summary>
@@ -222,9 +222,9 @@ namespace UKHO.ExchangeSetService.API.Services.V2
                 return validationResult;
             }
 
-            var salesCatalogServiceResponse = await _salesCatalogueService.GetProductsFromUpdatesSinceAsync(apiVersion, productType, updatesSinceRequest, correlationId, cancellationToken);
+            var salesCatalogueServiceResponse = await _salesCatalogueService.GetProductsFromUpdatesSinceAsync(apiVersion, productType, updatesSinceRequest, correlationId, cancellationToken);
 
-            if (salesCatalogServiceResponse.IsSuccess)
+            if (salesCatalogueServiceResponse.IsSuccess)
             {
                 var fssBatchResponse = await CreateFssBatchAsync(_userIdentifier.UserIdentity, correlationId);
                 if (fssBatchResponse.ResponseCode != HttpStatusCode.Created)
@@ -232,13 +232,13 @@ namespace UKHO.ExchangeSetService.API.Services.V2
                     return ServiceResponseResult<ExchangeSetStandardServiceResponse>.InternalServerError();
                 }
 
-                var essResponse = SetExchangeSetStandardResponse(updatesSinceRequest, salesCatalogServiceResponse, fssBatchResponse);
+                var essResponse = SetExchangeSetStandardResponse(updatesSinceRequest, salesCatalogueServiceResponse, fssBatchResponse);
 
                 var expiryDate = essResponse.Value.ExchangeSetStandardResponse.ExchangeSetUrlExpiryDateTime.Value.ToString("yyyy-MM-ddTHH:mm:ss.fffZ", CultureInfo.InvariantCulture);
 
                 CheckEmptyExchangeSet(essResponse.Value);
 
-                var success = await SaveSalesCatalogueStorageDetails(salesCatalogServiceResponse.Value.ResponseBody, fssBatchResponse.ResponseBody.BatchId, callbackUri, productType, correlationId, expiryDate, salesCatalogServiceResponse.Value.ScsRequestDateTime, isEmptyExchangeSet, essResponse.Value.ExchangeSetStandardResponse, apiVersion, productIdentifier);
+                var success = await SaveSalesCatalogueStorageDetails(salesCatalogueServiceResponse.Value.ResponseBody, fssBatchResponse.ResponseBody.BatchId, callbackUri, productType, correlationId, expiryDate, salesCatalogueServiceResponse.Value.ScsRequestDateTime, isEmptyExchangeSet, essResponse.Value.ExchangeSetStandardResponse, apiVersion, productIdentifier);
                 if (!success)
                 {
                     _logger.LogInformation(EventIds.CreateUpdateSinceError.ToEventId(), "ProcessUpdatesSinceRequestAsync failed for BatchId:{BatchId} | _X-Correlation-ID : {CorrelationId}", fssBatchResponse.ResponseBody.BatchId, correlationId);
@@ -247,7 +247,7 @@ namespace UKHO.ExchangeSetService.API.Services.V2
                 return essResponse;
             }
 
-            return SetExchangeSetStandardResponse(updatesSinceRequest, salesCatalogServiceResponse);
+            return SetExchangeSetStandardResponse(updatesSinceRequest, salesCatalogueServiceResponse);
         }
 
         /// <summary>

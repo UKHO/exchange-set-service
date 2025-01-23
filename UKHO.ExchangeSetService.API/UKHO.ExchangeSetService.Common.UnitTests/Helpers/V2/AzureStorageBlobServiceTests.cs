@@ -50,7 +50,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers.V2
         }
 
         [Test]
-        public async Task WhenSuccessful_ThenShouldStoreResponseAndAddQueueMessage()
+        public async Task WhenSuccessfulStoredResponseToBlobAndToQueue_ThenResponseTrue()
         {
             var containerName = "FakeContainer";
             var batchId = "FakeBatchId";
