@@ -1,10 +1,11 @@
-﻿using Azure.Storage.Queues;
+﻿using System;
+using System.Diagnostics.CodeAnalysis;
+using System.Text;
+using System.Threading.Tasks;
+using Azure.Storage.Queues;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Microsoft.Extensions.Diagnostics.HealthChecks;
-using System;
-using System.Diagnostics.CodeAnalysis;
-using System.Threading.Tasks;
 using UKHO.ExchangeSetService.Common.Configuration;
 using UKHO.ExchangeSetService.Common.Logging;
 
@@ -50,7 +51,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             QueueClient queueClient = new QueueClient(storageAccountConnectionString, queue);
 
             // convert message to base64string          
-            var messageBase64String = System.Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes(message));
+            var messageBase64String = Convert.ToBase64String(Encoding.UTF8.GetBytes(message));
             // Send a message to the queue
             await queueClient.SendMessageAsync(messageBase64String);
             logger.LogInformation(EventIds.AddedMessageInQueue.ToEventId(), "Added message in Queue:{queue} for BatchId:{batchId} and _X-Correlation-ID:{CorrelationId}", queue, batchId, correlationId);
