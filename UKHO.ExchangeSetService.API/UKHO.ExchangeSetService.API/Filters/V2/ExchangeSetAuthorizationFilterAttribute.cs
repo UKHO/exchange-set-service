@@ -16,8 +16,8 @@ namespace UKHO.ExchangeSetService.API.Filters.V2
 
         public override async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
         {
-            if (!TryGetExchangeSetStandard(context, out var productType) ||
-                !TryParseExchangeSetStandard(productType, out ExchangeSetStandard parsedEnum) ||
+            if (!TryGetExchangeSetStandard(context, out var exchangeSetStandard) ||
+                !TryParseExchangeSetStandard(exchangeSetStandard, out ExchangeSetStandard parsedEnum) ||
                 !IsValidExchangeSetStandard(parsedEnum))
             {
                 SetBadRequestResponse(context);
