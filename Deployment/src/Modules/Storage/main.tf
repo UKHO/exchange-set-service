@@ -16,7 +16,7 @@ resource "azurerm_storage_account" "ess_storage" {
 }
 
 resource "azurerm_storage_container" "ess_storage_container" {
-  name                               = "${var.service_name}-fulfilment"
+  name                               = "${var.service_name}-fulfilment-container"
   storage_account_name               = azurerm_storage_account.ess_storage.name
 }
 
