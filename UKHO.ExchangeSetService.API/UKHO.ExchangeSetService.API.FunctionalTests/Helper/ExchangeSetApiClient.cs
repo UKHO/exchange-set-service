@@ -38,7 +38,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
             switch (exchangeSetStandard)
             {
                 case "s100":
-                    uri = $"{apiHost}/v2/productType/s100/updatesSince?productIdentifier={productIdentifier}";
+                    uri = $"{apiHost}/v2/exchangeSet/s100/updatesSince?productIdentifier={productIdentifier}";
                     payloadJson = JsonConvert.SerializeObject(updatesSinceModel);
                     break;
 
@@ -84,7 +84,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
             switch (exchangeSetStandard)
             {
                 case "s100":
-                    uri = $"{apiHost}/v2/productType/s100/productVersions";
+                    uri = $"{apiHost}/v2/exchangeSet/s100/productVersions";
                     break;
 
                 default:
@@ -121,7 +121,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
             switch (exchangeSetStandard)
             {
                 case "s100":
-                    uri = $"{apiHost}/v2/productType/s100/productNames";
+                    uri = $"{apiHost}/v2/exchangeSet/s100/productNames";
                     break;
 
                 default:
