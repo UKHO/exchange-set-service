@@ -910,7 +910,39 @@ namespace UKHO.ExchangeSetService.Common.Logging
         /// <summary>
         /// 805223 - Request for sales catalogue service product names endpoint is completed.
         /// </summary>
-        SCSPostProductNamesRequestCompleted = 805223
+        SCSPostProductNamesRequestCompleted = 805223,
+        /// <summary>
+        /// 805224 - Request for storing sales catalogue service response in blob storage is started.
+        /// </summary>
+        StoreResponseRequestStart = 805224,
+        /// <summary>
+        /// 805225 - Request for storing sales catalogue service response in blob storage is completed.
+        /// </summary>
+        StoreResponseRequestCompleted = 805225,
+        /// <summary>
+        /// 805226 - Response is stored successfully in blob storage.
+        /// </summary>
+        ResponseStoredToBlobStorage = 805226,
+        /// <summary>
+        /// 805227 - Response failed to store in blob storage.
+        /// </summary>
+        ResponseFailedStoredToBlobStorage = 805227,
+        /// <summary>
+        /// 805228 - Create Product Name request failed.
+        /// </summary>
+        CreateProductNamesError = 805228,
+        /// <summary>
+        /// 805229 - Create Product version request failed.
+        /// </summary>
+        CreateProductVersionError = 805229,
+        /// <summary>
+        /// 805230 - Create Update since request failed.
+        /// </summary>
+        CreateUpdateSinceError = 805230,
+        /// <summary>
+        /// 805231 - Failed to upload stream to blob
+        /// </summary>
+        StreamUploadFailed = 805231
         #endregion
     }
 

@@ -25,5 +25,10 @@ namespace UKHO.ExchangeSetService.Common.Configuration
         public double LargeMediaExchangeSetSizeInMB { get; set; }
         public string WebAppVersion { get; set; }
         public double S57ExchangeSetSizeInMB { get; set; }
+        public string ExchangeSetQueueName { get; set; }
+        public string ExchangeSetStorageAccountName { get; set; }
+        public string ExchangeSetStorageAccountKey { get; set; }
+        public string ExchangeSetStorageContainerName { get; set; }
+
     }
 }

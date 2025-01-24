@@ -22,7 +22,9 @@ using UKHO.ExchangeSetService.Common.Models.Enums;
 using UKHO.ExchangeSetService.Common.Models.FileShareService.Response;
 using UKHO.ExchangeSetService.Common.Models.Response;
 using UKHO.ExchangeSetService.Common.Models.SalesCatalogue;
+using UKHO.ExchangeSetService.Common.Models.SalesCatalogue.V2;
 using UKHO.ExchangeSetService.Common.Models.V2.Request;
+using UKHO.ExchangeSetService.Common.Storage.V2;
 using IFileShareService = UKHO.ExchangeSetService.Common.Helpers.IFileShareService;
 using ISalesCatalogueService = UKHO.ExchangeSetService.Common.Helpers.V2.ISalesCatalogueService;
 using ProductType = UKHO.ExchangeSetService.Common.Models.V2.Enums.ProductType;
@@ -43,6 +45,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services.V2
         private ISalesCatalogueService _fakeSalesCatalogueService;
         private IFileShareService _fakeFileShareService;
         private UserIdentifier _fakeUserIdentifier;
+        private IExchangeSetServiceStorageProvider _fakeExchangeSetServiceStorageProvider;
 
         private ExchangeSetStandardService _service;
 
@@ -56,6 +59,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services.V2
             _fakeSalesCatalogueService = A.Fake<ISalesCatalogueService>();
             _fakeFileShareService = A.Fake<IFileShareService>();
             _fakeUserIdentifier = A.Fake<UserIdentifier>();
+            _fakeExchangeSetServiceStorageProvider= A.Fake<IExchangeSetServiceStorageProvider>();
 
             _service = new ExchangeSetStandardService(
                 _fakeLogger,
@@ -64,32 +68,36 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services.V2
                 _fakeProductNameValidator,
                 _fakeSalesCatalogueService,
                 _fakeFileShareService,
-                _fakeUserIdentifier);
+                _fakeUserIdentifier,
+                _fakeExchangeSetServiceStorageProvider);
         }
 
         [Test]
         public void WhenParameterIsNull_ThenConstructorThrowsArgumentNullException()
         {
-            Action nullLogger = () => new ExchangeSetStandardService(null, _fakeUpdatesSinceValidator, _fakeProductVersionsValidator, _fakeProductNameValidator, _fakeSalesCatalogueService, _fakeFileShareService, _fakeUserIdentifier);
+            Action nullLogger = () => new ExchangeSetStandardService(null, _fakeUpdatesSinceValidator, _fakeProductVersionsValidator, _fakeProductNameValidator, _fakeSalesCatalogueService, _fakeFileShareService, _fakeUserIdentifier, _fakeExchangeSetServiceStorageProvider);
             nullLogger.Should().ThrowExactly<ArgumentNullException>().And.ParamName.Should().Be("logger");
 
-            Action nullUpdatesSinceValidator = () => new ExchangeSetStandardService(_fakeLogger, null, _fakeProductVersionsValidator, _fakeProductNameValidator, _fakeSalesCatalogueService, _fakeFileShareService, _fakeUserIdentifier);
+            Action nullUpdatesSinceValidator = () => new ExchangeSetStandardService(_fakeLogger, null, _fakeProductVersionsValidator, _fakeProductNameValidator, _fakeSalesCatalogueService, _fakeFileShareService, _fakeUserIdentifier, _fakeExchangeSetServiceStorageProvider);
             nullUpdatesSinceValidator.Should().ThrowExactly<ArgumentNullException>().And.ParamName.Should().Be("updatesSinceValidator");
 
-            Action nullProductVersionsValidator = () => new ExchangeSetStandardService(_fakeLogger, _fakeUpdatesSinceValidator, null, _fakeProductNameValidator, _fakeSalesCatalogueService, _fakeFileShareService, _fakeUserIdentifier);
+            Action nullProductVersionsValidator = () => new ExchangeSetStandardService(_fakeLogger, _fakeUpdatesSinceValidator, null, _fakeProductNameValidator, _fakeSalesCatalogueService, _fakeFileShareService, _fakeUserIdentifier, _fakeExchangeSetServiceStorageProvider);
             nullProductVersionsValidator.Should().ThrowExactly<ArgumentNullException>().And.ParamName.Should().Be("productVersionsValidator");
 
-            Action nullProductNamesValidator = () => new ExchangeSetStandardService(_fakeLogger, _fakeUpdatesSinceValidator, _fakeProductVersionsValidator, null, _fakeSalesCatalogueService, _fakeFileShareService, _fakeUserIdentifier);
+            Action nullProductNamesValidator = () => new ExchangeSetStandardService(_fakeLogger, _fakeUpdatesSinceValidator, _fakeProductVersionsValidator, null, _fakeSalesCatalogueService, _fakeFileShareService, _fakeUserIdentifier, _fakeExchangeSetServiceStorageProvider);
             nullProductNamesValidator.Should().ThrowExactly<ArgumentNullException>().And.ParamName.Should().Be("productNameValidator");
 
-            var nullSalesCatalogueService = () => new ExchangeSetStandardService(_fakeLogger, _fakeUpdatesSinceValidator, _fakeProductVersionsValidator, _fakeProductNameValidator, null, _fakeFileShareService, _fakeUserIdentifier);
+            var nullSalesCatalogueService = () => new ExchangeSetStandardService(_fakeLogger, _fakeUpdatesSinceValidator, _fakeProductVersionsValidator, _fakeProductNameValidator, null, _fakeFileShareService, _fakeUserIdentifier, _fakeExchangeSetServiceStorageProvider);
             nullSalesCatalogueService.Should().ThrowExactly<ArgumentNullException>().And.ParamName.Should().Be("salesCatalogueService");
 
-            var nullFileShareService = () => new ExchangeSetStandardService(_fakeLogger, _fakeUpdatesSinceValidator, _fakeProductVersionsValidator, _fakeProductNameValidator, _fakeSalesCatalogueService, null, _fakeUserIdentifier);
+            var nullFileShareService = () => new ExchangeSetStandardService(_fakeLogger, _fakeUpdatesSinceValidator, _fakeProductVersionsValidator, _fakeProductNameValidator, _fakeSalesCatalogueService, null, _fakeUserIdentifier, _fakeExchangeSetServiceStorageProvider);
             nullFileShareService.Should().ThrowExactly<ArgumentNullException>().And.ParamName.Should().Be("fileShareService");
 
-            var nullUserIdentifier = () => new ExchangeSetStandardService(_fakeLogger, _fakeUpdatesSinceValidator, _fakeProductVersionsValidator, _fakeProductNameValidator, _fakeSalesCatalogueService, _fakeFileShareService, null);
+            var nullUserIdentifier = () => new ExchangeSetStandardService(_fakeLogger, _fakeUpdatesSinceValidator, _fakeProductVersionsValidator, _fakeProductNameValidator, _fakeSalesCatalogueService, _fakeFileShareService, null, _fakeExchangeSetServiceStorageProvider);
             nullUserIdentifier.Should().ThrowExactly<ArgumentNullException>().And.ParamName.Should().Be("userIdentifier");
+
+            var nullExchangeSetServiceStorageProvider = () => new ExchangeSetStandardService(_fakeLogger, _fakeUpdatesSinceValidator, _fakeProductVersionsValidator, _fakeProductNameValidator, _fakeSalesCatalogueService, _fakeFileShareService, _fakeUserIdentifier, null);
+            nullExchangeSetServiceStorageProvider.Should().ThrowExactly<ArgumentNullException>().And.ParamName.Should().Be("exchangeSetServiceStorageProvider");
         }
 
         [Test]
@@ -101,7 +109,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services.V2
                 .Returns(new ValidationResult());
 
             A.CallTo(() => _fakeSalesCatalogueService.GetProductsFromUpdatesSinceAsync(A<ApiVersion>.Ignored, A<string>.Ignored, A<UpdatesSinceRequest>.Ignored, A<string>.Ignored, A<CancellationToken>.Ignored))
-                .Returns(ServiceResponseResult<SalesCatalogueResponse>.Success(GetSalesCatalogueResponse()));
+                .Returns(ServiceResponseResult<V2SalesCatalogueResponse>.Success(GetSalesCatalogueResponse()));
 
             A.CallTo(() => _fakeFileShareService.CreateBatch(A<string>.Ignored, A<string>.Ignored))
                 .Returns(GetCreateBatchResponse());
@@ -127,7 +135,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services.V2
                 .Returns(new ValidationResult());
 
             A.CallTo(() => _fakeSalesCatalogueService.GetProductsFromUpdatesSinceAsync(A<ApiVersion>.Ignored, A<string>.Ignored, A<UpdatesSinceRequest>.Ignored, A<string>.Ignored, A<CancellationToken>.Ignored))
-                .Returns(ServiceResponseResult<SalesCatalogueResponse>.NotModified(new SalesCatalogueResponse()));
+                .Returns(ServiceResponseResult<V2SalesCatalogueResponse>.NotModified(new V2SalesCatalogueResponse()));
 
             var result = await _service.ProcessUpdatesSinceRequestAsync(updatesSinceRequest, ApiVersion.V2, ProductType.s100.ToString(), "s101", CallbackUri, _fakeCorrelationId, CancellationToken.None);
 
@@ -159,9 +167,9 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services.V2
                 .Returns(
                             httpStatusCode switch
                             {
-                                HttpStatusCode.BadRequest => ServiceResponseResult<SalesCatalogueResponse>.BadRequest(new ErrorDescription { CorrelationId = _fakeCorrelationId, Errors = [] }),
-                                HttpStatusCode.NotFound => ServiceResponseResult<SalesCatalogueResponse>.NotFound(new ErrorResponse { CorrelationId = _fakeCorrelationId, Detail = "Not found" }),
-                                _ => ServiceResponseResult<SalesCatalogueResponse>.InternalServerError()
+                                HttpStatusCode.BadRequest => ServiceResponseResult<V2SalesCatalogueResponse>.BadRequest(new ErrorDescription { CorrelationId = _fakeCorrelationId, Errors = [] }),
+                                HttpStatusCode.NotFound => ServiceResponseResult<V2SalesCatalogueResponse>.NotFound(new ErrorResponse { CorrelationId = _fakeCorrelationId, Detail = "Not found"}),
+                                _ => ServiceResponseResult<V2SalesCatalogueResponse>.InternalServerError()
                             });
 
             var result = await _service.ProcessUpdatesSinceRequestAsync(updatesSinceRequest, ApiVersion.V2, ProductType.s100.ToString(), "s101", CallbackUri, _fakeCorrelationId, CancellationToken.None);
@@ -230,7 +238,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services.V2
                 .Returns(new ValidationResult());
 
             A.CallTo(() => _fakeSalesCatalogueService.GetProductsFromUpdatesSinceAsync(A<ApiVersion>.Ignored, A<string>.Ignored, A<UpdatesSinceRequest>.Ignored, A<string>.Ignored, A<CancellationToken>.Ignored))
-                .Returns(ServiceResponseResult<SalesCatalogueResponse>.Success(GetSalesCatalogueResponse()));
+                .Returns(ServiceResponseResult<V2SalesCatalogueResponse>.Success(GetSalesCatalogueResponse()));
 
             A.CallTo(() => _fakeFileShareService.CreateBatch(A<string>.Ignored, A<string>.Ignored))
                 .Returns(new CreateBatchResponse { ResponseCode = HttpStatusCode.BadRequest });
@@ -286,7 +294,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services.V2
 
             A.CallTo(() => _fakeProductNameValidator.Validate(A<ProductNameRequest>.Ignored)).Returns(new ValidationResult());
             A.CallTo(() => _fakeSalesCatalogueService.PostProductNamesAsync(A<ApiVersion>.Ignored, A<string>.Ignored, A<IEnumerable<string>>.Ignored, A<string>.Ignored, A<CancellationToken>.Ignored))
-                .Returns(ServiceResponseResult<SalesCatalogueResponse>
+                .Returns(ServiceResponseResult<V2SalesCatalogueResponse>
                 .Success(GetSalesCatalogueResponse()));
             A.CallTo(() => _fakeFileShareService.CreateBatch(A<string>.Ignored, A<string>.Ignored))
                 .Returns(GetCreateBatchResponse());
@@ -310,7 +318,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services.V2
             A.CallTo(() => _fakeProductNameValidator.Validate(A<ProductNameRequest>.Ignored)).Returns(new ValidationResult());
 
             A.CallTo(() => _fakeSalesCatalogueService.PostProductNamesAsync(A<ApiVersion>.Ignored, A<string>.Ignored, A<IEnumerable<string>>.Ignored, A<string>.Ignored, A<CancellationToken>.Ignored))
-                .Returns(ServiceResponseResult<SalesCatalogueResponse>
+                .Returns(ServiceResponseResult<V2SalesCatalogueResponse>
                 .Success(GetSalesCatalogueResponse()));
 
             A.CallTo(() => _fakeFileShareService.CreateBatch(A<string>.Ignored, A<string>.Ignored))
@@ -335,7 +343,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services.V2
             A.CallTo(() => _fakeProductNameValidator.Validate(A<ProductNameRequest>.Ignored)).Returns(new ValidationResult());
 
             A.CallTo(() => _fakeSalesCatalogueService.PostProductNamesAsync(A<ApiVersion>.Ignored, A<string>.Ignored, A<IEnumerable<string>>.Ignored, A<string>.Ignored, A<CancellationToken>.Ignored))
-                .Returns(ServiceResponseResult<SalesCatalogueResponse>
+                .Returns(ServiceResponseResult<V2SalesCatalogueResponse>
                 .Success(GetSalesCatalogueResponse()));
 
             A.CallTo(() => _fakeFileShareService.CreateBatch(A<string>.Ignored, A<string>.Ignored))
@@ -357,7 +365,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services.V2
         {
             string[] productNames = { "Product1" };
 
-            var salesCatalogueResponse = ServiceResponseResult<SalesCatalogueResponse>.BadRequest(GetBadRequestResponse());
+            var salesCatalogueResponse = ServiceResponseResult<V2SalesCatalogueResponse>.BadRequest(GetBadRequestResponse());
 
             A.CallTo(() => _fakeSalesCatalogueService.PostProductNamesAsync(A<ApiVersion>.Ignored, A<string>.Ignored, A<IEnumerable<string>>.Ignored, A<string>.Ignored, A<CancellationToken>.Ignored))
                 .Returns(salesCatalogueResponse);
@@ -384,7 +392,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services.V2
                 .Returns(new ValidationResult());
 
             A.CallTo(() => _fakeSalesCatalogueService.PostProductVersionsAsync(A<ApiVersion>.Ignored, A<string>.Ignored, A<IEnumerable<ProductVersionRequest>>.Ignored, A<string>.Ignored, A<CancellationToken>.Ignored))
-               .Returns(ServiceResponseResult<SalesCatalogueResponse>.Success(GetSalesCatalogueServiceResponseForProductVersions(HttpStatusCode.OK)));
+               .Returns(ServiceResponseResult<V2SalesCatalogueResponse>.Success(GetSalesCatalogueServiceResponseForProductVersions(HttpStatusCode.OK)));
 
             A.CallTo(() => _fakeFileShareService.CreateBatch(A<string>.Ignored, A<string>.Ignored))
                 .Returns(GetCreateBatchResponse());
@@ -412,7 +420,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services.V2
                 .Returns(new ValidationResult());
 
             A.CallTo(() => _fakeSalesCatalogueService.PostProductVersionsAsync(A<ApiVersion>.Ignored, A<string>.Ignored, A<IEnumerable<ProductVersionRequest>>.Ignored, A<string>.Ignored, A<CancellationToken>.Ignored))
-               .Returns(ServiceResponseResult<SalesCatalogueResponse>.NotModified(GetSalesCatalogueServiceResponseForProductVersions(HttpStatusCode.NotModified)));
+               .Returns(ServiceResponseResult<V2SalesCatalogueResponse>.NotModified(GetSalesCatalogueServiceResponseForProductVersions(HttpStatusCode.NotModified)));
 
             A.CallTo(() => _fakeFileShareService.CreateBatch(A<string>.Ignored, A<string>.Ignored))
                 .Returns(GetCreateBatchResponse());
@@ -444,7 +452,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services.V2
                 .Returns(new ValidationResult());
 
             A.CallTo(() => _fakeSalesCatalogueService.PostProductVersionsAsync(A<ApiVersion>.Ignored, A<string>.Ignored, A<IEnumerable<ProductVersionRequest>>.Ignored, A<string>.Ignored, A<CancellationToken>.Ignored))
-                .Returns(ServiceResponseResult<SalesCatalogueResponse>.BadRequest(GetBadRequestResponse()));
+                .Returns(ServiceResponseResult<V2SalesCatalogueResponse>.BadRequest(GetBadRequestResponse()));
 
             var result = await _service.ProcessProductVersionsRequestAsync(productVersions, ApiVersion.V2, ProductType.s100.ToString(), CallbackUri, _fakeCorrelationId, CancellationToken.None);
 
@@ -469,9 +477,9 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services.V2
                 .Returns(
                             httpStatusCode switch
                             {
-                                HttpStatusCode.BadRequest => ServiceResponseResult<SalesCatalogueResponse>.BadRequest(new ErrorDescription { CorrelationId = _fakeCorrelationId, Errors = [] }),
-                                HttpStatusCode.NotFound => ServiceResponseResult<SalesCatalogueResponse>.NotFound(new ErrorResponse { CorrelationId = _fakeCorrelationId, Detail = "Not found" }),
-                                _ => ServiceResponseResult<SalesCatalogueResponse>.InternalServerError()
+                                HttpStatusCode.BadRequest => ServiceResponseResult<V2SalesCatalogueResponse>.BadRequest(new ErrorDescription { CorrelationId = _fakeCorrelationId, Errors = [] }),
+                                HttpStatusCode.NotFound => ServiceResponseResult<V2SalesCatalogueResponse>.NotFound(new ErrorResponse { CorrelationId = _fakeCorrelationId, Detail = "Not found" }),
+                                _ => ServiceResponseResult<V2SalesCatalogueResponse>.InternalServerError()
                             });
 
             var result = await _service.ProcessProductVersionsRequestAsync(productVersions, ApiVersion.V2, ProductType.s100.ToString(), CallbackUri, _fakeCorrelationId, CancellationToken.None);
@@ -550,7 +558,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services.V2
                 .Returns(new ValidationResult());
 
             A.CallTo(() => _fakeSalesCatalogueService.PostProductVersionsAsync(A<ApiVersion>.Ignored, A<string>.Ignored, A<IEnumerable<ProductVersionRequest>>.Ignored, A<string>.Ignored, A<CancellationToken>.Ignored))
-                .Returns(ServiceResponseResult<SalesCatalogueResponse>.Success(GetSalesCatalogueServiceResponseForProductVersions(HttpStatusCode.OK)));
+                .Returns(ServiceResponseResult<V2SalesCatalogueResponse>.Success(GetSalesCatalogueServiceResponseForProductVersions(HttpStatusCode.OK)));
 
             A.CallTo(() => _fakeFileShareService.CreateBatch(A<string>.Ignored, A<string>.Ignored))
                 .Returns(new CreateBatchResponse { ResponseCode = HttpStatusCode.BadRequest });
@@ -587,12 +595,12 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services.V2
                 });
         }
 
-        private static SalesCatalogueResponse GetSalesCatalogueResponse()
+        private static V2SalesCatalogueResponse GetSalesCatalogueResponse()
         {
-            return new SalesCatalogueResponse
+            return new V2SalesCatalogueResponse
             {
                 ResponseCode = HttpStatusCode.OK,
-                ResponseBody = new SalesCatalogueProductResponse
+                ResponseBody = new V2SalesCatalogueProductResponse
                 {
                     ProductCounts = new ProductCounts
                     {
@@ -603,8 +611,8 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services.V2
                                 new RequestedProductsNotReturned { ProductName = "102NO32904820801012", Reason = "invalidProduct" }
                             ]
                     },
-                    Products = [
-                            new Products
+                    Products = new List<V2Products> {
+                            new()
                             {
                                 ProductName = "productName",
                                 EditionNumber = 2,
@@ -615,23 +623,23 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services.V2
                                 },
                                 FileSize = 900000000
                             }
-                        ]
+                    }
                 },
                 ScsRequestDateTime = DateTime.UtcNow
             };
         }
 
-        private static SalesCatalogueResponse GetSalesCatalogueServiceResponseForProductVersions(HttpStatusCode httpStatusCode)
+        private static V2SalesCatalogueResponse GetSalesCatalogueServiceResponseForProductVersions(HttpStatusCode httpStatusCode)
         {
             return httpStatusCode switch
             {
                 HttpStatusCode.OK =>
-                    new SalesCatalogueResponse
+                    new V2SalesCatalogueResponse
                     {
                         ResponseCode = HttpStatusCode.OK,
                         ScsRequestDateTime = DateTime.UtcNow,
                         LastModified = DateTime.UtcNow,
-                        ResponseBody = new SalesCatalogueProductResponse
+                        ResponseBody = new V2SalesCatalogueProductResponse
                         {
                             ProductCounts = new ProductCounts
                             {
@@ -641,7 +649,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services.V2
                                 RequestedProductsNotReturned = []
                             },
                             Products = [
-                               new Products {
+                               new V2Products {
                                 ProductName = "101GB40079ABCDEFG",
                                 EditionNumber = 7,
                                 UpdateNumbers = [11, 12],
@@ -653,12 +661,12 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services.V2
                         }
                     },
                 HttpStatusCode.NotModified =>
-                new SalesCatalogueResponse
+                new V2SalesCatalogueResponse
                 {
                     ResponseCode = HttpStatusCode.NotModified,
                     ScsRequestDateTime = DateTime.UtcNow,
                     LastModified = DateTime.UtcNow,
-                    ResponseBody = new SalesCatalogueProductResponse
+                    ResponseBody = new V2SalesCatalogueProductResponse
                     {
                         Products = [],
                         ProductCounts = new ProductCounts()
