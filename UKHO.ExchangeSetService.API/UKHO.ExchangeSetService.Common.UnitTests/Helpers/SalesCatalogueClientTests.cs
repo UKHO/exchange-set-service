@@ -35,6 +35,12 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
             _salesCatalogueClient = new SalesCatalogueClient(_httpClientFactory);
         }
 
+        [TearDown]
+        public void TearDown()
+        {
+            _httpClient?.Dispose();
+        }
+
         [Test]
         public async Task WhenValidDataIsPassed_ThenCallSalesCatalogueServiceApiReturnsOkHttpResponseMessage()
         {

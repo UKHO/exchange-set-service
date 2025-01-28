@@ -1,0 +1,153 @@
+parameters:
+- name: Environment
+  type: string
+- name: AzureSubscription
+  type: string
+- name: LiveOrNonLive
+  type: string
+  default: "NonLive"  
+- name: ContinueEvenIfResourcesAreGettingDestroyed
+  type: boolean
+  default: false
+- name: Container
+  type: string
+- name: RunTests
+  type: boolean
+  default: false
+- name: pathSuffix
+  type: string
+  default: ""
+- name: v2Modifier
+  type: string
+  default: ""
+
+jobs:
+- deployment: DeployApp${{parameters.v2Modifier}}
+  timeoutInMinutes: 75
+  displayName: "${{parameters.Environment}}${{parameters.pathSuffix}} - deploy terraform and dotnet App"
+  environment: "Ess-${{parameters.Environment}}"
+  pool: $(DeploymentPool)
+  container: ${{parameters.Container}}
+  workspace:
+    clean: all
+  variables:
+    - group: "ESS-Deployment-Variables-${{parameters.Environment}}"
+    - group: "ESS-${{parameters.Environment}}${{parameters.v2Modifier}}-Variables"
+    - name: "ESSAzureADConfiguration.ClientId"
+      value: $(ESSClientId)
+    - name: "ESSAzureADConfiguration.TenantId"
+      value: $(TenantId)
+    - name: "EssAuthorizationConfiguration.TenantId"
+      value: $(TenantId)
+    - name: "EssAuthorizationConfiguration.AutoTestClientId"
+      value: $(AutoTestClientId_Authed)
+    - name: "EssAuthorizationConfiguration.AutoTestClientSecret"
+      value: $(AutoTestClientSecret_Authed)
+    - name: "EssAuthorizationConfiguration.EssClientId"
+      value: $(ESSClientId)
+    - name: "EssAuthorizationConfiguration.AutoTestClientIdNoAuth"
+      value: $(AutoTestClientId_NoAuth)
+    - name: "EssAuthorizationConfiguration.AutoTestClientSecretNoAuth"
+      value: $(AutoTestClientSecret_NoAuth)
+    - name: "AzureAdB2CTestConfiguration.ClientSecret"
+      value: $(AUTOTEST-ESS-SECRET)
+  strategy:
+    runOnce:
+      deploy:
+        steps:
+          - checkout: self
+            submodules: recursive
+
+          - template: continuous-deployment${{parameters.pathSuffix}}.yml
+            parameters:
+              ContinueEvenIfResourcesAreGettingDestroyed: ${{ parameters.ContinueEvenIfResourcesAreGettingDestroyed }}
+              AzureSubscription: ${{parameters.AzureSubscription}}
+
+          - template: continuous-deployment-apim${{parameters.pathSuffix}}.yml
+            parameters:
+              ContinueEvenIfResourcesAreGettingDestroyed: ${{ parameters.ContinueEvenIfResourcesAreGettingDestroyed }}
+              AzureSubscription: "UKHO-APIM-SOLAS-${{parameters.LiveOrNonLive}}"
+              TerraformKeyVault: $(APIM_TERRAFORM_KEYVAULT)
+              APIMResourceGroup: $(APIM_RESOURCE_GROUP_NAME)
+              APIMServiceInstance: $(APIM_SERVICE_NAME)
+              tfstateStorageAccountName: $(APIM_TFSTATE_STORAGE_ACCOUNT_NAME)
+
+- deployment: FunctionalTests${{parameters.v2Modifier}}
+  dependsOn: DeployApp${{parameters.v2Modifier}}
+  displayName: "Run Functional Tests ${{parameters.pathSuffix}}"
+  environment: "Ess-${{parameters.Environment}}"
+  pool: $(DeploymentPool)
+  container: ${{parameters.Container}}
+  condition: ${{parameters.RunTests}}
+  variables:
+    - group: "ESS-${{parameters.Environment}}${{parameters.v2Modifier}}-Variables"
+    - group: "ESS-Deployment-Variables-${{parameters.Environment}}"
+    - name: "ESSAzureADConfiguration.ClientId"
+      value: $(ESSClientId)
+    - name: "ESSAzureADConfiguration.TenantId"
+      value: $(TenantId)
+    - name: "EssAuthorizationConfiguration.TenantId"
+      value: $(TenantId)
+    - name: "EssAuthorizationConfiguration.AutoTestClientId"
+      value: $(AutoTestClientId_Authed)
+    - name: "EssAuthorizationConfiguration.AutoTestClientSecret"
+      value: $(AutoTestClientSecret_Authed)
+    - name: "EssAuthorizationConfiguration.EssClientId"
+      value: $(ESSClientId)
+    - name: "EssAuthorizationConfiguration.AutoTestClientIdNoAuth"
+      value: $(AutoTestClientId_NoAuth)
+    - name: "EssAuthorizationConfiguration.AutoTestClientSecretNoAuth"
+      value: $(AutoTestClientSecret_NoAuth)
+    - name: "AzureAdB2CTestConfiguration.ClientSecret"
+      value: $(AUTOTEST-ESS-SECRET)
+    - name: EssApiUrl
+      value: $[ dependencies.DeployApp${{parameters.v2Modifier}}.outputs['DeployApp${{parameters.v2Modifier}}.TerraformDeploy.EssUrl']  ]
+    - name: WEB_APP_NAME
+      value: $[ dependencies.DeployApp${{parameters.v2Modifier}}.outputs['DeployApp${{parameters.v2Modifier}}.TerraformDeploy.WEBAPPNAME']  ]
+    - name: RESOURCE_GROUP_NAME
+      value: $[ dependencies.DeployApp${{parameters.v2Modifier}}.outputs['DeployApp${{parameters.v2Modifier}}.TerraformDeploy.RESOURCEGROUPNAME']  ]
+  strategy:
+    runOnce:
+      deploy:
+        steps:
+          - task: DownloadBuildArtifacts@0
+            displayName: "Download Terraform Artifact"
+            inputs:
+              buildType: 'current'
+              downloadType: 'single'
+              artifactName: 'terraformartifact'
+              downloadPath: '$(Build.SourcesDirectory)'
+
+          - task: DownloadBuildArtifacts@0
+            displayName: "Download Functional test Artifact"
+            inputs:
+              buildType: 'current'
+              downloadType: 'single'
+              artifactName: 'functionaltests'
+              downloadPath: '$(Build.SourcesDirectory)'
+
+          - task: FileTransform@2
+            displayName: "File Transform: functionaltests"
+            inputs:
+              folderPath: '$(Build.SourcesDirectory)/functionaltests/'
+              enableXmlTransform: false
+              xmlTransformationRules: ''
+              jsonTargetFiles: '**/appsettings.json'
+
+          - task: UseDotNet@2
+            displayName: 'Use .NET SDK'
+            inputs:
+              packageType: sdk
+              version: $(SdkVersion)
+
+          - task: DotNetCoreCLI@2
+            displayName: "Run Functional"
+            inputs:
+              command: "test"
+              projects: |
+                **/*FunctionalTest*.dll
+                !**/*TestAdapter.dll
+                !**/obj/**
+              arguments: '--filter Category!=QCOnlyTest-AIOEnabled&Category!=QCOnlyTest-AIODisabled'
+              testRunTitle: "Dev-AutomationTests"
+              workingDirectory: '$(Build.SourcesDirectory)/functionaltests'

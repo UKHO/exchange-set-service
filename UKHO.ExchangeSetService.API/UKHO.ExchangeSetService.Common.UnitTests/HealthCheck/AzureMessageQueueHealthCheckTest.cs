@@ -1,10 +1,10 @@
-﻿using FakeItEasy;
+﻿using System;
+using System.Threading.Tasks;
+using FakeItEasy;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using NUnit.Framework;
-using System;
-using System.Threading.Tasks;
 using UKHO.ExchangeSetService.Common.Configuration;
 using UKHO.ExchangeSetService.Common.HealthCheck;
 using UKHO.ExchangeSetService.Common.Helpers;
@@ -31,7 +31,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.HealthCheck
             this.fakeAzureBlobStorageService = A.Fake<IAzureBlobStorageService>();
 
             this.fakeEssFulfilmentStorageConfiguration = Options.Create(new EssFulfilmentStorageConfiguration()
-            { QueueName = "testessdevqueue", StorageAccountKey = "testaccountkey", StorageAccountName = "testessdevstorage", StorageContainerName = "testContainer", DynamicQueueName = "testDynamicQueue", ExchangeSetTypes= "test", WebAppVersion = "" });
+            { QueueName = "testessdevqueue", StorageAccountKey = "testaccountkey", StorageAccountName = "testessdevstorage", StorageContainerName = "testContainer", DynamicQueueName = "testDynamicQueue", ExchangeSetTypes = "test", WebAppVersion = "" });
 
             azureMessageQueueHealthCheck = new AzureMessageQueueHealthCheck(fakeAzureMessageQueueHelperClient, fakeSalesCatalogueStorageService, fakeEssFulfilmentStorageConfiguration, fakeLogger, fakeAzureBlobStorageService);
         }
@@ -46,13 +46,13 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.HealthCheck
         [Test]
         public async Task WhenAzureMessageQueueExists_ThenAzureMessageQueueIsHealthy()
         {
-            A.CallTo(() => fakeSalesCatalogueStorageService.GetStorageAccountConnectionString(string.Empty,string.Empty)).Returns(GetStorageAccountConnectionStringAndContainerName().Item1);
+            A.CallTo(() => fakeSalesCatalogueStorageService.GetStorageAccountConnectionString(string.Empty, string.Empty)).Returns(GetStorageAccountConnectionStringAndContainerName().Item1);
             A.CallTo(() => fakeAzureMessageQueueHelperClient.CheckMessageQueueHealth(A<string>.Ignored, A<string>.Ignored)).Returns(new HealthCheckResult(HealthStatus.Healthy, "Azure message queue is healthy"));
             A.CallTo(() => fakeAzureBlobStorageService.GetInstanceCountBasedOnExchangeSetType(A<ExchangeSetType>.Ignored)).Returns(1);
 
             var response = await azureMessageQueueHealthCheck.CheckHealthAsync(new HealthCheckContext());
 
-            Assert.That(HealthStatus.Healthy, Is.EqualTo(response.Status));
+            Assert.That(response.Status, Is.EqualTo(HealthStatus.Healthy));
         }
 
         [Test]
@@ -64,7 +64,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.HealthCheck
 
             var response = await azureMessageQueueHealthCheck.CheckHealthAsync(new HealthCheckContext());
 
-            Assert.That(HealthStatus.Unhealthy, Is.EqualTo(response.Status));
+            Assert.That(response.Status, Is.EqualTo(HealthStatus.Unhealthy));
         }
 
         [Test]
@@ -74,7 +74,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.HealthCheck
 
             var response = await azureMessageQueueHealthCheck.CheckHealthAsync(new HealthCheckContext());
 
-            Assert.That(HealthStatus.Unhealthy, Is.EqualTo(response.Status));
+            Assert.That(response.Status, Is.EqualTo(HealthStatus.Unhealthy));
         }
 
         [Test]
@@ -85,7 +85,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.HealthCheck
 
             var response = await azureMessageQueueHealthCheck.CheckHealthAsync(new HealthCheckContext());
 
-            Assert.That(HealthStatus.Unhealthy, Is.EqualTo(response.Status));
+            Assert.That(response.Status, Is.EqualTo(HealthStatus.Unhealthy));
         }
 
         [Test]
@@ -97,7 +97,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.HealthCheck
 
             var response = await azureMessageQueueHealthCheck.CheckHealthAsync(new HealthCheckContext());
 
-            Assert.That(HealthStatus.Unhealthy, Is.EqualTo(response.Status));
+            Assert.That(response.Status, Is.EqualTo(HealthStatus.Unhealthy));
         }
     }
 }

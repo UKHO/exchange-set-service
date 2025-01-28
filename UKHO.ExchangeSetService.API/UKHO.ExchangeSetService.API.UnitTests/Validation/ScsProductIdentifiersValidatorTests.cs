@@ -1,6 +1,6 @@
-﻿using NUnit.Framework;
-using System.Linq;
+﻿using System.Linq;
 using FluentValidation.TestHelper;
+using NUnit.Framework;
 using UKHO.ExchangeSetService.API.Validation;
 using UKHO.ExchangeSetService.Common.Models.Request;
 
@@ -54,7 +54,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Validation
                 ProductIdentifier = productIdentifiers,
             };
             var result = validator.TestValidate(model);
-            Assert.That(0, Is.EqualTo(result.Errors.Count));
+            Assert.That(result.Errors, Is.Empty);
         }
         #endregion
     }
