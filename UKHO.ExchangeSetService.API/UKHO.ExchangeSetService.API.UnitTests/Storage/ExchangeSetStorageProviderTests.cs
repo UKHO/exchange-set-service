@@ -81,7 +81,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Storage
             string correlationId = "a6670458-9bbc-4b52-95a2-d1f50fe9e3ae";
             A.CallTo(() => fakeAzureBlobStorageService.StoreSaleCatalogueServiceResponseAsync(A<string>.Ignored, A<string>.Ignored, A<SalesCatalogueProductResponse>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, cancellationToken, A<string>.Ignored, fakeScsRequestDateTime, A<bool>.Ignored, A<bool>.Ignored, A<ExchangeSetResponse>.Ignored)).Returns(true);
             isSCSResponseAdded = await service.SaveSalesCatalogueStorageDetails(salesCatalogueResponse, batchId, callBackUri, exchangeSetStandard.ToString(), correlationId, fakeExpiryDate, fakeScsRequestDateTime, fakeIsEmptyEncExchangeSet, fakeIsEmptyAioExchangeSet, exchangeSetResponse);
-            Assert.That(true, Is.EqualTo(isSCSResponseAdded));
+            Assert.That(isSCSResponseAdded, Is.EqualTo(true));
         }
 
         [Test]
@@ -98,7 +98,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Storage
             CancellationToken cancellationToken = CancellationToken.None;
             A.CallTo(() => fakeAzureBlobStorageService.StoreSaleCatalogueServiceResponseAsync(A<string>.Ignored, A<string>.Ignored, A<SalesCatalogueProductResponse>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, cancellationToken, A<string>.Ignored, fakeScsRequestDateTime, A<bool>.Ignored, A<bool>.Ignored, A<ExchangeSetResponse>.Ignored)).Returns(false);
             bool isSCSResponseAdded = await service.SaveSalesCatalogueStorageDetails(salesCatalogueResponse, batchId, callBackUri, exchangeSetStandard.ToString(), correlationId, fakeExpiryDate, fakeScsRequestDateTime, fakeIsEmptyEncExchangeSet, fakeIsEmptyAioExchangeSet, exchangeSetResponse);
-            Assert.That(false, Is.EqualTo(isSCSResponseAdded));
+            Assert.That(isSCSResponseAdded, Is.EqualTo(false));
         }
     }
 }
