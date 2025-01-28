@@ -76,6 +76,8 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
                                 Attributes = new List<Attribute>{ new() { Key = "s57-CRC", Value = "1234CRC" } } },
                 new() { Filename = "Test5.001", FileSize = 400, MimeType = "application/s63", Links = new Links { Get = new Link { Href = "" } },
                                 Attributes = new List<Attribute>{ new() { Key = "s57-CRC", Value = "1234CRC" } } },
+                new() { Filename = "Test6.000", FileSize = 400, MimeType = "application/s57", Links = new Links { Get = new Link { Href = "" } },
+                                Attributes = new List<Attribute>{new() { Key = "s57-CRC", Value = "1234CRC" } } },
                 new() { Filename = "TEST4.TIF", FileSize = 400, MimeType = "IMAGE/TIFF", Links = new Links { Get = new Link { Href = "" } } },
                 new() { Filename = "Default.img", FileSize = 400, MimeType = "image/jpeg", Links = new Links { Get = new Link { Href = "" } } }
             };
