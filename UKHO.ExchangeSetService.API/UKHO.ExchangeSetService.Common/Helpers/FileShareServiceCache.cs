@@ -17,6 +17,9 @@ using UKHO.ExchangeSetService.Common.Models.AzureTableEntities;
 using UKHO.ExchangeSetService.Common.Models.FileShareService.Response;
 using UKHO.ExchangeSetService.Common.Models.SalesCatalogue;
 using UKHO.ExchangeSetService.Common.Storage;
+using Azure.Data.Tables;
+using Microsoft.IdentityModel.Tokens;
+using System.Runtime.InteropServices;
 
 namespace UKHO.ExchangeSetService.Common.Helpers
 {
@@ -50,7 +53,106 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             this.aioConfiguration = aioConfiguration.Value;
         }
 
-        public async Task<List<Products>> GetNonCachedProductDataForFss(List<Products> products, SearchBatchResponse internalSearchBatchResponse, string exchangeSetRootPath, SalesCatalogueServiceResponseQueueMessage queueMessage, CancellationTokenSource cancellationTokenSource, CancellationToken cancellationToken, string businessUnit)
+        public async Task<List<Products>> GetNonCachedProductDataForFss(
+                List<Products> products,
+                SearchBatchResponse internalSearchBatchResponse,
+                string exchangeSetRootPath,
+                SalesCatalogueServiceResponseQueueMessage queueMessage,
+                CancellationTokenSource cancellationTokenSource,
+                CancellationToken cancellationToken,
+                string businessUnit)
+        {
+            var storageConnectionString = azureStorageService.GetStorageAccountConnectionString(
+                    fssCacheConfiguration.Value.CacheStorageAccountName,
+                    fssCacheConfiguration.Value.CacheStorageAccountKey
+                    );
+            var tableName = fssCacheConfiguration.Value.FssSearchCacheTableName;
+            bool hasResponse;
+            var existingFiles = new List<int?>();
+            var internalProductsNotFound = new List<Products>();
+            // create an enum with 3 items with values 0, 1, 2
+            var subKeys = new { edition = 0, updateNumber = 1, businessUnit = 2 };
+
+            foreach (var product in products)
+            {
+                if (cancellationToken.IsCancellationRequested)
+                {
+                    logger.LogError(EventIds.CancellationTokenEvent.ToEventId(), "Operation cancelled as IsCancellationRequested flag is true while searching ENC files from cache for Product/CellName:{ProductName}, EditionNumber:{EditionNumber} and UpdateNumbers:[{UpdateNumbers}]. BatchId:{batchId} and _X-Correlation-ID:{CorrelationId}",
+                        product.ProductName, product.EditionNumber, string.Join(",", product.UpdateNumbers.Select(a => a.Value.ToString())), queueMessage.BatchId, queueMessage.CorrelationId);
+                    throw new OperationCanceledException();
+                }
+
+                var internalProductItemNotFound = new Products
+                {
+                    Cancellation = product.Cancellation,
+                    Dates = product.Dates,
+                    EditionNumber = product.EditionNumber,
+                    FileSize = product.FileSize,
+                    ProductName = product.ProductName,
+                    UpdateNumbers = product.UpdateNumbers,
+                    Bundle = product.Bundle
+                };
+
+                await foreach (var cacheInfo in await azureTableStorageClient.RetrieveUpdatesFromTableStorageAsync<FssSearchResponseCache>(
+                        product.ProductName, product.EditionNumber.Value, tableName, storageConnectionString))
+                {
+                    if (cacheInfo.RowKey.Split('|')[subKeys.businessUnit] == businessUnit)
+                    {
+                        var cacheUpdateNumber = int.Parse(cacheInfo.RowKey.Split('|')[subKeys.updateNumber]);
+                        existingFiles.Clear();
+
+                        if (cancellationToken.IsCancellationRequested)
+                        {
+                            logger.LogError(EventIds.CancellationTokenEvent.ToEventId(), "Operation cancelled as IsCancellationRequested flag is true while searching ENC files from cache for Product/CellName:{ProductName}, EditionNumber:{EditionNumber} and UpdateNumber:{UpdateNumber}. BatchId:{batchId} and _X-Correlation-ID:{CorrelationId}",
+                                product.ProductName, product.EditionNumber, cacheUpdateNumber, queueMessage.BatchId, queueMessage.CorrelationId);
+                            throw new OperationCanceledException();
+                        }
+
+                        hasResponse = !string.IsNullOrEmpty(cacheInfo.Response);
+
+
+                        if (!hasResponse) //Why would response be empty?
+                        {
+                            var blobClient = await azureBlobStorageClient.GetBlobClient($"{cacheInfo.BatchId}.json", storageConnectionString, cacheInfo.BatchId);
+
+                            if (blobClient != null)
+                            {
+                                cacheInfo.Response = await azureBlobStorageClient.DownloadTextAsync(blobClient);
+                                hasResponse = true;
+                            }
+                        }
+
+                        if (hasResponse)
+                        {
+                            var internalBatchDetail = await CheckIfCacheProductsExistsInBlob(
+                                    exchangeSetRootPath,
+                                    queueMessage,
+                                    product,
+                                    existingFiles,
+                                    cacheUpdateNumber,
+                                    storageConnectionString,
+                                    cacheInfo,
+                                    businessUnit);
+
+
+                            if (existingFiles.Count == internalBatchDetail.Files.Count())
+                            {
+                                internalSearchBatchResponse.Entries.Add(internalBatchDetail);
+                                internalProductItemNotFound.UpdateNumbers.Remove(cacheUpdateNumber);
+                            }
+                        }
+                    }
+                }
+
+                if (internalProductItemNotFound.UpdateNumbers != null && internalProductItemNotFound.UpdateNumbers.Any())
+                {
+                    internalProductsNotFound.Add(internalProductItemNotFound);
+                }
+            }
+            return internalProductsNotFound;
+        }
+
+        public async Task<List<Products>> RhzX_GetNonCachedProductDataForFss(List<Products> products, SearchBatchResponse internalSearchBatchResponse, string exchangeSetRootPath, SalesCatalogueServiceResponseQueueMessage queueMessage, CancellationTokenSource cancellationTokenSource, CancellationToken cancellationToken, string businessUnit)
         {
             var internalProductsNotFound = new List<Products>();
 

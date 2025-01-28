@@ -25,6 +25,17 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             }
         }
 
+        // rhz new method
+        public async Task<Azure.AsyncPageable<TElement>> RetrieveUpdatesFromTableStorageAsync<TElement>(string partitionKey, int edition, string tableName, string storageAccountConnectionString) where TElement : class, ITableEntity
+        {
+            //Partial query using productName, editionNumber
+            //this should return data with all update numbers & business units
+            var filter = $"PartitionKey eq '{partitionKey}' and RowKey ge '{edition}|' and RowKey lt '{edition}|~'";
+            var tableClient = await TableClientFactory.GetTableClient(tableName, storageAccountConnectionString);
+            return tableClient.QueryAsync<TElement>(filter: filter);
+            
+        }
+
         public async Task<TElement> RetrieveFromTableStorageAsync<TElement>(string partitionKey, string rowKey, string tableName, string storageAccountConnectionString) where TElement : class, ITableEntity
         {
             //var tableClient = await GetAzureTable(tableName, storageAccountConnectionString);

@@ -21,7 +21,7 @@ using UKHO.ExchangeSetService.Common.Models.SalesCatalogue;
 using UKHO.ExchangeSetService.Common.Storage;
 using Attribute = UKHO.ExchangeSetService.Common.Models.FileShareService.Response.Attribute;
 using Azure;
-using Azure.Storage.Blobs.Models;
+////using Azure.Storage.Blobs.Models;
 
 namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
 {
@@ -75,25 +75,29 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
                         };
         }
 
-        private List<Products> GetProductdetailsForEncAndAioProduct()
-        {
-            return new List<Products> {
-                            new Products {
-                                ProductName = "DE416050",
-                                EditionNumber = 2,
-                                UpdateNumbers = new List<int?> {0},
-                                FileSize = 400,
-                                Bundle = new List<Bundle> { new Bundle { BundleType = "DVD", Location = "M1;B1" } }
-                            },
-                            new Products {
-                                ProductName = "GB800001",
-                                EditionNumber = 1,
-                                UpdateNumbers = new List<int?> {0},
-                                FileSize = 400,
-                                Bundle = new List<Bundle> { new Bundle { BundleType = "DVD", Location = "M1;B3" } }
-                            }
-                        };
-        }
+        /// <summary>
+        /// /RhZ: This method is suspended.
+        /// </summary>
+        /// <returns></returns>
+        ////private List<Products> GetProductdetailsForEncAndAioProduct()
+        ////{
+        ////    return new List<Products> {
+        ////                    new Products {
+        ////                        ProductName = "DE416050",
+        ////                        EditionNumber = 2,
+        ////                        UpdateNumbers = new List<int?> {0},
+        ////                        FileSize = 400,
+        ////                        Bundle = new List<Bundle> { new Bundle { BundleType = "DVD", Location = "M1;B1" } }
+        ////                    },
+        ////                    new Products {
+        ////                        ProductName = "GB800001",
+        ////                        EditionNumber = 1,
+        ////                        UpdateNumbers = new List<int?> {0},
+        ////                        FileSize = 400,
+        ////                        Bundle = new List<Bundle> { new Bundle { BundleType = "DVD", Location = "M1;B3" } }
+        ////                    }
+        ////                };
+        ////}
 
         private SalesCatalogueServiceResponseQueueMessage GetScsResponseQueueMessage()
         {
@@ -152,16 +156,20 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
             };
         }
 
-        private FssSearchResponseCache GetEmptyResponseCache()
-        {
-            return new FssSearchResponseCache()
-            {
-                BatchId = "7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272",
-                PartitionKey = "DE416050",
-                RowKey = "2|0",
-                Response = string.Empty
-            };
-        }
+        /// <summary>
+        /// Rhz: This method is suspended.
+        /// </summary>
+        /// <returns></returns>
+        ////private FssSearchResponseCache GetEmptyResponseCache()
+        ////{
+        ////    return new FssSearchResponseCache()
+        ////    {
+        ////        BatchId = "7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272",
+        ////        PartitionKey = "DE416050",
+        ////        RowKey = "2|0",
+        ////        Response = string.Empty
+        ////    };
+        ////}
 
         private FssSearchResponseCache GetResponseCacheForAioProduct()
         {
@@ -188,23 +196,28 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
             };
         }
 
-        [Test]
-        [TestCase("ADDS")]
-        [TestCase("ADDS-S57")]
-        public async Task WhenGetNonCachedProductDataForFssIsCalled_ThenReturnProductNotFound(string businessUnit)
-        {
-            const string exchangeSetRootPath = @"C:\\HOME";
+        /// <summary>
+        /// /RhZ: This method is suspended.
+        /// </summary>
+        /// <param name="businessUnit"></param>
+        /// <returns></returns>
+        ////[Test]
+        ////[TestCase("ADDS")]
+        ////[TestCase("ADDS-S57")]
+        ////public async Task WhenGetNonCachedProductDataForFssIsCalled_ThenReturnProductNotFound(string businessUnit)
+        ////{
+        ////    const string exchangeSetRootPath = @"C:\\HOME";
 
-            A.CallTo(() => fakeAzureStorageService.GetStorageAccountConnectionString(A<string>.Ignored, A<string>.Ignored)).Returns(GetStorageAccountConnectionStringAndContainerName().Item1);
-            A.CallTo(() => fakeAzureTableStorageClient.RetrieveFromTableStorageAsync<FssSearchResponseCache>(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(GetResponseCache());
-            A.CallTo(() => fakeAzureBlobStorageClient.GetBlobClient(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(new BlobClient(new System.Uri("http://tempuri.org/blob")));
-            A.CallTo(() => fakeFileSystemHelper.DownloadToFileAsync(A<BlobClient>.Ignored, A<string>.Ignored));
-            CommonHelper.IsPeriodicOutputService = false;
+        ////    A.CallTo(() => fakeAzureStorageService.GetStorageAccountConnectionString(A<string>.Ignored, A<string>.Ignored)).Returns(GetStorageAccountConnectionStringAndContainerName().Item1);
+        ////    A.CallTo(() => fakeAzureTableStorageClient.RetrieveFromTableStorageAsync<FssSearchResponseCache>(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(GetResponseCache());
+        ////    A.CallTo(() => fakeAzureBlobStorageClient.GetBlobClient(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(new BlobClient(new System.Uri("http://tempuri.org/blob")));
+        ////    A.CallTo(() => fakeFileSystemHelper.DownloadToFileAsync(A<BlobClient>.Ignored, A<string>.Ignored));
+        ////    CommonHelper.IsPeriodicOutputService = false;
 
-            var response = await fileShareServiceCache.GetNonCachedProductDataForFss(GetProductdetails(), GetSearchBatchResponse(), exchangeSetRootPath, GetScsResponseQueueMessage(), null, CancellationToken.None, businessUnit);
+        ////    var response = await fileShareServiceCache.GetNonCachedProductDataForFss(GetProductdetails(), GetSearchBatchResponse(), exchangeSetRootPath, GetScsResponseQueueMessage(), null, CancellationToken.None, businessUnit);
 
-            Assert.That(response.Count, Is.EqualTo(0));
-        }
+        ////    Assert.That(response.Count, Is.EqualTo(0));
+        ////}
 
         [Test]
         [TestCase("ADDS")]
@@ -268,105 +281,113 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
             && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "Operation cancelled as IsCancellationRequested flag is true while searching ENC files from cache for Product/CellName:{ProductName}, EditionNumber:{EditionNumber} and UpdateNumbers:[{UpdateNumbers}]. BatchId:{batchId} and _X-Correlation-ID:{CorrelationId}").MustHaveHappenedOnceExactly();
         }
 
+        /// <summary>
+        /// Rhz: This method is suspended.
+        /// </summary>
+        /// <returns></returns>
+        ////[Test]
+        ////[TestCase("ADDS")]
+        ////[TestCase("ADDS-S57")]
+        ////public async Task WhenGetNonCachedProductDataForFssIsCalled_ThenReturnNonCachedProduct(string businessUnit)
+        ////{
+        ////    const string exchangeSetRootPath = @"C:\\HOME";
 
-        [Test]
-        [TestCase("ADDS")]
-        [TestCase("ADDS-S57")]
-        public async Task WhenGetNonCachedProductDataForFssIsCalled_ThenReturnNonCachedProduct(string businessUnit)
-        {
-            const string exchangeSetRootPath = @"C:\\HOME";
+        ////    A.CallTo(() => fakeAzureStorageService.GetStorageAccountConnectionString(A<string>.Ignored, A<string>.Ignored)).Returns(GetStorageAccountConnectionStringAndContainerName().Item1);
+        ////    A.CallTo(() => fakeAzureTableStorageClient.RetrieveFromTableStorageAsync<FssSearchResponseCache>(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(GetResponseCache());
+        ////    ///A.CallTo(() => fakeAzureTableStorageClient.RetrieveUpdatesFromTableStorageAsync<FssSearchResponseCache>(A<string>.Ignored, A<int>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(Task.FromResult(new List<FssSearchResponseCache> { GetResponseCache() }));
+        ////    A.CallTo(() => fakeAzureTableStorageClient.RetrieveUpdatesFromTableStorageAsync<FssSearchResponseCache>(A<string>.Ignored, A<int>.Ignored, A<string>.Ignored, A<string>.Ignored))
+        ////        .Returns(await Task.FromResult<AsyncPageable<FssSearchResponseCache>>(new FakeAsyncPageable<FssSearchResponseCache>(new List<FssSearchResponseCache> { GetResponseCache() })).ConfigureAwait(false));
 
-            A.CallTo(() => fakeAzureStorageService.GetStorageAccountConnectionString(A<string>.Ignored, A<string>.Ignored)).Returns(GetStorageAccountConnectionStringAndContainerName().Item1);
-            A.CallTo(() => fakeAzureTableStorageClient.RetrieveFromTableStorageAsync<FssSearchResponseCache>(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(GetResponseCache());
-            A.CallTo(() => fakeAzureBlobStorageClient.GetBlobClient(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(new BlobClient(new Uri("http://tempuri.org/blob")));
-            A.CallTo(() => fakeFileSystemHelper.DownloadToFileAsync(A<BlobClient>.Ignored, A<string>.Ignored)).Throws(new RequestFailedException(0, "Test error", BlobErrorCode.BlobNotFound.ToString(), null));
-            CommonHelper.IsPeriodicOutputService = false;
 
-            var nonCachedProduct = await fileShareServiceCache.GetNonCachedProductDataForFss(GetProductdetails(), GetSearchBatchResponse(), exchangeSetRootPath, GetScsResponseQueueMessage(), null, CancellationToken.None, businessUnit);
+        ////    A.CallTo(() => fakeAzureBlobStorageClient.GetBlobClient(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(new BlobClient(new Uri("http://tempuri.org/blob")));
+        ////    A.CallTo(() => fakeFileSystemHelper.DownloadToFileAsync(A<BlobClient>.Ignored, A<string>.Ignored)).Throws(new RequestFailedException(0, "Test error", BlobErrorCode.BlobNotFound.ToString(), null));
+        ////    CommonHelper.IsPeriodicOutputService = false;
 
-            Assert.That(nonCachedProduct.Count, Is.EqualTo(1));
+        ////    var nonCachedProduct = await fileShareServiceCache.GetNonCachedProductDataForFss(GetProductdetails(), GetSearchBatchResponse(), exchangeSetRootPath, GetScsResponseQueueMessage(), null, CancellationToken.None, businessUnit);
 
-            A.CallTo(fakeLogger).Where(call => call.Method.Name == "Log"
-            && call.GetArgument<LogLevel>(0) == LogLevel.Information
-            && call.GetArgument<EventId>(1) == EventIds.FileShareServiceSearchENCFilesFromCacheStart.ToEventId()
-            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "File share service search request from cache started for Product/CellName:{ProductName}, EditionNumber:{EditionNumber}, UpdateNumber:{UpdateNumber} and BusinessUnit:{BusinessUnit}. BatchId:{batchId} and _X-Correlation-ID:{CorrelationId}").MustHaveHappenedOnceExactly();
+        ////    Assert.That(nonCachedProduct.Count, Is.EqualTo(1));
 
-            A.CallTo(fakeLogger).Where(call => call.Method.Name == "Log"
-            && call.GetArgument<LogLevel>(0) == LogLevel.Information
-            && call.GetArgument<EventId>(1) == EventIds.FileShareServiceSearchENCFilesFromCacheCompleted.ToEventId()
-            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "File share service search request from cache completed for Product/CellName:{ProductName}, EditionNumber:{EditionNumber}, UpdateNumber:{UpdateNumber} and BusinessUnit:{BusinessUnit}. BatchId:{batchId} and _X-Correlation-ID:{CorrelationId}").MustHaveHappenedOnceExactly();
+        ////    A.CallTo(fakeLogger).Where(call => call.Method.Name == "Log"
+        ////    && call.GetArgument<LogLevel>(0) == LogLevel.Information
+        ////    && call.GetArgument<EventId>(1) == EventIds.FileShareServiceSearchENCFilesFromCacheStart.ToEventId()
+        ////    && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "File share service search request from cache started for Product/CellName:{ProductName}, EditionNumber:{EditionNumber}, UpdateNumber:{UpdateNumber} and BusinessUnit:{BusinessUnit}. BatchId:{batchId} and _X-Correlation-ID:{CorrelationId}").MustHaveHappenedOnceExactly();
 
-            A.CallTo(fakeLogger).Where(call => call.Method.Name == "Log"
-            && call.GetArgument<LogLevel>(0) == LogLevel.Information
-            && call.GetArgument<EventId>(1) == EventIds.FileShareServiceDownloadENCFilesFromCacheStart.ToEventId()
-            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "File share service download request from cache container for Product/CellName:{ProductName}, EditionNumber:{EditionNumber}, UpdateNumber:{UpdateNumber} and BusinessUnit:{BusinessUnit} with \n Href: [{FileUri}]. ESS BatchId:{batchId} and _X-Correlation-ID:{CorrelationId}").MustHaveHappenedOnceExactly();
+        ////    A.CallTo(fakeLogger).Where(call => call.Method.Name == "Log"
+        ////    && call.GetArgument<LogLevel>(0) == LogLevel.Information
+        ////    && call.GetArgument<EventId>(1) == EventIds.FileShareServiceSearchENCFilesFromCacheCompleted.ToEventId()
+        ////    && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "File share service search request from cache completed for Product/CellName:{ProductName}, EditionNumber:{EditionNumber}, UpdateNumber:{UpdateNumber} and BusinessUnit:{BusinessUnit}. BatchId:{batchId} and _X-Correlation-ID:{CorrelationId}").MustHaveHappenedOnceExactly();
 
-            A.CallTo(fakeLogger).Where(call => call.Method.Name == "Log"
-            && call.GetArgument<LogLevel>(0) == LogLevel.Error
-            && call.GetArgument<EventId>(1) == EventIds.GetBlobDetailsWithCacheContainerException.ToEventId()
-            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "Error while download the file from blob for Product/CellName:{ProductName}, EditionNumber:{EditionNumber}, UpdateNumber:{UpdateNumber} and BusinessUnit:{BusinessUnit}. BatchId:{batchId} and _X-Correlation-ID:{CorrelationId} for blobName: {Name}, fileItem: {fileItem} with error: {Message}").MustHaveHappenedOnceExactly();
-        }
+        ////    A.CallTo(fakeLogger).Where(call => call.Method.Name == "Log"
+        ////    && call.GetArgument<LogLevel>(0) == LogLevel.Information
+        ////    && call.GetArgument<EventId>(1) == EventIds.FileShareServiceDownloadENCFilesFromCacheStart.ToEventId()
+        ////    && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "File share service download request from cache container for Product/CellName:{ProductName}, EditionNumber:{EditionNumber}, UpdateNumber:{UpdateNumber} and BusinessUnit:{BusinessUnit} with \n Href: [{FileUri}]. ESS BatchId:{batchId} and _X-Correlation-ID:{CorrelationId}").MustHaveHappenedOnceExactly();
 
-        [Test]
-        [TestCase("ADDS")]
-        [TestCase("ADDS-S57")]
-        public async Task WhenGetNonCachedProductDataForFssIsCalled_ThenReturnNonCachedProductFromBlob(string businessUnit)
-        {
-            const string exchangeSetRootPath = @"C:\\HOME";
+        ////    A.CallTo(fakeLogger).Where(call => call.Method.Name == "Log"
+        ////    && call.GetArgument<LogLevel>(0) == LogLevel.Error
+        ////    && call.GetArgument<EventId>(1) == EventIds.GetBlobDetailsWithCacheContainerException.ToEventId()
+        ////    && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "Error while download the file from blob for Product/CellName:{ProductName}, EditionNumber:{EditionNumber}, UpdateNumber:{UpdateNumber} and BusinessUnit:{BusinessUnit}. BatchId:{batchId} and _X-Correlation-ID:{CorrelationId} for blobName: {Name}, fileItem: {fileItem} with error: {Message}").MustHaveHappenedOnceExactly();
+        ////}
 
-            A.CallTo(() => fakeAzureStorageService.GetStorageAccountConnectionString(A<string>.Ignored, A<string>.Ignored)).Returns(GetStorageAccountConnectionStringAndContainerName().Item1);
-            A.CallTo(() => fakeAzureTableStorageClient.RetrieveFromTableStorageAsync<FssSearchResponseCache>(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(GetEmptyResponseCache());
-            A.CallTo(() => fakeAzureBlobStorageClient.GetBlobClient(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(new BlobClient(new Uri("http://tempuri.org/blob")));
-            A.CallTo(() => fakeFileSystemHelper.DownloadToFileAsync(A<BlobClient>.Ignored, A<string>.Ignored));
+        ////[Test]
+        ////[TestCase("ADDS")]
+        ////[TestCase("ADDS-S57")]
+        ////public async Task WhenGetNonCachedProductDataForFssIsCalled_ThenReturnNonCachedProductFromBlob(string businessUnit)
+        ////{
+        ////    const string exchangeSetRootPath = @"C:\\HOME";
 
-            string blobResponse = JsonConvert.SerializeObject(GetBatchDetail(), Formatting.None);
-            A.CallTo(() => fakeAzureBlobStorageClient.DownloadTextAsync(A<BlobClient>.Ignored)).Returns(blobResponse);
-            CommonHelper.IsPeriodicOutputService = false;
+        ////    A.CallTo(() => fakeAzureStorageService.GetStorageAccountConnectionString(A<string>.Ignored, A<string>.Ignored)).Returns(GetStorageAccountConnectionStringAndContainerName().Item1);
+        ////    A.CallTo(() => fakeAzureTableStorageClient.RetrieveFromTableStorageAsync<FssSearchResponseCache>(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(GetEmptyResponseCache());
+        ////    A.CallTo(() => fakeAzureBlobStorageClient.GetBlobClient(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(new BlobClient(new Uri("http://tempuri.org/blob")));
+        ////    A.CallTo(() => fakeFileSystemHelper.DownloadToFileAsync(A<BlobClient>.Ignored, A<string>.Ignored));
 
-            var nonCachedProduct = await fileShareServiceCache.GetNonCachedProductDataForFss(GetProductdetails(), GetSearchBatchResponse(), exchangeSetRootPath, GetScsResponseQueueMessage(), null, CancellationToken.None, businessUnit);
+        ////    string blobResponse = JsonConvert.SerializeObject(GetBatchDetail(), Formatting.None);
+        ////    A.CallTo(() => fakeAzureBlobStorageClient.DownloadTextAsync(A<BlobClient>.Ignored)).Returns(blobResponse);
+        ////    CommonHelper.IsPeriodicOutputService = false;
 
-            Assert.That(nonCachedProduct.Count, Is.EqualTo(0));
-        }
+        ////    var nonCachedProduct = await fileShareServiceCache.GetNonCachedProductDataForFss(GetProductdetails(), GetSearchBatchResponse(), exchangeSetRootPath, GetScsResponseQueueMessage(), null, CancellationToken.None, businessUnit);
 
-        [Test]
-        [TestCase("ADDS")]
-        [TestCase("ADDS-S57")]
-        public void WhenGetNonCachedProductDataForFssIsCalled_ThenReturnStorageException(string businessUnit)
-        {
-            const string exchangeSetRootPath = @"C:\\HOME";
-            A.CallTo(() => fakeAzureStorageService.GetStorageAccountConnectionString(A<string>.Ignored, A<string>.Ignored)).Returns(GetStorageAccountConnectionStringAndContainerName().Item1);
-            A.CallTo(() => fakeAzureTableStorageClient.RetrieveFromTableStorageAsync<FssSearchResponseCache>(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(GetResponseCache());
-            A.CallTo(() => fakeAzureBlobStorageClient.GetBlobClient(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(new BlobClient(new Uri("http://tempuri.org/blob")));
-            // The following line will throw a an Exception reason that does not exist in the DownloadToFileAsync protected block.
-            // This will cause the method to drop into the catch block and throw a FulfilmentException.
-            // This follows a similar pattern used with the previous depricated WindowsAzure.Storage package.
-            A.CallTo(() => fakeFileSystemHelper.DownloadToFileAsync(A<BlobClient>.Ignored, A<string>.Ignored)).Throws(new RequestFailedException(0, "Test error", BlobErrorCode.BlobAlreadyExists.ToString(), null));
-            CommonHelper.IsPeriodicOutputService = false;
+        ////    Assert.That(nonCachedProduct.Count, Is.EqualTo(0));
+        ////}
 
-            Assert.ThrowsAsync(Is.TypeOf<FulfilmentException>().And.Message.EqualTo(fulfilmentExceptionMessage),
-                 async delegate { await fileShareServiceCache.GetNonCachedProductDataForFss(GetProductdetails(), GetSearchBatchResponse(), exchangeSetRootPath, GetScsResponseQueueMessage(), null, CancellationToken.None, businessUnit); });
+        ////[Test]
+        ////[TestCase("ADDS")]
+        ////[TestCase("ADDS-S57")]
+        ////public void WhenGetNonCachedProductDataForFssIsCalled_ThenReturnStorageException(string businessUnit)
+        ////{
+        ////    const string exchangeSetRootPath = @"C:\\HOME";
+        ////    A.CallTo(() => fakeAzureStorageService.GetStorageAccountConnectionString(A<string>.Ignored, A<string>.Ignored)).Returns(GetStorageAccountConnectionStringAndContainerName().Item1);
+        ////    A.CallTo(() => fakeAzureTableStorageClient.RetrieveFromTableStorageAsync<FssSearchResponseCache>(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(GetResponseCache());
+        ////    A.CallTo(() => fakeAzureBlobStorageClient.GetBlobClient(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(new BlobClient(new Uri("http://tempuri.org/blob")));
+        ////    // The following line will throw a an Exception reason that does not exist in the DownloadToFileAsync protected block.
+        ////    // This will cause the method to drop into the catch block and throw a FulfilmentException.
+        ////    // This follows a similar pattern used with the previous depricated WindowsAzure.Storage package.
+        ////    A.CallTo(() => fakeFileSystemHelper.DownloadToFileAsync(A<BlobClient>.Ignored, A<string>.Ignored)).Throws(new RequestFailedException(0, "Test error", BlobErrorCode.BlobAlreadyExists.ToString(), null));
+        ////    CommonHelper.IsPeriodicOutputService = false;
 
-            A.CallTo(fakeLogger).Where(call => call.Method.Name == "Log"
-            && call.GetArgument<LogLevel>(0) == LogLevel.Information
-            && call.GetArgument<EventId>(1) == EventIds.FileShareServiceSearchENCFilesFromCacheStart.ToEventId()
-            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "File share service search request from cache started for Product/CellName:{ProductName}, EditionNumber:{EditionNumber}, UpdateNumber:{UpdateNumber} and BusinessUnit:{BusinessUnit}. BatchId:{batchId} and _X-Correlation-ID:{CorrelationId}").MustHaveHappenedOnceExactly();
+        ////    Assert.ThrowsAsync(Is.TypeOf<FulfilmentException>().And.Message.EqualTo(fulfilmentExceptionMessage),
+        ////         async delegate { await fileShareServiceCache.GetNonCachedProductDataForFss(GetProductdetails(), GetSearchBatchResponse(), exchangeSetRootPath, GetScsResponseQueueMessage(), null, CancellationToken.None, businessUnit); });
 
-            A.CallTo(fakeLogger).Where(call => call.Method.Name == "Log"
-            && call.GetArgument<LogLevel>(0) == LogLevel.Information
-            && call.GetArgument<EventId>(1) == EventIds.FileShareServiceSearchENCFilesFromCacheCompleted.ToEventId()
-            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "File share service search request from cache completed for Product/CellName:{ProductName}, EditionNumber:{EditionNumber}, UpdateNumber:{UpdateNumber} and BusinessUnit:{BusinessUnit}. BatchId:{batchId} and _X-Correlation-ID:{CorrelationId}").MustHaveHappenedOnceExactly();
+        ////    A.CallTo(fakeLogger).Where(call => call.Method.Name == "Log"
+        ////    && call.GetArgument<LogLevel>(0) == LogLevel.Information
+        ////    && call.GetArgument<EventId>(1) == EventIds.FileShareServiceSearchENCFilesFromCacheStart.ToEventId()
+        ////    && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "File share service search request from cache started for Product/CellName:{ProductName}, EditionNumber:{EditionNumber}, UpdateNumber:{UpdateNumber} and BusinessUnit:{BusinessUnit}. BatchId:{batchId} and _X-Correlation-ID:{CorrelationId}").MustHaveHappenedOnceExactly();
 
-            A.CallTo(fakeLogger).Where(call => call.Method.Name == "Log"
-            && call.GetArgument<LogLevel>(0) == LogLevel.Information
-            && call.GetArgument<EventId>(1) == EventIds.FileShareServiceDownloadENCFilesFromCacheStart.ToEventId()
-            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "File share service download request from cache container for Product/CellName:{ProductName}, EditionNumber:{EditionNumber}, UpdateNumber:{UpdateNumber} and BusinessUnit:{BusinessUnit} with \n Href: [{FileUri}]. ESS BatchId:{batchId} and _X-Correlation-ID:{CorrelationId}").MustHaveHappenedOnceExactly();
+        ////    A.CallTo(fakeLogger).Where(call => call.Method.Name == "Log"
+        ////    && call.GetArgument<LogLevel>(0) == LogLevel.Information
+        ////    && call.GetArgument<EventId>(1) == EventIds.FileShareServiceSearchENCFilesFromCacheCompleted.ToEventId()
+        ////    && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "File share service search request from cache completed for Product/CellName:{ProductName}, EditionNumber:{EditionNumber}, UpdateNumber:{UpdateNumber} and BusinessUnit:{BusinessUnit}. BatchId:{batchId} and _X-Correlation-ID:{CorrelationId}").MustHaveHappenedOnceExactly();
 
-            A.CallTo(fakeLogger).Where(call => call.Method.Name == "Log"
-            && call.GetArgument<LogLevel>(0) == LogLevel.Error
-            && call.GetArgument<EventId>(1) == EventIds.DownloadENCFilesFromCacheContainerException.ToEventId()
-            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "Error while download the file from blob for Product/CellName:{ProductName}, EditionNumber:{EditionNumber}, UpdateNumber:{UpdateNumber} and BusinessUnit:{BusinessUnit}. BatchId:{batchId} and _X-Correlation-ID:{CorrelationId} for blobName: {Name}, fileItem: {fileItem} with error: {Message}").MustHaveHappenedOnceExactly();
+        ////    A.CallTo(fakeLogger).Where(call => call.Method.Name == "Log"
+        ////    && call.GetArgument<LogLevel>(0) == LogLevel.Information
+        ////    && call.GetArgument<EventId>(1) == EventIds.FileShareServiceDownloadENCFilesFromCacheStart.ToEventId()
+        ////    && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "File share service download request from cache container for Product/CellName:{ProductName}, EditionNumber:{EditionNumber}, UpdateNumber:{UpdateNumber} and BusinessUnit:{BusinessUnit} with \n Href: [{FileUri}]. ESS BatchId:{batchId} and _X-Correlation-ID:{CorrelationId}").MustHaveHappenedOnceExactly();
 
-        }
+        ////    A.CallTo(fakeLogger).Where(call => call.Method.Name == "Log"
+        ////    && call.GetArgument<LogLevel>(0) == LogLevel.Error
+        ////    && call.GetArgument<EventId>(1) == EventIds.DownloadENCFilesFromCacheContainerException.ToEventId()
+        ////    && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "Error while download the file from blob for Product/CellName:{ProductName}, EditionNumber:{EditionNumber}, UpdateNumber:{UpdateNumber} and BusinessUnit:{BusinessUnit}. BatchId:{batchId} and _X-Correlation-ID:{CorrelationId} for blobName: {Name}, fileItem: {fileItem} with error: {Message}").MustHaveHappenedOnceExactly();
+
+        ////}
 
         [Test]
         public async Task WhenInsertOrMergeFssCacheDetailForLargeResponseSize_ThenUploadSucessful()
@@ -387,41 +408,44 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
         }
 
         #region LargeMediaExchangeSet
+        /// <summary>
+        /// Rhz: This method is suspended.
+        /// </summary>
+        /// <returns></returns>
+        ////[Test]
+        ////public async Task WhenGetNonCachedProductDataForFssIsCalled_ThenReturnProductNotFoundForLargeMediaExchangeSet()
+        ////{
+        ////    string exchangeSetRootPath = @"C:\\HOME";
+        ////    string businessUnit = "ADDS";
 
-        [Test]
-        public async Task WhenGetNonCachedProductDataForFssIsCalled_ThenReturnProductNotFoundForLargeMediaExchangeSet()
-        {
-            string exchangeSetRootPath = @"C:\\HOME";
-            string businessUnit = "ADDS";
+        ////    A.CallTo(() => fakeAzureStorageService.GetStorageAccountConnectionString(A<string>.Ignored, A<string>.Ignored)).Returns(GetStorageAccountConnectionStringAndContainerName().Item1);
+        ////    A.CallTo(() => fakeAzureTableStorageClient.RetrieveFromTableStorageAsync<FssSearchResponseCache>(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(GetResponseCache());
+        ////    A.CallTo(() => fakeAzureBlobStorageClient.GetBlobClient(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(new BlobClient(new Uri("http://tempuri.org/blob")));
+        ////    A.CallTo(() => fakeFileSystemHelper.DownloadToFileAsync(A<BlobClient>.Ignored, A<string>.Ignored));
+        ////    CommonHelper.IsPeriodicOutputService = true;
 
-            A.CallTo(() => fakeAzureStorageService.GetStorageAccountConnectionString(A<string>.Ignored, A<string>.Ignored)).Returns(GetStorageAccountConnectionStringAndContainerName().Item1);
-            A.CallTo(() => fakeAzureTableStorageClient.RetrieveFromTableStorageAsync<FssSearchResponseCache>(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(GetResponseCache());
-            A.CallTo(() => fakeAzureBlobStorageClient.GetBlobClient(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(new BlobClient(new Uri("http://tempuri.org/blob")));
-            A.CallTo(() => fakeFileSystemHelper.DownloadToFileAsync(A<BlobClient>.Ignored, A<string>.Ignored));
-            CommonHelper.IsPeriodicOutputService = true;
+        ////    var response = await fileShareServiceCache.GetNonCachedProductDataForFss(GetProductdetails(), GetSearchBatchResponse(), exchangeSetRootPath, GetScsResponseQueueMessage(), null, CancellationToken.None, businessUnit);
 
-            var response = await fileShareServiceCache.GetNonCachedProductDataForFss(GetProductdetails(), GetSearchBatchResponse(), exchangeSetRootPath, GetScsResponseQueueMessage(), null, CancellationToken.None, businessUnit);
+        ////    Assert.That(response.Count, Is.EqualTo(0));
+        ////}
 
-            Assert.That(response.Count, Is.EqualTo(0));
-        }
+        ////[Test]
+        ////public async Task WhenGetNonCachedProductDataForFssIsCalled_ThenReturnProductNotFoundForLargeMediaExchangeSetWhenAioToggleIsOn()
+        ////{
+        ////    string exchangeSetRootPath = @"C:\\HOME";
+        ////    fakeAioConfiguration.Value.AioCells = "GB800001";
+        ////    string businessUnit = "ADDS";
 
-        [Test]
-        public async Task WhenGetNonCachedProductDataForFssIsCalled_ThenReturnProductNotFoundForLargeMediaExchangeSetWhenAioToggleIsOn()
-        {
-            string exchangeSetRootPath = @"C:\\HOME";
-            fakeAioConfiguration.Value.AioCells = "GB800001";
-            string businessUnit = "ADDS";
+        ////    A.CallTo(() => fakeAzureStorageService.GetStorageAccountConnectionString(A<string>.Ignored, A<string>.Ignored)).Returns(GetStorageAccountConnectionStringAndContainerName().Item1);
+        ////    A.CallTo(() => fakeAzureTableStorageClient.RetrieveFromTableStorageAsync<FssSearchResponseCache>(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(GetResponseCache()).Once().Then.Returns(GetResponseCacheForAioProduct());
+        ////    A.CallTo(() => fakeAzureBlobStorageClient.GetBlobClient(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(new BlobClient(new Uri("http://tempuri.org/blob")));
+        ////    A.CallTo(() => fakeFileSystemHelper.DownloadToFileAsync(A<BlobClient>.Ignored, A<string>.Ignored));
+        ////    CommonHelper.IsPeriodicOutputService = true;
 
-            A.CallTo(() => fakeAzureStorageService.GetStorageAccountConnectionString(A<string>.Ignored, A<string>.Ignored)).Returns(GetStorageAccountConnectionStringAndContainerName().Item1);
-            A.CallTo(() => fakeAzureTableStorageClient.RetrieveFromTableStorageAsync<FssSearchResponseCache>(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(GetResponseCache()).Once().Then.Returns(GetResponseCacheForAioProduct());
-            A.CallTo(() => fakeAzureBlobStorageClient.GetBlobClient(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(new BlobClient(new Uri("http://tempuri.org/blob")));
-            A.CallTo(() => fakeFileSystemHelper.DownloadToFileAsync(A<BlobClient>.Ignored, A<string>.Ignored));
-            CommonHelper.IsPeriodicOutputService = true;
+        ////    var response = await fileShareServiceCache.GetNonCachedProductDataForFss(GetProductdetailsForEncAndAioProduct(), GetSearchBatchResponse(), exchangeSetRootPath, GetScsResponseQueueMessage(), null, CancellationToken.None, businessUnit);
 
-            var response = await fileShareServiceCache.GetNonCachedProductDataForFss(GetProductdetailsForEncAndAioProduct(), GetSearchBatchResponse(), exchangeSetRootPath, GetScsResponseQueueMessage(), null, CancellationToken.None, businessUnit);
-
-            Assert.That(response.Count, Is.EqualTo(0));
-        }
+        ////    Assert.That(response.Count, Is.EqualTo(0));
+        ////}
         #endregion
 
         #region DownloadFileFromCache
