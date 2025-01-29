@@ -5,7 +5,6 @@ using System.Net;
 using System.Threading.Tasks;
 using AutoMapper;
 using FakeItEasy;
-using FluentAssertions;
 using FluentValidation.Results;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -810,8 +809,8 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
                     ExchangeSetStandard = ExchangeSetStandard.s57.ToString()
                 }, GetAzureADToken());
 
-            result.Should().BeOfType<ExchangeSetServiceResponse>();
-            result.HttpStatusCode.Should().Be(HttpStatusCode.BadRequest);
+            Assert.That(result, Is.TypeOf<ExchangeSetServiceResponse>());
+            Assert.That(result.HttpStatusCode, Is.EqualTo(HttpStatusCode.BadRequest));
         }
 
         [Test]
@@ -847,8 +846,8 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
                 }, GetAzureADToken());
 
 
-            result.Should().BeOfType<ExchangeSetServiceResponse>();
-            result.HttpStatusCode.Should().Be(HttpStatusCode.Created);
+            Assert.That(result, Is.TypeOf<ExchangeSetServiceResponse>());
+            Assert.That(result.HttpStatusCode, Is.EqualTo(HttpStatusCode.Created));
 
             A.CallTo(logger).Where(call => call.Method.Name == "Log"
             && call.GetArgument<LogLevel>(0) == LogLevel.Information
@@ -1290,8 +1289,8 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
                 ExchangeSetStandard = ExchangeSetStandard.s57.ToString()
             }, GetAzureADToken());
 
-            result.Should().BeOfType<ExchangeSetServiceResponse>();
-            result.HttpStatusCode.Should().Be(HttpStatusCode.BadRequest);
+            Assert.That(result, Is.TypeOf<ExchangeSetServiceResponse>());
+            Assert.That(result.HttpStatusCode, Is.EqualTo(HttpStatusCode.BadRequest));
         }
 
         [Test]
@@ -1328,8 +1327,8 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
             }, GetAzureADToken());
 
 
-            result.Should().BeOfType<ExchangeSetServiceResponse>();
-            result.HttpStatusCode.Should().Be(HttpStatusCode.Created);
+            Assert.That(result, Is.TypeOf<ExchangeSetServiceResponse>());
+            Assert.That(result.HttpStatusCode, Is.EqualTo(HttpStatusCode.Created));
 
 
             A.CallTo(logger).Where(call => call.Method.Name == "Log"
@@ -1607,8 +1606,8 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
                 CallbackUri = string.Empty
             }, GetAzureADToken());
 
-            result.Should().BeOfType<ExchangeSetServiceResponse>();
-            result.HttpStatusCode.Should().Be(HttpStatusCode.Created);
+            Assert.That(result, Is.TypeOf<ExchangeSetServiceResponse>());
+            Assert.That(result.HttpStatusCode, Is.EqualTo(HttpStatusCode.Created));
 
             A.CallTo(logger).Where(call => call.Method.Name == "Log"
             && call.GetArgument<LogLevel>(0) == LogLevel.Information
@@ -1876,8 +1875,8 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
                 CallbackUri = string.Empty
             }, GetAzureADToken());
 
-            result.Should().BeOfType<ExchangeSetServiceResponse>();
-            result.HttpStatusCode.Should().Be(HttpStatusCode.BadRequest);
+            Assert.That(result, Is.TypeOf<ExchangeSetServiceResponse>());
+            Assert.That(result.HttpStatusCode, Is.EqualTo(HttpStatusCode.BadRequest));
         }
 
         [Test]
@@ -1904,8 +1903,8 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
                 CallbackUri = string.Empty
             }, GetAzureADToken());
 
-            result.Should().BeOfType<ExchangeSetServiceResponse>();
-            result.HttpStatusCode.Should().Be(HttpStatusCode.Created);
+            Assert.That(result, Is.TypeOf<ExchangeSetServiceResponse>());
+            Assert.That(result.HttpStatusCode, Is.EqualTo(HttpStatusCode.Created));
 
             A.CallTo(logger).Where(call => call.Method.Name == "Log"
             && call.GetArgument<LogLevel>(0) == LogLevel.Information

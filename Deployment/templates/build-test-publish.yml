@@ -4,10 +4,6 @@ parameters:
   type: boolean
   default: false
 
-- name: DotNetVersion
-  type: string
-  default: '6.0.x'
-
 jobs:
 - job: Dependencychecker
   condition: eq('${{ parameters.DisableDependencyCheck }}', false)

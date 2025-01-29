@@ -4,7 +4,6 @@ using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using FakeItEasy;
-using FluentAssertions;
 using FluentValidation.Results;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -164,7 +163,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
 
             var result = (OkObjectResult)await fakeWebHookController.NewFilesPublished(fakeCacheJson);
 
-            result.StatusCode.Should().Be(200);
+            Assert.That(result.StatusCode, Is.EqualTo(200));
 
             A.CallTo(fakeLogger).Where(call => call.Method.Name == "Log"
               && call.GetArgument<LogLevel>(0) == LogLevel.Information
@@ -197,7 +196,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
 
             var result = (OkObjectResult)await fakeWebHookController.NewFilesPublished(fakeCacheJson);
 
-            result.StatusCode.Should().Be(200);
+            Assert.That(result.StatusCode, Is.EqualTo(200));
 
             A.CallTo(fakeLogger).Where(call => call.Method.Name == "Log"
               && call.GetArgument<LogLevel>(0) == LogLevel.Information

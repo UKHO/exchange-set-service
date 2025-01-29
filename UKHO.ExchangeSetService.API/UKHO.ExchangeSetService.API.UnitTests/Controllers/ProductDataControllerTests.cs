@@ -4,7 +4,6 @@ using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using FakeItEasy;
-using FluentAssertions;
 using FluentValidation.Results;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -27,7 +26,6 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
         private IHttpContextAccessor fakeHttpContextAccessor;
         private IProductDataService fakeProductDataService;
         private ILogger<ProductDataController> fakeLogger;
-        public const string errorMessage = "Either body is null or malformed";
 
         [SetUp]
         public void Setup()
@@ -262,8 +260,8 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
             A.CallTo(() => fakeProductDataService.ValidateProductDataByProductIdentifiers(A<ProductIdentifierRequest>.Ignored))
                  .Returns(new ValidationResult(new List<ValidationFailure>()));
 
-            string[] productIdentifiers = new string[] { "GB123456", "GB160060", "AU334550" };
-            string callbackUri = string.Empty;
+            var productIdentifiers = new string[] { "GB123456", "GB160060", "AU334550" };
+            var callbackUri = string.Empty;
 
             A.CallTo(() => fakeProductDataService.CreateProductDataByProductIdentifiers(A<ProductIdentifierRequest>.Ignored, A<AzureAdB2C>.Ignored))
                  .Returns(exchangeSetServiceResponse);
@@ -271,8 +269,11 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
             var result = (BadRequestObjectResult)await controller.PostProductIdentifiers(productIdentifiers, callbackUri, ExchangeSetStandard.s57.ToString());
             var errors = (ErrorDescription)result.Value;
 
-            result.StatusCode.Should().Be(400);
-            errors.Errors.Single().Description.Should().Be("The Exchange Set requested is very large and will not be created, please use a standard Exchange Set provided by the UKHO.");
+            Assert.Multiple(() =>
+            {
+                Assert.That(result.StatusCode, Is.EqualTo(400));
+                Assert.That(errors.Errors.Single().Description, Is.EqualTo("The Exchange Set requested is very large and will not be created, please use a standard Exchange Set provided by the UKHO."));
+            });
 
             A.CallTo(fakeLogger).Where(call => call.Method.Name == "Log"
             && call.GetArgument<LogLevel>(0) == LogLevel.Error
@@ -294,16 +295,19 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
             A.CallTo(() => fakeProductDataService.ValidateProductDataByProductIdentifiers(A<ProductIdentifierRequest>.Ignored))
                  .Returns(new ValidationResult(new List<ValidationFailure>()));
 
-            string[] productIdentifiers = new string[] { "GB123456", "GB160060", "AU334550" };
-            string callbackUri = string.Empty;
+            var productIdentifiers = new string[] { "GB123456", "GB160060", "AU334550" };
+            var callbackUri = string.Empty;
 
             A.CallTo(() => fakeProductDataService.CreateProductDataByProductIdentifiers(A<ProductIdentifierRequest>.Ignored, A<AzureAdB2C>.Ignored))
                  .Returns(exchangeSetServiceResponse);
 
             var result = (OkObjectResult)await controller.PostProductIdentifiers(productIdentifiers, callbackUri, ExchangeSetStandard.s63.ToString());
 
-            result.StatusCode.Should().Be(200);
-            ((UKHO.ExchangeSetService.Common.Models.Response.ExchangeSetResponse)result.Value).ExchangeSetCellCount.Should().Be(exchangeSetServiceResponse.ExchangeSetResponse.ExchangeSetCellCount);
+            Assert.Multiple(() =>
+            {
+                Assert.That(result.StatusCode, Is.EqualTo(200));
+                Assert.That(((ExchangeSetResponse)result.Value).ExchangeSetCellCount, Is.EqualTo(exchangeSetServiceResponse.ExchangeSetResponse.ExchangeSetCellCount));
+            });
 
             A.CallTo(fakeLogger).Where(call => call.Method.Name == "Log"
             && call.GetArgument<LogLevel>(0) == LogLevel.Information
@@ -498,8 +502,11 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
                             { new() { ProductName = "demo" } }, "", ExchangeSetStandard.s57.ToString());
             var errors = (ErrorDescription)result.Value;
 
-            result.StatusCode.Should().Be(400);
-            errors.Errors.Single().Description.Should().Be("The Exchange Set requested is very large and will not be created, please use a standard Exchange Set provided by the UKHO.");
+            Assert.Multiple(() =>
+            {
+                Assert.That(result.StatusCode, Is.EqualTo(400));
+                Assert.That(errors.Errors.Single().Description, Is.EqualTo("The Exchange Set requested is very large and will not be created, please use a standard Exchange Set provided by the UKHO."));
+            });
 
             A.CallTo(fakeLogger).Where(call => call.Method.Name == "Log"
             && call.GetArgument<LogLevel>(0) == LogLevel.Error
@@ -527,8 +534,11 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
             var result = (OkObjectResult)await controller.PostProductDataByProductVersions(new List<ProductVersionRequest>()
                             { new() { ProductName = "demo" } }, "", ExchangeSetStandard.s63.ToString());
 
-            result.StatusCode.Should().Be(200);
-            ((UKHO.ExchangeSetService.Common.Models.Response.ExchangeSetResponse)result.Value).ExchangeSetCellCount.Should().Be(exchangeSetServiceResponse.ExchangeSetResponse.ExchangeSetCellCount);
+            Assert.Multiple(() =>
+            {
+                Assert.That(result.StatusCode, Is.EqualTo(200));
+                Assert.That(((ExchangeSetResponse)result.Value).ExchangeSetCellCount, Is.EqualTo(exchangeSetServiceResponse.ExchangeSetResponse.ExchangeSetCellCount));
+            });
 
             A.CallTo(fakeLogger).Where(call => call.Method.Name == "Log"
             && call.GetArgument<LogLevel>(0) == LogLevel.Information
@@ -682,8 +692,11 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
             var result = (BadRequestObjectResult)await controller.GetProductDataSinceDateTime("Wed, 21 Oct 2015 07:28:00 GMT", "https://www.abc.com", ExchangeSetStandard.s57.ToString());
             var errors = (ErrorDescription)result.Value;
 
-            result.StatusCode.Should().Be(400);
-            errors.Errors.Single().Description.Should().Be("The Exchange Set requested is very large and will not be created, please use a standard Exchange Set provided by the UKHO.");
+            Assert.Multiple(() =>
+            {
+                Assert.That(result.StatusCode, Is.EqualTo(400));
+                Assert.That(errors.Errors.Single().Description, Is.EqualTo("The Exchange Set requested is very large and will not be created, please use a standard Exchange Set provided by the UKHO."));
+            });
 
             A.CallTo(fakeLogger).Where(call => call.Method.Name == "Log"
             && call.GetArgument<LogLevel>(0) == LogLevel.Error
@@ -710,8 +723,11 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
 
             var result = (OkObjectResult)await controller.GetProductDataSinceDateTime("Wed, 21 Oct 2015 07:28:00 GMT", "https://www.abc.com", ExchangeSetStandard.s63.ToString());
 
-            result.StatusCode.Should().Be(200);
-            ((UKHO.ExchangeSetService.Common.Models.Response.ExchangeSetResponse)result.Value).ExchangeSetCellCount.Should().Be(exchangeSetServiceResponse.ExchangeSetResponse.ExchangeSetCellCount);
+            Assert.Multiple(() =>
+            {
+                Assert.That(result.StatusCode, Is.EqualTo(200));
+                Assert.That(((ExchangeSetResponse)result.Value).ExchangeSetCellCount, Is.EqualTo(exchangeSetServiceResponse.ExchangeSetResponse.ExchangeSetCellCount));
+            });
 
             A.CallTo(fakeLogger).Where(call => call.Method.Name == "Log"
             && call.GetArgument<LogLevel>(0) == LogLevel.Information
