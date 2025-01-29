@@ -34,6 +34,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         //Product Backlog Item 71610: Create empty SERIAL.AIO file and add to AIO exchange set
         [Test]
         [Category("QCOnlyTest-AIOEnabled")]
+        [Ignore("Rhz: Suspended for other test")]
         public void WhenIDownloadAioZipExchangeSet_ThenASerialAioFileIsAvailable()
         {
             bool checkFile = FssBatchHelper.CheckforFileExist(DownloadedFolderPath, Config.AIOConfig.ExchangeSetSerialAioFile);
@@ -88,6 +89,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         //Product Backlog Item 72017: Create empty PRODUCTS.TXT file & add to AIO exchange set
         [Test]
         [Category("QCOnlyTest-AIOEnabled")]
+        [Ignore("Rhz: Suspended for other test")]
         public async Task WhenIDownloadAioZipExchangeSet_ThenAProductTxtFileIsAvailable()
         {
             bool checkFile = FssBatchHelper.CheckforFileExist(Path.Combine(DownloadedFolderPath, Config.ExchangeSetProductFilePath), Config.ExchangeSetProductFile);

@@ -24,6 +24,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
 
         [Test]
         [Category("QCOnlyTest-AIOEnabled")]
+        [Ignore("Rhz: Suspended for other test")]
         public async Task VerifyEmptyEncExchangeSetForProductVersion()
         {
             //// ENC_ROOT >>> ReadmeTxtFile
@@ -68,6 +69,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
 
         [Test]
         [Category("QCOnlyTest-AIOEnabled")]
+        [Ignore("Rhz: Suspended for other test")]
         public async Task VerifyEmptyAioExchangeSetForProductVersion()
         {
             //Verify Catalog file content

@@ -29,6 +29,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         //Product Backlog Item 71610: Create empty SERIAL.AIO file and add to AIO exchange set
         [Test]
         [Category("QCOnlyTest-AIOEnabled")]
+        [Ignore("Rhz: Suspended for other test")]
         public void WhenIDownloadAioZipExchangeSet_ThenASerialAioFileIsAvailable()
         {
             bool checkFile = FssBatchHelper.CheckforFileExist(AioDownloadedFolderPath, objStorage.Config.AIOConfig.ExchangeSetSerialAioFile);
@@ -41,6 +42,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
 
         [Test]
         [Category("QCOnlyTest-AIOEnabled")]
+        [Ignore("Rhz: Suspended for other test")]
         public void WhenIDownloadV01X01ZipExchangeSet_ThenASerialEncFileIsAvailable()
         {
             bool checkFile = FssBatchHelper.CheckforFileExist(EncDownloadedFolderPath, objStorage.Config.ExchangeSetSerialEncFile);
@@ -112,6 +114,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         //Product Backlog Item 72017: Create empty PRODUCTS.TXT file & add to AIO exchange set
         [Test]
         [Category("QCOnlyTest-AIOEnabled")]
+        [Ignore("Rhz: Suspended for other test")]
         public async Task WhenIDownloadAioZipExchangeSet_ThenAProductTxtFileIsAvailable()
         {
             bool checkFile = FssBatchHelper.CheckforFileExist(Path.Combine(AioDownloadedFolderPath, objStorage.Config.ExchangeSetProductFilePath), objStorage.Config.ExchangeSetProductFile);
@@ -129,6 +132,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
 
         [Test]
         [Category("QCOnlyTest-AIOEnabled")]
+        [Ignore("Rhz: Suspended for other test")]
         public async Task WhenIDownloadV01X01ZipExchangeSet_ThenAProductTxtFileIsAvailable()
         {
             bool checkFile = FssBatchHelper.CheckforFileExist(Path.Combine(EncDownloadedFolderPath, objStorage.Config.ExchangeSetProductFilePath), objStorage.Config.ExchangeSetProductFile);

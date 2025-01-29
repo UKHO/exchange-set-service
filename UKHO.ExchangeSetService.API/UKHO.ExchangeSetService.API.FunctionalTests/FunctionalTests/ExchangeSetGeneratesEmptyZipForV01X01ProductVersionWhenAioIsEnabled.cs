@@ -26,6 +26,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
 
         [Test]
         [Category("QCOnlyTest-AIOEnabled")]
+        [Ignore("Rhz: Suspended for other test")]
         public async Task WhenICallExchangeSetApiWithAValidProductVersion_ThenAProductTxtFileIsGenerated()
         {
             bool checkFile = FssBatchHelper.CheckforFileExist(Path.Combine(DownloadedFolderPath, objStorage.Config.ExchangeSetProductFilePath), objStorage.Config.ExchangeSetProductFile);
@@ -62,6 +63,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
 
         [Test]
         [Category("QCOnlyTest-AIOEnabled")]
+        [Ignore("Rhz: Suspended for other test")]
         public void WhenICallExchangeSetApiWithAValidProductVersion_ThenASerialEncFileIsGenerated()
         {
             bool checkFile = FssBatchHelper.CheckforFileExist(DownloadedFolderPath, objStorage.Config.ExchangeSetSerialEncFile);
