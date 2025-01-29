@@ -70,8 +70,9 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             bool hasResponse;
             var existingFiles = new List<int?>();
             var internalProductsNotFound = new List<Products>();
-            // create an enum with 3 items with values 0, 1, 2
+
             var subKeys = new { edition = 0, updateNumber = 1, businessUnit = 2 };
+
 
             foreach (var product in products)
             {
