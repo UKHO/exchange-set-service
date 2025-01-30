@@ -14,10 +14,17 @@ namespace UKHO.ExchangeSetService.Common.Helpers
     {
         public async Task<BlobClient> GetBlobClient(string fileName, string storageAccountConnectionString, string containerName)
         {
+            BlobClient blobClient = null;
             var blobServiceClient = new BlobServiceClient(storageAccountConnectionString);
             var blobContainerClient = blobServiceClient.GetBlobContainerClient(containerName);
-            await blobContainerClient.CreateIfNotExistsAsync();
-            return blobContainerClient.GetBlobClient(fileName);
+            if (await blobContainerClient.ExistsAsync())
+            {
+               blobClient = blobContainerClient.GetBlobClient(fileName);
+            }
+            // rhz: commented out the below code as the if statement above may replace it.
+            //await blobContainerClient.CreateIfNotExistsAsync();
+            //return blobContainerClient.GetBlobClient(fileName);
+            return blobClient;
         }
 
         public BlobClient GetBlobClientByUri(string uri, StorageSharedKeyCredential keyCredential)
