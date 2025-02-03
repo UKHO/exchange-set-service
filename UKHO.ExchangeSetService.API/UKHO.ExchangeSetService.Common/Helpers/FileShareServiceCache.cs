@@ -53,7 +53,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             this.aioConfiguration = aioConfiguration.Value;
         }
 
-        public async Task<List<Products>> GetNonCachedProductDataForFss(
+        public async Task<List<Products>> RhzX_GetNonCachedProductDataForFss(
                 List<Products> products,
                 SearchBatchResponse internalSearchBatchResponse,
                 string exchangeSetRootPath,
@@ -153,7 +153,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             return internalProductsNotFound;
         }
 
-        public async Task<List<Products>> RhzX_GetNonCachedProductDataForFss(List<Products> products, SearchBatchResponse internalSearchBatchResponse, string exchangeSetRootPath, SalesCatalogueServiceResponseQueueMessage queueMessage, CancellationTokenSource cancellationTokenSource, CancellationToken cancellationToken, string businessUnit)
+        public async Task<List<Products>> GetNonCachedProductDataForFss(List<Products> products, SearchBatchResponse internalSearchBatchResponse, string exchangeSetRootPath, SalesCatalogueServiceResponseQueueMessage queueMessage, CancellationTokenSource cancellationTokenSource, CancellationToken cancellationToken, string businessUnit)
         {
             var internalProductsNotFound = new List<Products>();
 
