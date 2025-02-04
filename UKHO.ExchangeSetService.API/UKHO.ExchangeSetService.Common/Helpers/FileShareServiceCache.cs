@@ -53,7 +53,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             this.aioConfiguration = aioConfiguration.Value;
         }
 
-        public async Task<List<Products>> RhzX_GetNonCachedProductDataForFss(
+        public async Task<List<Products>> GetNonCachedProductDataForFss(
                 List<Products> products,
                 SearchBatchResponse internalSearchBatchResponse,
                 string exchangeSetRootPath,
@@ -112,16 +112,19 @@ namespace UKHO.ExchangeSetService.Common.Helpers
                         hasResponse = !string.IsNullOrEmpty(cacheInfo.Response);
 
 
-                        if (!hasResponse) //Why would response be empty?
-                        {
-                            var blobClient = await azureBlobStorageClient.GetBlobClient($"{cacheInfo.BatchId}.json", storageConnectionString, cacheInfo.BatchId);
+                        //if (!hasResponse) //Why would response be empty?
+                        //{
+                        //    logger.LogError(EventIds.CreateProductDataError.ToEventId(), "Empty Response for Product/CellName:{ProductName}, EditionNumber:{EditionNumber} and UpdateNumber:{UpdateNumber}. BatchId:{batchId} and _X-Correlation-ID:{CorrelationId}",
+                        //        product.ProductName, product.EditionNumber, cacheUpdateNumber, queueMessage.BatchId, queueMessage.CorrelationId);
 
-                            if (blobClient != null)
-                            {
-                                cacheInfo.Response = await azureBlobStorageClient.DownloadTextAsync(blobClient);
-                                hasResponse = true;
-                            }
-                        }
+                        //    var blobClient = await azureBlobStorageClient.GetBlobClient($"{cacheInfo.BatchId}.json", storageConnectionString, cacheInfo.BatchId);
+
+                        //    if (blobClient != null)
+                        //    {
+                        //        cacheInfo.Response = await azureBlobStorageClient.DownloadTextAsync(blobClient);
+                        //        hasResponse = true;
+                        //    }
+                        //}
 
                         if (hasResponse)
                         {
@@ -153,7 +156,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             return internalProductsNotFound;
         }
 
-        public async Task<List<Products>> GetNonCachedProductDataForFss(List<Products> products, SearchBatchResponse internalSearchBatchResponse, string exchangeSetRootPath, SalesCatalogueServiceResponseQueueMessage queueMessage, CancellationTokenSource cancellationTokenSource, CancellationToken cancellationToken, string businessUnit)
+        public async Task<List<Products>> RhzX_GetNonCachedProductDataForFss(List<Products> products, SearchBatchResponse internalSearchBatchResponse, string exchangeSetRootPath, SalesCatalogueServiceResponseQueueMessage queueMessage, CancellationTokenSource cancellationTokenSource, CancellationToken cancellationToken, string businessUnit)
         {
             var internalProductsNotFound = new List<Products>();
 
