@@ -14,14 +14,10 @@ namespace UKHO.ExchangeSetService.Common.Helpers
     {
         public async Task<BlobClient> GetBlobClient(string fileName, string storageAccountConnectionString, string containerName)
         {
-            BlobClient blobClient = null;
             var blobServiceClient = new BlobServiceClient(storageAccountConnectionString);
             var blobContainerClient = blobServiceClient.GetBlobContainerClient(containerName);
-            if (await blobContainerClient.ExistsAsync())
-            {
-                blobClient = blobContainerClient.GetBlobClient(fileName);
-            }
-            return blobClient;
+            await blobContainerClient.CreateIfNotExistsAsync();
+            return blobContainerClient.GetBlobClient(fileName);
         }
 
         public BlobClient GetBlobClientByUri(string uri, StorageSharedKeyCredential keyCredential)
