@@ -557,7 +557,11 @@
     <cve>CVE-2021-22134</cve>
     <cve>CVE-2020-7020</cve>
     <cve>CVE-2023-49921</cve>
+    <cve>CVE-2024-23444</cve>
+    <cve>CVE-2024-23450</cve>
+    <cve>CVE-2024-43709</cve>
   </suppress>
+  
   <suppress>
     <notes>
       <![CDATA[
@@ -617,4 +621,5 @@
     <packageUrl regex="true">^pkg:nuget/Azure\.Core@.*$</packageUrl>
     <cve>CVE-2024-43591</cve>
   </suppress>
+  
 </suppressions>
