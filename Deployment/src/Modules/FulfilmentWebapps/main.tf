@@ -179,7 +179,7 @@ resource "azurerm_app_service_plan" "large_exchange_set_app_service_plan" {
 	size = var.app_service_sku.size
   }
   tags                = var.tags
-  zone_redundant      = true
+  zone_redundant      = false
 }
 
 resource "azurerm_app_service" "large_exchange_set_webapp" {
