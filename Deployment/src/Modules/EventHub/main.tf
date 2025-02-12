@@ -5,6 +5,7 @@ resource "azurerm_eventhub_namespace" "eventhub_namespace" {
   sku                 = "Standard"
   capacity            = 1
   tags                = var.tags
+  minimum_tls_version = "1.2"
 }
 
 resource "azurerm_eventhub" "eventhub" {
