@@ -9,9 +9,12 @@ namespace UKHO.ExchangeSetService.Common.Helpers
     public interface IAzureBlobStorageClient
     {
         Task<BlobClient> GetBlobClient(string fileName, string storageAccountConnectionString, string containerName);
-        BlobClient GetBlobClientByUri(string uri, StorageSharedKeyCredential keyCredential);
-        Task UploadFromStreamAsync(BlobClient blobClient, MemoryStream ms);
-        Task<string> DownloadTextAsync(BlobClient blobClient);
+        Task<BlobClient> GetBlobClientForUpload(string fileName, string storageAccountConnectionString, string containerName);
+        //BlobClient GetBlobClientByUri(string uri, StorageSharedKeyCredential keyCredential);
+        //Task UploadFromStreamAsync(BlobClient blobClient, MemoryStream ms);
+        //Task<string> DownloadTextAsync(BlobClient blobClient);
+        Task<string> DownloadTextAsync(string uri, StorageSharedKeyCredential keyCredential);
+        Task<string> DownloadTextAsync(string fileName, string storageAccountConnectionString, string containerName);
         Task<HealthCheckResult> CheckBlobContainerHealth(string storageAccountConnectionString, string containerName);
         Task DeleteCacheContainer(string storageAccountConnectionString, string containerName);
     }

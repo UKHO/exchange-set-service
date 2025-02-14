@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.IO.Abstractions;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -52,18 +53,21 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             var (saName,saKey) = GetStorageAccountNameAndKeyBasedOnExchangeSetType(instanceCountAndType.ExchangeSetType);
 
             var connectionString = scsStorageService.GetStorageAccountConnectionString(saName, saKey);
-            var blobClient = await azureBlobStorageClient.GetBlobClient(uploadFileName, connectionString, containerName);
+            //rhz var blobClient = await azureBlobStorageClient.GetBlobClient(uploadFileName, connectionString, containerName);
 
-            var scsStorageSuccessful = await UploadSalesCatalogueServiceResponseToBlobAsync(blobClient, salesCatalogueResponse);
-
-            if (scsStorageSuccessful)
+            //var scsStorageSuccessful = await UploadSalesCatalogueServiceResponseToBlobAsync(blobClient, salesCatalogueResponse);
+            //rhz this may return a tuple with the success and the uri
+            var scsAbsoluteUri = await UploadSalesCatalogueServiceResponseAsync(uploadFileName, connectionString, containerName, salesCatalogueResponse);
+            //if (scsStorageSuccessful)
+            if(!string.IsNullOrEmpty(scsAbsoluteUri))
             {
                 logger.LogInformation(EventIds.SCSResponseStoredToBlobStorage.ToEventId(), "Sales catalogue service response stored to blob storage with fileSizeInMB:{fileSizeInMB} for BatchId:{batchId} and _X-Correlation-ID:{CorrelationId} ", fileSizeInMB, batchId, correlationId);
 
                 var scsResponseQueueMessage = new SalesCatalogueServiceResponseQueueMessage()
                 {
                     BatchId = batchId,
-                    ScsResponseUri = blobClient.Uri.AbsoluteUri,
+                    //ScsResponseUri = blobClient.Uri.AbsoluteUri,
+                    ScsResponseUri = scsAbsoluteUri,
                     FileSize = fileSize,
                     CallbackUri = callBackUri ?? string.Empty,
                     ExchangeSetStandard = exchangeSetStandard,
@@ -83,7 +87,8 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             {
                 logger.LogInformation(EventIds.SCSResponseStoredToBlobStorage.ToEventId(), "Critical error, Sales catalogue service response not stored to blob storage for  fileSizeInMB:{fileSizeInMB} for BatchId:{batchId} and _X-Correlation-ID:{CorrelationId} ", fileSizeInMB, batchId, correlationId);
             }
-            return scsStorageSuccessful;
+            //return scsStorageSuccessful;
+            return !string.IsNullOrEmpty(scsAbsoluteUri);
         }
 
         public async Task AddQueueMessage(SalesCatalogueServiceResponseQueueMessage message,int instanceNumber,string storageAccountConnectionString)
@@ -110,7 +115,28 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             }
             return uploadSuccess;
         }
-        
+
+        private async Task<string> UploadSalesCatalogueServiceResponseAsync(string fileName, string connectionString, string containerName, SalesCatalogueProductResponse salesCatalogueResponse)
+        {
+            var absoluteUri = string.Empty;
+            var blobClient = await azureBlobStorageClient.GetBlobClientForUpload(connectionString, containerName, fileName);
+            var serializeJsonObject = JsonConvert.SerializeObject(salesCatalogueResponse);
+
+            using var ms = new MemoryStream();
+            LoadStreamWithJson(ms, serializeJsonObject);
+            try
+            {
+                // will throw exception if file already exists
+                var response = await blobClient.UploadAsync(ms);
+                absoluteUri = blobClient.Uri.AbsoluteUri;
+            }
+            catch (Exception ex)
+            {
+                logger.LogInformation(EventIds.SCSResponseStoredToBlobStorage.ToEventId(), "Critical Error, stream upload failed: {message} stream source {sjo} ", ex.Message, serializeJsonObject);
+            }
+            return absoluteUri;
+        }
+
 
         private void LoadStreamWithJson(Stream ms, object obj)
         {
@@ -128,9 +154,9 @@ namespace UKHO.ExchangeSetService.Common.Helpers
                 async () =>
                 {
                     var keyCredential = scsStorageService.GetStorageSharedKeyCredentials();
-                    var blobClient = azureBlobStorageClient.GetBlobClientByUri(scsResponseUri, keyCredential);
+                    // rhz var blobClient = azureBlobStorageClient.GetBlobClientByUri(scsResponseUri, keyCredential);
 
-                    var responseFile = await azureBlobStorageClient.DownloadTextAsync(blobClient);
+                    var responseFile = await azureBlobStorageClient.DownloadTextAsync(scsResponseUri, keyCredential);
                     SalesCatalogueProductResponse salesCatalogueProductResponse = JsonConvert.DeserializeObject<SalesCatalogueProductResponse>(responseFile);
 
                     return salesCatalogueProductResponse;

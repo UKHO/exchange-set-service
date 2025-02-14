@@ -10,6 +10,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
     {
         private static class TableClientFactory
         {
+            // time stamp for an hour.
             private static readonly ConcurrentDictionary<string, Task<TableClient>> tableClients = new();
             public static async Task<TableClient> GetTableClient(string tableName, string storageAccountConnectionString)
             {

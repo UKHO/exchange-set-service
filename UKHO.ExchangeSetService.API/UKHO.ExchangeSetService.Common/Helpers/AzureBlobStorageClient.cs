@@ -14,17 +14,27 @@ namespace UKHO.ExchangeSetService.Common.Helpers
     {
         public async Task<BlobClient> GetBlobClient(string fileName, string storageAccountConnectionString, string containerName)
         {
-            BlobClient blobClient = null;
+            // rhz : still have this because may still need it.
             var blobServiceClient = new BlobServiceClient(storageAccountConnectionString);
             var blobContainerClient = blobServiceClient.GetBlobContainerClient(containerName);
-            if (await blobContainerClient.ExistsAsync())
+            if (!await blobContainerClient.ExistsAsync())
             {
-               blobClient = blobContainerClient.GetBlobClient(fileName);
+                await blobContainerClient.CreateAsync();
             }
-            // rhz: commented out the below code as the if statement above may replace it.
-            //await blobContainerClient.CreateIfNotExistsAsync();
-            //return blobContainerClient.GetBlobClient(fileName);
-            return blobClient;
+                
+            return blobContainerClient.GetBlobClient(fileName);
+        }
+
+        public async Task<BlobClient> GetBlobClientForUpload(string fileName, string storageAccountConnectionString, string containerName)
+        {
+            var blobServiceClient = new BlobServiceClient(storageAccountConnectionString);
+            var blobContainerClient = blobServiceClient.GetBlobContainerClient(containerName);
+            if (!await blobContainerClient.ExistsAsync())
+            {
+                await blobContainerClient.CreateAsync();
+            }
+
+            return blobContainerClient.GetBlobClient(fileName);
         }
 
         public BlobClient GetBlobClientByUri(string uri, StorageSharedKeyCredential keyCredential)
@@ -32,9 +42,42 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             return new BlobClient(new Uri(uri), keyCredential);
         }
 
-        public async Task UploadFromStreamAsync(BlobClient blobClient,MemoryStream ms)
+        // rhz: commented out the below code as it may not used.
+        //public async Task UploadFromStreamAsync(BlobClient blobClient,MemoryStream ms)
+        //{
+        //    await blobClient.UploadAsync(ms);
+        //}
+
+        public async Task<string> DownloadTextAsync(string fileName, string storageAccountConnectionString, string containerName)
         {
-            await blobClient.UploadAsync(ms);
+            var blobClient = new BlobClient(storageAccountConnectionString, containerName,fileName);
+            if (await blobClient.ExistsAsync())
+            {
+                using var ms = new MemoryStream();
+                await blobClient.DownloadToAsync(ms);
+                return Encoding.UTF8.GetString(ms.ToArray());
+            }
+            else
+            {
+                //what should happen here?
+                return string.Empty;
+            }
+        }
+
+        public async Task<string> DownloadTextAsync(string uri, StorageSharedKeyCredential keyCredential)
+        {
+            var blobClient = new BlobClient(new Uri(uri), keyCredential);
+            if(await blobClient.ExistsAsync())
+            {
+                using var ms = new MemoryStream();
+                await blobClient.DownloadToAsync(ms);
+                return Encoding.UTF8.GetString(ms.ToArray());
+            }
+            else
+            {
+                //what should happen here?
+                return string.Empty;
+            }
         }
 
         public async Task<string> DownloadTextAsync(BlobClient blobClient)

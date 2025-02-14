@@ -117,13 +117,15 @@ namespace UKHO.ExchangeSetService.Common.Helpers
                             logger.LogInformation(EventIds.LogRequest.ToEventId(), "Empty Response for Product/CellName:{ProductName}, EditionNumber:{EditionNumber} and UpdateNumber:{UpdateNumber}. BatchId:{batchId} and _X-Correlation-ID:{CorrelationId}",
                                 product.ProductName, product.EditionNumber, cacheUpdateNumber, queueMessage.BatchId, queueMessage.CorrelationId);
 
-                            var blobClient = await azureBlobStorageClient.GetBlobClient($"{cacheInfo.BatchId}.json", storageConnectionString, cacheInfo.BatchId);
+                            // rhz var blobClient = await azureBlobStorageClient.GetBlobClient($"{cacheInfo.BatchId}.json", storageConnectionString, cacheInfo.BatchId);
 
-                            if (blobClient != null)
-                            {
-                                cacheInfo.Response = await azureBlobStorageClient.DownloadTextAsync(blobClient);
-                                hasResponse = true;
-                            }
+                            //if (blobClient != null)
+                            //{
+                            //    cacheInfo.Response = await azureBlobStorageClient.DownloadTextAsync(blobClient);
+                            //    hasResponse = true;
+                            //}
+                            cacheInfo.Response = await azureBlobStorageClient.DownloadTextAsync($"{cacheInfo.BatchId}.json", storageConnectionString, cacheInfo.BatchId);
+                            hasResponse = !string.IsNullOrEmpty(cacheInfo.Response);
                         }
 
                         if (hasResponse)
@@ -193,12 +195,14 @@ namespace UKHO.ExchangeSetService.Common.Helpers
 
                         if (cacheInfo != null && string.IsNullOrEmpty(cacheInfo.Response))
                         {
-                            var blobClient = await azureBlobStorageClient.GetBlobClient($"{cacheInfo.BatchId}.json", storageConnectionString, cacheInfo.BatchId);
+                            //rhz var blobClient = await azureBlobStorageClient.GetBlobClient($"{cacheInfo.BatchId}.json", storageConnectionString, cacheInfo.BatchId);
 
-                            if (blobClient != null)
-                            {
-                                cacheInfo.Response = await azureBlobStorageClient.DownloadTextAsync(blobClient);
-                            }
+                            //if (blobClient != null)
+                            //{
+                            //    cacheInfo.Response = await azureBlobStorageClient.DownloadTextAsync(blobClient);
+                            //}
+
+                            cacheInfo.Response = await azureBlobStorageClient.DownloadTextAsync($"{cacheInfo.BatchId}.json", storageConnectionString, cacheInfo.BatchId);
                         }
 
                         if (cacheInfo != null && !string.IsNullOrEmpty(cacheInfo.Response))
