@@ -98,6 +98,7 @@ namespace UKHO.ExchangeSetService.API.Services
                         PartitionKey = cellName,
                         RowKey = $"{editionNumber}|{updateNumber}|{enterpriseEventCacheDataRequest.BusinessUnit.ToUpper()}",
                         Response = JsonConvert.SerializeObject(enterpriseEventCacheDataRequest)
+                        // rhz todo Response = System.Text.Json.JsonSerializer.Serialize(enterpriseEventCacheDataRequest)
                     };
 
                     await DeleteCacheDataAsync(fssSearchResponse, storageConnectionString, correlationId);
@@ -147,6 +148,7 @@ namespace UKHO.ExchangeSetService.API.Services
         private async Task UploadDataToCacheAsync(FssSearchResponseCache fssSearchResponse, string correlationId)
         {
             var cacheBatchDetail = JsonConvert.DeserializeObject<BatchDetail>(fssSearchResponse.Response);
+            // rhz todo var cacheBatchDetail = System.Text.Json.JsonSerializer.Deserialize<BatchDetail>(fssSearchResponse.Response);
             string[] cacheTableRowKeys = fssSearchResponse.RowKey.Split('|', StringSplitOptions.TrimEntries);
 
             logger.LogInformation(EventIds.UploadCacheDataEventStart.ToEventId(), "Upload Cache data to table and blob started for ProductName:{cellName} of BusinessUnit:{businessUnit} and _X-Correlation-ID:{CorrelationId}", fssSearchResponse.PartitionKey, cacheTableRowKeys[2], correlationId);
@@ -172,9 +174,13 @@ namespace UKHO.ExchangeSetService.API.Services
                 {
                     var requestUri = new Uri(httpResponse.RequestMessage.RequestUri.ToString()).GetLeftPart(UriPartial.Path);
                     var serverValue = httpResponse.Headers.Server.ToString().Split('/');
-                    byte[] bytes = fileSystemHelper.ConvertStreamToByteArray(await httpResponse.Content.ReadAsStreamAsync());
+                    // rhz byte[] bytes = fileSystemHelper.ConvertStreamToByteArray(await httpResponse.Content.ReadAsStreamAsync());
+                    // rhz await fileShareServiceCache.CopyFileToBlob(new MemoryStream(bytes), fileName, fssSearchResponse.BatchId);
 
-                    await fileShareServiceCache.CopyFileToBlob(new MemoryStream(bytes), fileName, fssSearchResponse.BatchId);
+                    using (Stream stream = await httpResponse.Content.ReadAsStreamAsync())
+                    {
+                        await fileShareServiceCache.CopyFileToBlob(stream, fileName, fssSearchResponse.BatchId);
+                    }
 
                     logger.LogInformation(EventIds.UploadCacheDataToBlobEvent.ToEventId(), "Upload Cache data, save file to blob for ProductName:{cellName} of BusinessUnit:{businessUnit} and FileName:{filename} and _X-Correlation-ID:{CorrelationId}", fssSearchResponse.PartitionKey, cacheTableRowKeys[2], fileName, correlationId);
                     if (serverValue[0] == ServerHeaderValue)
@@ -197,6 +203,7 @@ namespace UKHO.ExchangeSetService.API.Services
                 PartitionKey = fssSearchResponse.PartitionKey,
                 RowKey = fssSearchResponse.RowKey,
                 Response = JsonConvert.SerializeObject(cacheBatchDetail)
+                // rhz todo Response = System.Text.Json.JsonSerializer.Serialize(cacheBatchDetail)
             };
 
             await logger.LogStartEndAndElapsedTimeAsync(EventIds.FileShareServiceSearchResponseStoreToCacheStart, EventIds.FileShareServiceSearchResponseStoreToCacheCompleted,
