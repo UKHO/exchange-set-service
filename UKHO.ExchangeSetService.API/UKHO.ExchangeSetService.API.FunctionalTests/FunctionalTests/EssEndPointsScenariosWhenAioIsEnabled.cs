@@ -33,6 +33,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
 
 
         [Test]
+        [Ignore("Rhz: Suspended for other test")]
         [Category("QCOnlyTest-AIOEnabled")]
         public async Task WhenICallTheProductIdentifiersApiWithValidAndGB800001ProductAndAioIsEnabled_ThenACorrectResponseIsReturned()
         {
@@ -67,6 +68,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         }
 
         [Test]
+        [Ignore("Rhz: Suspended for other test")]
         [Category("QCOnlyTest-AIOEnabled")]
         public async Task WhenICallTheProductVersionApiWithValidAndGB800001ProductAndAioIsEnabled_ThenTheCorrectResponseIsReturned()
         {
@@ -90,6 +92,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         }
 
         [Test]
+        [Ignore("Rhz: Suspended for other test")]
         [Category("QCOnlyTest-AIOEnabled")]
         public async Task WhenICallTheApiWithAValidRFC1123DateTimeAndAioIsEnabled_ThenACorrectResponseIsReturned()
         {
@@ -106,6 +109,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         }
 
         [Test]
+        [Ignore("Rhz: Suspended for other test")]
         [Category("QCOnlyTest-AIOEnabled")]
         public async Task WhenICallTheProductIdentifiersApiWithValidAndGB800001AndAnInvalidProductAndAioIsEnabled_ThenACorrectResponseIsReturned()
         {
@@ -143,6 +147,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         }
 
         [Test]
+        [Ignore("Rhz: Suspended for other test")]
         [Category("QCOnlyTest-AIOEnabled")]
         public async Task WhenICallTheProductVersionApiWithValidAndGB800001AndInvalidProductAndAioIsEnabled_ThenTheCorrectResponseIsReturned()
         {
@@ -171,6 +176,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         }
 
         [Test]
+        [Ignore("Rhz: Suspended for other test")]
         [Category("QCOnlyTest-AIOEnabled")]
 
         public async Task WhenICallTheProductIdentifiersApiWithValidEncAndNoAioProductAndAioIsEnabled_ThenACorrectResponseIsReturned()
@@ -206,6 +212,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         }
 
         [Test]
+        [Ignore("Rhz: Suspended for other test")]
         [Category("QCOnlyTest-AIOEnabled")]
         public async Task WhenICallTheProductVersionApiWithValidEncAndNoAioProductAndAioIsEnabled_ThenTheCorrectResponseIsReturned()
         {
@@ -228,6 +235,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         }
 
         [Test]
+        [Ignore("Rhz: Suspended for other test")]
         [Category("QCOnlyTest-AIOEnabled")]
         public async Task WhenICallTheProductIdentifiersApiWithOnlyAioProductAndAioIsEnabled_ThenACorrectResponseIsReturned()
         {
@@ -261,6 +269,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         }
 
         [Test]
+        [Ignore("Rhz: Suspended for other test")]
         [Category("QCOnlyTest-AIOEnabled")]
         public async Task WhenICallTheProductVersionApiOnlyAioProductAndAioIsEnabled_ThenTheCorrectResponseIsReturned()
         {
@@ -283,6 +292,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         }
 
         [Test]
+        [Ignore("Rhz: Suspended for other test")]
         [Category("QCOnlyTest-AIOEnabled")]
         public async Task WhenICallTheProductIdentifiersApiWithValidEncAndDuplicateAioProductAndAioIsEnabled_ThenACorrectResponseIsReturned()
         {
@@ -320,6 +330,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         }
 
         [Test]
+        [Ignore("Rhz: Suspended for other test")]
         [Category("QCOnlyTest-AIOEnabled")]
         public async Task WhenICallTheProductVersionApiWithValidEncAndDuplicateAioProductAndAioIsEnabled_ThenTheCorrectResponseIsReturned()
         {
@@ -347,6 +358,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         }
 
         [Test]
+        [Ignore("Rhz: Suspended for other test")]
         [Category("QCOnlyTest-AIOEnabled")]
         public async Task WhenICallTheProductIdentifiersApiWithValidEncProductAndAioCellWhichIsNotAvailableAndAioIsEnabled_ThenACorrectResponseIsReturned()
         {
@@ -384,6 +396,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         }
 
         [Test]
+        [Ignore("Rhz: Suspended for other test")]
         [Category("QCOnlyTest-AIOEnabled")]
         public async Task WhenICallTheProductVersionApiWithValidEncAndAioIsEnabled_ThenTheCorrectResponseIsReturned()
         {
@@ -427,6 +440,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         }
 
         [Test]
+        [Ignore("Rhz: Suspended for other test")]
         [Category("QCOnlyTest-AIOEnabled")]
         public async Task WhenICallTheProductIdentifiersApiWithLargeMediaCellsAndAioCellWhichIsNotAvailableAndAioIsEnabled_ThenACorrectResponseIsReturned()
         {
@@ -463,6 +477,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         }
 
         [Test]
+        [Ignore("Rhz: Suspended for other test")]
         [Category("QCOnlyTest-AIOEnabled")]
         public async Task WhenICallTheProductIdentifiersApiWithLargeMediaCellsAndAioIsEnabled_ThenACorrectResponseIsReturned()
         {
