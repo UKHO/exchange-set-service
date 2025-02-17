@@ -119,7 +119,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
         private async Task<string> UploadSalesCatalogueServiceResponseAsync(string fileName, string connectionString, string containerName, SalesCatalogueProductResponse salesCatalogueResponse)
         {
             var absoluteUri = string.Empty;
-            var blobClient = await azureBlobStorageClient.GetBlobClientForUpload(connectionString, containerName, fileName);
+            var blobClient = await azureBlobStorageClient.GetBlobClientForUpload(fileName,connectionString, containerName);
             var serializeJsonObject = JsonConvert.SerializeObject(salesCatalogueResponse);
 
             using var ms = new MemoryStream();
