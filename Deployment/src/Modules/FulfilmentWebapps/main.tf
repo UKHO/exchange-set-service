@@ -1,13 +1,10 @@
-resource "azurerm_app_service_plan" "small_exchange_set_app_service_plan" {
+resource "azurerm_service_plan" "small_exchange_set_app_service_plan" {
   count               = var.exchange_set_config.SmallExchangeSetInstance
   name                = "${local.small_exchange_set_name}-${sum([1,count.index])}-asp${var.suffix}"
   location            = var.location
   resource_group_name = var.resource_group_name
-  
-  sku {
-	tier = var.app_service_sku.tier
-	size = var.app_service_sku.size
-  }
+  sku_name            = var.app_service_sku.size
+  os_type             = "Windows"
   tags                = var.tags
 }
 
