@@ -174,13 +174,13 @@ namespace UKHO.ExchangeSetService.API.Services
                 {
                     var requestUri = new Uri(httpResponse.RequestMessage.RequestUri.ToString()).GetLeftPart(UriPartial.Path);
                     var serverValue = httpResponse.Headers.Server.ToString().Split('/');
-                    // rhz byte[] bytes = fileSystemHelper.ConvertStreamToByteArray(await httpResponse.Content.ReadAsStreamAsync());
-                    // rhz await fileShareServiceCache.CopyFileToBlob(new MemoryStream(bytes), fileName, fssSearchResponse.BatchId);
+                    byte[] bytes = fileSystemHelper.ConvertStreamToByteArray(await httpResponse.Content.ReadAsStreamAsync());
+                    await fileShareServiceCache.CopyFileToBlob(new MemoryStream(bytes), fileName, fssSearchResponse.BatchId);
 
-                    using (Stream stream = await httpResponse.Content.ReadAsStreamAsync())
-                    {
-                        await fileShareServiceCache.CopyFileToBlob(stream, fileName, fssSearchResponse.BatchId);
-                    }
+                    // rhz using (Stream stream = await httpResponse.Content.ReadAsStreamAsync())
+                    //{
+                    //    await fileShareServiceCache.CopyFileToBlob(stream, fileName, fssSearchResponse.BatchId);
+                    //}
 
                     logger.LogInformation(EventIds.UploadCacheDataToBlobEvent.ToEventId(), "Upload Cache data, save file to blob for ProductName:{cellName} of BusinessUnit:{businessUnit} and FileName:{filename} and _X-Correlation-ID:{CorrelationId}", fssSearchResponse.PartitionKey, cacheTableRowKeys[2], fileName, correlationId);
                     if (serverValue[0] == ServerHeaderValue)
