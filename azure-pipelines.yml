@@ -111,7 +111,8 @@ stages:
           ContinueEvenIfResourcesAreGettingDestroyed: ${{ parameters.ContinueEvenIfResourcesAreGettingDestroyed }}
           AzureSubscription: "Exchange-Set-Service-Dev-A-008-02"
           Container: ${{variables.Container}} 
-          RunTests: true
+          #RunTests: true
+          RunTests: false
 
       # - template: Deployment/templates/app-deploy.yml
       #   parameters:

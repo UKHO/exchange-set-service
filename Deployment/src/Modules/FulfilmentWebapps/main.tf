@@ -13,7 +13,7 @@ resource "azurerm_app_service" "small_exchange_set_webapp" {
   name                = "${local.small_exchange_set_name}-${sum([1,count.index])}-webapp${var.suffix}"
   location            = var.location
   resource_group_name = var.resource_group_name
-  app_service_plan_id = azurerm_app_service_plan.small_exchange_set_app_service_plan[count.index].id
+  app_service_plan_id = azurerm_service_plan.small_exchange_set_app_service_plan[count.index].id
   tags                = var.tags
 
   site_config {
@@ -42,7 +42,7 @@ resource "azurerm_app_service_slot" "small_exchange_set_staging" {
   app_service_name    = azurerm_app_service.small_exchange_set_webapp[count.index].name
   location            = azurerm_app_service.small_exchange_set_webapp[count.index].location
   resource_group_name = azurerm_app_service.small_exchange_set_webapp[count.index].resource_group_name
-  app_service_plan_id = azurerm_app_service_plan.small_exchange_set_app_service_plan[count.index].id
+  app_service_plan_id = azurerm_service_plan.small_exchange_set_app_service_plan[count.index].id
   tags                = azurerm_app_service.small_exchange_set_webapp[count.index].tags
 
   site_config {
