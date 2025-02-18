@@ -12,7 +12,7 @@ removed {
 }
 
 import {
-  for_each = local.config_data.ESSFulfilmentConfiguration.SmallExchangeSetInstance
-  to = module.fulfilment_webapp.azurerm_service_plan.small_exchange_set_app_service_plan[each.key]
-  id = "${azurerm_resource_group.rg.id}/providers/Microsoft.Web/serverFarms/${local.service_name}-${local.env_name}-sxs-${sum([1, each.key])}-asp${var.suffix}"
+  count = local.config_data.ESSFulfilmentConfiguration.SmallExchangeSetInstance
+  to = module.fulfilment_webapp.azurerm_service_plan.small_exchange_set_app_service_plan[count.index]
+  id = "${azurerm_resource_group.rg.id}/providers/Microsoft.Web/serverFarms/${local.service_name}-${local.env_name}-sxs-${sum([1, count.index])}-asp${var.suffix}"
 }
