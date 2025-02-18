@@ -1,6 +1,6 @@
 resource "azurerm_service_plan" "small_exchange_set_app_service_plan" {
   count               = var.exchange_set_config.SmallExchangeSetInstance
-  name                = "${local.small_exchange_set_name}-${sum([1,count.index])}-asp${var.suffix}"
+  name                = "${local.small_exchange_set_name}-${sum([1, count.index])}-asp${var.suffix}"
   location            = var.location
   resource_group_name = var.resource_group_name
   sku_name            = var.app_service_sku.size
@@ -79,25 +79,22 @@ resource "azurerm_app_service_slot_virtual_network_swift_connection" "small_exch
 }
 
 #Medium exchange set
-resource "azurerm_app_service_plan" "medium_exchange_set_app_service_plan" {
+resource "azurerm_service_plan" "medium_exchange_set_app_service_plan" {
   count               = var.exchange_set_config.MediumExchangeSetInstance
   name                = "${local.medium_exchange_set_name}-${sum([1,count.index])}-asp${var.suffix}"
   location            = var.location
   resource_group_name = var.resource_group_name
-  
-  sku {
-	tier = var.app_service_sku.tier
-	size = var.app_service_sku.size
-  }
+  sku_name            = var.app_service_sku.size
+  os_type             = "Windows"
   tags                = var.tags
 }
 
 resource "azurerm_app_service" "medium_exchange_set_webapp" {
   count               = var.exchange_set_config.MediumExchangeSetInstance
-  name                = "${local.medium_exchange_set_name}-${sum([1,count.index])}-webapp${var.suffix}"
+  name                = "${local.medium_exchange_set_name}-${sum([1, count.index])}-webapp${var.suffix}"
   location            = var.location
   resource_group_name = var.resource_group_name
-  app_service_plan_id = azurerm_app_service_plan.medium_exchange_set_app_service_plan[count.index].id
+  app_service_plan_id = azurerm_service_plan.medium_exchange_set_app_service_plan[count.index].id
   tags                = var.tags
 
   site_config {
@@ -126,7 +123,7 @@ resource "azurerm_app_service_slot" "medium_exchange_set_staging" {
   app_service_name    = azurerm_app_service.medium_exchange_set_webapp[count.index].name
   location            = azurerm_app_service.medium_exchange_set_webapp[count.index].location
   resource_group_name = azurerm_app_service.medium_exchange_set_webapp[count.index].resource_group_name
-  app_service_plan_id = azurerm_app_service_plan.medium_exchange_set_app_service_plan[count.index].id
+  app_service_plan_id = azurerm_service_plan.medium_exchange_set_app_service_plan[count.index].id
   tags                = azurerm_app_service.medium_exchange_set_webapp[count.index].tags
 
   site_config {
@@ -163,16 +160,13 @@ resource "azurerm_app_service_slot_virtual_network_swift_connection" "medium_exc
 }
 
 #Large exchange set
-resource "azurerm_app_service_plan" "large_exchange_set_app_service_plan" {
+resource "azurerm_service_plan" "large_exchange_set_app_service_plan" {
   count               = var.exchange_set_config.LargeExchangeSetInstance
-  name                = "${local.large_exchange_set_name}-${sum([1,count.index])}-asp${var.suffix}"
+  name                = "${local.large_exchange_set_name}-${sum([1, count.index])}-asp${var.suffix}"
   location            = var.location
   resource_group_name = var.resource_group_name
-  
-  sku {
-	tier = var.app_service_sku.tier
-	size = var.app_service_sku.size
-  }
+  sku_name            = var.app_service_sku.size
+  os_type             = "Windows"
   tags                = var.tags
 }
 
@@ -181,7 +175,7 @@ resource "azurerm_app_service" "large_exchange_set_webapp" {
   name                = "${local.large_exchange_set_name}-${sum([1,count.index])}-webapp${var.suffix}"
   location            = var.location
   resource_group_name = var.resource_group_name
-  app_service_plan_id = azurerm_app_service_plan.large_exchange_set_app_service_plan[count.index].id
+  app_service_plan_id = azurerm_service_plan.large_exchange_set_app_service_plan[count.index].id
   tags                = var.tags
 
   site_config {
@@ -210,7 +204,7 @@ resource "azurerm_app_service_slot" "large_exchange_set_staging" {
   app_service_name    = azurerm_app_service.large_exchange_set_webapp[count.index].name
   location            = azurerm_app_service.large_exchange_set_webapp[count.index].location
   resource_group_name = azurerm_app_service.large_exchange_set_webapp[count.index].resource_group_name
-  app_service_plan_id = azurerm_app_service_plan.large_exchange_set_app_service_plan[count.index].id
+  app_service_plan_id = azurerm_service_plan.large_exchange_set_app_service_plan[count.index].id
   tags                = azurerm_app_service.large_exchange_set_webapp[count.index].tags
 
   site_config {
