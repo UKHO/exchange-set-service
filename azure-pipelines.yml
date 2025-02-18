@@ -113,15 +113,15 @@ stages:
           Container: ${{variables.Container}} 
           RunTests: true
 
-      - template: Deployment/templates/app-deploy.yml
-        parameters:
-          Environment: "dev"
-          ContinueEvenIfResourcesAreGettingDestroyed: ${{ parameters.ContinueEvenIfResourcesAreGettingDestroyed }}
-          AzureSubscription: "Exchange-Set-Service-Dev-A-008-02"
-          Container: ${{variables.Container}} 
-          RunTests: false
-          pathSuffix: "-v2"
-          v2Modifier: "2"
+      # - template: Deployment/templates/app-deploy.yml
+      #   parameters:
+      #     Environment: "dev"
+      #     ContinueEvenIfResourcesAreGettingDestroyed: ${{ parameters.ContinueEvenIfResourcesAreGettingDestroyed }}
+      #     AzureSubscription: "Exchange-Set-Service-Dev-A-008-02"
+      #     Container: ${{variables.Container}} 
+      #     RunTests: false
+      #     pathSuffix: "-v2"
+      #     v2Modifier: "2"
 
   - stage: QCdeploy
     dependsOn:
