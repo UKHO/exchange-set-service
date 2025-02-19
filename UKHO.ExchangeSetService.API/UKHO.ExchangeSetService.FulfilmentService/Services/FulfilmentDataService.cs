@@ -254,7 +254,9 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             var exchangeSetInfoPath = Path.Combine(exchangeSetPath, fileShareServiceConfig.Value.Info);
 
             await CreateProductFile(batchId, exchangeSetInfoPath, correlationId, salesCatalogueEssDataResponse, scsRequestDateTime, encryption);
-            await CreateSerialEncFile(batchId, exchangeSetPath, correlationId);
+
+            if (encryption) await CreateSerialEncFile(batchId, exchangeSetPath, correlationId);
+
             await DownloadReadMeFileAsync(batchId, exchangeSetRootPath, correlationId);
             await CreateCatalogFile(batchId, exchangeSetRootPath, correlationId, listFulfilmentData, salesCatalogueEssDataResponse, salecatalogueProductResponse);
         }
