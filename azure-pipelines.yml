@@ -10,11 +10,6 @@ parameters:
     type: boolean
     default: false
 
-  - name: DisableDependencyCheck
-    displayName: "Disable OWASP dependency checking"
-    type: boolean
-    default: false
-
 trigger:
   - main
   - release/*
@@ -55,14 +50,6 @@ variables:
     value: "8.0.x"
   - name: WindowPool
     value: "NautilusBuild"
-
-resources:
-  repositories:
-  - repository: UKHOTemplates
-    type: github
-    name: UKHO/devops-pipelinetemplates
-    endpoint: UKHO
-    ref: refs/heads/main
 
 stages:
   - stage: Stryker_Mutator
@@ -112,8 +99,6 @@ stages:
     dependsOn: []
     jobs:
     - template: Deployment/templates/build-test-publish.yml  
-      parameters:
-        DisableDependencyCheck: ${{ parameters.DisableDependencyCheck }}
  
   - stage: Devdeploy
     dependsOn:
