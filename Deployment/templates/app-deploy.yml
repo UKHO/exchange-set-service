@@ -55,8 +55,19 @@ jobs:
     runOnce:
       deploy:
         steps:
-          - checkout: self
-            submodules: recursive
+          - checkout: none
+
+          - download: current
+            displayName: Download terraformartifact
+            artifact: terraformartifact
+
+          - download: current
+            displayName: Download ExchangeSetService
+            artifact: ExchangeSetService
+
+          - download: current
+            displayName: Download ExchangeSetServiceWebAPI
+            artifact: ExchangeSetServiceWebAPI
 
           - template: continuous-deployment${{parameters.pathSuffix}}.yml
             parameters:
