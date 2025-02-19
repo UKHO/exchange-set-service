@@ -90,7 +90,9 @@ module "fulfilment_webapp" {
   env_name                      = local.env_name
   service_name                  = local.service_name
   user_assigned_identity        = module.user_identity.ess_service_identity_id
-  app_service_sku               = var.app_service_sku[local.env_name]
+  sku_sxs                       = var.sku_sxs
+  sku_mxs                       = var.sku_mxs
+  sku_lxs                       = var.sku_lxs
   app_settings = {
     "EventHubLoggingConfiguration:Environment"             = local.env_name
     "EventHubLoggingConfiguration:MinimumLoggingLevel"     = "Warning"

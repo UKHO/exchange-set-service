@@ -40,36 +40,48 @@ variable "spoke_subnet_name" {
   type = string
 }
 
+variable "sku_sxs" {
+  type = string
+}
+
+variable "sku_mxs" {
+  type = string
+}
+
+variable "sku_lxs" {
+  type = string
+}
+
 variable "app_service_sku" {
   type = map(any)
   default = {
     "dev"    = {
-	    tier = "PremiumV2"
-	    size = "P1v2"
+        tier = "PremiumV2"
+        size = "P1v2"
         }
     "qa"     = {
-	    tier = "PremiumV3"
-	    size = "P1v3"
+        tier = "PremiumV3"
+        size = "P1v3"
         }
-    "vne"     = {
-	    tier = "PremiumV3"
-	    size = "P1v3"
+    "vne"    = {
+        tier = "PremiumV3"
+        size = "P1v3"
         }
-    "vni"     = {
-	    tier = "PremiumV3"
-	    size = "P1v3"
+    "vni"    = {
+        tier = "PremiumV3"
+        size = "P1v3"
         }
-    "iat"     = {
-      tier = "PremiumV3"
-      size = "P1v3"
+    "iat"    = {
+        tier = "PremiumV3"
+        size = "P1v3"
         }
-    "pre"  = {
-	    tier = "PremiumV3"
-	    size = "P1v3"
+    "pre"    = {
+        tier = "PremiumV3"
+        size = "P1v3"
         }
     "prod"   = {
-	    tier = "PremiumV3"
-	    size = "P1v3"
+        tier = "PremiumV3"
+        size = "P1v3"
         }
   }
 }

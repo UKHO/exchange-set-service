@@ -3,7 +3,7 @@ resource "azurerm_service_plan" "small_exchange_set_app_service_plan" {
   name                = "${local.small_exchange_set_name}-${sum([1, count.index])}-asp${var.suffix}"
   location            = var.location
   resource_group_name = var.resource_group_name
-  sku_name            = var.app_service_sku.size
+  sku_name            = var.sku_sxs
   os_type             = "Windows"
   tags                = var.tags
 }
@@ -84,7 +84,7 @@ resource "azurerm_service_plan" "medium_exchange_set_app_service_plan" {
   name                = "${local.medium_exchange_set_name}-${sum([1, count.index])}-asp${var.suffix}"
   location            = var.location
   resource_group_name = var.resource_group_name
-  sku_name            = var.app_service_sku.size
+  sku_name            = var.sku_mxs
   os_type             = "Windows"
   tags                = var.tags
 }
@@ -165,7 +165,7 @@ resource "azurerm_service_plan" "large_exchange_set_app_service_plan" {
   name                = "${local.large_exchange_set_name}-${sum([1, count.index])}-asp${var.suffix}"
   location            = var.location
   resource_group_name = var.resource_group_name
-  sku_name            = var.app_service_sku.size
+  sku_name            = var.sku_lxs
   os_type             = "Windows"
   tags                = var.tags
 }

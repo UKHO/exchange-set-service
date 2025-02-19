@@ -36,6 +36,9 @@ steps:
       TF_VAR_agent_2204_subnet: $(agent2204SubnetId)
       TF_VAR_agent_prd_subnet: $(agentprdSubnetId)
       TF_VAR_agent_subscription_id: $(agentSubscriptionId)
+      TF_VAR_sku_sxs: $(skuSxs)
+      TF_VAR_sku_mxs: $(skuMxs)
+      TF_VAR_sku_lxs: $(skuLxs)
 
   - task: FileTransform@2
     displayName: "File Transform: WebJob"
