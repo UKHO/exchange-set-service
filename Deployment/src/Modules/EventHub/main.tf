@@ -5,6 +5,7 @@ resource "azurerm_eventhub_namespace" "eventhub_namespace" {
   sku                 = "Standard"
   capacity            = 1
   tags                = var.tags
+  minimum_tls_version = "1.2"
 }
 
 resource "azurerm_eventhub" "eventhub" {
@@ -54,6 +55,7 @@ resource "azurerm_storage_account" "logstashStorage" {
   resource_group_name       = var.resource_group_name
   location                  = var.location
   account_kind              = "StorageV2"
+  min_tls_version           = "TLS1_2"
   account_tier              = "Standard"
   account_replication_type  = "LRS"
   access_tier               = "Hot"

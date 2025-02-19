@@ -5,6 +5,7 @@ resource "azurerm_storage_account" "small_exchange_set_storage" {
   account_tier = "Standard"
   account_replication_type = "LRS"
   account_kind = "StorageV2"
+  min_tls_version = "TLS1_2"
   allow_nested_items_to_be_public  = false
   network_rules {
     default_action             = "Deny"
@@ -36,6 +37,7 @@ resource "azurerm_storage_account" "medium_exchange_set_storage" {
   account_tier = "Standard"
   account_replication_type = "LRS"
   account_kind = "StorageV2"
+  min_tls_version = "TLS1_2"
   allow_nested_items_to_be_public     = false
   network_rules {
     default_action             = "Deny"
@@ -67,6 +69,7 @@ resource "azurerm_storage_account" "large_exchange_set_storage" {
   account_tier = "Standard"
   account_replication_type = "LRS"
   account_kind = "StorageV2"
+  min_tls_version = "TLS1_2"
   allow_nested_items_to_be_public     = false
   network_rules {
     default_action             = "Deny"
