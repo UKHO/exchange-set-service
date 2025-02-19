@@ -240,10 +240,10 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
             var stream = new MemoryStream(Encoding.UTF8.GetBytes("test stream"));
             const string fileName = "file name";
             const string batchId = "batch id";
-            var storageConnectionString = GetStorageAccountConnectionStringAndContainerName().Item1;
+            /// rhz var storageConnectionString = GetStorageAccountConnectionStringAndContainerName().Item1;
             var blobClient = A.Fake<BlobClient>(o => o.WithArgumentsForConstructor(() => new BlobClient(new Uri("http://tempuri.org/blob"),null)));
-            A.CallTo(() => fakeAzureStorageService.GetStorageAccountConnectionString(A<string>.Ignored, A<string>.Ignored)).Returns(storageConnectionString);
-            A.CallTo(() => fakeAzureBlobStorageClient.GetBlobClient(fileName, storageConnectionString, batchId)).Returns(blobClient);
+            ///rhz A.CallTo(() => fakeAzureStorageService.GetStorageAccountConnectionString(A<string>.Ignored, A<string>.Ignored)).Returns(storageConnectionString);
+            A.CallTo(() => fakeAzureBlobStorageClient.GetBlobClient(fileName, A<string>.Ignored, batchId)).Returns(blobClient);
             A.CallTo(() => blobClient.ExistsAsync(default)).Returns(Response.FromValue(false, default));
             await fileShareServiceCache.CopyFileToBlob(stream, fileName, batchId);
             A.CallTo(() => blobClient.UploadAsync(stream)).MustHaveHappenedOnceExactly();

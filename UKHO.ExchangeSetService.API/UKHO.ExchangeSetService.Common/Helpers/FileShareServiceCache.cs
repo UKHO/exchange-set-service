@@ -32,6 +32,8 @@ namespace UKHO.ExchangeSetService.Common.Helpers
         private readonly IOptions<CacheConfiguration> fssCacheConfiguration;
         private readonly IFileSystemHelper fileSystemHelper;
         private readonly AioConfiguration aioConfiguration;
+        private readonly string serviceConnectionString;
+        private readonly string serviceTableName;
         private const string CONTENT_TYPE = "application/json";
         private const int StringLength = 2;
         private const int responseFileSizeLimitInKb = 60;
@@ -51,6 +53,11 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             this.fssCacheConfiguration = fssCacheConfiguration;
             this.fileSystemHelper = fileSystemHelper;
             this.aioConfiguration = aioConfiguration.Value;
+            serviceConnectionString = this.azureStorageService.GetStorageAccountConnectionString(
+                    fssCacheConfiguration.Value.CacheStorageAccountName,
+                    fssCacheConfiguration.Value.CacheStorageAccountKey
+                    );
+            serviceTableName = this.fssCacheConfiguration.Value.FssSearchCacheTableName;
         }
 
         public async Task<List<Products>> GetNonCachedProductDataForFss(
@@ -62,11 +69,11 @@ namespace UKHO.ExchangeSetService.Common.Helpers
                 CancellationToken cancellationToken,
                 string businessUnit)
         {
-            var storageConnectionString = azureStorageService.GetStorageAccountConnectionString(
-                    fssCacheConfiguration.Value.CacheStorageAccountName,
-                    fssCacheConfiguration.Value.CacheStorageAccountKey
-                    );
-            var tableName = fssCacheConfiguration.Value.FssSearchCacheTableName;
+            // rhz var storageConnectionString = azureStorageService.GetStorageAccountConnectionString(
+            //        fssCacheConfiguration.Value.CacheStorageAccountName,
+            //        fssCacheConfiguration.Value.CacheStorageAccountKey
+            //        );
+            //var tableName = fssCacheConfiguration.Value.FssSearchCacheTableName;
             bool hasResponse;
             var existingFiles = new List<int?>();
             var internalProductsNotFound = new List<Products>();
@@ -95,7 +102,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
                 };
 
                 await foreach (var cacheInfo in await azureTableStorageClient.RetrieveUpdatesFromTableStorageAsync<FssSearchResponseCache>(
-                        product.ProductName, product.EditionNumber.Value, tableName, storageConnectionString))
+                        product.ProductName, product.EditionNumber.Value, serviceTableName, serviceConnectionString))
                 {
                     if (cacheInfo.RowKey.Split('|')[subKeys.businessUnit] == businessUnit)
                     {
@@ -124,7 +131,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
                             //    cacheInfo.Response = await azureBlobStorageClient.DownloadTextAsync(blobClient);
                             //    hasResponse = true;
                             //}
-                            cacheInfo.Response = await azureBlobStorageClient.DownloadTextAsync($"{cacheInfo.BatchId}.json", storageConnectionString, cacheInfo.BatchId);
+                            cacheInfo.Response = await azureBlobStorageClient.DownloadTextAsync($"{cacheInfo.BatchId}.json", serviceConnectionString, cacheInfo.BatchId);
                             hasResponse = !string.IsNullOrEmpty(cacheInfo.Response);
                         }
 
@@ -136,7 +143,6 @@ namespace UKHO.ExchangeSetService.Common.Helpers
                                     product,
                                     existingFiles,
                                     cacheUpdateNumber,
-                                    storageConnectionString,
                                     cacheInfo,
                                     businessUnit);
 
@@ -207,7 +213,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
 
                         if (cacheInfo != null && !string.IsNullOrEmpty(cacheInfo.Response))
                         {
-                            var internalBatchDetail = await CheckIfCacheProductsExistsInBlob(exchangeSetRootPath, queueMessage, item, updateNumbers, itemUpdateNumber, storageConnectionString, cacheInfo, businessUnit);
+                            var internalBatchDetail = await CheckIfCacheProductsExistsInBlob(exchangeSetRootPath, queueMessage, item, updateNumbers, itemUpdateNumber, cacheInfo, businessUnit);
 
                             int fileCount = internalBatchDetail.Files.Count();
 
@@ -236,7 +242,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             return internalProductsNotFound;
         }
 
-        private Task<BatchDetail> CheckIfCacheProductsExistsInBlob(string exchangeSetRootPath, SalesCatalogueServiceResponseQueueMessage queueMessage, Products item, List<int?> updateNumbers, int? itemUpdateNumber, string storageConnectionString, FssSearchResponseCache cacheInfo, string businessUnit)
+        private Task<BatchDetail> CheckIfCacheProductsExistsInBlob(string exchangeSetRootPath, SalesCatalogueServiceResponseQueueMessage queueMessage, Products item, List<int?> updateNumbers, int? itemUpdateNumber, FssSearchResponseCache cacheInfo, string businessUnit)
         {
             logger.LogInformation(EventIds.FileShareServiceSearchENCFilesFromCacheStart.ToEventId(), "File share service search request from cache started for Product/CellName:{ProductName}, EditionNumber:{EditionNumber}, UpdateNumber:{UpdateNumber} and BusinessUnit:{BusinessUnit}. BatchId:{batchId} and _X-Correlation-ID:{CorrelationId}", item.ProductName, item.EditionNumber, itemUpdateNumber, businessUnit, queueMessage.BatchId, queueMessage.CorrelationId);
             //rhz removed var internalBatchDetail = JsonConvert.DeserializeObject<BatchDetail>(cacheInfo.Response);
@@ -267,7 +273,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
                         string path = Path.Combine(downloadPath, fileName);
                         if (!fileSystemHelper.CheckFileExists(path))
                         {
-                            var blobClient = await azureBlobStorageClient.GetBlobClient(fileName, storageConnectionString, internalBatchDetail.BatchId);
+                            var blobClient = await azureBlobStorageClient.GetBlobClient(fileName, serviceConnectionString, internalBatchDetail.BatchId);
 
                             //Added to check blob exception
                             try
@@ -314,8 +320,8 @@ namespace UKHO.ExchangeSetService.Common.Helpers
 
         public async Task CopyFileToBlob(Stream stream, string fileName, string batchId)
         {
-            var storageConnectionString = azureStorageService.GetStorageAccountConnectionString(fssCacheConfiguration.Value.CacheStorageAccountName, fssCacheConfiguration.Value.CacheStorageAccountKey);
-            var blobClient = await azureBlobStorageClient.GetBlobClient(fileName, storageConnectionString, batchId);
+            // rhz var storageConnectionString = azureStorageService.GetStorageAccountConnectionString(fssCacheConfiguration.Value.CacheStorageAccountName, fssCacheConfiguration.Value.CacheStorageAccountKey);
+            var blobClient = await azureBlobStorageClient.GetBlobClient(fileName, serviceConnectionString, batchId);
 
             if (!await blobClient.ExistsAsync())
             {
@@ -339,14 +345,15 @@ namespace UKHO.ExchangeSetService.Common.Helpers
                 fssSearchResponseCache.Response = string.Empty;
             }
 
-            var storageConnectionString = azureStorageService.GetStorageAccountConnectionString(fssCacheConfiguration.Value.CacheStorageAccountName, fssCacheConfiguration.Value.CacheStorageAccountKey);
-            await azureTableStorageClient.InsertOrMergeIntoTableStorageAsync(fssSearchResponseCache, fssCacheConfiguration.Value.FssSearchCacheTableName, storageConnectionString);
+            // rhz var storageConnectionString = azureStorageService.GetStorageAccountConnectionString(fssCacheConfiguration.Value.CacheStorageAccountName, fssCacheConfiguration.Value.CacheStorageAccountKey);
+            //await azureTableStorageClient.InsertOrMergeIntoTableStorageAsync(fssSearchResponseCache, fssCacheConfiguration.Value.FssSearchCacheTableName, storageConnectionString);
+            await azureTableStorageClient.InsertOrMergeIntoTableStorageAsync(fssSearchResponseCache, serviceTableName, serviceConnectionString);
         }
 
         public async Task<Stream> DownloadFileFromCacheAsync(string fileName, string containerName)
         {
-            var storageConnectionString = azureStorageService.GetStorageAccountConnectionString(fssCacheConfiguration.Value.CacheStorageAccountName, fssCacheConfiguration.Value.CacheStorageAccountKey);
-            var blobClient = await azureBlobStorageClient.GetBlobClient(fileName, storageConnectionString, containerName);
+            // rhz var storageConnectionString = azureStorageService.GetStorageAccountConnectionString(fssCacheConfiguration.Value.CacheStorageAccountName, fssCacheConfiguration.Value.CacheStorageAccountKey);
+            var blobClient = await azureBlobStorageClient.GetBlobClient(fileName, serviceConnectionString, containerName);
 
             MemoryStream memoryStream = new MemoryStream();
             if (await blobClient.ExistsAsync())
