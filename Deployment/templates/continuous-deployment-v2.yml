@@ -16,6 +16,7 @@ steps:
 
   - task: PowerShell@2
     displayName: "terraform devdeploy for FSSUI"
+    name: TerraformDeploy2
     inputs:
       targetType: filePath
       filePath: '$(Pipeline.Workspace)/terraformartifact/terraform_conditional_run_v2.ps1'
@@ -67,7 +68,7 @@ steps:
     inputs:
       azureSubscription: "${{ parameters.AzureSubscription }}"
       appType: webApp
-      appName: "$(WEB_APP_NAME)"
+      appName: $(WEB_APP_NAME)
       package: "$(Pipeline.Workspace)/ExchangeSetServiceWebAPI/UKHO.ExchangeSetService.API.zip"
       deployToSlotOrASE: true
       slotName: $(WEB_APP_SLOT_NAME)
