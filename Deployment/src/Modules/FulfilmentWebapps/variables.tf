@@ -34,16 +34,16 @@ variable "user_assigned_identity" {
   type = string
 }
 
-variable "sku_sxs" {
-  type = string
+variable "app_service_control_sxs" {
+  type = object({ sku = string, zoneRedundant = bool })
 }
 
-variable "sku_mxs" {
-  type = string
+variable "app_service_control_mxs" {
+  type = object({ sku = string, zoneRedundant = bool })
 }
 
-variable "sku_lxs" {
-  type = string
+variable "app_service_control_lxs" {
+  type = object({ sku = string, zoneRedundant = bool })
 }
 
 variable "medium_exchange_set_subnets" {

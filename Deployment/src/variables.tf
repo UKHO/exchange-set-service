@@ -40,16 +40,16 @@ variable "spoke_subnet_name" {
   type = string
 }
 
-variable "sku_sxs" {
-  type = string
+variable "app_service_control_sxs" {
+  type = object({ sku = string, zoneRedundant = bool })
 }
 
-variable "sku_mxs" {
-  type = string
+variable "app_service_control_mxs" {
+  type = object({ sku = string, zoneRedundant = bool })
 }
 
-variable "sku_lxs" {
-  type = string
+variable "app_service_control_lxs" {
+  type = object({ sku = string, zoneRedundant = bool })
 }
 
 variable "app_service_sku" {
