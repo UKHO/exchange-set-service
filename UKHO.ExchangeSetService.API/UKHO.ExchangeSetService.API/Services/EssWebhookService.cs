@@ -97,8 +97,8 @@ namespace UKHO.ExchangeSetService.API.Services
                         BatchId = enterpriseEventCacheDataRequest.BatchId,
                         PartitionKey = cellName,
                         RowKey = $"{editionNumber}|{updateNumber}|{enterpriseEventCacheDataRequest.BusinessUnit.ToUpper()}",
-                        Response = JsonConvert.SerializeObject(enterpriseEventCacheDataRequest)
-                        // rhz todo Response = System.Text.Json.JsonSerializer.Serialize(enterpriseEventCacheDataRequest)
+                        // rhz removed Response = JsonConvert.SerializeObject(enterpriseEventCacheDataRequest)
+                        Response = System.Text.Json.JsonSerializer.Serialize(enterpriseEventCacheDataRequest)
                     };
 
                     await DeleteCacheDataAsync(fssSearchResponse, storageConnectionString, correlationId);
@@ -147,8 +147,8 @@ namespace UKHO.ExchangeSetService.API.Services
 
         private async Task UploadDataToCacheAsync(FssSearchResponseCache fssSearchResponse, string correlationId)
         {
-            var cacheBatchDetail = JsonConvert.DeserializeObject<BatchDetail>(fssSearchResponse.Response);
-            // rhz todo var cacheBatchDetail = System.Text.Json.JsonSerializer.Deserialize<BatchDetail>(fssSearchResponse.Response);
+            // rhz removed var cacheBatchDetail = JsonConvert.DeserializeObject<BatchDetail>(fssSearchResponse.Response);
+            var cacheBatchDetail = System.Text.Json.JsonSerializer.Deserialize<BatchDetail>(fssSearchResponse.Response);
             string[] cacheTableRowKeys = fssSearchResponse.RowKey.Split('|', StringSplitOptions.TrimEntries);
 
             logger.LogInformation(EventIds.UploadCacheDataEventStart.ToEventId(), "Upload Cache data to table and blob started for ProductName:{cellName} of BusinessUnit:{businessUnit} and _X-Correlation-ID:{CorrelationId}", fssSearchResponse.PartitionKey, cacheTableRowKeys[2], correlationId);
@@ -202,8 +202,8 @@ namespace UKHO.ExchangeSetService.API.Services
                 BatchId = fssSearchResponse.BatchId,
                 PartitionKey = fssSearchResponse.PartitionKey,
                 RowKey = fssSearchResponse.RowKey,
-                Response = JsonConvert.SerializeObject(cacheBatchDetail)
-                // rhz todo Response = System.Text.Json.JsonSerializer.Serialize(cacheBatchDetail)
+                // rhz removed Response = JsonConvert.SerializeObject(cacheBatchDetail)
+                Response = System.Text.Json.JsonSerializer.Serialize(cacheBatchDetail)
             };
 
             await logger.LogStartEndAndElapsedTimeAsync(EventIds.FileShareServiceSearchResponseStoreToCacheStart, EventIds.FileShareServiceSearchResponseStoreToCacheCompleted,
