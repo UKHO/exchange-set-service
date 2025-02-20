@@ -3,10 +3,10 @@ resource "azurerm_service_plan" "small_exchange_set_app_service_plan" {
   name                   = var.asp_name_sxs[count.index]
   location               = var.location
   resource_group_name    = var.resource_group_name
-  sku_name               = var.app_service_control_sxs.sku
+  sku_name               = var.asp_control_sxs.sku
   os_type                = "Windows"
   tags                   = var.tags
-  zone_balancing_enabled = var.app_service_control_sxs.zoneRedundant
+  zone_balancing_enabled = var.asp_control_sxs.zoneRedundant
 }
 
 resource "azurerm_app_service" "small_exchange_set_webapp" {
@@ -85,10 +85,10 @@ resource "azurerm_service_plan" "medium_exchange_set_app_service_plan" {
   name                   = var.asp_name_mxs[count.index]
   location               = var.location
   resource_group_name    = var.resource_group_name
-  sku_name               = var.app_service_control_mxs.sku
+  sku_name               = var.asp_control_mxs.sku
   os_type                = "Windows"
   tags                   = var.tags
-  zone_balancing_enabled = var.app_service_control_mxs.zoneRedundant
+  zone_balancing_enabled = var.asp_control_mxs.zoneRedundant
 }
 
 resource "azurerm_app_service" "medium_exchange_set_webapp" {
@@ -167,10 +167,10 @@ resource "azurerm_service_plan" "large_exchange_set_app_service_plan" {
   name                   = var.asp_name_lxs[count.index]
   location               = var.location
   resource_group_name    = var.resource_group_name
-  sku_name               = var.app_service_control_lxs.sku
+  sku_name               = var.asp_control_lxs.sku
   os_type                = "Windows"
   tags                   = var.tags
-  zone_balancing_enabled = var.app_service_control_lxs.zoneRedundant
+  zone_balancing_enabled = var.asp_control_lxs.zoneRedundant
 }
 
 resource "azurerm_app_service" "large_exchange_set_webapp" {
