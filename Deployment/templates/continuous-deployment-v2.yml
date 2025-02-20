@@ -36,9 +36,9 @@ steps:
       TF_VAR_agent_2204_subnet: $(agent2204SubnetId)
       TF_VAR_agent_prd_subnet: $(agentprdSubnetId)
       TF_VAR_agent_subscription_id: $(agentSubscriptionId)
-      TF_VAR_app_service_control_sxs: $(appServiceControlSxs)
-      TF_VAR_app_service_control_mxs: $(appServiceControlMxs)
-      TF_VAR_app_service_control_lxs: $(appServiceControlLxs)
+      TF_VAR_asp_control_sxs: $(appServicePlanControlSxs)
+      TF_VAR_asp_control_mxs: $(appServicePlanControlMxs)
+      TF_VAR_asp_control_lxs: $(appServicePlanControlLxs)
 
   - task: FileTransform@2
     displayName: "File Transform: WebJob"

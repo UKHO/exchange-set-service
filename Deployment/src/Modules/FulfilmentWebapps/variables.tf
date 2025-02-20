@@ -10,40 +10,10 @@ variable "app_settings" {
   type = map(string)
 }
 
-
 variable "tags" {
-
 }
 
 variable "small_exchange_set_subnets" {
-}
-
-variable "exchange_set_config"{
-
-}
-
-variable "service_name" {
-  type = string
-}
-
-variable "env_name"{
-  type = string
-}
-
-variable "user_assigned_identity" {
-  type = string
-}
-
-variable "app_service_control_sxs" {
-  type = object({ sku = string, zoneRedundant = bool })
-}
-
-variable "app_service_control_mxs" {
-  type = object({ sku = string, zoneRedundant = bool })
-}
-
-variable "app_service_control_lxs" {
-  type = object({ sku = string, zoneRedundant = bool })
 }
 
 variable "medium_exchange_set_subnets" {
@@ -52,12 +22,49 @@ variable "medium_exchange_set_subnets" {
 variable "large_exchange_set_subnets" {
 }
 
-locals {
-  small_exchange_set_name = "${var.service_name}-${var.env_name}-sxs"
-  medium_exchange_set_name = "${var.service_name}-${var.env_name}-mxs"
-  large_exchange_set_name = "${var.service_name}-${var.env_name}-lxs"
+variable "exchange_set_config" {
+}
+
+variable "user_assigned_identity" {
+  type = string
+}
+
+variable "asp_control_sxs" {
+  type = object({ sku = string, zoneRedundant = bool })
+}
+
+variable "asp_control_mxs" {
+  type = object({ sku = string, zoneRedundant = bool })
+}
+
+variable "asp_control_lxs" {
+  type = object({ sku = string, zoneRedundant = bool })
+}
+
+variable "asp_name_sxs" {
+  type = list(string)
+}
+
+variable "asp_name_mxs" {
+  type = list(string)
+}
+
+variable "asp_name_lxs" {
+  type = list(string)
+}
+
+variable "as_name_sxs" {
+  type = list(string)
+}
+
+variable "as_name_mxs" {
+  type = list(string)
+}
+
+variable "as_name_lxs" {
+  type = list(string)
 }
 
 variable "suffix" {
-  default     = ""
+  default = ""
 }

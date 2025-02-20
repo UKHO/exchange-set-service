@@ -22,6 +22,12 @@ locals {
     COST_CENTRE      = local.env_name == "dev" || local.env_name == "qa" || local.env_name == "prod" ? "A.008.02" : "A.011.08"
   }
   config_data = jsondecode(file("${path.module}/appsettings.json"))
+  asp_name_sxs = [for i in range(local.config_data.ESSFulfilmentConfiguration.SmallExchangeSetInstance) : "${local.service_name}-${local.env_name}-sxs-${sum([1, i])}-asp${var.suffix}"]
+  asp_name_mxs = [for i in range(local.config_data.ESSFulfilmentConfiguration.MediumExchangeSetInstance) : "${local.service_name}-${local.env_name}-mxs-${sum([1, i])}-asp${var.suffix}"]
+  asp_name_lxs = [for i in range(local.config_data.ESSFulfilmentConfiguration.LargeExchangeSetInstance) : "${local.service_name}-${local.env_name}-lxs-${sum([1, i])}-asp${var.suffix}"]
+  as_name_sxs = [for i in range(local.config_data.ESSFulfilmentConfiguration.SmallExchangeSetInstance) : "${local.service_name}-${local.env_name}-sxs-${sum([1, i])}-webapp${var.suffix}"]
+  as_name_mxs = [for i in range(local.config_data.ESSFulfilmentConfiguration.MediumExchangeSetInstance) : "${local.service_name}-${local.env_name}-mxs-${sum([1, i])}-webapp${var.suffix}"]
+  as_name_lxs = [for i in range(local.config_data.ESSFulfilmentConfiguration.LargeExchangeSetInstance) : "${local.service_name}-${local.env_name}-lxs-${sum([1, i])}-webapp${var.suffix}"]
 }
 
 variable "allowed_ips" {
@@ -40,15 +46,15 @@ variable "spoke_subnet_name" {
   type = string
 }
 
-variable "app_service_control_sxs" {
+variable "asp_control_sxs" {
   type = object({ sku = string, zoneRedundant = bool })
 }
 
-variable "app_service_control_mxs" {
+variable "asp_control_mxs" {
   type = object({ sku = string, zoneRedundant = bool })
 }
 
-variable "app_service_control_lxs" {
+variable "asp_control_lxs" {
   type = object({ sku = string, zoneRedundant = bool })
 }
 
