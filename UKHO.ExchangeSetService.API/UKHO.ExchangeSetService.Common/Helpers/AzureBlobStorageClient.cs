@@ -64,6 +64,20 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             }
         }
 
+        public async Task<bool> DownloadToFileAsync(string storageAccountConnectionString, string containerName, string fileName, string filePath)
+        {
+            var blobClient = new BlobClient(storageAccountConnectionString, containerName, fileName);
+            if (await blobClient.ExistsAsync())
+            {
+                await blobClient.DownloadToAsync(filePath);
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
         public async Task<string> DownloadTextAsync(string uri, StorageSharedKeyCredential keyCredential)
         {
             var blobClient = new BlobClient(new Uri(uri), keyCredential);

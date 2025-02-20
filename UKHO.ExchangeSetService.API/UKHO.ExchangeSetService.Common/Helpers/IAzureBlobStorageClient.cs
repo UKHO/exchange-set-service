@@ -15,6 +15,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
         //Task<string> DownloadTextAsync(BlobClient blobClient);
         Task<string> DownloadTextAsync(string uri, StorageSharedKeyCredential keyCredential);
         Task<string> DownloadTextAsync(string fileName, string storageAccountConnectionString, string containerName);
+        Task<bool> DownloadToFileAsync(string storageAccountConnectionString, string containerName, string fileName, string filePath);
         Task<HealthCheckResult> CheckBlobContainerHealth(string storageAccountConnectionString, string containerName);
         Task DeleteCacheContainer(string storageAccountConnectionString, string containerName);
     }

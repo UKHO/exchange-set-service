@@ -20,6 +20,7 @@ using UKHO.ExchangeSetService.Common.Storage;
 using Azure.Data.Tables;
 using Microsoft.IdentityModel.Tokens;
 using System.Runtime.InteropServices;
+using Azure.Storage.Blobs;
 
 namespace UKHO.ExchangeSetService.Common.Helpers
 {
@@ -273,23 +274,32 @@ namespace UKHO.ExchangeSetService.Common.Helpers
                         string path = Path.Combine(downloadPath, fileName);
                         if (!fileSystemHelper.CheckFileExists(path))
                         {
-                            var blobClient = await azureBlobStorageClient.GetBlobClient(fileName, serviceConnectionString, internalBatchDetail.BatchId);
+                            //var blobClient = await azureBlobStorageClient.GetBlobClient(fileName, serviceConnectionString, internalBatchDetail.BatchId);
 
-                            //Added to check blob exception
                             try
                             {
-                                await fileSystemHelper.DownloadToFileAsync(blobClient, path);
-                                updateNumbers.Add(itemUpdateNumber.Value);
+                                var containerName = internalBatchDetail.BatchId;
+                                //await fileSystemHelper.DownloadToFileAsync(blobClient, path);
+                                if (await azureBlobStorageClient.DownloadToFileAsync(serviceConnectionString, containerName, fileName,path))
+                                {
+                                    updateNumbers.Add(itemUpdateNumber.Value);
+                                }
+                                else
+                                {
+                                    logger.LogInformation(EventIds.DownloadENCFilesNonOkResponse.ToEventId(), "File not found for Product/CellName:{ProductName}, EditionNumber:{EditionNumber}, UpdateNumber:{UpdateNumber} and BusinessUnit:{BusinessUnit}. BatchId:{batchId} and _X-Correlation-ID:{CorrelationId} for blobName: {Name}, fileItem: {fileItem}", item.ProductName, item.EditionNumber, itemUpdateNumber, businessUnit, queueMessage.BatchId, queueMessage.CorrelationId, fileName, fileItem);
+                                }
+
                             }
-                            catch (RequestFailedException requestFailedException) when(requestFailedException.ErrorCode == BlobErrorCode.BlobNotFound.ToString())
+                            catch (RequestFailedException requestFailedException) when (requestFailedException.ErrorCode == BlobErrorCode.BlobNotFound.ToString())
                             {
-                                logger.LogError(EventIds.GetBlobDetailsWithCacheContainerException.ToEventId(), "Error while download the file from blob for Product/CellName:{ProductName}, EditionNumber:{EditionNumber}, UpdateNumber:{UpdateNumber} and BusinessUnit:{BusinessUnit}. BatchId:{batchId} and _X-Correlation-ID:{CorrelationId} for blobName: {Name}, fileItem: {fileItem} with error: {Message}", item.ProductName, item.EditionNumber, itemUpdateNumber, businessUnit, queueMessage.BatchId, queueMessage.CorrelationId, blobClient.Name, fileItem, requestFailedException.Message);
+                                logger.LogError(EventIds.GetBlobDetailsWithCacheContainerException.ToEventId(), "Error while download the file from blob for Product/CellName:{ProductName}, EditionNumber:{EditionNumber}, UpdateNumber:{UpdateNumber} and BusinessUnit:{BusinessUnit}. BatchId:{batchId} and _X-Correlation-ID:{CorrelationId} for blobName: {Name}, fileItem: {fileItem} with error: {Message}", item.ProductName, item.EditionNumber, itemUpdateNumber, businessUnit, queueMessage.BatchId, queueMessage.CorrelationId, fileName, fileItem, requestFailedException.Message);
                             }
                             catch (Exception ex)
                             {
-                                logger.LogError(EventIds.DownloadENCFilesFromCacheContainerException.ToEventId(), "Error while download the file from blob for Product/CellName:{ProductName}, EditionNumber:{EditionNumber}, UpdateNumber:{UpdateNumber} and BusinessUnit:{BusinessUnit}. BatchId:{batchId} and _X-Correlation-ID:{CorrelationId} for blobName: {Name}, fileItem: {fileItem} with error: {Message}", item.ProductName, item.EditionNumber, itemUpdateNumber, businessUnit, queueMessage.BatchId, queueMessage.CorrelationId, blobClient.Name, fileItem, ex.Message);
+                                logger.LogError(EventIds.DownloadENCFilesFromCacheContainerException.ToEventId(), "Error while download the file from blob for Product/CellName:{ProductName}, EditionNumber:{EditionNumber}, UpdateNumber:{UpdateNumber} and BusinessUnit:{BusinessUnit}. BatchId:{batchId} and _X-Correlation-ID:{CorrelationId} for blobName: {Name}, fileItem: {fileItem} with error: {Message}", item.ProductName, item.EditionNumber, itemUpdateNumber, businessUnit, queueMessage.BatchId, queueMessage.CorrelationId, fileName, fileItem, ex.Message);
                                 throw new FulfilmentException(EventIds.DownloadENCFilesFromCacheContainerException.ToEventId());
-                            }
+                            } 
+                            
                         }
                         internalBatchDetail.IgnoreCache = true;
                     }

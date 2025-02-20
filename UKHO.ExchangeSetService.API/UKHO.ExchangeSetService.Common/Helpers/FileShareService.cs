@@ -130,6 +130,8 @@ namespace UKHO.ExchangeSetService.Common.Helpers
 
             if (cacheProductsNotFound != null && cacheProductsNotFound.Any())
             {
+                // rhz temp log
+                logger.LogInformation(EventIds.LogRequest.ToEventId(), "Products not found and should be cached  _X-Correlation-ID:{CorrelationId}",message.CorrelationId);
                 var internalNotFoundProducts = new List<Products>();
                 var accessToken = await authFssTokenProvider.GetManagedIdentityAuthAsync(fileShareServiceConfig.Value.ResourceId);
                 var productWithAttributes = GenerateQueryForFss(cacheProductsNotFound);
