@@ -7,26 +7,33 @@ variable "location" {
 }
 
 variable "tags" {
-
 }
 
-variable "exchange_set_config"{
-
+variable "exchange_set_config" {
 }
+
+variable "queue_resource_uri_sxs" {
+  type = list(string)
+}
+
+variable "queue_resource_uri_mxs" {
+  type = list(string)
+}
+
+variable "queue_resource_uri_lxs" {
+  type = list(string)
+}
+
+
+
+
+
 
 variable "asp_name" {
   type = string
 }
 
 variable "asp_id" {
-  type = string
-}
-
-variable "commit_queue_metric_resource_uri" {
-  type = string
-}
-
-variable "env_name"{
   type = string
 }
 

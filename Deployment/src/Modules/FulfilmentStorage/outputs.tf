@@ -1,3 +1,4 @@
+#small exchange set
 output small_exchange_set_name {
   value = azurerm_storage_account.small_exchange_set_storage.name
 }
@@ -14,6 +15,10 @@ output small_exchange_set_primary_access_key {
 
 output small_exchange_set_fulfilment_queues {
   value = azurerm_storage_queue.small_exchange_set_storage_queue[*].name
+}
+
+output queue_resource_uri_sxs {
+  value = "${azurerm_storage_account.small_exchange_set_storage.id}/services/queue/queues/${azurerm_storage_queue.small_exchange_set_storage_queue[*].name}"
 }
 
 #medium exchange set
@@ -35,6 +40,10 @@ output medium_exchange_set_fulfilment_queues {
   value = azurerm_storage_queue.medium_exchange_set_storage_queue[*].name
 }
 
+output queue_resource_uri_mxs {
+  value = "${azurerm_storage_account.medium_exchange_set_storage.id}/services/queue/queues/${azurerm_storage_queue.medium_exchange_set_storage_queue[*].name}"
+}
+
 #large exchange set
 output large_exchange_set_name {
   value = azurerm_storage_account.large_exchange_set_storage.name
@@ -52,4 +61,8 @@ output large_exchange_set_primary_access_key {
 
 output large_exchange_set_fulfilment_queues {
   value = azurerm_storage_queue.large_exchange_set_storage_queue[*].name
+}
+
+output queue_resource_uri_lxs {
+  value = "${azurerm_storage_account.large_exchange_set_storage.id}/services/queue/queues/${azurerm_storage_queue.large_exchange_set_storage_queue[*].name}"
 }
