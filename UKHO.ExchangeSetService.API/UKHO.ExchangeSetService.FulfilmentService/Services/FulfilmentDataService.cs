@@ -261,7 +261,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             }
             else
             {
-                logger.LogInformation(EventIds.SerialFileCreationSkipped.ToEventId(), "ESS Webjob : serial.enc is not created for BatchId:{BatchId} | _X-Correlation-ID : {CorrelationId}", batchId, correlationId);
+                logger.LogInformation(EventIds.SerialFileCreationSkipped.ToEventId(), "serial.enc is not created for BatchId:{BatchId} | _X-Correlation-ID : {CorrelationId}", batchId, correlationId);
             }
 
             await DownloadReadMeFileAsync(batchId, exchangeSetRootPath, correlationId);
