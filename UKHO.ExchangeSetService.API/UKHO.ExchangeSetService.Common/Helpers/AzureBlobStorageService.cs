@@ -2,12 +2,12 @@
 using System.IO;
 using System.IO.Abstractions;
 using System.Linq;
+using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using Azure.Storage.Blobs;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Newtonsoft.Json;
 using UKHO.ExchangeSetService.Common.Configuration;
 using UKHO.ExchangeSetService.Common.Extensions;
 using UKHO.ExchangeSetService.Common.Logging;
@@ -93,14 +93,14 @@ namespace UKHO.ExchangeSetService.Common.Helpers
 
         public async Task AddQueueMessage(SalesCatalogueServiceResponseQueueMessage message,int instanceNumber,string storageAccountConnectionString)
         {
-            var scsResponseQueueMessageJSON = JsonConvert.SerializeObject(message);
+            var scsResponseQueueMessageJSON = JsonSerializer.Serialize(message);
             await azureMessageQueueHelper.AddMessage(message.BatchId, instanceNumber, storageAccountConnectionString, scsResponseQueueMessageJSON, message.CorrelationId);
         }
 
         public async Task<bool> UploadSalesCatalogueServiceResponseToBlobAsync(BlobClient blobClient, SalesCatalogueProductResponse salesCatalogueResponse)
         {
             var uploadSuccess = false;
-            var serializeJsonObject = JsonConvert.SerializeObject(salesCatalogueResponse);
+            var serializeJsonObject = JsonSerializer.Serialize(salesCatalogueResponse);
             
             using var ms = new MemoryStream();
             LoadStreamWithJson(ms, serializeJsonObject);
@@ -119,8 +119,8 @@ namespace UKHO.ExchangeSetService.Common.Helpers
         private async Task<string> UploadSalesCatalogueServiceResponseAsync(string fileName, string connectionString, string containerName, SalesCatalogueProductResponse salesCatalogueResponse)
         {
             var absoluteUri = string.Empty;
-            var blobClient = await azureBlobStorageClient.GetBlobClientForUpload(fileName,connectionString, containerName);
-            var serializeJsonObject = JsonConvert.SerializeObject(salesCatalogueResponse);
+            var blobClient = await azureBlobStorageClient.GetBlobClient(fileName,connectionString, containerName);
+            var serializeJsonObject = JsonSerializer.Serialize(salesCatalogueResponse);
 
             using var ms = new MemoryStream();
             LoadStreamWithJson(ms, serializeJsonObject);
@@ -136,7 +136,6 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             }
             return absoluteUri;
         }
-
 
         private void LoadStreamWithJson(Stream ms, object obj)
         {
@@ -154,10 +153,9 @@ namespace UKHO.ExchangeSetService.Common.Helpers
                 async () =>
                 {
                     var keyCredential = scsStorageService.GetStorageSharedKeyCredentials();
-                    // rhz var blobClient = azureBlobStorageClient.GetBlobClientByUri(scsResponseUri, keyCredential);
 
                     var responseFile = await azureBlobStorageClient.DownloadTextAsync(scsResponseUri, keyCredential);
-                    SalesCatalogueProductResponse salesCatalogueProductResponse = JsonConvert.DeserializeObject<SalesCatalogueProductResponse>(responseFile);
+                    SalesCatalogueProductResponse salesCatalogueProductResponse = JsonSerializer.Deserialize<SalesCatalogueProductResponse>(responseFile);
 
                     return salesCatalogueProductResponse;
                 },

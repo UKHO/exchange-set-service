@@ -1,13 +1,13 @@
 ﻿using FluentValidation.Results;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Newtonsoft.Json;
 using System;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Text.Json;
 using Azure;
 using UKHO.ExchangeSetService.API.Validation;
 using UKHO.ExchangeSetService.Common.Configuration;
@@ -98,7 +98,7 @@ namespace UKHO.ExchangeSetService.API.Services
                         PartitionKey = cellName,
                         RowKey = $"{editionNumber}|{updateNumber}|{enterpriseEventCacheDataRequest.BusinessUnit.ToUpper()}",
                         // rhz removed Response = JsonConvert.SerializeObject(enterpriseEventCacheDataRequest)
-                        Response = System.Text.Json.JsonSerializer.Serialize(enterpriseEventCacheDataRequest)
+                        Response = JsonSerializer.Serialize(enterpriseEventCacheDataRequest)
                     };
 
                     await DeleteCacheDataAsync(fssSearchResponse, storageConnectionString, correlationId);
@@ -148,7 +148,7 @@ namespace UKHO.ExchangeSetService.API.Services
         private async Task UploadDataToCacheAsync(FssSearchResponseCache fssSearchResponse, string correlationId)
         {
             // rhz removed var cacheBatchDetail = JsonConvert.DeserializeObject<BatchDetail>(fssSearchResponse.Response);
-            var cacheBatchDetail = System.Text.Json.JsonSerializer.Deserialize<BatchDetail>(fssSearchResponse.Response);
+            var cacheBatchDetail = JsonSerializer.Deserialize<BatchDetail>(fssSearchResponse.Response);
             string[] cacheTableRowKeys = fssSearchResponse.RowKey.Split('|', StringSplitOptions.TrimEntries);
 
             logger.LogInformation(EventIds.UploadCacheDataEventStart.ToEventId(), "Upload Cache data to table and blob started for ProductName:{cellName} of BusinessUnit:{businessUnit} and _X-Correlation-ID:{CorrelationId}", fssSearchResponse.PartitionKey, cacheTableRowKeys[2], correlationId);
@@ -203,7 +203,7 @@ namespace UKHO.ExchangeSetService.API.Services
                 PartitionKey = fssSearchResponse.PartitionKey,
                 RowKey = fssSearchResponse.RowKey,
                 // rhz removed Response = JsonConvert.SerializeObject(cacheBatchDetail)
-                Response = System.Text.Json.JsonSerializer.Serialize(cacheBatchDetail)
+                Response = JsonSerializer.Serialize(cacheBatchDetail)
             };
 
             await logger.LogStartEndAndElapsedTimeAsync(EventIds.FileShareServiceSearchResponseStoreToCacheStart, EventIds.FileShareServiceSearchResponseStoreToCacheCompleted,

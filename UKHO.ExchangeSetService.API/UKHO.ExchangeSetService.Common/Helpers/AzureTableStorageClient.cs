@@ -10,7 +10,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
     {
         private static class TableClientFactory
         {
-            // time stamp for an hour.
+            // time stamp for an hour?.
             private static readonly ConcurrentDictionary<string, Task<TableClient>> tableClients = new();
             public static async Task<TableClient> GetTableClient(string tableName, string storageAccountConnectionString)
             {
@@ -39,7 +39,6 @@ namespace UKHO.ExchangeSetService.Common.Helpers
 
         public async Task<TElement> RetrieveFromTableStorageAsync<TElement>(string partitionKey, string rowKey, string tableName, string storageAccountConnectionString) where TElement : class, ITableEntity
         {
-            //var tableClient = await GetAzureTable(tableName, storageAccountConnectionString);
             var tableClient = await TableClientFactory.GetTableClient(tableName, storageAccountConnectionString);
 
             var operation = await tableClient.GetEntityIfExistsAsync<TElement>(partitionKey, rowKey);
@@ -48,7 +47,6 @@ namespace UKHO.ExchangeSetService.Common.Helpers
 
         public async Task<ITableEntity> InsertOrMergeIntoTableStorageAsync(ITableEntity entity, string tableName, string storageAccountConnectionString)
         {
-            //var tableClient = await GetAzureTable(tableName, storageAccountConnectionString);
             var tableClient = await TableClientFactory.GetTableClient(tableName, storageAccountConnectionString);
 
             var result = await tableClient.UpsertEntityAsync(entity);
@@ -57,14 +55,13 @@ namespace UKHO.ExchangeSetService.Common.Helpers
 
         public async Task<ITableEntity> DeleteAsync(ITableEntity entity, string tableName, string storageAccountConnectionString, string containerName)
         {
-            //var tableClient = await GetAzureTable(tableName, storageAccountConnectionString);
             var tableClient = await TableClientFactory.GetTableClient(tableName, storageAccountConnectionString);
 
             await tableClient.DeleteEntityAsync(entity.PartitionKey, entity.RowKey, entity.ETag);
             return entity;
         }
 
-        //private static async Task<TableClient> GetAzureTable(string tableName, string storageAccountConnectionString)
+        // rhz private static async Task<TableClient> GetAzureTable(string tableName, string storageAccountConnectionString)
         //{
         //    var serviceClient = new TableServiceClient(storageAccountConnectionString);
         //    var tableClient = serviceClient.GetTableClient(tableName);

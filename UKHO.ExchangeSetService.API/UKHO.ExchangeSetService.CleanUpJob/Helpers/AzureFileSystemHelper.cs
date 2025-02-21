@@ -79,10 +79,9 @@ namespace UKHO.ExchangeSetService.CleanUpJob.Helpers
         public async Task DeleteHistoricScsResponseFile(DirectoryInfo subDirectory, string storageAccountConnectionString, string containerName)
         {
             var batchId = subDirectory.Name;
-            string scsResponseFileName = new DirectoryInfo(batchId).Name + ".json";
+            var scsResponseFileName = new DirectoryInfo(batchId).Name + ".json";
 
-            var blobClient = await azureBlobStorageClient.GetBlobClient(scsResponseFileName, storageAccountConnectionString, containerName);
-            var response = await blobClient.DeleteIfExistsAsync();
+            var response = await azureBlobStorageClient.DeleteFile(storageAccountConnectionString, containerName, scsResponseFileName);
 
             if (response)
             {

@@ -104,7 +104,6 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
         #region StoreSaleCatalogueServiceResponseAsync
 
         [Test]
-        [Ignore("Rhz: Suspended for other test")]
         [TestCase(ExchangeSetStandard.s63)]
         [TestCase(ExchangeSetStandard.s57)]
         public async Task WhenCallStoreSaleCatalogueServiceResponseAsync_ThenReturnsTrue(ExchangeSetStandard exchangeSetStandard)

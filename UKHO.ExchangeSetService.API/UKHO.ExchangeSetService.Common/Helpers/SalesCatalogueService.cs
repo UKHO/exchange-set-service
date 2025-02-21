@@ -1,10 +1,10 @@
 ﻿using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
+using System.Text.Json;
 using System.Threading.Tasks;
 using UKHO.ExchangeSetService.Common.Configuration;
 using UKHO.ExchangeSetService.Common.Extensions;
@@ -61,7 +61,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
                     var accessToken = await authScsTokenProvider.GetManagedIdentityAuthAsync(salesCatalogueConfig.Value.ResourceId);
                     var uri = $"/{salesCatalogueConfig.Value.Version}/productData/{salesCatalogueConfig.Value.ProductType}/products/productIdentifiers";
 
-                    string payloadJson = JsonConvert.SerializeObject(productIdentifiers);
+                    string payloadJson = JsonSerializer.Serialize(productIdentifiers);
 
                     var httpResponse = await salesCatalogueClient.CallSalesCatalogueServiceApi(HttpMethod.Post, payloadJson, accessToken, uri);
 
@@ -84,7 +84,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
                     var accessToken = await authScsTokenProvider.GetManagedIdentityAuthAsync(salesCatalogueConfig.Value.ResourceId);
                     var uri = $"/{salesCatalogueConfig.Value.Version}/productData/{salesCatalogueConfig.Value.ProductType}/products/productVersions";
 
-                    string payloadJson = JsonConvert.SerializeObject(productVersions);
+                    string payloadJson = JsonSerializer.Serialize(productVersions);
 
                     var httpResponse = await salesCatalogueClient.CallSalesCatalogueServiceApi(HttpMethod.Post, payloadJson, accessToken, uri);
 
@@ -129,7 +129,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
                 var lastModified = httpResponse.Content.Headers.LastModified;
                 if (httpResponse.StatusCode == HttpStatusCode.OK)
                 {
-                    response.ResponseBody = JsonConvert.DeserializeObject<SalesCatalogueProductResponse>(body);
+                    response.ResponseBody = JsonSerializer.Deserialize<SalesCatalogueProductResponse>(body);
                 }
                 if (lastModified != null)
                 {
@@ -157,7 +157,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
                 var lastModified = httpResponse.Content.Headers.LastModified;
                 if (httpResponse.StatusCode == HttpStatusCode.OK)
                 {
-                    response.ResponseBody = JsonConvert.DeserializeObject<List<SalesCatalogueDataProductResponse>>(body);
+                    response.ResponseBody = JsonSerializer.Deserialize<List<SalesCatalogueDataProductResponse>>(body);
                 }
                 if (lastModified != null)
                 {

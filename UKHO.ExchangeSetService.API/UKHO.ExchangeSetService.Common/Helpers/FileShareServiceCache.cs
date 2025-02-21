@@ -2,12 +2,12 @@
 using Microsoft.Extensions.Options;
 using Azure;
 using Azure.Storage.Blobs.Models;
-using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using UKHO.ExchangeSetService.Common.Configuration;
@@ -132,7 +132,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
                             //    cacheInfo.Response = await azureBlobStorageClient.DownloadTextAsync(blobClient);
                             //    hasResponse = true;
                             //}
-                            cacheInfo.Response = await azureBlobStorageClient.DownloadTextAsync($"{cacheInfo.BatchId}.json", serviceConnectionString, cacheInfo.BatchId);
+                            cacheInfo.Response = await azureBlobStorageClient.DownloadTextAsync(serviceConnectionString, cacheInfo.BatchId, $"{cacheInfo.BatchId}.json");
                             hasResponse = !string.IsNullOrEmpty(cacheInfo.Response);
                         }
 
@@ -209,7 +209,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
                             //    cacheInfo.Response = await azureBlobStorageClient.DownloadTextAsync(blobClient);
                             //}
 
-                            cacheInfo.Response = await azureBlobStorageClient.DownloadTextAsync($"{cacheInfo.BatchId}.json", storageConnectionString, cacheInfo.BatchId);
+                            cacheInfo.Response = await azureBlobStorageClient.DownloadTextAsync(storageConnectionString, cacheInfo.BatchId, $"{cacheInfo.BatchId}.json");
                         }
 
                         if (cacheInfo != null && !string.IsNullOrEmpty(cacheInfo.Response))
@@ -247,7 +247,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
         {
             logger.LogInformation(EventIds.FileShareServiceSearchENCFilesFromCacheStart.ToEventId(), "File share service search request from cache started for Product/CellName:{ProductName}, EditionNumber:{EditionNumber}, UpdateNumber:{UpdateNumber} and BusinessUnit:{BusinessUnit}. BatchId:{batchId} and _X-Correlation-ID:{CorrelationId}", item.ProductName, item.EditionNumber, itemUpdateNumber, businessUnit, queueMessage.BatchId, queueMessage.CorrelationId);
             //rhz removed var internalBatchDetail = JsonConvert.DeserializeObject<BatchDetail>(cacheInfo.Response);
-            var internalBatchDetail = System.Text.Json.JsonSerializer.Deserialize<BatchDetail>(cacheInfo.Response);
+            var internalBatchDetail = JsonSerializer.Deserialize<BatchDetail>(cacheInfo.Response);
             logger.LogInformation(EventIds.FileShareServiceSearchENCFilesFromCacheCompleted.ToEventId(), "File share service search request from cache completed for Product/CellName:{ProductName}, EditionNumber:{EditionNumber}, UpdateNumber:{UpdateNumber} and BusinessUnit:{BusinessUnit}. BatchId:{batchId} and _X-Correlation-ID:{CorrelationId}", item.ProductName, item.EditionNumber, itemUpdateNumber, businessUnit, queueMessage.BatchId, queueMessage.CorrelationId);
             string downloadPath;
 
@@ -274,12 +274,9 @@ namespace UKHO.ExchangeSetService.Common.Helpers
                         string path = Path.Combine(downloadPath, fileName);
                         if (!fileSystemHelper.CheckFileExists(path))
                         {
-                            //var blobClient = await azureBlobStorageClient.GetBlobClient(fileName, serviceConnectionString, internalBatchDetail.BatchId);
-
                             try
                             {
                                 var containerName = internalBatchDetail.BatchId;
-                                //await fileSystemHelper.DownloadToFileAsync(blobClient, path);
                                 if (await azureBlobStorageClient.DownloadToFileAsync(serviceConnectionString, containerName, fileName,path))
                                 {
                                     updateNumbers.Add(itemUpdateNumber.Value);
@@ -288,7 +285,6 @@ namespace UKHO.ExchangeSetService.Common.Helpers
                                 {
                                     logger.LogInformation(EventIds.DownloadENCFilesNonOkResponse.ToEventId(), "File not found for Product/CellName:{ProductName}, EditionNumber:{EditionNumber}, UpdateNumber:{UpdateNumber} and BusinessUnit:{BusinessUnit}. BatchId:{batchId} and _X-Correlation-ID:{CorrelationId} for blobName: {Name}, fileItem: {fileItem}", item.ProductName, item.EditionNumber, itemUpdateNumber, businessUnit, queueMessage.BatchId, queueMessage.CorrelationId, fileName, fileItem);
                                 }
-
                             }
                             catch (RequestFailedException requestFailedException) when (requestFailedException.ErrorCode == BlobErrorCode.BlobNotFound.ToString())
                             {
@@ -330,9 +326,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
 
         public async Task CopyFileToBlob(Stream stream, string fileName, string batchId)
         {
-            // rhz var storageConnectionString = azureStorageService.GetStorageAccountConnectionString(fssCacheConfiguration.Value.CacheStorageAccountName, fssCacheConfiguration.Value.CacheStorageAccountKey);
-            var blobClient = await azureBlobStorageClient.GetBlobClient(fileName, serviceConnectionString, batchId);
-
+            var blobClient = await azureBlobStorageClient.GetBlobClient(serviceConnectionString, batchId, fileName);
             if (!await blobClient.ExistsAsync())
             {
                 await blobClient.UploadAsync(stream);
@@ -355,16 +349,12 @@ namespace UKHO.ExchangeSetService.Common.Helpers
                 fssSearchResponseCache.Response = string.Empty;
             }
 
-            // rhz var storageConnectionString = azureStorageService.GetStorageAccountConnectionString(fssCacheConfiguration.Value.CacheStorageAccountName, fssCacheConfiguration.Value.CacheStorageAccountKey);
-            //await azureTableStorageClient.InsertOrMergeIntoTableStorageAsync(fssSearchResponseCache, fssCacheConfiguration.Value.FssSearchCacheTableName, storageConnectionString);
             await azureTableStorageClient.InsertOrMergeIntoTableStorageAsync(fssSearchResponseCache, serviceTableName, serviceConnectionString);
         }
 
         public async Task<Stream> DownloadFileFromCacheAsync(string fileName, string containerName)
         {
-            // rhz var storageConnectionString = azureStorageService.GetStorageAccountConnectionString(fssCacheConfiguration.Value.CacheStorageAccountName, fssCacheConfiguration.Value.CacheStorageAccountKey);
-            var blobClient = await azureBlobStorageClient.GetBlobClient(fileName, serviceConnectionString, containerName);
-
+            var blobClient = await azureBlobStorageClient.GetBlobClient(serviceConnectionString, containerName, fileName);
             MemoryStream memoryStream = new MemoryStream();
             if (await blobClient.ExistsAsync())
             {
