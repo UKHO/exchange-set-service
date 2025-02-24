@@ -278,15 +278,14 @@ namespace UKHO.ExchangeSetService.Common.Helpers
 
                             try
                             {
-                                var containerName = internalBatchDetail.BatchId;
                                 //await fileSystemHelper.DownloadToFileAsync(blobClient, path);
-                                if (await azureBlobStorageClient.DownloadToFileAsync(serviceConnectionString, containerName, fileName,path))
+                                if (await azureBlobStorageClient.DownloadToFileAsync(serviceConnectionString, internalBatchDetail.BatchId, fileName,path))
                                 {
                                     updateNumbers.Add(itemUpdateNumber.Value);
                                 }
                                 else
                                 {
-                                    logger.LogInformation(EventIds.DownloadENCFilesNonOkResponse.ToEventId(), "File not found for Product/CellName:{ProductName}, EditionNumber:{EditionNumber}, UpdateNumber:{UpdateNumber} and BusinessUnit:{BusinessUnit}. BatchId:{batchId} and _X-Correlation-ID:{CorrelationId} for blobName: {Name}, fileItem: {fileItem}", item.ProductName, item.EditionNumber, itemUpdateNumber, businessUnit, queueMessage.BatchId, queueMessage.CorrelationId, fileName, fileItem);
+                                    logger.LogError(EventIds.DownloadENCFilesNonOkResponse.ToEventId(), "File not found for Product/CellName:{ProductName}, EditionNumber:{EditionNumber}, UpdateNumber:{UpdateNumber} and BusinessUnit:{BusinessUnit}. BatchId:{batchId} and _X-Correlation-ID:{CorrelationId} for blobName: {Name}, fileItem: {fileItem}", item.ProductName, item.EditionNumber, itemUpdateNumber, businessUnit, queueMessage.BatchId, queueMessage.CorrelationId, fileName, fileItem);
                                 }
 
                             }
