@@ -1,13 +1,11 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using NUnit.Framework;
 using UKHO.ExchangeSetService.API.FunctionalTests.Helper;
-using UKHO.ExchangeSetService.API.FunctionalTests.Models;
 
 namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
 {
     [TestFixture]
-    public class ExchangeSetGenerateFilesForEncAndAioProductVersionWhenExchangeStandardS57 : ObjectStorage
+    public class ExchangeSetGenerateFilesForEncAndAioProductIdentifierWhenExchangeStandardS57 : ObjectStorage
     {
         [OneTimeSetUp]
         public async Task SetupAsync()
@@ -18,10 +16,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
             EssJwtToken = await authTokenProvider.GetEssToken();
             FssJwtToken = await authTokenProvider.GetFssToken();
             DataHelper = new DataHelper();
-            ProductVersionData = new List<ProductVersionModel>();
-            ProductVersionData.Add(DataHelper.GetProductVersionModelData(Config.AIOConfig.AioCellName, Config.AIOConfig.AioEditionNumber, 0));
-            ProductVersionData.Add(DataHelper.GetProductVersionModelData("DE4NO18Q", 2, 0));
-            ApiEssResponse = await ExchangeSetApiClient.GetProductVersionsAsync(ProductVersionData, accessToken: EssJwtToken, callbackUri: null, exchangeSetStandard: "s57");
+            ApiEssResponse = await ExchangeSetApiClient.GetProductIdentifiersDataAsync(DataHelper.GetProductIdentifiersForEncAndAio(), accessToken: EssJwtToken, callbackUri: null, exchangeSetStandard: "s57");
             DownloadedFolderPath = await FileContentHelper.DownloadAndExtractAioZip(ApiEssResponse, FssJwtToken);
         }
 
