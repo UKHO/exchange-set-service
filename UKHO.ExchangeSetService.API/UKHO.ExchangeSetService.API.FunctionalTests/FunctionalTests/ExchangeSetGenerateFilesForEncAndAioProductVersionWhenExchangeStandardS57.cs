@@ -40,14 +40,14 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         public void WhenIDownloadAioZipExchangeSet_ThenASerialAioFileIsAvailable()
         {
             bool checkFile = FssBatchHelper.CheckforFileExist(DownloadedFolderPath, Config.AIOConfig.ExchangeSetSerialAioFile);
-            Assert.That(checkFile, Is.True, $"{Config.ExchangeSetSerialEncFile} File not Exist in the specified folder path : {DownloadedFolderPath}");
+            Assert.That(checkFile, Is.True, $"{Config.AIOConfig.ExchangeSetSerialAioFile} File not exist in the specified folder path : {DownloadedFolderPath}");
         }
 
         [Test]
         [Category("QCOnlyTest-AIOEnabled")]
-        public void WhenIDownloadZipExchangeSet_ThenASerialAioFileIsNotAvailable()
+        public void WhenIDownloadZipExchangeSet_ThenASerialFileIsNotAvailable()
         {
-            bool checkFile = FssBatchHelper.CheckforFileExist(DownloadedFolderPath, Config.AIOConfig.ExchangeSetSerialAioFile);
+            bool checkFile = FssBatchHelper.CheckforFileExist(DownloadedFolderPath, Config.ExchangeSetSerialEncFile);
             Assert.That(checkFile, Is.False, $"{Config.ExchangeSetSerialEncFile} File should not exist in the specified folder path : {DownloadedFolderPath}");
         }
 
