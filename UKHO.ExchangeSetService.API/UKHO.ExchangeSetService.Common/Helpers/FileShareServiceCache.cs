@@ -274,17 +274,20 @@ namespace UKHO.ExchangeSetService.Common.Helpers
                         string path = Path.Combine(downloadPath, fileName);
                         if (!fileSystemHelper.CheckFileExists(path))
                         {
+                            var blobClient = await azureBlobStorageClient.GetBlobClient(fileName, serviceConnectionString, internalBatchDetail.BatchId);
+
                             try
                             {
-                                var containerName = internalBatchDetail.BatchId;
-                                if (await azureBlobStorageClient.DownloadToFileAsync(serviceConnectionString, containerName, fileName,path))
-                                {
-                                    updateNumbers.Add(itemUpdateNumber.Value);
-                                }
-                                else
-                                {
-                                    logger.LogInformation(EventIds.DownloadENCFilesNonOkResponse.ToEventId(), "File not found for Product/CellName:{ProductName}, EditionNumber:{EditionNumber}, UpdateNumber:{UpdateNumber} and BusinessUnit:{BusinessUnit}. BatchId:{batchId} and _X-Correlation-ID:{CorrelationId} for blobName: {Name}, fileItem: {fileItem}", item.ProductName, item.EditionNumber, itemUpdateNumber, businessUnit, queueMessage.BatchId, queueMessage.CorrelationId, fileName, fileItem);
-                                }
+                                await fileSystemHelper.DownloadToFileAsync(blobClient, path);
+                                updateNumbers.Add(itemUpdateNumber.Value);
+                                //if (await azureBlobStorageClient.DownloadToFileAsync(serviceConnectionString, internalBatchDetail.BatchId, fileName,path))
+                                //{
+                                //    updateNumbers.Add(itemUpdateNumber.Value);
+                                //}
+                                //else
+                                //{
+                                //    logger.LogError(EventIds.DownloadENCFilesNonOkResponse.ToEventId(), "File not found for Product/CellName:{ProductName}, EditionNumber:{EditionNumber}, UpdateNumber:{UpdateNumber} and BusinessUnit:{BusinessUnit}. BatchId:{batchId} and _X-Correlation-ID:{CorrelationId} for blobName: {Name}, fileItem: {fileItem}", item.ProductName, item.EditionNumber, itemUpdateNumber, businessUnit, queueMessage.BatchId, queueMessage.CorrelationId, fileName, fileItem);
+                                //}
                             }
                             catch (RequestFailedException requestFailedException) when (requestFailedException.ErrorCode == BlobErrorCode.BlobNotFound.ToString())
                             {
