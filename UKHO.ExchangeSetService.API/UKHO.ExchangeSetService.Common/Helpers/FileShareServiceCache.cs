@@ -274,7 +274,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
                         string path = Path.Combine(downloadPath, fileName);
                         if (!fileSystemHelper.CheckFileExists(path))
                         {
-                            var blobClient = await azureBlobStorageClient.GetBlobClient(fileName, serviceConnectionString, internalBatchDetail.BatchId);
+                            var blobClient = await azureBlobStorageClient.GetBlobClient(serviceConnectionString, internalBatchDetail.BatchId, fileName);
 
                             try
                             {
