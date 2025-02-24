@@ -10,6 +10,7 @@ using UKHO.ExchangeSetService.API.FunctionalTests.Models;
 
 namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
 {
+    [TestFixture]
     public class ExchangeSetGenerateFilesForEncAndAioProductVersionWhenExchangeStandardS57 : ObjectStorage
     {
         [OneTimeSetUp]
@@ -35,6 +36,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
 
         
         [Test]
+        [Category("QCOnlyTest-AIOEnabled")]
         public void WhenIDownloadAioZipExchangeSet_ThenASerialAioFileIsAvailable()
         {
             bool checkFile = FssBatchHelper.CheckforFileExist(DownloadedFolderPath, Config.AIOConfig.ExchangeSetSerialAioFile);
@@ -42,6 +44,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         }
 
         [Test]
+        [Category("QCOnlyTest-AIOEnabled")]
         public void WhenIDownloadZipExchangeSet_ThenASerialAioFileIsNotAvailable()
         {
             bool checkFile = FssBatchHelper.CheckforFileExist(DownloadedFolderPath, Config.AIOConfig.ExchangeSetSerialAioFile);
