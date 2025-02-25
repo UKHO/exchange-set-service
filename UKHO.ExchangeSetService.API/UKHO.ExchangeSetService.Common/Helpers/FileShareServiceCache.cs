@@ -2,12 +2,12 @@
 using Microsoft.Extensions.Options;
 using Azure;
 using Azure.Storage.Blobs.Models;
-using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using UKHO.ExchangeSetService.Common.Configuration;
@@ -36,7 +36,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
         private readonly string serviceConnectionString;
         private readonly string serviceTableName;
         private const string CONTENT_TYPE = "application/json";
-        private const int StringLength = 2;
+        private const int TwoChars = 2;
         private const int responseFileSizeLimitInKb = 60;
 
         public FileShareServiceCache(IAzureBlobStorageClient azureBlobStorageClient,
@@ -70,17 +70,12 @@ namespace UKHO.ExchangeSetService.Common.Helpers
                 CancellationToken cancellationToken,
                 string businessUnit)
         {
-            // rhz var storageConnectionString = azureStorageService.GetStorageAccountConnectionString(
-            //        fssCacheConfiguration.Value.CacheStorageAccountName,
-            //        fssCacheConfiguration.Value.CacheStorageAccountKey
-            //        );
-            //var tableName = fssCacheConfiguration.Value.FssSearchCacheTableName;
             bool hasResponse;
             var existingFiles = new List<int?>();
+            var updateNumberList = new List<int?>();
             var internalProductsNotFound = new List<Products>();
 
             var subKeys = new { edition = 0, updateNumber = 1, businessUnit = 2 };
-
 
             foreach (var product in products)
             {
@@ -91,16 +86,18 @@ namespace UKHO.ExchangeSetService.Common.Helpers
                     throw new OperationCanceledException();
                 }
 
-                var internalProductItemNotFound = new Products
-                {
-                    Cancellation = product.Cancellation,
-                    Dates = product.Dates,
-                    EditionNumber = product.EditionNumber,
-                    FileSize = product.FileSize,
-                    ProductName = product.ProductName,
-                    UpdateNumbers = product.UpdateNumbers,
-                    Bundle = product.Bundle
-                };
+                // rhz : We only want to do this if we need it.
+                updateNumberList = product.UpdateNumbers;
+                //var internalProductItemNotFound = new Products
+                //{
+                //    Cancellation = product.Cancellation,
+                //    Dates = product.Dates,
+                //    EditionNumber = product.EditionNumber,
+                //    FileSize = product.FileSize,
+                //    ProductName = product.ProductName,
+                //    UpdateNumbers = product.UpdateNumbers,
+                //    Bundle = product.Bundle
+                //};
 
                 await foreach (var cacheInfo in await azureTableStorageClient.RetrieveUpdatesFromTableStorageAsync<FssSearchResponseCache>(
                         product.ProductName, product.EditionNumber.Value, serviceTableName, serviceConnectionString))
@@ -119,19 +116,11 @@ namespace UKHO.ExchangeSetService.Common.Helpers
 
                         hasResponse = !string.IsNullOrEmpty(cacheInfo.Response);
 
-
                         if (!hasResponse) //Why would response be empty?
                         {
                             logger.LogInformation(EventIds.LogRequest.ToEventId(), "Empty Response for Product/CellName:{ProductName}, EditionNumber:{EditionNumber} and UpdateNumber:{UpdateNumber}. BatchId:{batchId} and _X-Correlation-ID:{CorrelationId}",
                                 product.ProductName, product.EditionNumber, cacheUpdateNumber, queueMessage.BatchId, queueMessage.CorrelationId);
 
-                            // rhz var blobClient = await azureBlobStorageClient.GetBlobClient($"{cacheInfo.BatchId}.json", storageConnectionString, cacheInfo.BatchId);
-
-                            //if (blobClient != null)
-                            //{
-                            //    cacheInfo.Response = await azureBlobStorageClient.DownloadTextAsync(blobClient);
-                            //    hasResponse = true;
-                            //}
                             cacheInfo.Response = await azureBlobStorageClient.DownloadTextAsync($"{cacheInfo.BatchId}.json", serviceConnectionString, cacheInfo.BatchId);
                             hasResponse = !string.IsNullOrEmpty(cacheInfo.Response);
                         }
@@ -147,19 +136,30 @@ namespace UKHO.ExchangeSetService.Common.Helpers
                                     cacheInfo,
                                     businessUnit);
 
-
                             if (existingFiles.Count == internalBatchDetail.Files.Count())
                             {
                                 internalSearchBatchResponse.Entries.Add(internalBatchDetail);
-                                internalProductItemNotFound.UpdateNumbers.Remove(cacheUpdateNumber);
+                                updateNumberList.Remove(cacheUpdateNumber);
+                                //internalProductItemNotFound.UpdateNumbers.Remove(cacheUpdateNumber);
                             }
                         }
                     }
                 }
 
-                if (internalProductItemNotFound.UpdateNumbers != null && internalProductItemNotFound.UpdateNumbers.Any())
+                if (updateNumberList != null && updateNumberList.Any())
                 {
-                    internalProductsNotFound.Add(internalProductItemNotFound);
+                    //internalProductsNotFound.Add(internalProductItemNotFound);
+                    logger.LogInformation(EventIds.LogRequest.ToEventId(), "Creating Product Not Found Class _X-Correlation-ID:{CorrelationId}", queueMessage.CorrelationId);
+                    internalProductsNotFound.Add(new Products
+                    {
+                        Cancellation = product.Cancellation,
+                        Dates = product.Dates,
+                        EditionNumber = product.EditionNumber,
+                        FileSize = product.FileSize,
+                        ProductName = product.ProductName,
+                        UpdateNumbers = updateNumberList,
+                        Bundle = product.Bundle
+                    });
                 }
             }
             return internalProductsNotFound;
@@ -247,7 +247,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
         {
             logger.LogInformation(EventIds.FileShareServiceSearchENCFilesFromCacheStart.ToEventId(), "File share service search request from cache started for Product/CellName:{ProductName}, EditionNumber:{EditionNumber}, UpdateNumber:{UpdateNumber} and BusinessUnit:{BusinessUnit}. BatchId:{batchId} and _X-Correlation-ID:{CorrelationId}", item.ProductName, item.EditionNumber, itemUpdateNumber, businessUnit, queueMessage.BatchId, queueMessage.CorrelationId);
             //rhz removed var internalBatchDetail = JsonConvert.DeserializeObject<BatchDetail>(cacheInfo.Response);
-            var internalBatchDetail = System.Text.Json.JsonSerializer.Deserialize<BatchDetail>(cacheInfo.Response);
+            var internalBatchDetail = JsonSerializer.Deserialize<BatchDetail>(cacheInfo.Response);
             logger.LogInformation(EventIds.FileShareServiceSearchENCFilesFromCacheCompleted.ToEventId(), "File share service search request from cache completed for Product/CellName:{ProductName}, EditionNumber:{EditionNumber}, UpdateNumber:{UpdateNumber} and BusinessUnit:{BusinessUnit}. BatchId:{batchId} and _X-Correlation-ID:{CorrelationId}", item.ProductName, item.EditionNumber, itemUpdateNumber, businessUnit, queueMessage.BatchId, queueMessage.CorrelationId);
             string downloadPath;
 
@@ -259,7 +259,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             }
             else
             {
-                downloadPath = Path.Combine(exchangeSetRootPath, item.ProductName.Substring(0, StringLength), item.ProductName, item.EditionNumber.Value.ToString(), itemUpdateNumber.Value.ToString());
+                downloadPath = Path.Combine(exchangeSetRootPath, item.ProductName[..TwoChars], item.ProductName, item.EditionNumber.Value.ToString(), itemUpdateNumber.Value.ToString());
             }
 
             return logger.LogStartEndAndElapsedTimeAsync(EventIds.FileShareServiceDownloadENCFilesFromCacheStart, EventIds.FileShareServiceDownloadENCFilesFromCacheCompleted,
@@ -274,11 +274,8 @@ namespace UKHO.ExchangeSetService.Common.Helpers
                         string path = Path.Combine(downloadPath, fileName);
                         if (!fileSystemHelper.CheckFileExists(path))
                         {
-                            //var blobClient = await azureBlobStorageClient.GetBlobClient(fileName, serviceConnectionString, internalBatchDetail.BatchId);
-
                             try
                             {
-                                //await fileSystemHelper.DownloadToFileAsync(blobClient, path);
                                 if (await azureBlobStorageClient.DownloadToFileAsync(serviceConnectionString, internalBatchDetail.BatchId, fileName,path))
                                 {
                                     updateNumbers.Add(itemUpdateNumber.Value);
@@ -315,13 +312,13 @@ namespace UKHO.ExchangeSetService.Common.Helpers
                 List<string> aioCells = !string.IsNullOrEmpty(aioConfiguration.AioCells) ? new(aioConfiguration.AioCells.Split(',')) : new List<string>();
 
                 if (!aioCells.Contains(item.ProductName))
-                    downloadPath = Path.Combine(exchangeSetRootPath, item.ProductName.Substring(0, StringLength), item.ProductName, item.EditionNumber.Value.ToString());
+                    downloadPath = Path.Combine(exchangeSetRootPath, item.ProductName[..TwoChars], item.ProductName, item.EditionNumber.Value.ToString());
                 else
-                    downloadPath = Path.Combine(exchangeSetRootPath, item.ProductName.Substring(0, StringLength), item.ProductName, item.EditionNumber.Value.ToString(), itemUpdateNumber.Value.ToString());
+                    downloadPath = Path.Combine(exchangeSetRootPath, item.ProductName[..TwoChars], item.ProductName, item.EditionNumber.Value.ToString(), itemUpdateNumber.Value.ToString());
             }
             else
             {
-                downloadPath = Path.Combine(exchangeSetRootPath, item.ProductName.Substring(0, StringLength), item.ProductName, item.EditionNumber.Value.ToString());
+                downloadPath = Path.Combine(exchangeSetRootPath, item.ProductName[..TwoChars], item.ProductName, item.EditionNumber.Value.ToString());
             }
 
             return downloadPath;
@@ -329,7 +326,6 @@ namespace UKHO.ExchangeSetService.Common.Helpers
 
         public async Task CopyFileToBlob(Stream stream, string fileName, string batchId)
         {
-            // rhz var storageConnectionString = azureStorageService.GetStorageAccountConnectionString(fssCacheConfiguration.Value.CacheStorageAccountName, fssCacheConfiguration.Value.CacheStorageAccountKey);
             var blobClient = await azureBlobStorageClient.GetBlobClient(fileName, serviceConnectionString, batchId);
 
             if (!await blobClient.ExistsAsync())
@@ -354,14 +350,11 @@ namespace UKHO.ExchangeSetService.Common.Helpers
                 fssSearchResponseCache.Response = string.Empty;
             }
 
-            // rhz var storageConnectionString = azureStorageService.GetStorageAccountConnectionString(fssCacheConfiguration.Value.CacheStorageAccountName, fssCacheConfiguration.Value.CacheStorageAccountKey);
-            //await azureTableStorageClient.InsertOrMergeIntoTableStorageAsync(fssSearchResponseCache, fssCacheConfiguration.Value.FssSearchCacheTableName, storageConnectionString);
             await azureTableStorageClient.InsertOrMergeIntoTableStorageAsync(fssSearchResponseCache, serviceTableName, serviceConnectionString);
         }
 
         public async Task<Stream> DownloadFileFromCacheAsync(string fileName, string containerName)
         {
-            // rhz var storageConnectionString = azureStorageService.GetStorageAccountConnectionString(fssCacheConfiguration.Value.CacheStorageAccountName, fssCacheConfiguration.Value.CacheStorageAccountKey);
             var blobClient = await azureBlobStorageClient.GetBlobClient(fileName, serviceConnectionString, containerName);
 
             MemoryStream memoryStream = new MemoryStream();
