@@ -26,7 +26,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         public void WhenIDownloadAioZipExchangeSet_ThenASerialAioFileIsAvailable()
         {
             bool checkFile = FssBatchHelper.CheckforFileExist(DownloadedFolderPath, Config.AIOConfig.ExchangeSetSerialAioFile);
-            Assert.That(checkFile, Is.True, $"{Config.AIOConfig.ExchangeSetSerialAioFile} File not exist in the specified folder path : {DownloadedFolderPath}");
+            Assert.That(checkFile, Is.True, $"{Config.AIOConfig.ExchangeSetSerialAioFile} File should exist in the specified folder path : {DownloadedFolderPath}");
         }
 
         [Test]
