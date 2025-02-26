@@ -87,18 +87,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
                     throw new OperationCanceledException();
                 }
 
-                // rhz : We only want to do this if we need it.
                 updateNumberList = product.UpdateNumbers;
-                //var internalProductItemNotFound = new Products
-                //{
-                //    Cancellation = product.Cancellation,
-                //    Dates = product.Dates,
-                //    EditionNumber = product.EditionNumber,
-                //    FileSize = product.FileSize,
-                //    ProductName = product.ProductName,
-                //    UpdateNumbers = product.UpdateNumbers,
-                //    Bundle = product.Bundle
-                //};
 
                 await foreach (var cacheInfo in await azureTableStorageClient.RetrieveUpdatesFromTableStorageAsync<FssSearchResponseCache>(
                         product.ProductName, product.EditionNumber.Value, serviceTableName, serviceConnectionString))
@@ -141,7 +130,6 @@ namespace UKHO.ExchangeSetService.Common.Helpers
                             {
                                 internalSearchBatchResponse.Entries.Add(internalBatchDetail);
                                 updateNumberList.Remove(cacheUpdateNumber);
-                                //internalProductItemNotFound.UpdateNumbers.Remove(cacheUpdateNumber);
                             }
                         }
                     }
@@ -149,8 +137,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
 
                 if (updateNumberList != null && updateNumberList.Any())
                 {
-                    //internalProductsNotFound.Add(internalProductItemNotFound);
-                    logger.LogInformation(EventIds.LogRequest.ToEventId(), "Creating Product Not Found Class _X-Correlation-ID:{CorrelationId}", queueMessage.CorrelationId);
+                    logger.LogInformation(EventIds.LogRequest.ToEventId(), "Creating Product Not Found Class for Product:{ProductName} _X-Correlation-ID:{CorrelationId}", product.ProductName, queueMessage.CorrelationId);
                     internalProductsNotFound.Add(new Products
                     {
                         Cancellation = product.Cancellation,
