@@ -196,6 +196,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             }
             if (internalNotFoundProducts.Any() || !internalSearchBatchResponse.Entries.Any())
             {
+                //rhz why is this serialized?
                 var internalNotFoundProductsPayLoadJson = JsonConvert.SerializeObject(internalNotFoundProducts.Any() ? internalNotFoundProducts.Distinct() : products);
                 cancellationTokenSource.Cancel();
                 logger.LogError(EventIds.FSSResponseNotFoundForRespectiveProductWhileQuerying.ToEventId(), "Error in file share service while searching ENC files and no data found while querying for products:{internalNotFoundProductsPayLoadJson} and BatchId:{batchId} and _X-Correlation-ID:{correlationId}", internalNotFoundProductsPayLoadJson, batchId, correlationId);
