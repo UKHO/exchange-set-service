@@ -516,7 +516,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
                     BatchId = entry.BatchId,
                     PartitionKey = productName,
                     RowKey = $"{editionNumber}|{updateNumber}|{businessUnit}",
-                    Response = JsonConvert.SerializeObject(entry)
+                    Response = JsonConvert.SerializeObject(entry)    // rhz todo
                 };
                 await logger.LogStartEndAndElapsedTimeAsync(EventIds.FileShareServiceSearchResponseStoreToCacheStart, EventIds.FileShareServiceSearchResponseStoreToCacheCompleted,
                     "File share service search response insert/merge request in azure table for cache for Product/CellName:{ProductName}, EditionNumber:{EditionNumber}, UpdateNumber:{UpdateNumber} and BusinessUnit:{BusinessUnit} with FSS BatchId:{FssBatchId}. BatchId:{batchId} and _X-Correlation-ID:{CorrelationId}",

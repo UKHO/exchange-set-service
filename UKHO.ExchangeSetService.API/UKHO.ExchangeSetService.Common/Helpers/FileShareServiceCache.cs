@@ -70,6 +70,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
                 CancellationToken cancellationToken,
                 string businessUnit)
         {
+            logger.LogInformation(EventIds.LogRequest.ToEventId(), "GetNonCachedProductDataForFss started...");
             bool hasResponse;
             var existingFiles = new List<int?>();
             var updateNumberList = new List<int?>();
@@ -162,6 +163,8 @@ namespace UKHO.ExchangeSetService.Common.Helpers
                     });
                 }
             }
+            logger.LogInformation(EventIds.LogRequest.ToEventId(), "GetNonCachedProductDataForFss completed...");
+
             return internalProductsNotFound;
         }
 
