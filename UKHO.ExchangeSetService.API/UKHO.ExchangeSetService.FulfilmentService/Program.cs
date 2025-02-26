@@ -29,6 +29,10 @@ using UKHO.ExchangeSetService.FulfilmentService.Validation;
 using Elastic.Apm.Azure.Storage;
 using Elastic.Apm.DiagnosticSource;
 using Elastic.Apm;
+using UKHO.ExchangeSetService.Common.Helpers.FileShare;
+using UKHO.ExchangeSetService.Common.Helpers.Auth;
+using UKHO.ExchangeSetService.Common.Helpers.SalesCatalogue;
+using UKHO.ExchangeSetService.Common.Helpers.FileShare.FileShareInterfaces;
 
 namespace UKHO.ExchangeSetService.FulfilmentService
 {

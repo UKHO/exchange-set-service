@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace UKHO.ExchangeSetService.Common.Helpers
+namespace UKHO.ExchangeSetService.Common.Helpers.SalesCatalogue
 {
     [ExcludeFromCodeCoverage] ////Excluded from code coverage as it has actual http calls 
     public class SalesCatalogueClient : ISalesCatalogueClient

@@ -7,29 +7,17 @@ using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using UKHO.ExchangeSetService.Common.Configuration;
-using UKHO.ExchangeSetService.Common.Helpers;
 using UKHO.ExchangeSetService.Common.Logging;
+using UKHO.ExchangeSetService.Common.Helpers.Auth;
+using UKHO.ExchangeSetService.Common.Helpers.FileShare.FileShareInterfaces;
 
 namespace UKHO.ExchangeSetService.Common.HealthCheck
 {
-    public class FileShareServiceHealthCheck : IHealthCheck
+    public class FileShareServiceHealthCheck(IFileShareServiceClient fileShareService,
+                                       IAuthFssTokenProvider authFssTokenProvider,
+                                       IOptions<FileShareServiceConfiguration> fileShareServiceConfig,
+                                       ILogger<FileShareServiceHealthCheck> logger) : IHealthCheck
     {
-        private readonly IFileShareServiceClient fileShareServiceClient;
-        private readonly IAuthFssTokenProvider authFssTokenProvider;
-        private readonly ILogger<FileShareService> logger;
-        private readonly IOptions<FileShareServiceConfiguration> fileShareServiceConfig;
-
-        public FileShareServiceHealthCheck(IFileShareServiceClient fileShareService,
-                                           IAuthFssTokenProvider authFssTokenProvider,
-                                           IOptions<FileShareServiceConfiguration> fileShareServiceConfig,
-                                           ILogger<FileShareService> logger)
-        {
-            this.fileShareServiceClient = fileShareService;
-            this.authFssTokenProvider = authFssTokenProvider;
-            this.fileShareServiceConfig = fileShareServiceConfig;
-            this.logger = logger;
-        }
-
         public async Task<HealthCheckResult> CheckHealthAsync(HealthCheckContext context, CancellationToken cancellationToken = default)
         {
             try
@@ -37,7 +25,7 @@ namespace UKHO.ExchangeSetService.Common.HealthCheck
                 var uri = $"/batch?limit={fileShareServiceConfig.Value.Limit}&start={fileShareServiceConfig.Value.Start}&$filter=BusinessUnit eq 'invalid'";
                 var accessToken = await authFssTokenProvider.GetManagedIdentityAuthAsync(fileShareServiceConfig.Value.ResourceId);
                 string payloadJson = string.Empty;
-                var fileShareServiceResponse = await fileShareServiceClient.CallFileShareServiceApi(HttpMethod.Get, payloadJson, accessToken, uri, CancellationToken.None);
+                var fileShareServiceResponse = await fileShareService.CallFileShareServiceApi(HttpMethod.Get, payloadJson, accessToken, uri, CancellationToken.None);
                 if (fileShareServiceResponse.StatusCode == HttpStatusCode.OK)
                 {
                     logger.LogDebug(EventIds.FileShareServiceIsHealthy.ToEventId(), "File share service is healthy responded with {StatusCode}", fileShareServiceResponse.StatusCode);

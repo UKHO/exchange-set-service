@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 using UKHO.ExchangeSetService.Common.Models.Request;
 using UKHO.ExchangeSetService.Common.Models.SalesCatalogue;
 
-namespace UKHO.ExchangeSetService.Common.Helpers
+namespace UKHO.ExchangeSetService.Common.Helpers.SalesCatalogue
 {
     public interface ISalesCatalogueService
     {

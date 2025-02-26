@@ -11,14 +11,14 @@ using UKHO.ExchangeSetService.Common.Configuration;
 using UKHO.ExchangeSetService.Common.Logging;
 using UKHO.ExchangeSetService.Common.Models.Request;
 
-namespace UKHO.ExchangeSetService.Common.Helpers
+namespace UKHO.ExchangeSetService.Common.Helpers.Auth
 {
     [ExcludeFromCodeCoverage] ////Excluded from code coverage as it has ADD interaction
     public class AuthTokenProvider
     {
         private readonly IOptions<EssManagedIdentityConfiguration> essManagedIdentityConfiguration;
         private readonly ILogger<AuthTokenProvider> logger;
-        private static readonly Object _lock = new Object();
+        private static readonly object _lock = new object();
         private readonly IDistributedCache _cache;
 
         public AuthTokenProvider(IOptions<EssManagedIdentityConfiguration> essManagedIdentityConfiguration, IDistributedCache _cache, ILogger<AuthTokenProvider> logger)
