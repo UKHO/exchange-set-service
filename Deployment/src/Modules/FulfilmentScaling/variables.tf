@@ -24,27 +24,20 @@ variable "queue_resource_uri_lxs" {
   type = list(string)
 }
 
-
-
-
-
-
-variable "asp_name" {
-  type = string
+variable "exchange_set_config" {
 }
 
-variable "asp_id" {
-  type = string
+variable "asp" {
 }
 
-variable "auto_scale_in_threshold" {
-  type = number
+variable "asp_control_sxs" {
+  type = object(any)
 }
 
-variable "auto_scale_out_threshold" {
-  type = number
+variable "asp_control_mxs" {
+  type = object(any)
 }
 
-variable "auto_scale_max_instances" {
-  type = number
+variable "asp_control_lxs" {
+  type = object(any)
 }

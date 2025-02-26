@@ -47,15 +47,15 @@ variable "spoke_subnet_name" {
 }
 
 variable "asp_control_sxs" {
-  type = object({ sku = string, zoneRedundant = bool })
+  type = object({ sku = string, zoneRedundant = bool, enableAutoScale = bool, autoScaleMaxInstances = number, autoScaleInThreshold = number, autoScaleOutThreshold = number, autoScaleInAmount = number, autoScaleOutAmount = number })
 }
 
 variable "asp_control_mxs" {
-  type = object({ sku = string, zoneRedundant = bool })
+  type = object({ sku = string, zoneRedundant = bool, enableAutoScale = bool, autoScaleMaxInstances = number, autoScaleInThreshold = number, autoScaleOutThreshold = number, autoScaleInAmount = number, autoScaleOutAmount = number })
 }
 
 variable "asp_control_lxs" {
-  type = object({ sku = string, zoneRedundant = bool })
+  type = object({ sku = string, zoneRedundant = bool, enableAutoScale = bool, autoScaleMaxInstances = number, autoScaleInThreshold = number, autoScaleOutThreshold = number, autoScaleInAmount = number, autoScaleOutAmount = number })
 }
 
 variable "app_service_sku" {
