@@ -87,7 +87,8 @@ namespace UKHO.ExchangeSetService.Common.Helpers
                     throw new OperationCanceledException();
                 }
 
-                updateNumberList = product.UpdateNumbers;
+                updateNumberList.Clear();
+                updateNumberList.AddRange(product.UpdateNumbers);
 
                 await foreach (var cacheInfo in await azureTableStorageClient.RetrieveUpdatesFromTableStorageAsync<FssSearchResponseCache>(
                         product.ProductName, product.EditionNumber.Value, serviceTableName, serviceConnectionString))
