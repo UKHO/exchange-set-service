@@ -6,7 +6,7 @@ using UKHO.ExchangeSetService.Common.Models.AzureTableEntities;
 using UKHO.ExchangeSetService.Common.Models.FileShareService.Response;
 using UKHO.ExchangeSetService.Common.Models.SalesCatalogue;
 
-namespace UKHO.ExchangeSetService.Common.Helpers.FileShare.FileShareInterfaces
+namespace UKHO.ExchangeSetService.Common.Helpers
 {
     public interface IFileShareServiceCache
     {

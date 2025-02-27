@@ -29,9 +29,8 @@ using UKHO.ExchangeSetService.Common.Configuration;
 using UKHO.ExchangeSetService.Common.HealthCheck;
 using UKHO.ExchangeSetService.Common.Helpers;
 using UKHO.ExchangeSetService.Common.Helpers.Auth;
-using UKHO.ExchangeSetService.Common.Helpers.FileShare;
-using UKHO.ExchangeSetService.Common.Helpers.FileShare.FileShareInterfaces;
 using UKHO.ExchangeSetService.Common.Helpers.SalesCatalogue;
+using UKHO.ExchangeSetService.Common.Helpers.Zip;
 using UKHO.ExchangeSetService.Common.Logging;
 using UKHO.ExchangeSetService.Common.Storage;
 using UKHO.Logging.EventHubLogProvider;
@@ -171,7 +170,11 @@ namespace UKHO.ExchangeSetService.API
 
 
             builder.Services.AddScoped<IFileSystemHelper, FileSystemHelper>();
-            builder.Services.AddScoped<IFileShareService, FileShareService>();
+            builder.Services.AddScoped<IFileShareBatchService, FileShareBatchService>();
+            builder.Services.AddScoped<IFileShareUploadService, FileShareUploadService>();
+            builder.Services.AddScoped<IFileShareDownloadService, FileShareDownloadService>();
+            builder.Services.AddScoped<IFileShareSearchService, FileShareSearchService>();
+            builder.Services.AddScoped<IZip, FileZip>();
             builder.Services.AddScoped<IProductDataService, ProductDataService>();
             builder.Services.AddScoped<IMonitorHelper, MonitorHelper>();
             builder.Services.AddScoped<IProductIdentifierValidator, ProductIdentifierValidator>();

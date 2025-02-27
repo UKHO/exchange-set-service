@@ -17,9 +17,9 @@ using UKHO.ExchangeSetService.Common.Models.AzureTableEntities;
 using UKHO.ExchangeSetService.Common.Models.FileShareService.Response;
 using UKHO.ExchangeSetService.Common.Models.SalesCatalogue;
 using UKHO.ExchangeSetService.Common.Storage;
-using UKHO.ExchangeSetService.Common.Helpers.FileShare.FileShareInterfaces;
+using UKHO.ExchangeSetService.Common.Helpers;
 
-namespace UKHO.ExchangeSetService.Common.Helpers.FileShare
+namespace UKHO.ExchangeSetService.Common.Helpers
 {
     public class FileShareServiceCache : IFileShareServiceCache
     {
@@ -30,7 +30,6 @@ namespace UKHO.ExchangeSetService.Common.Helpers.FileShare
         private readonly IOptions<CacheConfiguration> fssCacheConfiguration;
         private readonly IFileSystemHelper fileSystemHelper;
         private readonly AioConfiguration aioConfiguration;
-        private const string CONTENT_TYPE = "application/json";
         private const int StringLength = 2;
         private const int responseFileSizeLimitInKb = 60;
 

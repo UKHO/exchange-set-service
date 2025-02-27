@@ -3,7 +3,7 @@
 
 using System.Threading.Tasks;
 
-namespace UKHO.ExchangeSetService.Common.Helpers.FileShare.FileShareInterfaces
+namespace UKHO.ExchangeSetService.Common.Helpers
 {
     public interface IFileShareUploadService
     {

@@ -9,14 +9,15 @@ using System.Threading.Tasks;
 using UKHO.ExchangeSetService.Common.Configuration;
 using UKHO.ExchangeSetService.Common.Logging;
 using UKHO.ExchangeSetService.Common.Helpers.Auth;
-using UKHO.ExchangeSetService.Common.Helpers.FileShare.FileShareInterfaces;
+using UKHO.ExchangeSetService.Common.Helpers;
+using UKHO.ExchangeSetService.Common.Helpers;
 
 namespace UKHO.ExchangeSetService.Common.HealthCheck
 {
     public class FileShareServiceHealthCheck(IFileShareServiceClient fileShareService,
                                        IAuthFssTokenProvider authFssTokenProvider,
                                        IOptions<FileShareServiceConfiguration> fileShareServiceConfig,
-                                       ILogger<FileShareServiceHealthCheck> logger) : IHealthCheck
+                                       ILogger<FileShareService> logger) : IHealthCheck
     {
         public async Task<HealthCheckResult> CheckHealthAsync(HealthCheckContext context, CancellationToken cancellationToken = default)
         {

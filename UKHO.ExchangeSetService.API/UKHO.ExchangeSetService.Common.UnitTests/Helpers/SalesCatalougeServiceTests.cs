@@ -9,11 +9,12 @@ using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 using UKHO.ExchangeSetService.Common.Configuration;
-using UKHO.ExchangeSetService.Common.Helpers;
 using System.Collections.Generic;
 using UKHO.ExchangeSetService.Common.Models.SalesCatalogue;
 using Newtonsoft.Json;
 using UKHO.ExchangeSetService.Common.Models.Request;
+using UKHO.ExchangeSetService.Common.Helpers.SalesCatalogue;
+using UKHO.ExchangeSetService.Common.Helpers.Auth;
 
 namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
 {

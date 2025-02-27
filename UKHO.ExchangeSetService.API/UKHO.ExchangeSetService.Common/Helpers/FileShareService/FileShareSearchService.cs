@@ -11,13 +11,14 @@ using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using UKHO.ExchangeSetService.Common.Configuration;
 using UKHO.ExchangeSetService.Common.Helpers.Auth;
+using UKHO.ExchangeSetService.Common.Helpers;
 using UKHO.ExchangeSetService.Common.Logging;
 using UKHO.ExchangeSetService.Common.Models.FileShareService.Response;
 
-namespace UKHO.ExchangeSetService.Common.Helpers.FileShare.FileShareInterfaces
+namespace UKHO.ExchangeSetService.Common.Helpers
 {
     public class FileShareSearchService(
-        ILogger<FileShareSearchService> logger,
+        ILogger<FileShareService> logger,
         IAuthFssTokenProvider authFssTokenProvider,
         IOptions<FileShareServiceConfiguration> fileShareServiceConfig,
         IFileShareServiceClient fileShareServiceClient)

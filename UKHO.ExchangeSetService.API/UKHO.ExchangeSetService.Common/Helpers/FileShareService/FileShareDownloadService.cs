@@ -15,16 +15,16 @@ using Newtonsoft.Json;
 using UKHO.ExchangeSetService.Common.Configuration;
 using UKHO.ExchangeSetService.Common.Extensions;
 using UKHO.ExchangeSetService.Common.Helpers.Auth;
-using UKHO.ExchangeSetService.Common.Helpers.FileShare.FileShareInterfaces;
+using UKHO.ExchangeSetService.Common.Helpers;
 using UKHO.ExchangeSetService.Common.Logging;
 using UKHO.ExchangeSetService.Common.Models.AzureTableEntities;
 using UKHO.ExchangeSetService.Common.Models.FileShareService.Response;
 using UKHO.ExchangeSetService.Common.Models.SalesCatalogue;
 
-namespace UKHO.ExchangeSetService.Common.Helpers.FileShare
+namespace UKHO.ExchangeSetService.Common.Helpers
 {
     public class FileShareDownloadService(
-        ILogger<FileShareDownloadService> logger,
+        ILogger<FileShareService> logger,
         IAuthFssTokenProvider authFssTokenProvider,
         IOptions<FileShareServiceConfiguration> fileShareServiceConfig,
         IFileShareServiceClient fileShareServiceClient,

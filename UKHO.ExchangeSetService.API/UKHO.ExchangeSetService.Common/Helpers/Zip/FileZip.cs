@@ -10,7 +10,7 @@ using UKHO.ExchangeSetService.Common.Logging;
 
 namespace UKHO.ExchangeSetService.Common.Helpers.Zip
 {
-    public class FileZip(ILogger<FileZip> logger, IFileSystemHelper fileSystemHelper, IOptions<FileShareServiceConfiguration> fileShareServiceConfig)
+    public class FileZip(ILogger<FileShareService> logger, IFileSystemHelper fileSystemHelper, IOptions<FileShareServiceConfiguration> fileShareServiceConfig) : IZip
     {
         public async Task<bool> CreateZipFileForExchangeSet(string batchId, string exchangeSetZipRootPath, string correlationId)
         {

@@ -24,55 +24,22 @@ using UKHO.ExchangeSetService.Common.Storage;
 
 namespace UKHO.ExchangeSetService.API.Services
 {
-    public class ProductDataService : IProductDataService
+    public class ProductDataService(IProductIdentifierValidator productIdentifierValidator,
+        IProductDataProductVersionsValidator productVersionsValidator,
+        IScsProductIdentifierValidator scsProductIdentifierValidator,
+        IProductDataSinceDateTimeValidator productDataSinceDateTimeValidator,
+        ISalesCatalogueService salesCatalougeService,
+        IMapper mapper,
+        IFileShareService fileShareService,
+        ILogger<ProductDataService> logger, IExchangeSetStorageProvider exchangeSetStorageProvider,
+        IOptions<EssFulfilmentStorageConfiguration> essFulfilmentStorageconfig, IMonitorHelper monitorHelper,
+        UserIdentifier userIdentifier, IAzureAdB2CHelper azureAdB2CHelper, IOptions<AioConfiguration> aioConfiguration,
+        IScsDataSinceDateTimeValidator scsDataSinceDateTimeValidator) : IProductDataService
     {
         private const string RFC1123Format = "ddd, dd MMM yyyy HH':'mm':'ss 'GMT'";
-        private readonly IProductIdentifierValidator productIdentifierValidator;
-        private readonly IScsProductIdentifierValidator scsProductIdentifierValidator;
-        private readonly IProductDataProductVersionsValidator productVersionsValidator;
-        private readonly IProductDataSinceDateTimeValidator productDataSinceDateTimeValidator;
-        private readonly ISalesCatalogueService salesCatalogueService;
-        private readonly IMapper mapper;
-        private readonly IFileShareService fileShareService;
-        private readonly ILogger<ProductDataService> logger;
-        private readonly IExchangeSetStorageProvider exchangeSetStorageProvider;
-        private readonly IOptions<EssFulfilmentStorageConfiguration> essFulfilmentStorageconfig;
-        private readonly IMonitorHelper monitorHelper;
-        private readonly UserIdentifier userIdentifier;
-        private readonly IAzureAdB2CHelper azureAdB2CHelper;
-        private readonly AioConfiguration aioConfiguration;
+        private readonly AioConfiguration aioConfiguration = aioConfiguration.Value;
         private bool isEmptyEncExchangeSet = false;
         private bool isEmptyAioExchangeSet = false;
-        private readonly IScsDataSinceDateTimeValidator scsDataSinceDateTimeValidator;
-
-        public ProductDataService(IProductIdentifierValidator productIdentifierValidator,
-            IProductDataProductVersionsValidator productVersionsValidator,
-            IScsProductIdentifierValidator scsProductIdentifierValidator,
-            IProductDataSinceDateTimeValidator productDataSinceDateTimeValidator,
-            ISalesCatalogueService salesCatalougeService,
-            IMapper mapper,
-            IFileShareService fileShareService,
-            ILogger<ProductDataService> logger, IExchangeSetStorageProvider exchangeSetStorageProvider,
-            IOptions<EssFulfilmentStorageConfiguration> essFulfilmentStorageconfig, IMonitorHelper monitorHelper,
-            UserIdentifier userIdentifier, IAzureAdB2CHelper azureAdB2CHelper, IOptions<AioConfiguration> aioConfiguration,
-            IScsDataSinceDateTimeValidator scsDataSinceDateTimeValidator)
-        {
-            this.productIdentifierValidator = productIdentifierValidator;
-            this.scsProductIdentifierValidator = scsProductIdentifierValidator;
-            this.productVersionsValidator = productVersionsValidator;
-            this.productDataSinceDateTimeValidator = productDataSinceDateTimeValidator;
-            this.salesCatalogueService = salesCatalougeService;
-            this.mapper = mapper;
-            this.fileShareService = fileShareService;
-            this.logger = logger;
-            this.exchangeSetStorageProvider = exchangeSetStorageProvider;
-            this.essFulfilmentStorageconfig = essFulfilmentStorageconfig;
-            this.monitorHelper = monitorHelper;
-            this.userIdentifier = userIdentifier;
-            this.azureAdB2CHelper = azureAdB2CHelper;
-            this.aioConfiguration = aioConfiguration.Value;
-            this.scsDataSinceDateTimeValidator = scsDataSinceDateTimeValidator;
-        }
 
         public async Task<ExchangeSetServiceResponse> CreateProductDataByProductIdentifiers(ProductIdentifierRequest productIdentifierRequest, AzureAdB2C azureAdB2C)
         {
@@ -80,7 +47,7 @@ namespace UKHO.ExchangeSetService.API.Services
 
             IEnumerable<string> aioCells = FilterAioCellsByProductIdentifiers(productIdentifierRequest).ToList();
 
-            var salesCatalogueResponse = await salesCatalogueService.PostProductIdentifiersAsync(productIdentifierRequest.ProductIdentifier.ToList(), productIdentifierRequest.CorrelationId);
+            var salesCatalogueResponse = await salesCatalougeService.PostProductIdentifiersAsync(productIdentifierRequest.ProductIdentifier.ToList(), productIdentifierRequest.CorrelationId);
             long fileSize = 0;
             if (salesCatalogueResponse.ResponseCode == HttpStatusCode.OK)
             {
@@ -139,7 +106,7 @@ namespace UKHO.ExchangeSetService.API.Services
 
         public async Task<SalesCatalogueResponse> CreateProductDataByProductIdentifiers(ScsProductIdentifierRequest scsProductIdentifierRequest)
         {
-            var salesCatalogueResponse = await salesCatalogueService.PostProductIdentifiersAsync(scsProductIdentifierRequest.ProductIdentifier.ToList(), scsProductIdentifierRequest.CorrelationId);
+            var salesCatalogueResponse = await salesCatalougeService.PostProductIdentifiersAsync(scsProductIdentifierRequest.ProductIdentifier.ToList(), scsProductIdentifierRequest.CorrelationId);
             return salesCatalogueResponse;
         }
 
@@ -203,7 +170,7 @@ namespace UKHO.ExchangeSetService.API.Services
 
             IEnumerable<string> aioCells = FilterAioCellsByProductVersions(request).ToList();
 
-            var salesCatalogueResponse = await salesCatalogueService.PostProductVersionsAsync(request.ProductVersions, request.CorrelationId);
+            var salesCatalogueResponse = await salesCatalougeService.PostProductVersionsAsync(request.ProductVersions, request.CorrelationId);
             long fileSize = 0;
             if (salesCatalogueResponse.ResponseCode == HttpStatusCode.OK)
             {
@@ -292,7 +259,7 @@ namespace UKHO.ExchangeSetService.API.Services
         public async Task<ExchangeSetServiceResponse> CreateProductDataSinceDateTime(ProductDataSinceDateTimeRequest productDataSinceDateTimeRequest, AzureAdB2C azureAdB2C)
         {
             DateTime salesCatalogueServiceRequestStartedAt = DateTime.UtcNow;
-            var salesCatalogueResponse = await salesCatalogueService.GetProductsFromSpecificDateAsync(productDataSinceDateTimeRequest.SinceDateTime, productDataSinceDateTimeRequest.CorrelationId);
+            var salesCatalogueResponse = await salesCatalougeService.GetProductsFromSpecificDateAsync(productDataSinceDateTimeRequest.SinceDateTime, productDataSinceDateTimeRequest.CorrelationId);
             long fileSize = 0;
             if (salesCatalogueResponse.ResponseCode == HttpStatusCode.OK)
             {
@@ -353,7 +320,7 @@ namespace UKHO.ExchangeSetService.API.Services
         }
         public async Task<SalesCatalogueResponse> GetProductDataSinceDateTime(ProductDataSinceDateTimeRequest productDataSinceDateTimeRequest)
         {
-            var salesCatalogueResponse = await salesCatalogueService.GetProductsFromSpecificDateAsync(productDataSinceDateTimeRequest.SinceDateTime, productDataSinceDateTimeRequest.CorrelationId);
+            var salesCatalogueResponse = await salesCatalougeService.GetProductsFromSpecificDateAsync(productDataSinceDateTimeRequest.SinceDateTime, productDataSinceDateTimeRequest.CorrelationId);
             return salesCatalogueResponse;
         }
 

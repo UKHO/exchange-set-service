@@ -29,10 +29,9 @@ using UKHO.ExchangeSetService.FulfilmentService.Validation;
 using Elastic.Apm.Azure.Storage;
 using Elastic.Apm.DiagnosticSource;
 using Elastic.Apm;
-using UKHO.ExchangeSetService.Common.Helpers.FileShare;
 using UKHO.ExchangeSetService.Common.Helpers.Auth;
 using UKHO.ExchangeSetService.Common.Helpers.SalesCatalogue;
-using UKHO.ExchangeSetService.Common.Helpers.FileShare.FileShareInterfaces;
+using UKHO.ExchangeSetService.Common.Helpers.Zip;
 
 namespace UKHO.ExchangeSetService.FulfilmentService
 {
@@ -178,7 +177,11 @@ namespace UKHO.ExchangeSetService.FulfilmentService
 
                  services.AddSingleton<IAuthFssTokenProvider, AuthFssTokenProvider>();
                  services.AddSingleton<IAuthScsTokenProvider, AuthScsTokenProvider>();
-                 services.AddScoped<IFileShareService, FileShareService>();
+                 services.AddScoped<IFileShareBatchService, FileShareBatchService>();
+                 services.AddScoped<IFileShareUploadService, FileShareUploadService>();
+                 services.AddScoped<IFileShareDownloadService, FileShareDownloadService>();
+                 services.AddScoped<IFileShareSearchService, FileShareSearchService>();
+                 services.AddScoped<IZip, FileZip>();
                  services.AddScoped<IFulfilmentFileShareService, FulfilmentFileShareService>();
                  services.AddScoped<IFulfilmentAncillaryFiles, FulfilmentAncillaryFiles>();
                  services.AddScoped<IFileSystemHelper, FileSystemHelper>();

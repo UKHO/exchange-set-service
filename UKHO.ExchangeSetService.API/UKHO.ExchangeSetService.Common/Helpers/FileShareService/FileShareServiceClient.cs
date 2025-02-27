@@ -5,10 +5,10 @@ using System.Net.Http.Headers;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using UKHO.ExchangeSetService.Common.Helpers.FileShare.FileShareInterfaces;
+using UKHO.ExchangeSetService.Common.Helpers;
 using UKHO.ExchangeSetService.Common.Models.FileShareService.Response;
 
-namespace UKHO.ExchangeSetService.Common.Helpers.FileShare
+namespace UKHO.ExchangeSetService.Common.Helpers
 {
     [ExcludeFromCodeCoverage] ////Excluded from code coverage as it has actual http calls 
     public class FileShareServiceClient : IFileShareServiceClient

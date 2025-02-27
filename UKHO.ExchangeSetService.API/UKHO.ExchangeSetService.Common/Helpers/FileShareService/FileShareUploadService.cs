@@ -13,13 +13,14 @@ using Newtonsoft.Json;
 using UKHO.ExchangeSetService.Common.Configuration;
 using UKHO.ExchangeSetService.Common.Extensions;
 using UKHO.ExchangeSetService.Common.Helpers.Auth;
+using UKHO.ExchangeSetService.Common.Helpers;
 using UKHO.ExchangeSetService.Common.Logging;
 using UKHO.ExchangeSetService.Common.Models.FileShareService.Response;
 
-namespace UKHO.ExchangeSetService.Common.Helpers.FileShare.FileShareInterfaces
+namespace UKHO.ExchangeSetService.Common.Helpers
 {
     public class FileShareUploadService(
-        ILogger<FileShareUploadService> logger,
+        ILogger<FileShareService> logger,
         IMonitorHelper monitorHelper,
         IAuthFssTokenProvider authFssTokenProvider,
         IOptions<FileShareServiceConfiguration> fileShareServiceConfig,

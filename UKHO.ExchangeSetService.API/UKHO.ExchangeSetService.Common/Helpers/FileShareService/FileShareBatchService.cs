@@ -3,31 +3,31 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Net;
+using System.Net.Http;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
-using UKHO.ExchangeSetService.Common.Helpers.Auth;
-using UKHO.ExchangeSetService.Common.Helpers.FileShare.FileShareInterfaces;
-using UKHO.ExchangeSetService.Common.Logging;
-using UKHO.ExchangeSetService.Common.Models.FileShareService.Response;
-using System.Net.Http;
-using UKHO.ExchangeSetService.Common.Models.SalesCatalogue;
-using UKHO.ExchangeSetService.Common.Models.FileShareService.Enums;
-using System.Diagnostics;
-using UKHO.ExchangeSetService.Common.Configuration;
 using Microsoft.Extensions.Options;
-using System.Globalization;
-using UKHO.ExchangeSetService.Common.Models.FileShareService.Request;
-using System.Net;
+using Newtonsoft.Json;
+using UKHO.ExchangeSetService.Common.Configuration;
 using UKHO.ExchangeSetService.Common.Extensions;
-using System.Text;
+using UKHO.ExchangeSetService.Common.Helpers.Auth;
+using UKHO.ExchangeSetService.Common.Helpers;
+using UKHO.ExchangeSetService.Common.Logging;
+using UKHO.ExchangeSetService.Common.Models.FileShareService.Enums;
+using UKHO.ExchangeSetService.Common.Models.FileShareService.Request;
+using UKHO.ExchangeSetService.Common.Models.FileShareService.Response;
+using UKHO.ExchangeSetService.Common.Models.SalesCatalogue;
 
-namespace UKHO.ExchangeSetService.Common.Helpers.FileShare
+namespace UKHO.ExchangeSetService.Common.Helpers
 {
-    public class FileShareBatchService(ILogger<FileShareBatchService> logger, IMonitorHelper monitorHelper, IAuthFssTokenProvider authFssTokenProvider,
+    public class FileShareBatchService(ILogger<FileShareService> logger, IMonitorHelper monitorHelper, IAuthFssTokenProvider authFssTokenProvider,
         IOptions<FileShareServiceConfiguration> fileShareServiceConfig, IFileShareServiceClient fileShareServiceClient,
                                 IOptions<AioConfiguration> aioConfiguration, IFileSystemHelper fileSystemHelper,
                                 IOptions<CacheConfiguration> fssCacheConfiguration,
