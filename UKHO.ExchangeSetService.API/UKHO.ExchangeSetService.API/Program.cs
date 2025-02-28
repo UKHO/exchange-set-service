@@ -1,4 +1,5 @@
 using Azure.Identity;
+using Elastic.Apm.Api;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
@@ -168,7 +169,7 @@ namespace UKHO.ExchangeSetService.API
             }).AddHeaderPropagation().AddPolicyHandler((services, request) =>
                     CommonHelper.GetRetryPolicy(services.GetService<ILogger<IFileShareServiceClient>>(), "File Share", EventIds.RetryHttpClientFSSRequest, retryCount, sleepDuration));
 
-
+            builder.Services.AddScoped<IFileShareService, FileShareService>();
             builder.Services.AddScoped<IFileSystemHelper, FileSystemHelper>();
             builder.Services.AddScoped<IFileShareBatchService, FileShareBatchService>();
             builder.Services.AddScoped<IFileShareUploadService, FileShareUploadService>();
@@ -193,6 +194,7 @@ namespace UKHO.ExchangeSetService.API
             builder.Services.AddScoped<BespokeExchangeSetAuthorizationFilterAttribute>();
             builder.Services.AddScoped<IScsProductIdentifierValidator, ScsProductIdentifierValidator>();
             builder.Services.AddScoped<IScsDataSinceDateTimeValidator, ScsDataSinceDateTimeValidator>();
+
 
             builder.Services.AddHealthChecks()
                 .AddCheck<FileShareServiceHealthCheck>("FileShareServiceHealthCheck")
