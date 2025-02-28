@@ -177,6 +177,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService
 
                  services.AddSingleton<IAuthFssTokenProvider, AuthFssTokenProvider>();
                  services.AddSingleton<IAuthScsTokenProvider, AuthScsTokenProvider>();
+                 services.AddScoped<IFileShareService, FileShareService>();
                  services.AddScoped<IFileShareBatchService, FileShareBatchService>();
                  services.AddScoped<IFileShareUploadService, FileShareUploadService>();
                  services.AddScoped<IFileShareDownloadService, FileShareDownloadService>();
