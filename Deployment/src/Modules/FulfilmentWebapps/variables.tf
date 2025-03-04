@@ -30,15 +30,12 @@ variable "user_assigned_identity" {
 }
 
 variable "asp_control_sxs" {
-  type = object(any)
 }
 
 variable "asp_control_mxs" {
-  type = object(any)
 }
 
 variable "asp_control_lxs" {
-  type = object(any)
 }
 
 variable "asp_name_sxs" {

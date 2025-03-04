@@ -31,13 +31,10 @@ variable "asp" {
 }
 
 variable "asp_control_sxs" {
-  type = object(any)
 }
 
 variable "asp_control_mxs" {
-  type = object(any)
 }
 
 variable "asp_control_lxs" {
-  type = object(any)
 }
