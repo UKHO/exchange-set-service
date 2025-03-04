@@ -131,6 +131,21 @@ module "fulfilment_storage" {
   agent_prd_subnet                      = var.agent_prd_subnet
 }
 
+module "fulfilment_scaling" {
+  source                 = "./Modules/FulfilmentScaling"
+  resource_group_name    = azurerm_resource_group.rg.name
+  location               = azurerm_resource_group.rg.location
+  tags                   = local.tags
+  exchange_set_config    = local.config_data.ESSFulfilmentConfiguration
+  queue_resource_uri_sxs = module.fulfilment_storage.queue_resource_uri_sxs
+  queue_resource_uri_mxs = module.fulfilment_storage.queue_resource_uri_mxs
+  queue_resource_uri_lxs = module.fulfilment_storage.queue_resource_uri_lxs
+  asp_control_sxs        = var.asp_control_sxs
+  asp_control_mxs        = var.asp_control_mxs
+  asp_control_lxs        = var.asp_control_lxs
+  asp                    = module.fulfilment_webapp.asp
+}
+
 module "key_vault" {
   source              = "./Modules/KeyVault"
   name                = local.key_vault_name

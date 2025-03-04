@@ -24,12 +24,6 @@ variable "queue_resource_uri_lxs" {
   type = list(string)
 }
 
-variable "exchange_set_config" {
-}
-
-variable "asp" {
-}
-
 variable "asp_control_sxs" {
 }
 
@@ -37,4 +31,7 @@ variable "asp_control_mxs" {
 }
 
 variable "asp_control_lxs" {
+}
+
+variable "asp" {
 }
