@@ -39,3 +39,11 @@ output "large_exchange_set_scm_credentials"{
     })
   sensitive = true
 }
+
+output "asp" {
+  value = {
+    sxs = [for a in azurerm_service_plan.small_exchange_set_app_service_plan : { id = a.id, name = a.name }]
+    mxs = [for a in azurerm_service_plan.medium_exchange_set_app_service_plan : { id = a.id, name = a.name }]
+    lxs = [for a in azurerm_service_plan.large_exchange_set_app_service_plan : { id = a.id, name = a.name }]
+  }
+}

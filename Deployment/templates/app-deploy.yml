@@ -55,8 +55,19 @@ jobs:
     runOnce:
       deploy:
         steps:
-          - checkout: self
-            submodules: recursive
+          - checkout: none
+
+          - download: current
+            displayName: Download terraformartifact
+            artifact: terraformartifact
+
+          - download: current
+            displayName: Download ExchangeSetService
+            artifact: ExchangeSetService
+
+          - download: current
+            displayName: Download ExchangeSetServiceWebAPI
+            artifact: ExchangeSetServiceWebAPI
 
           - template: continuous-deployment${{parameters.pathSuffix}}.yml
             parameters:
@@ -101,35 +112,25 @@ jobs:
     - name: "AzureAdB2CTestConfiguration.ClientSecret"
       value: $(AUTOTEST-ESS-SECRET)
     - name: EssApiUrl
-      value: $[ dependencies.DeployApp${{parameters.v2Modifier}}.outputs['DeployApp${{parameters.v2Modifier}}.TerraformDeploy.EssUrl']  ]
+      value: $[ dependencies.DeployApp${{parameters.v2Modifier}}.outputs['DeployApp${{parameters.v2Modifier}}.TerraformDeploy${{parameters.v2Modifier}}.EssUrl']  ]
     - name: WEB_APP_NAME
-      value: $[ dependencies.DeployApp${{parameters.v2Modifier}}.outputs['DeployApp${{parameters.v2Modifier}}.TerraformDeploy.WEBAPPNAME']  ]
+      value: $[ dependencies.DeployApp${{parameters.v2Modifier}}.outputs['DeployApp${{parameters.v2Modifier}}.TerraformDeploy${{parameters.v2Modifier}}.WEBAPPNAME']  ]
     - name: RESOURCE_GROUP_NAME
-      value: $[ dependencies.DeployApp${{parameters.v2Modifier}}.outputs['DeployApp${{parameters.v2Modifier}}.TerraformDeploy.RESOURCEGROUPNAME']  ]
+      value: $[ dependencies.DeployApp${{parameters.v2Modifier}}.outputs['DeployApp${{parameters.v2Modifier}}.TerraformDeploy${{parameters.v2Modifier}}.RESOURCEGROUPNAME']  ]
   strategy:
     runOnce:
       deploy:
         steps:
-          - task: DownloadBuildArtifacts@0
-            displayName: "Download Terraform Artifact"
-            inputs:
-              buildType: 'current'
-              downloadType: 'single'
-              artifactName: 'terraformartifact'
-              downloadPath: '$(Build.SourcesDirectory)'
+          - checkout: none
 
-          - task: DownloadBuildArtifacts@0
-            displayName: "Download Functional test Artifact"
-            inputs:
-              buildType: 'current'
-              downloadType: 'single'
-              artifactName: 'functionaltests'
-              downloadPath: '$(Build.SourcesDirectory)'
+          - download: current
+            displayName: Download functionaltests
+            artifact: functionaltests
 
           - task: FileTransform@2
             displayName: "File Transform: functionaltests"
             inputs:
-              folderPath: '$(Build.SourcesDirectory)/functionaltests/'
+              folderPath: '$(Pipeline.Workspace)/functionaltests/'
               enableXmlTransform: false
               xmlTransformationRules: ''
               jsonTargetFiles: '**/appsettings.json'
@@ -150,4 +151,4 @@ jobs:
                 !**/obj/**
               arguments: '--filter Category!=QCOnlyTest-AIOEnabled&Category!=QCOnlyTest-AIODisabled'
               testRunTitle: "Dev-AutomationTests"
-              workingDirectory: '$(Build.SourcesDirectory)/functionaltests'
+              workingDirectory: '$(Pipeline.Workspace)/functionaltests'
