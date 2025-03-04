@@ -1,9 +1,9 @@
 resource "azurerm_monitor_autoscale_setting" "autoscale_setting_sxs" {
   count               = var.asp_control_sxs.enableAutoScale ? var.exchange_set_config.SmallExchangeSetInstance : 0
-  name                = "${var.asp[sxs].name}-autoscale"
+  name                = "${var.asp[sxs][count.index].name}-autoscale"
   resource_group_name = var.resource_group_name
   location            = var.location
-  target_resource_id  = var.asp[sxs].id
+  target_resource_id  = var.asp[sxs][count.index].id
   tags                = var.tags
 
   profile {
