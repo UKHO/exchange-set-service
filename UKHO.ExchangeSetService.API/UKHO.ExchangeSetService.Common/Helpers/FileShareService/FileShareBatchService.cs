@@ -31,7 +31,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
         IOptions<FileShareServiceConfiguration> fileShareServiceConfig, IFileShareServiceClient fileShareServiceClient,
                                 IOptions<AioConfiguration> aioConfiguration, IFileSystemHelper fileSystemHelper,
                                 IOptions<CacheConfiguration> fssCacheConfiguration,
-                                IFileShareServiceCache fileShareServiceCache,
+                                IFileShareServiceCache fileShareServiceCache,   
                                 IFileShareDownloadService fileShareDownloadService) : IFileShareBatchService
     {
         private const string ZIPFILE = "zip";

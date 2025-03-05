@@ -85,7 +85,9 @@ namespace UKHO.ExchangeSetService.API.Services
             var exchangeSetServiceResponse = await SetExchangeSetResponseLinks(response, productIdentifierRequest.CorrelationId);
 
             if (exchangeSetServiceResponse.HttpStatusCode != HttpStatusCode.Created)
+            {
                 return exchangeSetServiceResponse;
+            }
 
             string expiryDate = exchangeSetServiceResponse.ExchangeSetResponse.ExchangeSetUrlExpiryDateTime.Value.ToString("yyyy-MM-ddTHH:mm:ss.fffZ", CultureInfo.InvariantCulture);
 
@@ -243,9 +245,9 @@ namespace UKHO.ExchangeSetService.API.Services
                 var successful = await SaveSalesCatalogueStorageDetails(salesCatalogueResponse.ResponseBody, exchangeSetServiceResponse.BatchId, request.CallbackUri, request.ExchangeSetStandard, request.CorrelationId, expiryDate, salesCatalogueResponse.ScsRequestDateTime, isEmptyEncExchangeSet, isEmptyAioExchangeSet, exchangeSetServiceResponse.ExchangeSetResponse);
                 if (!successful)
                 {
-                    logger.LogInformation(EventIds.CreateProductDataError.ToEventId(), "CreateProductDataByProductVersions failed for BatchId:{BatchId} | _X-Correlation-ID : {CorrelationId}",  exchangeSetServiceResponse.BatchId, request.CorrelationId);
+                    logger.LogInformation(EventIds.CreateProductDataError.ToEventId(), "CreateProductDataByProductVersions failed for BatchId:{BatchId} | _X-Correlation-ID : {CorrelationId}", exchangeSetServiceResponse.BatchId, request.CorrelationId);
                 }
-                
+
             }
 
             return response;

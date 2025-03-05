@@ -22,10 +22,14 @@ namespace UKHO.ExchangeSetService.Common.Helpers.SalesCatalogue
             HttpContent content = null;
 
             if (requestBody != null)
+            {
                 content = new StringContent(requestBody, Encoding.UTF8, "application/json");
+            }
 
             using var httpRequestMessage = new HttpRequestMessage(method, uri)
-            { Content = content };
+            {
+                Content = content
+            };
 
             if (correlationId != "")
             {

@@ -48,7 +48,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers.Auth
         {
             var tokenCredential = new DefaultAzureCredential(new DefaultAzureCredentialOptions { ManagedIdentityClientId = essManagedIdentityConfiguration.Value.ClientId });
             var accessToken = await tokenCredential.GetTokenAsync(
-                new TokenRequestContext(scopes: new string[] { resource + "/.default" }) { }
+                new TokenRequestContext(scopes: [resource + "/.default"]) { }
             );
 
             return new AccessTokenItem
