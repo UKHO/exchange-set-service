@@ -162,18 +162,21 @@ module "key_vault" {
   }
   secrets = merge(
       {
-        "EventHubLoggingConfiguration--ConnectionString"            = module.eventhub.log_primary_connection_string
-        "EventHubLoggingConfiguration--EntityPath"                  = module.eventhub.entity_path
-        "ESSFulfilmentConfiguration--StorageAccountName"            = module.fulfilment_storage.small_exchange_set_name
-        "ESSFulfilmentConfiguration--StorageAccountKey"             = module.fulfilment_storage.small_exchange_set_primary_access_key
-        "ESSFulfilmentConfiguration--SmallExchangeSetAccountName"   = module.fulfilment_storage.small_exchange_set_name
-        "ESSFulfilmentConfiguration--SmallExchangeSetAccountKey"    = module.fulfilment_storage.small_exchange_set_primary_access_key
-        "ESSFulfilmentConfiguration--MediumExchangeSetAccountName"  = module.fulfilment_storage.medium_exchange_set_name
-        "ESSFulfilmentConfiguration--MediumExchangeSetAccountKey"   = module.fulfilment_storage.medium_exchange_set_primary_access_key
-        "ESSFulfilmentConfiguration--LargeExchangeSetAccountName"   = module.fulfilment_storage.large_exchange_set_name
-        "ESSFulfilmentConfiguration--LargeExchangeSetAccountKey"    = module.fulfilment_storage.large_exchange_set_primary_access_key
-        "CacheConfiguration--CacheStorageAccountName"               = module.cache_storage.cache_storage_name
-        "CacheConfiguration--CacheStorageAccountKey"                = module.cache_storage.cache_storage_primary_access_key
+        "EventHubLoggingConfiguration--ConnectionString"             = module.eventhub.log_primary_connection_string
+        "EventHubLoggingConfiguration--EntityPath"                   = module.eventhub.entity_path
+        "ESSFulfilmentConfiguration--StorageAccountName"             = module.fulfilment_storage.small_exchange_set_name
+        "ESSFulfilmentConfiguration--StorageAccountKey"              = module.fulfilment_storage.small_exchange_set_primary_access_key
+        "ESSFulfilmentConfiguration--SmallExchangeSetAccountName"    = module.fulfilment_storage.small_exchange_set_name
+        "ESSFulfilmentConfiguration--SmallExchangeSetAccountKey"     = module.fulfilment_storage.small_exchange_set_primary_access_key
+        "ESSFulfilmentConfiguration--SmallExchangeSetZoneRedundant"  = var.asp_control_sxs.zoneRedundant
+        "ESSFulfilmentConfiguration--MediumExchangeSetAccountName"   = module.fulfilment_storage.medium_exchange_set_name
+        "ESSFulfilmentConfiguration--MediumExchangeSetAccountKey"    = module.fulfilment_storage.medium_exchange_set_primary_access_key
+        "ESSFulfilmentConfiguration--MediumExchangeSetZoneRedundant" = var.asp_control_mxs.zoneRedundant
+        "ESSFulfilmentConfiguration--LargeExchangeSetAccountName"    = module.fulfilment_storage.large_exchange_set_name
+        "ESSFulfilmentConfiguration--LargeExchangeSetAccountKey"     = module.fulfilment_storage.large_exchange_set_primary_access_key
+        "ESSFulfilmentConfiguration--LargeExchangeSetZoneRedundant"  = var.asp_control_lxs.zoneRedundant
+        "CacheConfiguration--CacheStorageAccountName"                = module.cache_storage.cache_storage_name
+        "CacheConfiguration--CacheStorageAccountKey"                 = module.cache_storage.cache_storage_primary_access_key
       },
       module.fulfilment_webapp.small_exchange_set_scm_credentials,
       module.fulfilment_webapp.medium_exchange_set_scm_credentials,

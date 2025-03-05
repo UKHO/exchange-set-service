@@ -22,12 +22,13 @@ locals {
     COST_CENTRE      = local.env_name == "dev" || local.env_name == "qa" || local.env_name == "prod" ? "A.008.02" : "A.011.08"
   }
   config_data = jsondecode(file("${path.module}/appsettings.json"))
-  asp_name_sxs = [for i in range(local.config_data.ESSFulfilmentConfiguration.SmallExchangeSetInstance) : "${local.service_name}-${local.env_name}-sxs-${sum([1, i])}${var.asp_control_sxs.zoneRedundant ? "-z" : ""}-asp${var.suffix}"]
-  asp_name_mxs = [for i in range(local.config_data.ESSFulfilmentConfiguration.MediumExchangeSetInstance) : "${local.service_name}-${local.env_name}-mxs-${sum([1, i])}${var.asp_control_mxs.zoneRedundant ? "-z" : ""}-asp${var.suffix}"]
-  asp_name_lxs = [for i in range(local.config_data.ESSFulfilmentConfiguration.LargeExchangeSetInstance) : "${local.service_name}-${local.env_name}-lxs-${sum([1, i])}${var.asp_control_lxs.zoneRedundant ? "-z" : ""}-asp${var.suffix}"]
-  as_name_sxs = [for i in range(local.config_data.ESSFulfilmentConfiguration.SmallExchangeSetInstance) : "${local.service_name}-${local.env_name}-sxs-${sum([1, i])}${var.asp_control_sxs.zoneRedundant ? "-z" : ""}-webapp${var.suffix}"]
-  as_name_mxs = [for i in range(local.config_data.ESSFulfilmentConfiguration.MediumExchangeSetInstance) : "${local.service_name}-${local.env_name}-mxs-${sum([1, i])}${var.asp_control_mxs.zoneRedundant ? "-z" : ""}-webapp${var.suffix}"]
-  as_name_lxs = [for i in range(local.config_data.ESSFulfilmentConfiguration.LargeExchangeSetInstance) : "${local.service_name}-${local.env_name}-lxs-${sum([1, i])}${var.asp_control_lxs.zoneRedundant ? "-z" : ""}-webapp${var.suffix}"]
+  # These names should match those used in AzureWebJobsHealthCheckService in UKHO.ExchangeSetService.Common.
+  asp_name_sxs = [for i in range(local.config_data.ESSFulfilmentConfiguration.SmallExchangeSetInstance) : "${local.service_name}-${local.env_name}-sxs-${sum([1, i])}${var.asp_control_sxs.zoneRedundant ? "-zr" : ""}-asp${var.suffix}"]
+  asp_name_mxs = [for i in range(local.config_data.ESSFulfilmentConfiguration.MediumExchangeSetInstance) : "${local.service_name}-${local.env_name}-mxs-${sum([1, i])}${var.asp_control_mxs.zoneRedundant ? "-zr" : ""}-asp${var.suffix}"]
+  asp_name_lxs = [for i in range(local.config_data.ESSFulfilmentConfiguration.LargeExchangeSetInstance) : "${local.service_name}-${local.env_name}-lxs-${sum([1, i])}${var.asp_control_lxs.zoneRedundant ? "-zr" : ""}-asp${var.suffix}"]
+  as_name_sxs = [for i in range(local.config_data.ESSFulfilmentConfiguration.SmallExchangeSetInstance) : "${local.service_name}-${local.env_name}-sxs-${sum([1, i])}${var.asp_control_sxs.zoneRedundant ? "-zr" : ""}-webapp${var.suffix}"]
+  as_name_mxs = [for i in range(local.config_data.ESSFulfilmentConfiguration.MediumExchangeSetInstance) : "${local.service_name}-${local.env_name}-mxs-${sum([1, i])}${var.asp_control_mxs.zoneRedundant ? "-zr" : ""}-webapp${var.suffix}"]
+  as_name_lxs = [for i in range(local.config_data.ESSFulfilmentConfiguration.LargeExchangeSetInstance) : "${local.service_name}-${local.env_name}-lxs-${sum([1, i])}${var.asp_control_lxs.zoneRedundant ? "-zr" : ""}-webapp${var.suffix}"]
 }
 
 variable "allowed_ips" {
