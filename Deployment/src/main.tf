@@ -241,6 +241,7 @@ module "azure-dashboard" {
   resource_group = azurerm_resource_group.rg
   tags           = local.tags
 }
+
 module "cache_storage" {
   source                                = "./Modules/CacheStorage"
   name                                  = (local.env_name == "prod" || local.env_name == "pre") && var.storage_suffix == "v2" ? "${local.service_name}${local.env_name}cachestorageukho2" : "${local.service_name}${local.env_name}cachestorageukho${var.storage_suffix}"
