@@ -89,7 +89,7 @@ jobs:
   environment: "Ess-${{parameters.Environment}}"
   pool: $(DeploymentPool)
   container: ${{parameters.Container}}
-  condition: ${{parameters.RunTests}}
+  condition: and(succeeded(), ${{parameters.RunTests}})
   variables:
     - group: "ESS-${{parameters.Environment}}${{parameters.v2Modifier}}-Variables"
     - group: "ESS-Deployment-Variables-${{parameters.Environment}}"

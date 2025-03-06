@@ -4,11 +4,11 @@ parameters:
   - name: ContinueEvenIfResourcesAreGettingDestroyed
     displayName: "Continue even if resources are getting destroyed"
     type: boolean
-    default: true
+    default: false
   - name: disableStryker
     displayName: "Disable Stryker"
     type: boolean
-    default: true
+    default: false
 
 trigger:
   - main
@@ -111,18 +111,17 @@ stages:
           ContinueEvenIfResourcesAreGettingDestroyed: ${{ parameters.ContinueEvenIfResourcesAreGettingDestroyed }}
           AzureSubscription: "Exchange-Set-Service-Dev-A-008-02"
           Container: ${{variables.Container}} 
-          #RunTests: true
-          RunTests: false
+          RunTests: true
 
-      # - template: Deployment/templates/app-deploy.yml
-      #   parameters:
-      #     Environment: "dev"
-      #     ContinueEvenIfResourcesAreGettingDestroyed: ${{ parameters.ContinueEvenIfResourcesAreGettingDestroyed }}
-      #     AzureSubscription: "Exchange-Set-Service-Dev-A-008-02"
-      #     Container: ${{variables.Container}} 
-      #     RunTests: false
-      #     pathSuffix: "-v2"
-      #     v2Modifier: "2"
+      - template: Deployment/templates/app-deploy.yml
+        parameters:
+          Environment: "dev"
+          ContinueEvenIfResourcesAreGettingDestroyed: ${{ parameters.ContinueEvenIfResourcesAreGettingDestroyed }}
+          AzureSubscription: "Exchange-Set-Service-Dev-A-008-02"
+          Container: ${{variables.Container}} 
+          RunTests: false
+          pathSuffix: "-v2"
+          v2Modifier: "2"
 
   - stage: QCdeploy
     dependsOn:
