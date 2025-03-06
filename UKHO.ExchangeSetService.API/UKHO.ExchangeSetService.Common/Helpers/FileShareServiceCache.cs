@@ -52,7 +52,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
 
         public async Task<List<Products>> GetNonCachedProductDataForFss(List<Products> products, SearchBatchResponse internalSearchBatchResponse, string exchangeSetRootPath, SalesCatalogueServiceResponseQueueMessage queueMessage, CancellationTokenSource cancellationTokenSource, CancellationToken cancellationToken, string businessUnit)
         {
-            var SuspectUpdateNumbersList = new List<int?>();
+            var suspectUpdateNumbersList = new List<int?>();
             var internalProductsNotFound = new List<Products>();
 
             foreach (var item in products)
@@ -101,17 +101,17 @@ namespace UKHO.ExchangeSetService.Common.Helpers
                             }
                             else
                             {
-                                SuspectUpdateNumbersList.Add(itemUpdateNumber);
+                                suspectUpdateNumbersList.Add(itemUpdateNumber);
                             }
                             productList.Add(compareProducts);
                         }
                         else
                         {
-                            SuspectUpdateNumbersList.Add(itemUpdateNumber);
+                            suspectUpdateNumbersList.Add(itemUpdateNumber);
                         }
                     }
                 }
-                if (SuspectUpdateNumbersList != null && SuspectUpdateNumbersList.Count > 0)
+                if (suspectUpdateNumbersList.Count > 0)
                 {
                     internalProductsNotFound.Add(new Products
                     {
@@ -120,10 +120,10 @@ namespace UKHO.ExchangeSetService.Common.Helpers
                         EditionNumber = item.EditionNumber,
                         FileSize = item.FileSize,
                         ProductName = item.ProductName,
-                        UpdateNumbers = [.. SuspectUpdateNumbersList],
+                        UpdateNumbers = [.. suspectUpdateNumbersList],
                         Bundle = item.Bundle
                     });
-                    SuspectUpdateNumbersList.Clear();
+                    suspectUpdateNumbersList.Clear();
                 }
             }
 
