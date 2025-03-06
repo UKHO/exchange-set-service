@@ -52,26 +52,20 @@ namespace UKHO.ExchangeSetService.Common.Helpers
 
         public async Task<List<Products>> GetNonCachedProductDataForFss(List<Products> products, SearchBatchResponse internalSearchBatchResponse, string exchangeSetRootPath, SalesCatalogueServiceResponseQueueMessage queueMessage, CancellationTokenSource cancellationTokenSource, CancellationToken cancellationToken, string businessUnit)
         {
+            var suspectUpdateNumbersList = new List<int?>();
             var internalProductsNotFound = new List<Products>();
 
             foreach (var item in products)
             {
                 if (cancellationToken.IsCancellationRequested)
                 {
-                    logger.LogError(EventIds.CancellationTokenEvent.ToEventId(), "Operation cancelled as IsCancellationRequested flag is true while searching ENC files from cache for Product/CellName:{ProductName}, EditionNumber:{EditionNumber} and UpdateNumbers:[{UpdateNumbers}]. BatchId:{batchId} and _X-Correlation-ID:{CorrelationId}",
-                        item.ProductName, item.EditionNumber, string.Join(",", item.UpdateNumbers.Select(a => a.Value.ToString())), queueMessage.BatchId, queueMessage.CorrelationId);
+                    logger.LogError(EventIds.CancellationTokenEvent.ToEventId(),
+                        "Operation cancelled as IsCancellationRequested flag is true while searching ENC files from cache for Product/CellName:{ProductName}, EditionNumber:{EditionNumber} and UpdateNumbers:[{UpdateNumbers}]. BatchId:{batchId} and _X-Correlation-ID:{CorrelationId}",
+                        item.ProductName, item.EditionNumber, string.Join(",", item.UpdateNumbers.Select(a => a.Value)), queueMessage.BatchId, queueMessage.CorrelationId);
                     throw new OperationCanceledException();
                 }
-                var internalProductItemNotFound = new Products
-                {
-                    Cancellation = item.Cancellation,
-                    Dates = item.Dates,
-                    EditionNumber = item.EditionNumber,
-                    FileSize = item.FileSize,
-                    ProductName = item.ProductName,
-                    UpdateNumbers = new List<int?>(),
-                    Bundle = item.Bundle
-                };
+
+                
 
                 List<int?> updateNumbers = new List<int?>();
                 foreach (var itemUpdateNumber in item.UpdateNumbers)
@@ -107,19 +101,29 @@ namespace UKHO.ExchangeSetService.Common.Helpers
                             }
                             else
                             {
-                                internalProductItemNotFound.UpdateNumbers.Add(itemUpdateNumber);
+                                suspectUpdateNumbersList.Add(itemUpdateNumber);
                             }
                             productList.Add(compareProducts);
                         }
                         else
                         {
-                            internalProductItemNotFound.UpdateNumbers.Add(itemUpdateNumber);
+                            suspectUpdateNumbersList.Add(itemUpdateNumber);
                         }
                     }
                 }
-                if (internalProductItemNotFound.UpdateNumbers != null && internalProductItemNotFound.UpdateNumbers.Any())
+                if (suspectUpdateNumbersList.Count > 0)
                 {
-                    internalProductsNotFound.Add(internalProductItemNotFound);
+                    internalProductsNotFound.Add(new Products
+                    {
+                        Cancellation = item.Cancellation,
+                        Dates = item.Dates,
+                        EditionNumber = item.EditionNumber,
+                        FileSize = item.FileSize,
+                        ProductName = item.ProductName,
+                        UpdateNumbers = [.. suspectUpdateNumbersList],
+                        Bundle = item.Bundle
+                    });
+                    suspectUpdateNumbersList.Clear();
                 }
             }
 
