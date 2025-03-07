@@ -2,7 +2,7 @@
 using System.Threading.Tasks;
 using FakeItEasy;
 using NUnit.Framework;
-using UKHO.ExchangeSetService.Common.Helpers;
+using UKHO.ExchangeSetService.Common.Helpers.SalesCatalogue;
 using UKHO.ExchangeSetService.Common.Models.SalesCatalogue;
 using UKHO.ExchangeSetService.FulfilmentService.Services;
 

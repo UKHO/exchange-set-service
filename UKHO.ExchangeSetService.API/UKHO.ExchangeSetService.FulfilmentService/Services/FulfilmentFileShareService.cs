@@ -9,26 +9,22 @@ using System.Threading;
 using System.Threading.Tasks;
 using UKHO.ExchangeSetService.Common.Configuration;
 using UKHO.ExchangeSetService.Common.Helpers;
+using UKHO.ExchangeSetService.Common.Helpers.Zip;
 using UKHO.ExchangeSetService.Common.Logging;
 using UKHO.ExchangeSetService.Common.Models.FileShareService.Response;
 using UKHO.ExchangeSetService.Common.Models.SalesCatalogue;
 
 namespace UKHO.ExchangeSetService.FulfilmentService.Services
 {
-    public class FulfilmentFileShareService : IFulfilmentFileShareService
+    public class FulfilmentFileShareService(
+        IOptions<FileShareServiceConfiguration> fileShareServiceConfig,
+        IFileShareBatchService fileShareBatchService,
+        IFileShareDownloadService fileShareDownloadService,
+        IFileShareSearchService fileShareSearchService,
+        IFileShareUploadService fileShareUploadService,
+        IZip zip,
+        ILogger<FulfilmentFileShareService> logger) : IFulfilmentFileShareService
     {
-        private readonly IOptions<FileShareServiceConfiguration> fileShareServiceConfig;
-        private readonly IFileShareService fileShareService;
-        private readonly ILogger<FulfilmentFileShareService> logger;
-
-        public FulfilmentFileShareService(IOptions<FileShareServiceConfiguration> fileShareServiceConfig,
-            IFileShareService fileShareService, ILogger<FulfilmentFileShareService> logger)
-        {
-            this.fileShareServiceConfig = fileShareServiceConfig;
-            this.fileShareService = fileShareService;
-            this.logger = logger;
-        }
-
         public List<Products> SliceFileShareServiceProductsWithUpdateNumber(List<Products> products)
         {
             var listSubUpdateNumberProduts = new List<Products>();
@@ -73,7 +69,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
                         logger.LogError(EventIds.CancellationTokenEvent.ToEventId(), "Operation cancelled as IsCancellationRequested flag is true while searching ENC files from File Share Service with cancellationToken:{cancellationTokenSource.Token} at time:{DateTime.UtcNow} and productdetails:{productDetail.ToString()} and BatchId:{batchId} and _X-Correlation-ID:{correlationId}", JsonConvert.SerializeObject(cancellationTokenSource.Token), DateTime.UtcNow, productDetail.ToString(), message.BatchId, message.CorrelationId);
                         throw new OperationCanceledException();
                     }
-                    var result = await fileShareService.GetBatchInfoBasedOnProducts(item, message, cancellationTokenSource, cancellationToken, exchangeSetRootPath, businessUnit);
+                    var result = await fileShareBatchService.GetBatchInfoBasedOnProducts(item, message, cancellationTokenSource, cancellationToken, exchangeSetRootPath, businessUnit);
                     listBatchDetails.AddRange(result.Entries);
                     fileShareServiceSearchQueryCount += result.QueryCount;
                 }
@@ -91,7 +87,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
 
         public IEnumerable<List<Products>> SliceFileShareServiceProducts(List<Products> products)
         {
-            return CommonHelper.SplitList((SliceFileShareServiceProductsWithUpdateNumber(products)), fileShareServiceConfig.Value.ProductLimit);
+            return CommonHelper.SplitList(SliceFileShareServiceProductsWithUpdateNumber(products), fileShareServiceConfig.Value.ProductLimit);
         }
 
         private List<FulfilmentDataResponse> SetFulfilmentDataResponse(SearchBatchResponse searchBatchResponse)
@@ -113,50 +109,50 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
         }
         public async Task<bool> DownloadReadMeFileFromFssAsync(string filePath, string batchId, string exchangeSetRootPath, string correlationId)
         {
-            return await fileShareService.DownloadReadMeFileFromFssAsync(filePath, batchId, exchangeSetRootPath, correlationId);
+            return await fileShareDownloadService.DownloadReadMeFileFromFssAsync(filePath, batchId, exchangeSetRootPath, correlationId);
         }
 
         public async Task<string> SearchReadMeFilePath(string batchId, string correlationId)
         {
-            return await fileShareService.SearchReadMeFilePath(batchId, correlationId);
+            return await fileShareSearchService.SearchReadMeFilePath(batchId, correlationId);
         }
 
         public async Task<string> SearchIhoPubFilePath(string batchId, string correlationId)
         {
-            return await fileShareService.SearchIhoPubFilePath(batchId, correlationId);
+            return await fileShareSearchService.SearchIhoPubFilePath(batchId, correlationId);
         }
 
         public async Task<string> SearchIhoCrtFilePath(string batchId, string correlationId)
         {
-            return await fileShareService.SearchIhoCrtFilePath(batchId, correlationId);
+            return await fileShareSearchService.SearchIhoCrtFilePath(batchId, correlationId);
         }
         public async Task<bool> DownloadIhoPubFile(string filePath, string batchId, string exchangeSetRootPath, string correlationId)
         {
-            return await fileShareService.DownloadIhoPubFile(filePath, batchId, exchangeSetRootPath, correlationId);
+            return await fileShareDownloadService.DownloadIhoPubFile(filePath, batchId, exchangeSetRootPath, correlationId);
         }
 
         public async Task<bool> DownloadIhoCrtFile(string filePath, string batchId, string aioExchangeSetPath, string correlationId)
         {
-            return await fileShareService.DownloadIhoCrtFile(filePath, batchId, aioExchangeSetPath, correlationId);
+            return await fileShareDownloadService.DownloadIhoCrtFile(filePath, batchId, aioExchangeSetPath, correlationId);
         }
 
         public async Task<bool> CreateZipFileForExchangeSet(string batchId, string exchangeSetZipRootPath, string correlationId)
         {
-            return await fileShareService.CreateZipFileForExchangeSet(batchId, exchangeSetZipRootPath, correlationId);
+            return await zip.CreateZipFileForExchangeSet(batchId, exchangeSetZipRootPath, correlationId);
         }
         public async Task<bool> UploadZipFileForExchangeSetToFileShareService(string batchId, string exchangeSetZipRootPath, string correlationId, string zipFileName)
         {
-            return await fileShareService.UploadFileToFileShareService(batchId, exchangeSetZipRootPath, correlationId, zipFileName);
+            return await fileShareUploadService.UploadFileToFileShareService(batchId, exchangeSetZipRootPath, correlationId, zipFileName);
         }
 
         public async Task<bool> UploadZipFileForLargeMediaExchangeSetToFileShareService(string batchId, string exchangeSetZipRootPath, string correlationId, string mediaZipFileName)
         {
-            return await fileShareService.UploadLargeMediaFileToFileShareService(batchId, exchangeSetZipRootPath, correlationId, mediaZipFileName);
+            return await fileShareUploadService.UploadLargeMediaFileToFileShareService(batchId, exchangeSetZipRootPath, correlationId, mediaZipFileName);
         }
 
         public async Task<bool> CommitLargeMediaExchangeSet(string batchId, string exchangeSetZipPath, string correlationId)
         {
-            return await fileShareService.CommitAndGetBatchStatusForLargeMediaExchangeSet(batchId, exchangeSetZipPath, correlationId);
+            return await fileShareBatchService.CommitAndGetBatchStatusForLargeMediaExchangeSet(batchId, exchangeSetZipPath, correlationId);
         }
 
         public async Task<IEnumerable<BatchFile>> SearchFolderDetails(string batchId, string correlationId, string folderName)
@@ -172,22 +168,22 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
                 uri += $" and $batch(Content) eq '{fileShareServiceConfig.Value.Content}'";
                 uri += $" and $batch(Catalogue Type) eq '{fileShareServiceConfig.Value.Adc}'";
             }
-            return await fileShareService.SearchFolderDetails(batchId, correlationId, uri);
+            return await fileShareSearchService.SearchFolderDetails(batchId, correlationId, uri);
         }
 
         public async Task<bool> DownloadFolderDetails(string batchId, string correlationId, IEnumerable<BatchFile> fileDetails, string exchangeSetPath)
         {
-            return await fileShareService.DownloadFolderDetails(batchId, correlationId, fileDetails, exchangeSetPath);
+            return await fileShareDownloadService.DownloadFolderDetails(batchId, correlationId, fileDetails, exchangeSetPath);
         }
 
         public async Task<bool> CommitExchangeSet(string batchId, string correlationId, string exchangeSetZipPath)
         {
-            return await fileShareService.CommitBatchToFss(batchId, correlationId, exchangeSetZipPath);
+            return await fileShareBatchService.CommitBatchToFss(batchId, correlationId, exchangeSetZipPath);
         }
 
         public async Task<bool> DownloadReadMeFileFromCacheAsync(string batchId, string exchangeSetRootPath, string correlationId)
         {
-            return await fileShareService.DownloadReadMeFileFromCacheAsync(batchId,exchangeSetRootPath,correlationId);
+            return await fileShareDownloadService.DownloadReadMeFileFromCacheAsync(batchId,exchangeSetRootPath,correlationId);
         }
     }
 }

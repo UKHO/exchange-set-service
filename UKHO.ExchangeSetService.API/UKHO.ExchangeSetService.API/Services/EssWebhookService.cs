@@ -18,7 +18,7 @@ using UKHO.ExchangeSetService.Common.Models.AzureTableEntities;
 using UKHO.ExchangeSetService.Common.Models.FileShareService.Response;
 using UKHO.ExchangeSetService.Common.Models.Request;
 using UKHO.ExchangeSetService.Common.Storage;
-
+using UKHO.ExchangeSetService.Common.Helpers.Auth;
 
 namespace UKHO.ExchangeSetService.API.Services
 {

@@ -19,36 +19,13 @@ using UKHO.ExchangeSetService.FulfilmentService.Services;
 namespace UKHO.ExchangeSetService.FulfilmentService
 {
     [ExcludeFromCodeCoverage]
-    public class FulfilmentServiceJob
+    public class FulfilmentServiceJob(IConfiguration configuration,
+                                IFulfilmentDataService fulFilmentDataService, ILogger<FulfilmentServiceJob> logger, IFileSystemHelper fileSystemHelper,
+                                IFileShareBatchService fileBatchShareService, IFileShareUploadService fileShareUploadService, IOptions<FileShareServiceConfiguration> fileShareServiceConfig,
+                                IAzureBlobStorageService azureBlobStorageService, IFulfilmentCallBackService fulfilmentCallBackService,
+                                IOptions<PeriodicOutputServiceConfiguration> periodicOutputServiceConfiguration, IOptions<AioConfiguration> aioConfiguration)
     {
-        protected IConfiguration configuration;
-        private readonly IFulfilmentDataService fulFilmentDataService;
-        private readonly ILogger<FulfilmentServiceJob> logger;
-        private readonly IFileSystemHelper fileSystemHelper;
-        private readonly IFileShareService fileShareService;
-        private readonly IOptions<FileShareServiceConfiguration> fileShareServiceConfig;
-        private readonly IAzureBlobStorageService azureBlobStorageService;
-        private readonly IFulfilmentCallBackService fulfilmentCallBackService;
-        private readonly IOptions<PeriodicOutputServiceConfiguration> periodicOutputServiceConfiguration;
-        private readonly IOptions<AioConfiguration> aioConfiguration;
-
-        public FulfilmentServiceJob(IConfiguration configuration,
-                                    IFulfilmentDataService fulFilmentDataService, ILogger<FulfilmentServiceJob> logger, IFileSystemHelper fileSystemHelper,
-                                    IFileShareService fileShareService, IOptions<FileShareServiceConfiguration> fileShareServiceConfig,
-                                    IAzureBlobStorageService azureBlobStorageService, IFulfilmentCallBackService fulfilmentCallBackService,
-                                    IOptions<PeriodicOutputServiceConfiguration> periodicOutputServiceConfiguration, IOptions<AioConfiguration> aioConfiguration)
-        {
-            this.configuration = configuration;
-            this.fulFilmentDataService = fulFilmentDataService;
-            this.logger = logger;
-            this.fileSystemHelper = fileSystemHelper;
-            this.fileShareService = fileShareService;
-            this.fileShareServiceConfig = fileShareServiceConfig;
-            this.azureBlobStorageService = azureBlobStorageService;
-            this.fulfilmentCallBackService = fulfilmentCallBackService;
-            this.periodicOutputServiceConfiguration = periodicOutputServiceConfiguration;
-            this.aioConfiguration = aioConfiguration;
-        }
+        protected IConfiguration configuration = configuration;
 
         public async Task ProcessQueueMessage([QueueTrigger("%ESSFulfilmentStorageConfiguration:QueueName%")] QueueMessage message)
         {
@@ -135,11 +112,11 @@ namespace UKHO.ExchangeSetService.FulfilmentService
             if (fileSystemHelper.CheckFileExists(errorFileFullPath))
             {
                 var isErrorFileCommitted = false;
-                var isUploaded = await fileShareService.UploadFileToFileShareService(fulfilmentServiceQueueMessage.BatchId, batchFolderPath, fulfilmentServiceQueueMessage.CorrelationId, fileShareServiceConfig.Value.ErrorFileName);
+                var isUploaded = await fileShareUploadService.UploadFileToFileShareService(fulfilmentServiceQueueMessage.BatchId, batchFolderPath, fulfilmentServiceQueueMessage.CorrelationId, fileShareServiceConfig.Value.ErrorFileName);
 
                 if (isUploaded)
                 {
-                    isErrorFileCommitted = await fileShareService.CommitBatchToFss(fulfilmentServiceQueueMessage.BatchId, fulfilmentServiceQueueMessage.CorrelationId, batchFolderPath, fileShareServiceConfig.Value.ErrorFileName);
+                    isErrorFileCommitted = await fileBatchShareService.CommitBatchToFss(fulfilmentServiceQueueMessage.BatchId, fulfilmentServiceQueueMessage.CorrelationId, batchFolderPath, fileShareServiceConfig.Value.ErrorFileName);
                 }
 
                 if (isErrorFileCommitted)
