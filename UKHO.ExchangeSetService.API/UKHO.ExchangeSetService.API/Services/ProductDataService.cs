@@ -28,7 +28,7 @@ namespace UKHO.ExchangeSetService.API.Services
         IProductDataProductVersionsValidator productVersionsValidator,
         IScsProductIdentifierValidator scsProductIdentifierValidator,
         IProductDataSinceDateTimeValidator productDataSinceDateTimeValidator,
-        ISalesCatalogueService salesCatalougeService,
+        ISalesCatalogueService salesCatalogueService,
         IMapper mapper,
         IFileShareService fileShareService,
         ILogger<ProductDataService> logger, IExchangeSetStorageProvider exchangeSetStorageProvider,
@@ -47,7 +47,7 @@ namespace UKHO.ExchangeSetService.API.Services
 
             IEnumerable<string> aioCells = FilterAioCellsByProductIdentifiers(productIdentifierRequest).ToList();
 
-            var salesCatalogueResponse = await salesCatalougeService.PostProductIdentifiersAsync(productIdentifierRequest.ProductIdentifier.ToList(), productIdentifierRequest.CorrelationId);
+            var salesCatalogueResponse = await salesCatalogueService.PostProductIdentifiersAsync(productIdentifierRequest.ProductIdentifier.ToList(), productIdentifierRequest.CorrelationId);
             long fileSize = 0;
             if (salesCatalogueResponse.ResponseCode == HttpStatusCode.OK)
             {
@@ -108,7 +108,7 @@ namespace UKHO.ExchangeSetService.API.Services
 
         public async Task<SalesCatalogueResponse> CreateProductDataByProductIdentifiers(ScsProductIdentifierRequest scsProductIdentifierRequest)
         {
-            var salesCatalogueResponse = await salesCatalougeService.PostProductIdentifiersAsync(scsProductIdentifierRequest.ProductIdentifier.ToList(), scsProductIdentifierRequest.CorrelationId);
+            var salesCatalogueResponse = await salesCatalogueService.PostProductIdentifiersAsync(scsProductIdentifierRequest.ProductIdentifier.ToList(), scsProductIdentifierRequest.CorrelationId);
             return salesCatalogueResponse;
         }
 
@@ -172,7 +172,7 @@ namespace UKHO.ExchangeSetService.API.Services
 
             IEnumerable<string> aioCells = FilterAioCellsByProductVersions(request).ToList();
 
-            var salesCatalogueResponse = await salesCatalougeService.PostProductVersionsAsync(request.ProductVersions, request.CorrelationId);
+            var salesCatalogueResponse = await salesCatalogueService.PostProductVersionsAsync(request.ProductVersions, request.CorrelationId);
             long fileSize = 0;
             if (salesCatalogueResponse.ResponseCode == HttpStatusCode.OK)
             {
@@ -261,7 +261,7 @@ namespace UKHO.ExchangeSetService.API.Services
         public async Task<ExchangeSetServiceResponse> CreateProductDataSinceDateTime(ProductDataSinceDateTimeRequest productDataSinceDateTimeRequest, AzureAdB2C azureAdB2C)
         {
             DateTime salesCatalogueServiceRequestStartedAt = DateTime.UtcNow;
-            var salesCatalogueResponse = await salesCatalougeService.GetProductsFromSpecificDateAsync(productDataSinceDateTimeRequest.SinceDateTime, productDataSinceDateTimeRequest.CorrelationId);
+            var salesCatalogueResponse = await salesCatalogueService.GetProductsFromSpecificDateAsync(productDataSinceDateTimeRequest.SinceDateTime, productDataSinceDateTimeRequest.CorrelationId);
             long fileSize = 0;
             if (salesCatalogueResponse.ResponseCode == HttpStatusCode.OK)
             {
@@ -322,7 +322,7 @@ namespace UKHO.ExchangeSetService.API.Services
         }
         public async Task<SalesCatalogueResponse> GetProductDataSinceDateTime(ProductDataSinceDateTimeRequest productDataSinceDateTimeRequest)
         {
-            var salesCatalogueResponse = await salesCatalougeService.GetProductsFromSpecificDateAsync(productDataSinceDateTimeRequest.SinceDateTime, productDataSinceDateTimeRequest.CorrelationId);
+            var salesCatalogueResponse = await salesCatalogueService.GetProductsFromSpecificDateAsync(productDataSinceDateTimeRequest.SinceDateTime, productDataSinceDateTimeRequest.CorrelationId);
             return salesCatalogueResponse;
         }
 
