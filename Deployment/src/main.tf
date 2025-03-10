@@ -87,10 +87,16 @@ module "fulfilment_webapp" {
   large_exchange_set_subnets    = data.azurerm_subnet.large_exchange_set_subnet[*].id
   suffix                        = var.suffix
   exchange_set_config           = local.config_data.ESSFulfilmentConfiguration
-  env_name                      = local.env_name
-  service_name                  = local.service_name
   user_assigned_identity        = module.user_identity.ess_service_identity_id
-  app_service_sku               = var.app_service_sku[local.env_name]
+  asp_control_sxs               = var.asp_control_sxs
+  asp_control_mxs               = var.asp_control_mxs
+  asp_control_lxs               = var.asp_control_lxs
+  asp_name_sxs                  = local.asp_name_sxs
+  asp_name_mxs                  = local.asp_name_mxs
+  asp_name_lxs                  = local.asp_name_lxs
+  as_name_sxs                   = local.as_name_sxs
+  as_name_mxs                   = local.as_name_mxs
+  as_name_lxs                   = local.as_name_lxs
   app_settings = {
     "EventHubLoggingConfiguration:Environment"             = local.env_name
     "EventHubLoggingConfiguration:MinimumLoggingLevel"     = "Warning"
@@ -125,6 +131,21 @@ module "fulfilment_storage" {
   agent_prd_subnet                      = var.agent_prd_subnet
 }
 
+module "fulfilment_scaling" {
+  source                 = "./Modules/FulfilmentScaling"
+  resource_group_name    = azurerm_resource_group.rg.name
+  location               = azurerm_resource_group.rg.location
+  tags                   = local.tags
+  exchange_set_config    = local.config_data.ESSFulfilmentConfiguration
+  queue_resource_uri_sxs = module.fulfilment_storage.queue_resource_uri_sxs
+  queue_resource_uri_mxs = module.fulfilment_storage.queue_resource_uri_mxs
+  queue_resource_uri_lxs = module.fulfilment_storage.queue_resource_uri_lxs
+  asp_control_sxs        = var.asp_control_sxs
+  asp_control_mxs        = var.asp_control_mxs
+  asp_control_lxs        = var.asp_control_lxs
+  asp                    = module.fulfilment_webapp.asp
+}
+
 module "key_vault" {
   source              = "./Modules/KeyVault"
   name                = local.key_vault_name
@@ -141,18 +162,21 @@ module "key_vault" {
   }
   secrets = merge(
       {
-        "EventHubLoggingConfiguration--ConnectionString"            = module.eventhub.log_primary_connection_string
-        "EventHubLoggingConfiguration--EntityPath"                  = module.eventhub.entity_path
-        "ESSFulfilmentConfiguration--StorageAccountName"            = module.fulfilment_storage.small_exchange_set_name
-        "ESSFulfilmentConfiguration--StorageAccountKey"             = module.fulfilment_storage.small_exchange_set_primary_access_key
-        "ESSFulfilmentConfiguration--SmallExchangeSetAccountName"   = module.fulfilment_storage.small_exchange_set_name
-        "ESSFulfilmentConfiguration--SmallExchangeSetAccountKey"    = module.fulfilment_storage.small_exchange_set_primary_access_key
-        "ESSFulfilmentConfiguration--MediumExchangeSetAccountName"  = module.fulfilment_storage.medium_exchange_set_name
-        "ESSFulfilmentConfiguration--MediumExchangeSetAccountKey"   = module.fulfilment_storage.medium_exchange_set_primary_access_key
-        "ESSFulfilmentConfiguration--LargeExchangeSetAccountName"   = module.fulfilment_storage.large_exchange_set_name
-        "ESSFulfilmentConfiguration--LargeExchangeSetAccountKey"    = module.fulfilment_storage.large_exchange_set_primary_access_key
-        "CacheConfiguration--CacheStorageAccountName"               = module.cache_storage.cache_storage_name
-        "CacheConfiguration--CacheStorageAccountKey"                = module.cache_storage.cache_storage_primary_access_key
+        "EventHubLoggingConfiguration--ConnectionString"             = module.eventhub.log_primary_connection_string
+        "EventHubLoggingConfiguration--EntityPath"                   = module.eventhub.entity_path
+        "ESSFulfilmentConfiguration--StorageAccountName"             = module.fulfilment_storage.small_exchange_set_name
+        "ESSFulfilmentConfiguration--StorageAccountKey"              = module.fulfilment_storage.small_exchange_set_primary_access_key
+        "ESSFulfilmentConfiguration--SmallExchangeSetAccountName"    = module.fulfilment_storage.small_exchange_set_name
+        "ESSFulfilmentConfiguration--SmallExchangeSetAccountKey"     = module.fulfilment_storage.small_exchange_set_primary_access_key
+        "ESSFulfilmentConfiguration--SmallExchangeSetZoneRedundant"  = var.asp_control_sxs.zoneRedundant
+        "ESSFulfilmentConfiguration--MediumExchangeSetAccountName"   = module.fulfilment_storage.medium_exchange_set_name
+        "ESSFulfilmentConfiguration--MediumExchangeSetAccountKey"    = module.fulfilment_storage.medium_exchange_set_primary_access_key
+        "ESSFulfilmentConfiguration--MediumExchangeSetZoneRedundant" = var.asp_control_mxs.zoneRedundant
+        "ESSFulfilmentConfiguration--LargeExchangeSetAccountName"    = module.fulfilment_storage.large_exchange_set_name
+        "ESSFulfilmentConfiguration--LargeExchangeSetAccountKey"     = module.fulfilment_storage.large_exchange_set_primary_access_key
+        "ESSFulfilmentConfiguration--LargeExchangeSetZoneRedundant"  = var.asp_control_lxs.zoneRedundant
+        "CacheConfiguration--CacheStorageAccountName"                = module.cache_storage.cache_storage_name
+        "CacheConfiguration--CacheStorageAccountKey"                 = module.cache_storage.cache_storage_primary_access_key
       },
       module.fulfilment_webapp.small_exchange_set_scm_credentials,
       module.fulfilment_webapp.medium_exchange_set_scm_credentials,
@@ -217,6 +241,7 @@ module "azure-dashboard" {
   resource_group = azurerm_resource_group.rg
   tags           = local.tags
 }
+
 module "cache_storage" {
   source                                = "./Modules/CacheStorage"
   name                                  = (local.env_name == "prod" || local.env_name == "pre") && var.storage_suffix == "v2" ? "${local.service_name}${local.env_name}cachestorageukho2" : "${local.service_name}${local.env_name}cachestorageukho${var.storage_suffix}"
