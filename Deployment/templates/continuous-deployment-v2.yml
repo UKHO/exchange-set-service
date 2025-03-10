@@ -16,6 +16,7 @@ steps:
 
   - task: PowerShell@2
     displayName: "terraform devdeploy for FSSUI"
+    name: TerraformDeploy2
     inputs:
       targetType: filePath
       filePath: '$(Pipeline.Workspace)/terraformartifact/terraform_conditional_run_v2.ps1'
@@ -35,6 +36,9 @@ steps:
       TF_VAR_agent_2204_subnet: $(agent2204SubnetId)
       TF_VAR_agent_prd_subnet: $(agentprdSubnetId)
       TF_VAR_agent_subscription_id: $(agentSubscriptionId)
+      TF_VAR_asp_control_sxs: $(appServicePlanControlSxs)
+      TF_VAR_asp_control_mxs: $(appServicePlanControlMxs)
+      TF_VAR_asp_control_lxs: $(appServicePlanControlLxs)
 
   - task: FileTransform@2
     displayName: "File Transform: WebJob"
@@ -67,7 +71,7 @@ steps:
     inputs:
       azureSubscription: "${{ parameters.AzureSubscription }}"
       appType: webApp
-      appName: "$(WEB_APP_NAME)"
+      appName: $(WEB_APP_NAME)
       package: "$(Pipeline.Workspace)/ExchangeSetServiceWebAPI/UKHO.ExchangeSetService.API.zip"
       deployToSlotOrASE: true
       slotName: $(WEB_APP_SLOT_NAME)

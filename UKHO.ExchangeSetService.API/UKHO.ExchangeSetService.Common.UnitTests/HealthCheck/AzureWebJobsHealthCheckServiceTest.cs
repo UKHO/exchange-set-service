@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Configuration;
 using System.Threading.Tasks;
 using FakeItEasy;
 using Microsoft.AspNetCore.Hosting;
@@ -14,33 +15,36 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.HealthCheck
 {
     public class AzureWebJobsHealthCheckServiceTest
     {
-        private IOptions<EssFulfilmentStorageConfiguration> fakeEssFulfilmentStorageConfiguration;
-        private IWebJobsAccessKeyProvider fakeWebJobsAccessKeyProvider;
-        private IWebHostEnvironment fakeWebHostEnvironment;
-        private IAzureBlobStorageService fakeAzureBlobStorageService;
-        private IAzureWebJobsHealthCheckClient fakeAzureWebJobsHealthCheckClient;
-        private AzureWebJobsHealthCheckService azureWebJobsHealthCheckService;
+        private EssFulfilmentStorageConfiguration _essFulfilmentStorageConfiguration;
+        private IOptions<EssFulfilmentStorageConfiguration> _fakeEssFulfilmentStorageConfiguration;
+        private IWebJobsAccessKeyProvider _fakeWebJobsAccessKeyProvider;
+        private IWebHostEnvironment _fakeWebHostEnvironment;
+        private IAzureBlobStorageService _fakeAzureBlobStorageService;
+        private IAzureWebJobsHealthCheckClient _fakeAzureWebJobsHealthCheckClient;
+        private AzureWebJobsHealthCheckService _azureWebJobsHealthCheckService;
 
         [SetUp]
         public void Setup()
         {
-            this.fakeEssFulfilmentStorageConfiguration = Options.Create(new EssFulfilmentStorageConfiguration() { ExchangeSetTypes = "sxs,mxs,lxs", WebAppVersion = "" });
-            this.fakeWebJobsAccessKeyProvider = A.Fake<IWebJobsAccessKeyProvider>();
-            this.fakeWebHostEnvironment = A.Fake<IWebHostEnvironment>();
-            this.fakeAzureBlobStorageService = A.Fake<IAzureBlobStorageService>();
-            this.fakeAzureWebJobsHealthCheckClient = A.Fake<IAzureWebJobsHealthCheckClient>();
+            _essFulfilmentStorageConfiguration = new EssFulfilmentStorageConfiguration { ExchangeSetTypes = "sxs,mxs,lxs", WebAppVersion = "" };
+            _fakeEssFulfilmentStorageConfiguration = A.Fake<IOptions<EssFulfilmentStorageConfiguration>>();
+            A.CallTo(() => _fakeEssFulfilmentStorageConfiguration.Value).ReturnsLazily(() => _essFulfilmentStorageConfiguration);
+            _fakeWebJobsAccessKeyProvider = A.Fake<IWebJobsAccessKeyProvider>();
+            _fakeWebHostEnvironment = A.Fake<IWebHostEnvironment>();
+            _fakeAzureBlobStorageService = A.Fake<IAzureBlobStorageService>();
+            _fakeAzureWebJobsHealthCheckClient = A.Fake<IAzureWebJobsHealthCheckClient>();
 
-            azureWebJobsHealthCheckService = new AzureWebJobsHealthCheckService(fakeEssFulfilmentStorageConfiguration, fakeWebJobsAccessKeyProvider, fakeWebHostEnvironment, fakeAzureBlobStorageService, fakeAzureWebJobsHealthCheckClient);
+            _azureWebJobsHealthCheckService = new AzureWebJobsHealthCheckService(_fakeEssFulfilmentStorageConfiguration, _fakeWebJobsAccessKeyProvider, _fakeWebHostEnvironment, _fakeAzureBlobStorageService, _fakeAzureWebJobsHealthCheckClient);
         }
 
         [Test]
         public async Task WhenAzureWebJobStatusIsNotRunning_ThenReturnUnhealthy()
         {
-            A.CallTo(() => fakeAzureBlobStorageService.GetInstanceCountBasedOnExchangeSetType(A<ExchangeSetType>.Ignored)).Returns(1);
-            A.CallTo(() => fakeAzureWebJobsHealthCheckClient.CheckAllWebJobsHealth(A<List<WebJobDetails>>.Ignored))
-               .Returns(new HealthCheckResult(HealthStatus.Unhealthy, "Azure message queue is unhealthy"));
+            A.CallTo(() => _fakeAzureBlobStorageService.GetInstanceCountBasedOnExchangeSetType(A<ExchangeSetType>.Ignored)).Returns(1);
+            A.CallTo(() => _fakeAzureWebJobsHealthCheckClient.CheckAllWebJobsHealth(A<List<WebJobDetails>>.Ignored))
+                .Returns(new HealthCheckResult(HealthStatus.Unhealthy, "Azure message queue is unhealthy"));
 
-            var response = await azureWebJobsHealthCheckService.CheckHealthAsync();
+            var response = await _azureWebJobsHealthCheckService.CheckHealthAsync();
 
             Assert.That(response.Status, Is.EqualTo(HealthStatus.Unhealthy));
         }
@@ -48,11 +52,11 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.HealthCheck
         [Test]
         public async Task WhenAzureWebJobStatusIsRunning_ThenReturnHealthy()
         {
-            A.CallTo(() => fakeAzureBlobStorageService.GetInstanceCountBasedOnExchangeSetType(A<ExchangeSetType>.Ignored)).Returns(1);
-            A.CallTo(() => fakeAzureWebJobsHealthCheckClient.CheckAllWebJobsHealth(A<List<WebJobDetails>>.Ignored))
-               .Returns(new HealthCheckResult(HealthStatus.Healthy, "Azure message queue is healthy"));
+            A.CallTo(() => _fakeAzureBlobStorageService.GetInstanceCountBasedOnExchangeSetType(A<ExchangeSetType>.Ignored)).Returns(1);
+            A.CallTo(() => _fakeAzureWebJobsHealthCheckClient.CheckAllWebJobsHealth(A<List<WebJobDetails>>.Ignored))
+                .Returns(new HealthCheckResult(HealthStatus.Healthy, "Azure message queue is healthy"));
 
-            var response = await azureWebJobsHealthCheckService.CheckHealthAsync();
+            var response = await _azureWebJobsHealthCheckService.CheckHealthAsync();
 
             Assert.That(response.Status, Is.EqualTo(HealthStatus.Healthy));
         }
@@ -60,13 +64,13 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.HealthCheck
         [Test]
         public async Task WhenAzureWebJobStatusIsNotRunningForV2_ThenReturnUnhealthy()
         {
-            this.fakeEssFulfilmentStorageConfiguration.Value.WebAppVersion = "v2";
+            _fakeEssFulfilmentStorageConfiguration.Value.WebAppVersion = "v2";
 
-            A.CallTo(() => fakeAzureBlobStorageService.GetInstanceCountBasedOnExchangeSetType(A<ExchangeSetType>.Ignored)).Returns(1);
-            A.CallTo(() => fakeAzureWebJobsHealthCheckClient.CheckAllWebJobsHealth(A<List<WebJobDetails>>.Ignored))
+            A.CallTo(() => _fakeAzureBlobStorageService.GetInstanceCountBasedOnExchangeSetType(A<ExchangeSetType>.Ignored)).Returns(1);
+            A.CallTo(() => _fakeAzureWebJobsHealthCheckClient.CheckAllWebJobsHealth(A<List<WebJobDetails>>.Ignored))
                 .Returns(new HealthCheckResult(HealthStatus.Unhealthy, "Azure message queue is unhealthy"));
 
-            var response = await azureWebJobsHealthCheckService.CheckHealthAsync();
+            var response = await _azureWebJobsHealthCheckService.CheckHealthAsync();
 
             Assert.That(response.Status, Is.EqualTo(HealthStatus.Unhealthy));
         }
@@ -74,15 +78,23 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.HealthCheck
         [Test]
         public async Task WhenAzureWebJobStatusIsRunningForV2_ThenReturnHealthy()
         {
-            this.fakeEssFulfilmentStorageConfiguration.Value.WebAppVersion = "v2";
+            _fakeEssFulfilmentStorageConfiguration.Value.WebAppVersion = "v2";
 
-            A.CallTo(() => fakeAzureBlobStorageService.GetInstanceCountBasedOnExchangeSetType(A<ExchangeSetType>.Ignored)).Returns(1);
-            A.CallTo(() => fakeAzureWebJobsHealthCheckClient.CheckAllWebJobsHealth(A<List<WebJobDetails>>.Ignored))
+            A.CallTo(() => _fakeAzureBlobStorageService.GetInstanceCountBasedOnExchangeSetType(A<ExchangeSetType>.Ignored)).Returns(1);
+            A.CallTo(() => _fakeAzureWebJobsHealthCheckClient.CheckAllWebJobsHealth(A<List<WebJobDetails>>.Ignored))
                 .Returns(new HealthCheckResult(HealthStatus.Healthy, "Azure message queue is healthy"));
 
-            var response = await azureWebJobsHealthCheckService.CheckHealthAsync();
+            var response = await _azureWebJobsHealthCheckService.CheckHealthAsync();
 
             Assert.That(response.Status, Is.EqualTo(HealthStatus.Healthy));
+        }
+
+        [Test]
+        public void WhenAnInvalidExchangeSetTypeExists_ThenThrowAnException()
+        {
+            _essFulfilmentStorageConfiguration = new EssFulfilmentStorageConfiguration { ExchangeSetTypes = "osx,sxs,mxs,lxs", WebAppVersion = "" };
+
+            Assert.ThrowsAsync<ConfigurationErrorsException>(() => _azureWebJobsHealthCheckService.CheckHealthAsync());
         }
     }
 }

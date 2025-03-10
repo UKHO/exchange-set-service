@@ -59,7 +59,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{677CA5FC-9AD
 	ProjectSection(SolutionItems) = preProject
 		..\Deployment\src\azure.tf = ..\Deployment\src\azure.tf
 		..\Deployment\src\main.tf = ..\Deployment\src\main.tf
-		..\Deployment\src\migration.tf = ..\Deployment\src\migration.tf
 		..\Deployment\src\outputs.tf = ..\Deployment\src\outputs.tf
 		..\Deployment\src\resource-group.tf = ..\Deployment\src\resource-group.tf
 		..\Deployment\src\variables.tf = ..\Deployment\src\variables.tf
@@ -117,6 +116,13 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "FulfilmentKeyVault", "Fulfi
 		..\Deployment\src\Modules\FulfilmentKeyVault\main.tf = ..\Deployment\src\Modules\FulfilmentKeyVault\main.tf
 		..\Deployment\src\Modules\FulfilmentKeyVault\outputs.tf = ..\Deployment\src\Modules\FulfilmentKeyVault\outputs.tf
 		..\Deployment\src\Modules\FulfilmentKeyVault\variables.tf = ..\Deployment\src\Modules\FulfilmentKeyVault\variables.tf
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "FulfilmentScaling", "FulfilmentScaling", "{6BD38EDD-5933-47A8-A6D3-8465272271E8}"
+	ProjectSection(SolutionItems) = preProject
+		..\Deployment\src\Modules\FulfilmentScaling\main.tf = ..\Deployment\src\Modules\FulfilmentScaling\main.tf
+		..\Deployment\src\Modules\FulfilmentScaling\outputs.tf = ..\Deployment\src\Modules\FulfilmentScaling\outputs.tf
+		..\Deployment\src\Modules\FulfilmentScaling\variables.tf = ..\Deployment\src\Modules\FulfilmentScaling\variables.tf
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "FulfilmentStorage", "FulfilmentStorage", "{6A87B398-1BB7-46C7-B2AC-A4A0DB9F198D}"
@@ -306,6 +312,7 @@ Global
 		{015773D7-1DBA-4FD6-AD2E-3252DE480449} = {0A2EBC96-6994-4FFA-AD6B-7943D5FF173F}
 		{D8B30D22-5378-4C65-90F7-87761A3C48A9} = {0A2EBC96-6994-4FFA-AD6B-7943D5FF173F}
 		{DA4D0AF8-D4F4-463B-914E-EC58313D5942} = {0A2EBC96-6994-4FFA-AD6B-7943D5FF173F}
+		{6BD38EDD-5933-47A8-A6D3-8465272271E8} = {0A2EBC96-6994-4FFA-AD6B-7943D5FF173F}
 		{6A87B398-1BB7-46C7-B2AC-A4A0DB9F198D} = {0A2EBC96-6994-4FFA-AD6B-7943D5FF173F}
 		{EB9E0D1A-EDDC-4671-9216-A738590B8A9E} = {0A2EBC96-6994-4FFA-AD6B-7943D5FF173F}
 		{6EBC606F-5A3D-4EE7-81DA-25BEE35FE1E4} = {0A2EBC96-6994-4FFA-AD6B-7943D5FF173F}
