@@ -59,38 +59,8 @@ variable "asp_control_lxs" {
   type = object({ sku = string, zoneRedundant = bool, enableAutoScale = bool, autoScaleMaxInstances = number, autoScaleInThreshold = number, autoScaleOutThreshold = number, autoScaleInAmount = number, autoScaleOutAmount = number })
 }
 
-variable "app_service_sku" {
-  type = map(any)
-  default = {
-    "dev"    = {
-        tier = "PremiumV2"
-        size = "P1v2"
-        }
-    "qa"     = {
-        tier = "PremiumV3"
-        size = "P1v3"
-        }
-    "vne"    = {
-        tier = "PremiumV3"
-        size = "P1v3"
-        }
-    "vni"    = {
-        tier = "PremiumV3"
-        size = "P1v3"
-        }
-    "iat"    = {
-        tier = "PremiumV3"
-        size = "P1v3"
-        }
-    "pre"    = {
-        tier = "PremiumV3"
-        size = "P1v3"
-        }
-    "prod"   = {
-        tier = "PremiumV3"
-        size = "P1v3"
-        }
-  }
+variable "asp_control_webapp" {
+  type = object({ sku = string, zoneRedundant = bool })
 }
 
 variable "agent_rg" {

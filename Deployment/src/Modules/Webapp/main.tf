@@ -1,16 +1,22 @@
-resource "azurerm_app_service_plan" "app_service_plan" {
-  name                = "${var.name}-asp"
-  location            = var.location
-  resource_group_name = var.resource_group_name
-  
-  sku {
-	tier = var.app_service_sku.tier
-	size = var.app_service_sku.size
-  }
-  tags                = var.tags
+resource "terraform_data" "replacement" {
+  zoneRedundant = var.asp_control_webapp.zoneRedundant
+}
+
+resource "azurerm_service_plan" "app_service_plan" {
+  name                   = "${var.name}-asp"
+  location               = var.location
+  resource_group_name    = var.resource_group_name
+  sku_name               = var.asp_control_webapp.sku
+  os_type                = "Windows"
+  tags                   = var.tags
+  zone_balancing_enabled = var.asp_control_webapp.zoneRedundant
 }
 
 resource "azurerm_app_service" "webapp_service" {
+  lifecycle {
+    replace_triggered_by = [terraform_data.replacement]
+  }
+
   name                = var.name
   location            = var.location
   resource_group_name = var.resource_group_name
@@ -46,13 +52,16 @@ resource "azurerm_app_service" "webapp_service" {
 }
 
 resource "azurerm_app_service_slot" "staging" {
+  lifecycle {
+    replace_triggered_by = [terraform_data.replacement]
+  }
+
   name                = "staging"
   app_service_name    = azurerm_app_service.webapp_service.name
   location            = azurerm_app_service.webapp_service.location
   resource_group_name = azurerm_app_service.webapp_service.resource_group_name
   app_service_plan_id = azurerm_app_service.webapp_service.app_service_plan_id
-  tags                = azurerm_app_service.webapp_service.tags
-  
+  tags                = azurerm_app_service.webapp_service.tags  
 
   site_config {
     windows_fx_version  =   "DOTNETCORE|6.0"
@@ -81,7 +90,6 @@ resource "azurerm_app_service_slot" "staging" {
 
   https_only          = azurerm_app_service.webapp_service.https_only
 }
-
 
 resource "azurerm_app_service_virtual_network_swift_connection" "webapp_vnet_integration" {
   app_service_id = azurerm_app_service.webapp_service.id
