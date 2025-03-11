@@ -1,5 +1,5 @@
 resource "terraform_data" "replacement" {
-  zoneRedundant = var.asp_control_webapp.zoneRedundant
+  input = var.asp_control_webapp.zoneRedundant
 }
 
 resource "azurerm_service_plan" "app_service_plan" {
