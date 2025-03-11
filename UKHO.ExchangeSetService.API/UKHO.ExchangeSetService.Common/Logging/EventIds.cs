@@ -863,7 +863,7 @@ namespace UKHO.ExchangeSetService.Common.Logging
         /// <summary>
         /// 805212 - serial.enc file creation is skipped
         /// </summary>
-        SerialFileCreationSkipped = 805212
+        SerialFileCreationSkipped = 805212,
 
         #region V2
 
