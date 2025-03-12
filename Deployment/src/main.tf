@@ -168,13 +168,10 @@ module "key_vault" {
         "ESSFulfilmentConfiguration--StorageAccountKey"              = module.fulfilment_storage.small_exchange_set_primary_access_key
         "ESSFulfilmentConfiguration--SmallExchangeSetAccountName"    = module.fulfilment_storage.small_exchange_set_name
         "ESSFulfilmentConfiguration--SmallExchangeSetAccountKey"     = module.fulfilment_storage.small_exchange_set_primary_access_key
-        "ESSFulfilmentConfiguration--SmallExchangeSetZoneRedundant"  = var.asp_control_sxs.zoneRedundant
         "ESSFulfilmentConfiguration--MediumExchangeSetAccountName"   = module.fulfilment_storage.medium_exchange_set_name
         "ESSFulfilmentConfiguration--MediumExchangeSetAccountKey"    = module.fulfilment_storage.medium_exchange_set_primary_access_key
-        "ESSFulfilmentConfiguration--MediumExchangeSetZoneRedundant" = var.asp_control_mxs.zoneRedundant
         "ESSFulfilmentConfiguration--LargeExchangeSetAccountName"    = module.fulfilment_storage.large_exchange_set_name
         "ESSFulfilmentConfiguration--LargeExchangeSetAccountKey"     = module.fulfilment_storage.large_exchange_set_primary_access_key
-        "ESSFulfilmentConfiguration--LargeExchangeSetZoneRedundant"  = var.asp_control_lxs.zoneRedundant
         "CacheConfiguration--CacheStorageAccountName"                = module.cache_storage.cache_storage_name
         "CacheConfiguration--CacheStorageAccountKey"                 = module.cache_storage.cache_storage_primary_access_key
       },

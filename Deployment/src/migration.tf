@@ -15,9 +15,3 @@ import {
   to = module.webapp_service.azurerm_service_plan.app_service_plan
   id = "${azurerm_resource_group.rg.id}/providers/Microsoft.Web/serverFarms/${local.web_app_name}-asp"
 }
-
-import {
-  to = module.webapp_service.terraform_data.replacement
-  input = false
-}
-

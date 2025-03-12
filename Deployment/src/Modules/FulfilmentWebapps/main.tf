@@ -1,3 +1,8 @@
+# Small exchange set
+resource "terraform_data" "replacement_sxs" {
+  input = var.asp_control_sxs.zoneRedundant
+}
+
 resource "azurerm_service_plan" "small_exchange_set_app_service_plan" {
   count                  = var.exchange_set_config.SmallExchangeSetInstance
   name                   = var.asp_name_sxs[count.index]
@@ -10,6 +15,10 @@ resource "azurerm_service_plan" "small_exchange_set_app_service_plan" {
 }
 
 resource "azurerm_app_service" "small_exchange_set_webapp" {
+  lifecycle {
+    replace_triggered_by = [terraform_data.replacement_sxs]
+  }
+
   count               = var.exchange_set_config.SmallExchangeSetInstance
   name                = var.as_name_sxs[count.index]
   location            = var.location
@@ -38,6 +47,10 @@ resource "azurerm_app_service" "small_exchange_set_webapp" {
 }
 
 resource "azurerm_app_service_slot" "small_exchange_set_staging" {
+  lifecycle {
+    replace_triggered_by = [terraform_data.replacement_sxs]
+  }
+
   count               = var.exchange_set_config.SmallExchangeSetInstance
   name                = "staging"
   app_service_name    = azurerm_app_service.small_exchange_set_webapp[count.index].name
@@ -79,7 +92,11 @@ resource "azurerm_app_service_slot_virtual_network_swift_connection" "small_exch
   slot_name      = azurerm_app_service_slot.small_exchange_set_staging[count.index].name
 }
 
-#Medium exchange set
+# Medium exchange set
+resource "terraform_data" "replacement_mxs" {
+  input = var.asp_control_mxs.zoneRedundant
+}
+
 resource "azurerm_service_plan" "medium_exchange_set_app_service_plan" {
   count                  = var.exchange_set_config.MediumExchangeSetInstance
   name                   = var.asp_name_mxs[count.index]
@@ -92,6 +109,10 @@ resource "azurerm_service_plan" "medium_exchange_set_app_service_plan" {
 }
 
 resource "azurerm_app_service" "medium_exchange_set_webapp" {
+  lifecycle {
+    replace_triggered_by = [terraform_data.replacement_mxs]
+  }
+
   count               = var.exchange_set_config.MediumExchangeSetInstance
   name                = var.as_name_mxs[count.index]
   location            = var.location
@@ -120,6 +141,10 @@ resource "azurerm_app_service" "medium_exchange_set_webapp" {
 }
 
 resource "azurerm_app_service_slot" "medium_exchange_set_staging" {
+  lifecycle {
+    replace_triggered_by = [terraform_data.replacement_mxs]
+  }
+
   count               = var.exchange_set_config.MediumExchangeSetInstance
   name                = "staging"
   app_service_name    = azurerm_app_service.medium_exchange_set_webapp[count.index].name
@@ -161,7 +186,11 @@ resource "azurerm_app_service_slot_virtual_network_swift_connection" "medium_exc
   slot_name      = azurerm_app_service_slot.medium_exchange_set_staging[count.index].name
 }
 
-#Large exchange set
+# Large exchange set
+resource "terraform_data" "replacement_lxs" {
+  input = var.asp_control_lxs.zoneRedundant
+}
+
 resource "azurerm_service_plan" "large_exchange_set_app_service_plan" {
   count                  = var.exchange_set_config.LargeExchangeSetInstance
   name                   = var.asp_name_lxs[count.index]
@@ -174,6 +203,10 @@ resource "azurerm_service_plan" "large_exchange_set_app_service_plan" {
 }
 
 resource "azurerm_app_service" "large_exchange_set_webapp" {
+  lifecycle {
+    replace_triggered_by = [terraform_data.replacement_lxs]
+  }
+
   count               = var.exchange_set_config.LargeExchangeSetInstance
   name                = var.as_name_lxs[count.index]
   location            = var.location
@@ -202,6 +235,10 @@ resource "azurerm_app_service" "large_exchange_set_webapp" {
 }
 
 resource "azurerm_app_service_slot" "large_exchange_set_staging" {
+  lifecycle {
+    replace_triggered_by = [terraform_data.replacement_lxs]
+  }
+
   count               = var.exchange_set_config.LargeExchangeSetInstance
   name                = "staging"
   app_service_name    = azurerm_app_service.large_exchange_set_webapp[count.index].name

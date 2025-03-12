@@ -120,6 +120,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "FulfilmentKeyVault", "Fulfi
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "FulfilmentScaling", "FulfilmentScaling", "{6BD38EDD-5933-47A8-A6D3-8465272271E8}"
+	ProjectSection(SolutionItems) = preProject
+		..\Deployment\src\Modules\FulfilmentScaling\main.tf = ..\Deployment\src\Modules\FulfilmentScaling\main.tf
+		..\Deployment\src\Modules\FulfilmentScaling\outputs.tf = ..\Deployment\src\Modules\FulfilmentScaling\outputs.tf
+		..\Deployment\src\Modules\FulfilmentScaling\variables.tf = ..\Deployment\src\Modules\FulfilmentScaling\variables.tf
+	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "FulfilmentStorage", "FulfilmentStorage", "{6A87B398-1BB7-46C7-B2AC-A4A0DB9F198D}"
 	ProjectSection(SolutionItems) = preProject
