@@ -860,89 +860,93 @@ namespace UKHO.ExchangeSetService.Common.Logging
         /// 805211 - Download readme.txt file is failed.
         /// </summary>
         ErrorInDownloadReadMeFile = 805211,
+        /// <summary>
+        /// 805212 - serial.enc file creation is skipped
+        /// </summary>
+        SerialFileCreationSkipped = 805212,
 
         #region V2
 
         /// <summary>
-        /// 805212 - Request for updatesSince endpoint started.
+        /// 805213 - Request for updatesSince endpoint started.
         /// </summary>
-        PostUpdatesSinceRequestStarted = 805212,
+        PostUpdatesSinceRequestStarted = 805213,
         /// <summary>
-        /// 805213 - Request for updatesSince endpoint completed.
+        /// 805214 - Request for updatesSince endpoint completed.
         /// </summary>
-        PostUpdatesSinceRequestCompleted = 805213,
+        PostUpdatesSinceRequestCompleted = 805214,
         /// <summary>
-        /// 805214 - Creation of updatesSince is started.
+        /// 805215 - Creation of updatesSince is started.
         /// </summary>
-        CreateUpdatesSinceStarted = 805214,
+        CreateUpdatesSinceStarted = 805215,
         /// <summary>
-        /// 805215 - Creation of updatesSince is completed.
+        /// 805216 - Creation of updatesSince is completed.
         /// </summary>
-        CreateUpdatesSinceCompleted = 805215,
+        CreateUpdatesSinceCompleted = 805216,
         /// <summary>
-        /// 805216 - Exception occurred for updatesSince.
+        /// 805217 - Exception occurred for updatesSince.
         /// </summary>
-        CreateUpdatesSinceException = 805216,
+        CreateUpdatesSinceException = 805217,
         /// <summary>
-        /// 805217 - Empty body error.
+        /// 805218 - Empty body error.
         /// </summary>
-        EmptyBodyError = 805217,
+        EmptyBodyError = 805218,
         /// <summary>
-        /// 805218 - Validation failed.
+        /// 805219 - Validation failed.
         /// </summary>
-        ValidationFailed = 805218,
+        ValidationFailed = 805219,
         /// <summary>
-        /// 805219 - Request for exchange set service product names endpoint is started.
+        /// 805220 - Request for exchange set service product names endpoint is started.
         /// </summary>
-        PostProductNamesRequestStart = 805219,
+        PostProductNamesRequestStart = 805220,
         /// <summary>
-        /// 805220 - Request for exchange set service product names endpoint is completed.
+        /// 805221 - Request for exchange set service product names endpoint is completed.
         /// </summary>
-        PostProductNamesRequestCompleted = 805220,
+        PostProductNamesRequestCompleted = 805221,
         /// <summary>
-        /// 805221 - Uri exception occurred.
+        /// 805222 - Uri exception occurred.
         /// </summary>
-        UriException = 805221,
+        UriException = 805222,
         /// <summary>
-        /// 805222 - Request for sales catalogue service product names endpoint is started.
+        /// 805223 - Request for sales catalogue service product names endpoint is started.
         /// </summary>
-        SCSPostProductNamesRequestStart = 805222,
+        SCSPostProductNamesRequestStart = 805223,
         /// <summary>
-        /// 805223 - Request for sales catalogue service product names endpoint is completed.
+        /// 805224 - Request for sales catalogue service product names endpoint is completed.
         /// </summary>
-        SCSPostProductNamesRequestCompleted = 805223,
+        SCSPostProductNamesRequestCompleted = 805224,
         /// <summary>
-        /// 805224 - Request for storing sales catalogue service response in blob storage is started.
+        /// 805225 - Request for storing sales catalogue service response in blob storage is started.
         /// </summary>
-        StoreResponseRequestStart = 805224,
+        StoreResponseRequestStart = 805225,
         /// <summary>
-        /// 805225 - Request for storing sales catalogue service response in blob storage is completed.
+        /// 805226 - Request for storing sales catalogue service response in blob storage is completed.
         /// </summary>
-        StoreResponseRequestCompleted = 805225,
+        StoreResponseRequestCompleted = 805226,
         /// <summary>
-        /// 805226 - Response is stored successfully in blob storage.
+        /// 805227 - Response is stored successfully in blob storage.
         /// </summary>
-        ResponseStoredToBlobStorage = 805226,
+        ResponseStoredToBlobStorage = 805227,
         /// <summary>
-        /// 805227 - Response failed to store in blob storage.
+        /// 805228 - Response failed to store in blob storage.
         /// </summary>
-        ResponseFailedStoredToBlobStorage = 805227,
+        ResponseFailedStoredToBlobStorage = 805228,
         /// <summary>
-        /// 805228 - Create Product Name request failed.
+        /// 805229 - Create Product Name request failed.
         /// </summary>
-        CreateProductNamesError = 805228,
+        CreateProductNamesError = 805229,
         /// <summary>
-        /// 805229 - Create Product version request failed.
+        /// 805230 - Create Product version request failed.
         /// </summary>
-        CreateProductVersionError = 805229,
+        CreateProductVersionError = 805230,
         /// <summary>
-        /// 805230 - Create Update since request failed.
+        /// 805231 - Create Update since request failed.
         /// </summary>
-        CreateUpdateSinceError = 805230,
+        CreateUpdateSinceError = 805231,
         /// <summary>
-        /// 805231 - Failed to upload stream to blob
+        /// 805232 - Failed to upload stream to blob
         /// </summary>
-        StreamUploadFailed = 805231
+        StreamUploadFailed = 805232
         #endregion
     }
 

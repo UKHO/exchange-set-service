@@ -16,7 +16,10 @@ namespace UKHO.ExchangeSetService.Common.Helpers
         {
             var blobServiceClient = new BlobServiceClient(storageAccountConnectionString);
             var blobContainerClient = blobServiceClient.GetBlobContainerClient(containerName);
-            await blobContainerClient.CreateIfNotExistsAsync();
+            if (!await blobContainerClient.ExistsAsync())
+            {
+                await blobContainerClient.CreateAsync();
+            }
             return blobContainerClient.GetBlobClient(fileName);
         }
 
