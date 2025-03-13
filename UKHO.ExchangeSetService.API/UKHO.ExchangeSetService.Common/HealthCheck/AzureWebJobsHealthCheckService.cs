@@ -35,27 +35,25 @@ namespace UKHO.ExchangeSetService.Common.HealthCheck
                     throw new ConfigurationErrorsException($"Invalid EssFulfilmentStorageConfiguration.ExchangeSetType: {exchangeSetTypeName}");
                 }
 
-                var zoneRedundantPartialName = GetZoneRedundantPartialName(exchangeSetType);
-
                 for (var instance = 1; instance <= azureBlobStorageService.GetInstanceCountBasedOnExchangeSetType(exchangeSetType); instance++)
                 {
                     if (!webAppVersion.Equals("v2", StringComparison.InvariantCultureIgnoreCase))
                     {
                         userNameKey =
-                            $"ess-{webHostEnvironment.EnvironmentName}-{exchangeSetType}-{instance}{zoneRedundantPartialName}-webapp-scm-username";
+                            $"ess-{webHostEnvironment.EnvironmentName}-{exchangeSetType}-{instance}-webapp-scm-username";
                         passwordKey =
-                            $"ess-{webHostEnvironment.EnvironmentName}-{exchangeSetType}-{instance}{zoneRedundantPartialName}-webapp-scm-password";
+                            $"ess-{webHostEnvironment.EnvironmentName}-{exchangeSetType}-{instance}-webapp-scm-password";
                         webJobUri =
-                            $"https://ess-{webHostEnvironment.EnvironmentName}-{exchangeSetType}-{instance}{zoneRedundantPartialName}-webapp.scm.azurewebsites.net/api/continuouswebjobs/ESSFulfilmentWebJob";
+                            $"https://ess-{webHostEnvironment.EnvironmentName}-{exchangeSetType}-{instance}-webapp.scm.azurewebsites.net/api/continuouswebjobs/ESSFulfilmentWebJob";
                     }
                     else
                     {
                         userNameKey =
-                            $"ess-{webHostEnvironment.EnvironmentName}-{exchangeSetType}-{instance}{zoneRedundantPartialName}-webapp-v2-scm-username";
+                            $"ess-{webHostEnvironment.EnvironmentName}-{exchangeSetType}-{instance}-webapp-v2-scm-username";
                         passwordKey =
-                            $"ess-{webHostEnvironment.EnvironmentName}-{exchangeSetType}-{instance}{zoneRedundantPartialName}-webapp-v2-scm-password";
+                            $"ess-{webHostEnvironment.EnvironmentName}-{exchangeSetType}-{instance}-webapp-v2-scm-password";
                         webJobUri =
-                            $"https://ess-{webHostEnvironment.EnvironmentName}-{exchangeSetType}-{instance}{zoneRedundantPartialName}-webapp-v2.scm.azurewebsites.net/api/continuouswebjobs/ESSFulfilmentWebJob";
+                            $"https://ess-{webHostEnvironment.EnvironmentName}-{exchangeSetType}-{instance}-webapp-v2.scm.azurewebsites.net/api/continuouswebjobs/ESSFulfilmentWebJob";
                     }
 
                     var userPassword = webJobsAccessKeyProvider.GetWebJobsAccessKey(userNameKey) + ":" + webJobsAccessKeyProvider.GetWebJobsAccessKey(passwordKey);
@@ -75,20 +73,6 @@ namespace UKHO.ExchangeSetService.Common.HealthCheck
             await webJobsHealth;
 
             return webJobsHealth.Result;
-        }
-
-        private string GetZoneRedundantPartialName(ExchangeSetType exchangeSetType)
-        {
-            if ((exchangeSetType == ExchangeSetType.sxs && essFulfilmentStorageConfiguration.Value.SmallExchangeSetZoneRedundant) ||
-                (exchangeSetType == ExchangeSetType.mxs && essFulfilmentStorageConfiguration.Value.MediumExchangeSetZoneRedundant) ||
-                (exchangeSetType == ExchangeSetType.lxs && essFulfilmentStorageConfiguration.Value.LargeExchangeSetZoneRedundant))
-            {
-                return "-zr";
-            }
-            else
-            {
-                return string.Empty;
-            }
         }
     }
 }

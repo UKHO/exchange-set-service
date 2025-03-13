@@ -172,6 +172,56 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "templates", "templates", "{
 		..\Deployment\templates\retain-pipeline.yml = ..\Deployment\templates\retain-pipeline.yml
 	EndProjectSection
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "MockApiDeployment", "MockApiDeployment", "{E5FFDBAB-FF7F-44F9-93F8-9F6204D574D2}"
+	ProjectSection(SolutionItems) = preProject
+		..\MockApiDeployment\mock_api_deployment.ps1 = ..\MockApiDeployment\mock_api_deployment.ps1
+		..\MockApiDeployment\mock_api_terraform_run.ps1 = ..\MockApiDeployment\mock_api_terraform_run.ps1
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{CA007B23-6748-495E-8103-6BF9AE5A9B95}"
+	ProjectSection(SolutionItems) = preProject
+		..\MockApiDeployment\src\azure.tf = ..\MockApiDeployment\src\azure.tf
+		..\MockApiDeployment\src\main.tf = ..\MockApiDeployment\src\main.tf
+		..\MockApiDeployment\src\outputs.tf = ..\MockApiDeployment\src\outputs.tf
+		..\MockApiDeployment\src\resource-group.tf = ..\MockApiDeployment\src\resource-group.tf
+		..\MockApiDeployment\src\variables.tf = ..\MockApiDeployment\src\variables.tf
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Modules", "Modules", "{3F02D342-318E-46EA-B36F-8FD87F1A3DF7}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "KeyVault", "KeyVault", "{45A18167-35D0-452F-83C8-94D435C570B9}"
+	ProjectSection(SolutionItems) = preProject
+		..\MockApiDeployment\src\Modules\KeyVault\main.tf = ..\MockApiDeployment\src\Modules\KeyVault\main.tf
+		..\MockApiDeployment\src\Modules\KeyVault\outputs.tf = ..\MockApiDeployment\src\Modules\KeyVault\outputs.tf
+		..\MockApiDeployment\src\Modules\KeyVault\variables.tf = ..\MockApiDeployment\src\Modules\KeyVault\variables.tf
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Storage", "Storage", "{DD9C87C1-C185-4358-A754-760E3FEFE7C2}"
+	ProjectSection(SolutionItems) = preProject
+		..\MockApiDeployment\src\Modules\Storage\main.tf = ..\MockApiDeployment\src\Modules\Storage\main.tf
+		..\MockApiDeployment\src\Modules\Storage\outputs.tf = ..\MockApiDeployment\src\Modules\Storage\outputs.tf
+		..\MockApiDeployment\src\Modules\Storage\variables.tf = ..\MockApiDeployment\src\Modules\Storage\variables.tf
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "UserIdentity", "UserIdentity", "{9103BE13-8BCB-49BE-B532-28D327750DE3}"
+	ProjectSection(SolutionItems) = preProject
+		..\MockApiDeployment\src\Modules\UserIdentity\main.tf = ..\MockApiDeployment\src\Modules\UserIdentity\main.tf
+		..\MockApiDeployment\src\Modules\UserIdentity\outputs.tf = ..\MockApiDeployment\src\Modules\UserIdentity\outputs.tf
+		..\MockApiDeployment\src\Modules\UserIdentity\variables.tf = ..\MockApiDeployment\src\Modules\UserIdentity\variables.tf
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Webapp", "Webapp", "{19437D10-77D8-457A-8DD1-F536866FCA4B}"
+	ProjectSection(SolutionItems) = preProject
+		..\MockApiDeployment\src\Modules\Webapp\main.tf = ..\MockApiDeployment\src\Modules\Webapp\main.tf
+		..\MockApiDeployment\src\Modules\Webapp\outputs.tf = ..\MockApiDeployment\src\Modules\Webapp\outputs.tf
+		..\MockApiDeployment\src\Modules\Webapp\variables.tf = ..\MockApiDeployment\src\Modules\Webapp\variables.tf
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "templates", "templates", "{CF9C28F3-8D7A-45C7-B1A2-3F5566A93A9A}"
+	ProjectSection(SolutionItems) = preProject
+		..\MockApiDeployment\templates\mock-api-continuous-deployment.yml = ..\MockApiDeployment\templates\mock-api-continuous-deployment.yml
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -320,6 +370,14 @@ Global
 		{A353C5A3-EB29-43E2-8F34-20DEAC44335B} = {0A2EBC96-6994-4FFA-AD6B-7943D5FF173F}
 		{D4B0B7C5-14F7-4D55-AAA0-BFDB5B069A5E} = {0A2EBC96-6994-4FFA-AD6B-7943D5FF173F}
 		{CC76E061-CD46-4BCE-8825-90E734983AC2} = {5DF44DD6-E717-4446-AFBC-1957EED57C6A}
+		{E5FFDBAB-FF7F-44F9-93F8-9F6204D574D2} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
+		{CA007B23-6748-495E-8103-6BF9AE5A9B95} = {E5FFDBAB-FF7F-44F9-93F8-9F6204D574D2}
+		{3F02D342-318E-46EA-B36F-8FD87F1A3DF7} = {CA007B23-6748-495E-8103-6BF9AE5A9B95}
+		{45A18167-35D0-452F-83C8-94D435C570B9} = {3F02D342-318E-46EA-B36F-8FD87F1A3DF7}
+		{DD9C87C1-C185-4358-A754-760E3FEFE7C2} = {3F02D342-318E-46EA-B36F-8FD87F1A3DF7}
+		{9103BE13-8BCB-49BE-B532-28D327750DE3} = {3F02D342-318E-46EA-B36F-8FD87F1A3DF7}
+		{19437D10-77D8-457A-8DD1-F536866FCA4B} = {3F02D342-318E-46EA-B36F-8FD87F1A3DF7}
+		{CF9C28F3-8D7A-45C7-B1A2-3F5566A93A9A} = {E5FFDBAB-FF7F-44F9-93F8-9F6204D574D2}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {34A7E0FB-1B94-467F-9F79-6E05647A6F69}

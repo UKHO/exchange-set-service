@@ -14,7 +14,6 @@ variable "app_settings" {
   type = map(string)
 }
 
-
 variable "tags" {
 
 }
@@ -27,7 +26,7 @@ variable "user_assigned_identity" {
   type = string
 }
 
-variable "app_service_sku" {
+variable "asp_control_webapp" {
 
 }
 
