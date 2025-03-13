@@ -39,6 +39,7 @@ steps:
       TF_VAR_asp_control_sxs: $(appServicePlanControlSxs)
       TF_VAR_asp_control_mxs: $(appServicePlanControlMxs)
       TF_VAR_asp_control_lxs: $(appServicePlanControlLxs)
+      TF_VAR_asp_control_webapp: $(appServicePlanControlWebApp)
 
   - task: FileTransform@2
     displayName: "File Transform: WebJob"

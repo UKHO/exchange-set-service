@@ -11,15 +11,12 @@ namespace UKHO.ExchangeSetService.Common.Configuration
         public string SmallExchangeSetAccountName { get; set; }
         public string SmallExchangeSetAccountKey { get; set; }
         public int SmallExchangeSetInstance { get; set; }
-        public bool SmallExchangeSetZoneRedundant { get; set; }
         public string MediumExchangeSetAccountName { get; set; }
         public string MediumExchangeSetAccountKey { get; set; }
         public int MediumExchangeSetInstance { get; set; }
-        public bool MediumExchangeSetZoneRedundant { get; set; }
         public string LargeExchangeSetAccountName { get; set; }
         public string LargeExchangeSetAccountKey { get; set; }
         public int LargeExchangeSetInstance { get; set; }
-        public bool LargeExchangeSetZoneRedundant { get; set; }
         public string QueueName { get; set; }
         public string DynamicQueueName { get; set; }
         public double LargeExchangeSetSizeInMB { get; set; }
