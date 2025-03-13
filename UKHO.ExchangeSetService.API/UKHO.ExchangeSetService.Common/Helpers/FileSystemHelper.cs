@@ -60,7 +60,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             return customFileInfo;
         }
 
-        public byte[] UploadFileBlockMetaData(UploadBlockMetaData UploadBlockMetaData)
+        public byte[] UploadFileBlockMetaData(UploadBlockMetaData UploadBlockMetaData)  
         {
             var fileInfo = new FileInfo(UploadBlockMetaData.FullFileName);
             Byte[] byteData = new Byte[UploadBlockMetaData.Length];

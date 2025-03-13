@@ -9,12 +9,15 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using FakeItEasy;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using NUnit.Framework;
 using UKHO.ExchangeSetService.Common.Configuration;
 using UKHO.ExchangeSetService.Common.Helpers;
+using UKHO.ExchangeSetService.Common.Helpers.Auth;
+using UKHO.ExchangeSetService.Common.Helpers.Zip;
 using UKHO.ExchangeSetService.Common.Logging;
 using UKHO.ExchangeSetService.Common.Models.FileShareService.Response;
 using UKHO.ExchangeSetService.Common.Models.SalesCatalogue;
@@ -65,7 +68,25 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
             fakeCacheConfiguration = Options.Create(new CacheConfiguration { CacheStorageAccountKey = "key", CacheStorageAccountName = "cache", FssSearchCacheTableName = "AnyName", IsFssCacheEnabled = true });
             fakeAioConfiguration = A.Fake<IOptions<AioConfiguration>>();
 
-            fileShareService = new FileShareService(fakeFileShareServiceClient, fakeAuthFssTokenProvider, fakeFileShareConfig, fakeLogger, fakeFileShareServiceCache, fakeCacheConfiguration, fakeFileSystemHelper, fakeMonitorHelper, fakeAioConfiguration);
+            ServiceCollection services = new ServiceCollection();
+            services.AddSingleton(fakeLogger);
+            services.AddSingleton(fakeAuthFssTokenProvider);
+            services.AddSingleton(fakeFileShareConfig);
+            services.AddSingleton(fakeFileShareServiceClient);
+            services.AddSingleton(fakeFileSystemHelper);
+            services.AddSingleton(fakeFileShareServiceCache);
+            services.AddSingleton(fakeMonitorHelper);
+            services.AddSingleton(fakeCacheConfiguration);
+            services.AddSingleton(fakeAioConfiguration);
+            services.AddScoped<IFileShareDownloadService, FileShareDownloadService>();
+            services.AddScoped<IFileShareSearchService, FileShareSearchService>();
+            services.AddScoped<IFileShareUploadService, FileShareUploadService>();
+            services.AddScoped<IFileShareBatchService, FileShareBatchService>();
+            services.AddScoped<IZip, FileZip>();
+            services.AddScoped<IFileShareService, FileShareService>();
+            var sp = services.BuildServiceProvider();
+
+            fileShareService = sp.GetService<IFileShareService>();
         }
 
         private static Attribute GetAttribute(string key, string value) => new() { Key = key, Value = value };
