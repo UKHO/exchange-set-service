@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace UKHO.ExchangeSetService.Common.Helpers
+namespace UKHO.ExchangeSetService.Common.Helpers.SalesCatalogue
 {
     [ExcludeFromCodeCoverage] ////Excluded from code coverage as it has actual http calls 
     public class SalesCatalogueClient : ISalesCatalogueClient
@@ -22,10 +22,14 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             HttpContent content = null;
 
             if (requestBody != null)
+            {
                 content = new StringContent(requestBody, Encoding.UTF8, "application/json");
+            }
 
             using var httpRequestMessage = new HttpRequestMessage(method, uri)
-            { Content = content };
+            {
+                Content = content
+            };
 
             if (correlationId != "")
             {

@@ -13,6 +13,7 @@ using UKHO.ExchangeSetService.API.Validation;
 using UKHO.ExchangeSetService.Common.Configuration;
 using UKHO.ExchangeSetService.Common.Extensions;
 using UKHO.ExchangeSetService.Common.Helpers;
+using UKHO.ExchangeSetService.Common.Helpers.SalesCatalogue;
 using UKHO.ExchangeSetService.Common.Logging;
 using UKHO.ExchangeSetService.Common.Models.AzureADB2C;
 using UKHO.ExchangeSetService.Common.Models.Enums;
@@ -23,55 +24,22 @@ using UKHO.ExchangeSetService.Common.Storage;
 
 namespace UKHO.ExchangeSetService.API.Services
 {
-    public class ProductDataService : IProductDataService
+    public class ProductDataService(IProductIdentifierValidator productIdentifierValidator,
+        IProductDataProductVersionsValidator productVersionsValidator,
+        IScsProductIdentifierValidator scsProductIdentifierValidator,
+        IProductDataSinceDateTimeValidator productDataSinceDateTimeValidator,
+        ISalesCatalogueService salesCatalogueService,
+        IMapper mapper,
+        IFileShareService fileShareService,
+        ILogger<ProductDataService> logger, IExchangeSetStorageProvider exchangeSetStorageProvider,
+        IOptions<EssFulfilmentStorageConfiguration> essFulfilmentStorageconfig, IMonitorHelper monitorHelper,
+        UserIdentifier userIdentifier, IAzureAdB2CHelper azureAdB2CHelper, IOptions<AioConfiguration> aioConfiguration,
+        IScsDataSinceDateTimeValidator scsDataSinceDateTimeValidator) : IProductDataService
     {
         private const string RFC1123Format = "ddd, dd MMM yyyy HH':'mm':'ss 'GMT'";
-        private readonly IProductIdentifierValidator productIdentifierValidator;
-        private readonly IScsProductIdentifierValidator scsProductIdentifierValidator;
-        private readonly IProductDataProductVersionsValidator productVersionsValidator;
-        private readonly IProductDataSinceDateTimeValidator productDataSinceDateTimeValidator;
-        private readonly ISalesCatalogueService salesCatalogueService;
-        private readonly IMapper mapper;
-        private readonly IFileShareService fileShareService;
-        private readonly ILogger<ProductDataService> logger;
-        private readonly IExchangeSetStorageProvider exchangeSetStorageProvider;
-        private readonly IOptions<EssFulfilmentStorageConfiguration> essFulfilmentStorageconfig;
-        private readonly IMonitorHelper monitorHelper;
-        private readonly UserIdentifier userIdentifier;
-        private readonly IAzureAdB2CHelper azureAdB2CHelper;
-        private readonly AioConfiguration aioConfiguration;
+        private readonly AioConfiguration aioConfiguration = aioConfiguration.Value;
         private bool isEmptyEncExchangeSet = false;
         private bool isEmptyAioExchangeSet = false;
-        private readonly IScsDataSinceDateTimeValidator scsDataSinceDateTimeValidator;
-
-        public ProductDataService(IProductIdentifierValidator productIdentifierValidator,
-            IProductDataProductVersionsValidator productVersionsValidator,
-            IScsProductIdentifierValidator scsProductIdentifierValidator,
-            IProductDataSinceDateTimeValidator productDataSinceDateTimeValidator,
-            ISalesCatalogueService salesCatalougeService,
-            IMapper mapper,
-            IFileShareService fileShareService,
-            ILogger<ProductDataService> logger, IExchangeSetStorageProvider exchangeSetStorageProvider,
-            IOptions<EssFulfilmentStorageConfiguration> essFulfilmentStorageconfig, IMonitorHelper monitorHelper,
-            UserIdentifier userIdentifier, IAzureAdB2CHelper azureAdB2CHelper, IOptions<AioConfiguration> aioConfiguration,
-            IScsDataSinceDateTimeValidator scsDataSinceDateTimeValidator)
-        {
-            this.productIdentifierValidator = productIdentifierValidator;
-            this.scsProductIdentifierValidator = scsProductIdentifierValidator;
-            this.productVersionsValidator = productVersionsValidator;
-            this.productDataSinceDateTimeValidator = productDataSinceDateTimeValidator;
-            this.salesCatalogueService = salesCatalougeService;
-            this.mapper = mapper;
-            this.fileShareService = fileShareService;
-            this.logger = logger;
-            this.exchangeSetStorageProvider = exchangeSetStorageProvider;
-            this.essFulfilmentStorageconfig = essFulfilmentStorageconfig;
-            this.monitorHelper = monitorHelper;
-            this.userIdentifier = userIdentifier;
-            this.azureAdB2CHelper = azureAdB2CHelper;
-            this.aioConfiguration = aioConfiguration.Value;
-            this.scsDataSinceDateTimeValidator = scsDataSinceDateTimeValidator;
-        }
 
         public async Task<ExchangeSetServiceResponse> CreateProductDataByProductIdentifiers(ProductIdentifierRequest productIdentifierRequest, AzureAdB2C azureAdB2C)
         {
@@ -117,7 +85,9 @@ namespace UKHO.ExchangeSetService.API.Services
             var exchangeSetServiceResponse = await SetExchangeSetResponseLinks(response, productIdentifierRequest.CorrelationId);
 
             if (exchangeSetServiceResponse.HttpStatusCode != HttpStatusCode.Created)
+            {
                 return exchangeSetServiceResponse;
+            }
 
             string expiryDate = exchangeSetServiceResponse.ExchangeSetResponse.ExchangeSetUrlExpiryDateTime.Value.ToString("yyyy-MM-ddTHH:mm:ss.fffZ", CultureInfo.InvariantCulture);
 
@@ -275,9 +245,9 @@ namespace UKHO.ExchangeSetService.API.Services
                 var successful = await SaveSalesCatalogueStorageDetails(salesCatalogueResponse.ResponseBody, exchangeSetServiceResponse.BatchId, request.CallbackUri, request.ExchangeSetStandard, request.CorrelationId, expiryDate, salesCatalogueResponse.ScsRequestDateTime, isEmptyEncExchangeSet, isEmptyAioExchangeSet, exchangeSetServiceResponse.ExchangeSetResponse);
                 if (!successful)
                 {
-                    logger.LogInformation(EventIds.CreateProductDataError.ToEventId(), "CreateProductDataByProductVersions failed for BatchId:{BatchId} | _X-Correlation-ID : {CorrelationId}",  exchangeSetServiceResponse.BatchId, request.CorrelationId);
+                    logger.LogInformation(EventIds.CreateProductDataError.ToEventId(), "CreateProductDataByProductVersions failed for BatchId:{BatchId} | _X-Correlation-ID : {CorrelationId}", exchangeSetServiceResponse.BatchId, request.CorrelationId);
                 }
-                
+
             }
 
             return response;
