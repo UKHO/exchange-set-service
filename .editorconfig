@@ -37,7 +37,7 @@ dotnet_style_namespace_match_folder = true:suggestion
 dotnet_style_readonly_field = true:suggestion
 
 # JSON files
-[*.json}]
+[*.json]
 insert_final_newline = true
 indent_style = space
 indent_size = 2
