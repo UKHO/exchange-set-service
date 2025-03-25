@@ -1,4 +1,5 @@
 using Azure.Identity;
+using Elastic.Apm.Api;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
@@ -28,6 +29,9 @@ using UKHO.ExchangeSetService.API.Validation;
 using UKHO.ExchangeSetService.Common.Configuration;
 using UKHO.ExchangeSetService.Common.HealthCheck;
 using UKHO.ExchangeSetService.Common.Helpers;
+using UKHO.ExchangeSetService.Common.Helpers.Auth;
+using UKHO.ExchangeSetService.Common.Helpers.SalesCatalogue;
+using UKHO.ExchangeSetService.Common.Helpers.Zip;
 using UKHO.ExchangeSetService.Common.Logging;
 using UKHO.ExchangeSetService.Common.Storage;
 using UKHO.Logging.EventHubLogProvider;
@@ -47,7 +51,7 @@ namespace UKHO.ExchangeSetService.API
             if (!string.IsNullOrWhiteSpace(kvServiceUri))
             {
                 builder.Configuration.AddAzureKeyVault(new Uri(kvServiceUri),
-                    new DefaultAzureCredential(new DefaultAzureCredentialOptions { ManagedIdentityClientId = builder.Configuration["ESSManagedIdentity:ClientId"] }));
+                    new DefaultAzureCredential( new DefaultAzureCredentialOptions { ManagedIdentityClientId = builder.Configuration["ESSManagedIdentity:ClientId"] }));
             }
 
 #if DEBUG
@@ -165,9 +169,13 @@ namespace UKHO.ExchangeSetService.API
             }).AddHeaderPropagation().AddPolicyHandler((services, request) =>
                     CommonHelper.GetRetryPolicy(services.GetService<ILogger<IFileShareServiceClient>>(), "File Share", EventIds.RetryHttpClientFSSRequest, retryCount, sleepDuration));
 
-
-            builder.Services.AddScoped<IFileSystemHelper, FileSystemHelper>();
             builder.Services.AddScoped<IFileShareService, FileShareService>();
+            builder.Services.AddScoped<IFileSystemHelper, FileSystemHelper>();
+            builder.Services.AddScoped<IFileShareBatchService, FileShareBatchService>();
+            builder.Services.AddScoped<IFileShareUploadService, FileShareUploadService>();
+            builder.Services.AddScoped<IFileShareDownloadService, FileShareDownloadService>();
+            builder.Services.AddScoped<IFileShareSearchService, FileShareSearchService>();
+            builder.Services.AddScoped<IZip, FileZip>();
             builder.Services.AddScoped<IProductDataService, ProductDataService>();
             builder.Services.AddScoped<IMonitorHelper, MonitorHelper>();
             builder.Services.AddScoped<IProductIdentifierValidator, ProductIdentifierValidator>();
@@ -186,6 +194,7 @@ namespace UKHO.ExchangeSetService.API
             builder.Services.AddScoped<BespokeExchangeSetAuthorizationFilterAttribute>();
             builder.Services.AddScoped<IScsProductIdentifierValidator, ScsProductIdentifierValidator>();
             builder.Services.AddScoped<IScsDataSinceDateTimeValidator, ScsDataSinceDateTimeValidator>();
+
 
             builder.Services.AddHealthChecks()
                 .AddCheck<FileShareServiceHealthCheck>("FileShareServiceHealthCheck")

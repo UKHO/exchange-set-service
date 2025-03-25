@@ -5,6 +5,7 @@ using System.Net.Http.Headers;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using UKHO.ExchangeSetService.Common.Helpers;
 using UKHO.ExchangeSetService.Common.Models.FileShareService.Response;
 
 namespace UKHO.ExchangeSetService.Common.Helpers
@@ -19,7 +20,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             this.httpClient = httpClient;
         }
 
-        public async Task<HttpResponseMessage> CallFileShareServiceApi(HttpMethod method, string requestBody, string authToken, string uri,CancellationToken cancellationToken, string correlationId="")
+        public async Task<HttpResponseMessage> CallFileShareServiceApi(HttpMethod method, string requestBody, string authToken, string uri, CancellationToken cancellationToken, string correlationId = "")
         {
             HttpContent content = null;
 
@@ -39,11 +40,11 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             return response;
         }
 
-        public async Task<HttpResponseMessage> AddFileInBatchAsync(HttpMethod method, FileCreateModel fileModel, string authToken,string baseUrl,string batchId, string fileName, long? fileContentSizeHeader,
+        public async Task<HttpResponseMessage> AddFileInBatchAsync(HttpMethod method, FileCreateModel fileModel, string authToken, string baseUrl, string batchId, string fileName, long? fileContentSizeHeader,
                 string mimeTypeHeader = "application/octet-stream", string correlationId = "")
         {
-            string uri = $"{baseUrl}/batch/{batchId}/files/{fileName}";
-            string payloadJson = JsonConvert.SerializeObject(fileModel);
+            var uri = $"{baseUrl}/batch/{batchId}/files/{fileName}";
+            var payloadJson = JsonConvert.SerializeObject(fileModel);
 
             using var httpRequestMessage = new HttpRequestMessage(method, uri)
             { Content = new StringContent(payloadJson, Encoding.UTF8, "application/json") };
@@ -64,13 +65,13 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             return await httpClient.SendAsync(httpRequestMessage, CancellationToken.None);
         }
 
-        public async Task<HttpResponseMessage> UploadFileBlockAsync(HttpMethod method, string baseUrl,string batchId, string fileName, string blockId, byte[] blockBytes, byte[] md5Hash, string accessToken, CancellationToken cancellationToken, string mimeTypeHeader = "application/octet-stream", string correlationId = "")
+        public async Task<HttpResponseMessage> UploadFileBlockAsync(HttpMethod method, string baseUrl, string batchId, string fileName, string blockId, byte[] blockBytes, byte[] md5Hash, string accessToken, CancellationToken cancellationToken, string mimeTypeHeader = "application/octet-stream", string correlationId = "")
         {
-            string uri = $"{baseUrl}/batch/{batchId}/files/{fileName}/{blockId}";
+            var uri = $"{baseUrl}/batch/{batchId}/files/{fileName}/{blockId}";
 
             using var httpRequestMessage = new HttpRequestMessage(method, uri)
-            { Content = (blockBytes == null) ? null : new ByteArrayContent(blockBytes) };
-            httpRequestMessage.Content.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("application/octet-stream");
+            { Content = blockBytes == null ? null : new ByteArrayContent(blockBytes) };
+            httpRequestMessage.Content.Headers.ContentType = new MediaTypeHeaderValue("application/octet-stream");
 
             if (md5Hash != null)
             {
@@ -92,8 +93,8 @@ namespace UKHO.ExchangeSetService.Common.Helpers
 
         public async Task<HttpResponseMessage> WriteBlockInFileAsync(HttpMethod method, string baseUrl, string batchId, string fileName, WriteBlockFileModel writeBlockFileModel, string accessToken, string mimeTypeHeader = "application/octet-stream", string correlationId = "")
         {
-            string uri = $"{baseUrl}/batch/{batchId}/files/{fileName}";
-            string payloadJson = JsonConvert.SerializeObject(writeBlockFileModel);
+            var uri = $"{baseUrl}/batch/{batchId}/files/{fileName}";
+            var payloadJson = JsonConvert.SerializeObject(writeBlockFileModel);
 
             using var httpRequestMessage = new HttpRequestMessage(method, uri)
             { Content = new StringContent(payloadJson, Encoding.UTF8, "application/json") };
@@ -113,8 +114,8 @@ namespace UKHO.ExchangeSetService.Common.Helpers
 
         public async Task<HttpResponseMessage> CommitBatchAsync(HttpMethod method, string baseUrl, string batchId, BatchCommitModel batchCommitModel, string accessToken, string correlationId = "")
         {
-            string uri = $"{baseUrl}/batch/{batchId}";
-            string payloadJson = JsonConvert.SerializeObject(batchCommitModel.FileDetails);
+            var uri = $"{baseUrl}/batch/{batchId}";
+            var payloadJson = JsonConvert.SerializeObject(batchCommitModel.FileDetails);
 
             using var httpRequestMessage = new HttpRequestMessage(method, uri)
             { Content = new StringContent(payloadJson, Encoding.UTF8, "application/json") };
@@ -131,7 +132,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
 
         public async Task<HttpResponseMessage> GetBatchStatusAsync(HttpMethod method, string baseUrl, string batchId, string accessToken, string correlationId = "")
         {
-            string uri = $"{baseUrl}/batch/{batchId}/status";
+            var uri = $"{baseUrl}/batch/{batchId}/status";
 
             using var httpRequestMessage = new HttpRequestMessage(HttpMethod.Get, uri);
             if (correlationId != "")

@@ -1,34 +1,37 @@
-﻿using Microsoft.Azure.WebJobs.Host;
+﻿using System;
+using System.Diagnostics.CodeAnalysis;
+using System.IO.Abstractions;
+using System.Linq;
+using System.Net.Http.Headers;
+using System.Reflection;
+using Azure.Extensions.AspNetCore.Configuration.Secrets;
+using Azure.Identity;
+using Azure.Security.KeyVault.Secrets;
+using Elastic.Apm;
+using Elastic.Apm.Azure.Storage;
+using Elastic.Apm.DiagnosticSource;
+using Microsoft.ApplicationInsights.Extensibility;
+using Microsoft.Azure.WebJobs.Host;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using UKHO.Logging.EventHubLogProvider;
-#pragma warning disable S1128 // Unused "using" should be removed
+#if DEBUG
 using Serilog;
 using Serilog.Events;
-#pragma warning disable S1128 // Unused "using" should be removed
-using System;
-using System.Diagnostics.CodeAnalysis;
+#endif
 using UKHO.ExchangeSetService.Common.Configuration;
 using UKHO.ExchangeSetService.Common.Helpers;
-using UKHO.ExchangeSetService.Common.Storage;
-using UKHO.ExchangeSetService.FulfilmentService.Services;
-using System.Reflection;
-using System.Linq;
-using System.Net.Http.Headers;
-using System.IO.Abstractions;
-using Azure.Identity;
-using Azure.Security.KeyVault.Secrets;
-using Azure.Extensions.AspNetCore.Configuration.Secrets;
-using UKHO.ExchangeSetService.FulfilmentService.Configuration;
+using UKHO.ExchangeSetService.Common.Helpers.Auth;
+using UKHO.ExchangeSetService.Common.Helpers.SalesCatalogue;
+using UKHO.ExchangeSetService.Common.Helpers.Zip;
 using UKHO.ExchangeSetService.Common.Logging;
-using Microsoft.ApplicationInsights.Extensibility;
+using UKHO.ExchangeSetService.Common.Storage;
+using UKHO.ExchangeSetService.FulfilmentService.Configuration;
 using UKHO.ExchangeSetService.FulfilmentService.Filters;
+using UKHO.ExchangeSetService.FulfilmentService.Services;
 using UKHO.ExchangeSetService.FulfilmentService.Validation;
-using Elastic.Apm.Azure.Storage;
-using Elastic.Apm.DiagnosticSource;
-using Elastic.Apm;
+using UKHO.Logging.EventHubLogProvider;
 
 namespace UKHO.ExchangeSetService.FulfilmentService
 {
@@ -47,7 +50,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService
 
             HostBuilder hostBuilder = BuildHostConfiguration();
             IHost host = hostBuilder.Build();
-            
+
             using (host)
             {
                 host.Run();
@@ -101,10 +104,11 @@ namespace UKHO.ExchangeSetService.FulfilmentService
                  builder.AddConsole();
 
                  //Add Application Insights if needed (if key exists in settings)
-                 string instrumentationKey = ConfigurationBuilder["APPINSIGHTS_INSTRUMENTATIONKEY"];
-                 if (!string.IsNullOrEmpty(instrumentationKey))
+                 var connectionString = ConfigurationBuilder["APPLICATIONINSIGHTS_CONNECTION_STRING"];
+
+                 if (!string.IsNullOrEmpty(connectionString))
                  {
-                     builder.AddApplicationInsightsWebJobs(o => o.InstrumentationKey = instrumentationKey);
+                     builder.AddApplicationInsightsWebJobs(o => o.ConnectionString = connectionString);
                  }
 
                  EventHubLoggingConfiguration eventhubConfig = ConfigurationBuilder.GetSection("EventHubLoggingConfiguration").Get<EventHubLoggingConfiguration>();
@@ -175,6 +179,11 @@ namespace UKHO.ExchangeSetService.FulfilmentService
                  services.AddSingleton<IAuthFssTokenProvider, AuthFssTokenProvider>();
                  services.AddSingleton<IAuthScsTokenProvider, AuthScsTokenProvider>();
                  services.AddScoped<IFileShareService, FileShareService>();
+                 services.AddScoped<IFileShareBatchService, FileShareBatchService>();
+                 services.AddScoped<IFileShareUploadService, FileShareUploadService>();
+                 services.AddScoped<IFileShareDownloadService, FileShareDownloadService>();
+                 services.AddScoped<IFileShareSearchService, FileShareSearchService>();
+                 services.AddScoped<IZip, FileZip>();
                  services.AddScoped<IFulfilmentFileShareService, FulfilmentFileShareService>();
                  services.AddScoped<IFulfilmentAncillaryFiles, FulfilmentAncillaryFiles>();
                  services.AddScoped<IFileSystemHelper, FileSystemHelper>();

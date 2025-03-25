@@ -49,7 +49,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             });
             fakeLogger = A.Fake<ILogger<FulfilmentFileShareService>>();
 
-            fulfilmentFileShareService = new FulfilmentFileShareService(fakefileShareServiceConfig, fakefileShareService, fakeLogger);
+            fulfilmentFileShareService = new FulfilmentFileShareService(fakefileShareServiceConfig, fakefileShareService, fakefileShareService, fakefileShareService, fakefileShareService, fakefileShareService, fakeLogger);
         }
 
         private static List<Products> GetProductdetails()
@@ -253,7 +253,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
         {
             const bool isBatchCommitted = false;
             A.CallTo(() => fakefileShareService.CommitAndGetBatchStatusForLargeMediaExchangeSet(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(isBatchCommitted);
-
+            
             var result = await fulfilmentFileShareService.CommitLargeMediaExchangeSet(FakeBatchId, FakeExchangeSetRootPath, null);
             Assert.That(result, Is.EqualTo(isBatchCommitted));
         }
