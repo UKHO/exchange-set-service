@@ -1,0 +1,256 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.13.35919.96
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Stub", "Stub", "{02EA681E-C7D8-13C7-8484-4AC65E1B71E8}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UKHO.SalesCatalogueFileShareServicesMock.API", "UKHO.SalesCatalogueFileShareServicesMock.API\UKHO.SalesCatalogueFileShareServicesMock.API\UKHO.SalesCatalogueFileShareServicesMock.API.csproj", "{B1684574-201F-1BFF-FE44-DAF73219C30F}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{49EBF898-0482-4F67-8634-2F72000DE39F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UKHO.ExchangeSetService.API.FunctionalTests", "UKHO.ExchangeSetService.API\UKHO.ExchangeSetService.API.FunctionalTests\UKHO.ExchangeSetService.API.FunctionalTests.csproj", "{7E99F74E-CDB0-EB3E-C09B-B64113090C17}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UKHO.ExchangeSetService.API.UnitTests", "UKHO.ExchangeSetService.API\UKHO.ExchangeSetService.API.UnitTests\UKHO.ExchangeSetService.API.UnitTests.csproj", "{826477EC-88DB-AD86-BBBA-F90111526811}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UKHO.ExchangeSetService.Common.UnitTests", "UKHO.ExchangeSetService.API\UKHO.ExchangeSetService.Common.UnitTests\UKHO.ExchangeSetService.Common.UnitTests.csproj", "{730AAF37-847B-B5A6-154B-690441042F72}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UKHO.ExchangeSetService.Webjob.CleanUpJob.UnitTests", "UKHO.ExchangeSetService.API\UKHO.ExchangeSetService.Webjob.CleanUpJob.UnitTests\UKHO.ExchangeSetService.Webjob.CleanUpJob.UnitTests.csproj", "{2C1C3EB9-E419-E697-3404-987C25FD6797}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UKHO.ExchangeSetService.Webjob.UnitTests", "UKHO.ExchangeSetService.API\UKHO.ExchangeSetService.Webjob.UnitTests\UKHO.ExchangeSetService.Webjob.UnitTests.csproj", "{26BF3684-F03C-56E9-31F0-8A950E98EE0D}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "WebJobs", "WebJobs", "{92883773-C020-46BA-9557-4D491B39D0B0}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UKHO.ExchangeSetService.CleanUpJob", "UKHO.ExchangeSetService.API\UKHO.ExchangeSetService.CleanUpJob\UKHO.ExchangeSetService.CleanUpJob.csproj", "{1E99635D-6C75-D21E-FE82-A595D556479A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UKHO.ExchangeSetService.FulfilmentService", "UKHO.ExchangeSetService.API\UKHO.ExchangeSetService.FulfilmentService\UKHO.ExchangeSetService.FulfilmentService.csproj", "{1D4872A4-81B2-77E9-1ACA-B5A3184FCEF7}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UKHO.ExchangeSetService.API", "UKHO.ExchangeSetService.API\UKHO.ExchangeSetService.API\UKHO.ExchangeSetService.API.csproj", "{D1D4FFA3-1951-8548-6825-FA3BB7C9DC41}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UKHO.ExchangeSetService.Common", "UKHO.ExchangeSetService.API\UKHO.ExchangeSetService.Common\UKHO.ExchangeSetService.Common.csproj", "{2F591B9E-177A-A6D2-704B-6E64A4D485D6}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Deployment", "Deployment", "{21EE8128-FC89-48AF-B67F-0036B387BE59}"
+	ProjectSection(SolutionItems) = preProject
+		Deployment\add-lease.ps1 = Deployment\add-lease.ps1
+		Deployment\ADDS-e2e-tests.ps1 = Deployment\ADDS-e2e-tests.ps1
+		Deployment\check_service_status.ps1 = Deployment\check_service_status.ps1
+		Deployment\fulfilment_webjob_deployment.ps1 = Deployment\fulfilment_webjob_deployment.ps1
+		Deployment\set_api_webjob_aio_feature_configuration.ps1 = Deployment\set_api_webjob_aio_feature_configuration.ps1
+		Deployment\terraform_conditional_run.ps1 = Deployment\terraform_conditional_run.ps1
+		Deployment\terraform_conditional_run_apim.ps1 = Deployment\terraform_conditional_run_apim.ps1
+		Deployment\terraform_conditional_run_apim_v2.ps1 = Deployment\terraform_conditional_run_apim_v2.ps1
+		Deployment\terraform_conditional_run_v2.ps1 = Deployment\terraform_conditional_run_v2.ps1
+		Deployment\terraform_run.ps1 = Deployment\terraform_run.ps1
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{A8243124-F129-4E8E-926B-1DBE9A1FC529}"
+	ProjectSection(SolutionItems) = preProject
+		Deployment\src\azure.tf = Deployment\src\azure.tf
+		Deployment\src\main.tf = Deployment\src\main.tf
+		Deployment\src\migration.tf = Deployment\src\migration.tf
+		Deployment\src\outputs.tf = Deployment\src\outputs.tf
+		Deployment\src\resource-group.tf = Deployment\src\resource-group.tf
+		Deployment\src\variables.tf = Deployment\src\variables.tf
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Modules", "Modules", "{D41D2E74-AE52-4E51-85D9-9E5AB9183FE7}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "APIM", "APIM", "{DE5A3107-754B-4FF9-8A16-04BA073A8892}"
+	ProjectSection(SolutionItems) = preProject
+		Deployment\src\Modules\APIM\azure.tf = Deployment\src\Modules\APIM\azure.tf
+		Deployment\src\Modules\APIM\main.tf = Deployment\src\Modules\APIM\main.tf
+		Deployment\src\Modules\APIM\outputs.tf = Deployment\src\Modules\APIM\outputs.tf
+		Deployment\src\Modules\APIM\variables.tf = Deployment\src\Modules\APIM\variables.tf
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Modules", "Modules", "{4B22E7C5-9CE5-436A-9836-36525C660312}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ExchangeSetService", "ExchangeSetService", "{FBD7B940-F0B9-4C92-B456-2042C34606B3}"
+	ProjectSection(SolutionItems) = preProject
+		Deployment\src\Modules\APIM\Modules\ExchangeSetService\main.tf = Deployment\src\Modules\APIM\Modules\ExchangeSetService\main.tf
+		Deployment\src\Modules\APIM\Modules\ExchangeSetService\outputs.tf = Deployment\src\Modules\APIM\Modules\ExchangeSetService\outputs.tf
+		Deployment\src\Modules\APIM\Modules\ExchangeSetService\variables.tf = Deployment\src\Modules\APIM\Modules\ExchangeSetService\variables.tf
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "AppInsights", "AppInsights", "{626DBF50-69B3-4DFD-8F28-DC5920E1AFFE}"
+	ProjectSection(SolutionItems) = preProject
+		Deployment\src\Modules\AppInsights\main.tf = Deployment\src\Modules\AppInsights\main.tf
+		Deployment\src\Modules\AppInsights\outputs.tf = Deployment\src\Modules\AppInsights\outputs.tf
+		Deployment\src\Modules\AppInsights\variables.tf = Deployment\src\Modules\AppInsights\variables.tf
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "azuredashboard", "azuredashboard", "{78CFCEA4-8A54-4C70-8152-7DCE52EB4995}"
+	ProjectSection(SolutionItems) = preProject
+		Deployment\src\Modules\azuredashboard\dashboard.tpl = Deployment\src\Modules\azuredashboard\dashboard.tpl
+		Deployment\src\Modules\azuredashboard\main.tf = Deployment\src\Modules\azuredashboard\main.tf
+		Deployment\src\Modules\azuredashboard\variables.tf = Deployment\src\Modules\azuredashboard\variables.tf
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "CacheStorage", "CacheStorage", "{C5727058-EE64-4D2C-B1E8-8A32FA87F9E9}"
+	ProjectSection(SolutionItems) = preProject
+		Deployment\src\Modules\CacheStorage\main.tf = Deployment\src\Modules\CacheStorage\main.tf
+		Deployment\src\Modules\CacheStorage\outputs.tf = Deployment\src\Modules\CacheStorage\outputs.tf
+		Deployment\src\Modules\CacheStorage\variables.tf = Deployment\src\Modules\CacheStorage\variables.tf
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "EventHub", "EventHub", "{5062512D-4B7D-4332-979F-B4FA01399571}"
+	ProjectSection(SolutionItems) = preProject
+		Deployment\src\Modules\EventHub\main.tf = Deployment\src\Modules\EventHub\main.tf
+		Deployment\src\Modules\EventHub\outputs.tf = Deployment\src\Modules\EventHub\outputs.tf
+		Deployment\src\Modules\EventHub\variables.tf = Deployment\src\Modules\EventHub\variables.tf
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "FulfilmentKeyVault", "FulfilmentKeyVault", "{CDF32D94-C7B2-428C-AD95-F546DE05F130}"
+	ProjectSection(SolutionItems) = preProject
+		Deployment\src\Modules\FulfilmentKeyVault\main.tf = Deployment\src\Modules\FulfilmentKeyVault\main.tf
+		Deployment\src\Modules\FulfilmentKeyVault\outputs.tf = Deployment\src\Modules\FulfilmentKeyVault\outputs.tf
+		Deployment\src\Modules\FulfilmentKeyVault\variables.tf = Deployment\src\Modules\FulfilmentKeyVault\variables.tf
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "FulfilmentScaling", "FulfilmentScaling", "{6D8D2D49-AB1C-47E0-BBB6-8AC3C2D94A90}"
+	ProjectSection(SolutionItems) = preProject
+		Deployment\src\Modules\FulfilmentScaling\main.tf = Deployment\src\Modules\FulfilmentScaling\main.tf
+		Deployment\src\Modules\FulfilmentScaling\outputs.tf = Deployment\src\Modules\FulfilmentScaling\outputs.tf
+		Deployment\src\Modules\FulfilmentScaling\variables.tf = Deployment\src\Modules\FulfilmentScaling\variables.tf
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "FulfilmentStorage", "FulfilmentStorage", "{91387DBA-994E-4BC4-8A6A-940611D24965}"
+	ProjectSection(SolutionItems) = preProject
+		Deployment\src\Modules\FulfilmentStorage\main.tf = Deployment\src\Modules\FulfilmentStorage\main.tf
+		Deployment\src\Modules\FulfilmentStorage\outputs.tf = Deployment\src\Modules\FulfilmentStorage\outputs.tf
+		Deployment\src\Modules\FulfilmentStorage\variables.tf = Deployment\src\Modules\FulfilmentStorage\variables.tf
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "FulfilmentWebapps", "FulfilmentWebapps", "{B4285EBB-070C-47A4-8CD4-C2B5407ECA03}"
+	ProjectSection(SolutionItems) = preProject
+		Deployment\src\Modules\FulfilmentWebapps\main.tf = Deployment\src\Modules\FulfilmentWebapps\main.tf
+		Deployment\src\Modules\FulfilmentWebapps\outputs.tf = Deployment\src\Modules\FulfilmentWebapps\outputs.tf
+		Deployment\src\Modules\FulfilmentWebapps\variables.tf = Deployment\src\Modules\FulfilmentWebapps\variables.tf
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "KeyVault", "KeyVault", "{8288D1E0-7DFF-4352-9B6B-063C66EA92C5}"
+	ProjectSection(SolutionItems) = preProject
+		Deployment\src\Modules\KeyVault\main.tf = Deployment\src\Modules\KeyVault\main.tf
+		Deployment\src\Modules\KeyVault\outputs.tf = Deployment\src\Modules\KeyVault\outputs.tf
+		Deployment\src\Modules\KeyVault\variables.tf = Deployment\src\Modules\KeyVault\variables.tf
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "UserIdentity", "UserIdentity", "{AF51BA50-B8CF-463D-9B89-D4195AC73719}"
+	ProjectSection(SolutionItems) = preProject
+		Deployment\src\Modules\UserIdentity\main.tf = Deployment\src\Modules\UserIdentity\main.tf
+		Deployment\src\Modules\UserIdentity\outputs.tf = Deployment\src\Modules\UserIdentity\outputs.tf
+		Deployment\src\Modules\UserIdentity\variables.tf = Deployment\src\Modules\UserIdentity\variables.tf
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Webapp", "Webapp", "{6B41A13C-CFC7-4416-A896-2AD690C853FA}"
+	ProjectSection(SolutionItems) = preProject
+		Deployment\src\Modules\Webapp\main.tf = Deployment\src\Modules\Webapp\main.tf
+		Deployment\src\Modules\Webapp\outputs.tf = Deployment\src\Modules\Webapp\outputs.tf
+		Deployment\src\Modules\Webapp\variables.tf = Deployment\src\Modules\Webapp\variables.tf
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "templates", "templates", "{28297E9F-2255-44D6-A43F-56721CAB9359}"
+	ProjectSection(SolutionItems) = preProject
+		Deployment\templates\app-deploy.yml = Deployment\templates\app-deploy.yml
+		Deployment\templates\build-test-publish.yml = Deployment\templates\build-test-publish.yml
+		Deployment\templates\continuous-deployment-apim-v2.yml = Deployment\templates\continuous-deployment-apim-v2.yml
+		Deployment\templates\continuous-deployment-apim.yml = Deployment\templates\continuous-deployment-apim.yml
+		Deployment\templates\continuous-deployment-v2.yml = Deployment\templates\continuous-deployment-v2.yml
+		Deployment\templates\continuous-deployment.yml = Deployment\templates\continuous-deployment.yml
+		Deployment\templates\retain-pipeline.yml = Deployment\templates\retain-pipeline.yml
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Pipeline", "Pipeline", "{A279B62E-6241-42CD-8438-D27CFD5DB60F}"
+	ProjectSection(SolutionItems) = preProject
+		Apply-AssemblyVersionAndDefaults.ps1 = Apply-AssemblyVersionAndDefaults.ps1
+		azure-pipelines.yml = azure-pipelines.yml
+		bespokeExchangeSetService_OpenApi_definition_internal.yaml = bespokeExchangeSetService_OpenApi_definition_internal.yaml
+		BuildNuget.config = BuildNuget.config
+		catalog-info.yaml = catalog-info.yaml
+		CodeCoverageReport.ps1 = CodeCoverageReport.ps1
+		exchangeSetService_OpenApi_definition.yaml = exchangeSetService_OpenApi_definition.yaml
+		exchangeSetService_Ui_OpenApi_definition.yaml = exchangeSetService_Ui_OpenApi_definition.yaml
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{B1684574-201F-1BFF-FE44-DAF73219C30F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B1684574-201F-1BFF-FE44-DAF73219C30F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B1684574-201F-1BFF-FE44-DAF73219C30F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B1684574-201F-1BFF-FE44-DAF73219C30F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7E99F74E-CDB0-EB3E-C09B-B64113090C17}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7E99F74E-CDB0-EB3E-C09B-B64113090C17}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7E99F74E-CDB0-EB3E-C09B-B64113090C17}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7E99F74E-CDB0-EB3E-C09B-B64113090C17}.Release|Any CPU.Build.0 = Release|Any CPU
+		{826477EC-88DB-AD86-BBBA-F90111526811}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{826477EC-88DB-AD86-BBBA-F90111526811}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{826477EC-88DB-AD86-BBBA-F90111526811}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{826477EC-88DB-AD86-BBBA-F90111526811}.Release|Any CPU.Build.0 = Release|Any CPU
+		{730AAF37-847B-B5A6-154B-690441042F72}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{730AAF37-847B-B5A6-154B-690441042F72}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{730AAF37-847B-B5A6-154B-690441042F72}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{730AAF37-847B-B5A6-154B-690441042F72}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2C1C3EB9-E419-E697-3404-987C25FD6797}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2C1C3EB9-E419-E697-3404-987C25FD6797}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2C1C3EB9-E419-E697-3404-987C25FD6797}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2C1C3EB9-E419-E697-3404-987C25FD6797}.Release|Any CPU.Build.0 = Release|Any CPU
+		{26BF3684-F03C-56E9-31F0-8A950E98EE0D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{26BF3684-F03C-56E9-31F0-8A950E98EE0D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{26BF3684-F03C-56E9-31F0-8A950E98EE0D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{26BF3684-F03C-56E9-31F0-8A950E98EE0D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1E99635D-6C75-D21E-FE82-A595D556479A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1E99635D-6C75-D21E-FE82-A595D556479A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1E99635D-6C75-D21E-FE82-A595D556479A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1E99635D-6C75-D21E-FE82-A595D556479A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1D4872A4-81B2-77E9-1ACA-B5A3184FCEF7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1D4872A4-81B2-77E9-1ACA-B5A3184FCEF7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1D4872A4-81B2-77E9-1ACA-B5A3184FCEF7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1D4872A4-81B2-77E9-1ACA-B5A3184FCEF7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D1D4FFA3-1951-8548-6825-FA3BB7C9DC41}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D1D4FFA3-1951-8548-6825-FA3BB7C9DC41}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D1D4FFA3-1951-8548-6825-FA3BB7C9DC41}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D1D4FFA3-1951-8548-6825-FA3BB7C9DC41}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2F591B9E-177A-A6D2-704B-6E64A4D485D6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2F591B9E-177A-A6D2-704B-6E64A4D485D6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2F591B9E-177A-A6D2-704B-6E64A4D485D6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2F591B9E-177A-A6D2-704B-6E64A4D485D6}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{B1684574-201F-1BFF-FE44-DAF73219C30F} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
+		{7E99F74E-CDB0-EB3E-C09B-B64113090C17} = {49EBF898-0482-4F67-8634-2F72000DE39F}
+		{826477EC-88DB-AD86-BBBA-F90111526811} = {49EBF898-0482-4F67-8634-2F72000DE39F}
+		{730AAF37-847B-B5A6-154B-690441042F72} = {49EBF898-0482-4F67-8634-2F72000DE39F}
+		{2C1C3EB9-E419-E697-3404-987C25FD6797} = {49EBF898-0482-4F67-8634-2F72000DE39F}
+		{26BF3684-F03C-56E9-31F0-8A950E98EE0D} = {49EBF898-0482-4F67-8634-2F72000DE39F}
+		{1E99635D-6C75-D21E-FE82-A595D556479A} = {92883773-C020-46BA-9557-4D491B39D0B0}
+		{1D4872A4-81B2-77E9-1ACA-B5A3184FCEF7} = {92883773-C020-46BA-9557-4D491B39D0B0}
+		{21EE8128-FC89-48AF-B67F-0036B387BE59} = {A279B62E-6241-42CD-8438-D27CFD5DB60F}
+		{A8243124-F129-4E8E-926B-1DBE9A1FC529} = {21EE8128-FC89-48AF-B67F-0036B387BE59}
+		{D41D2E74-AE52-4E51-85D9-9E5AB9183FE7} = {A8243124-F129-4E8E-926B-1DBE9A1FC529}
+		{DE5A3107-754B-4FF9-8A16-04BA073A8892} = {D41D2E74-AE52-4E51-85D9-9E5AB9183FE7}
+		{4B22E7C5-9CE5-436A-9836-36525C660312} = {DE5A3107-754B-4FF9-8A16-04BA073A8892}
+		{FBD7B940-F0B9-4C92-B456-2042C34606B3} = {4B22E7C5-9CE5-436A-9836-36525C660312}
+		{626DBF50-69B3-4DFD-8F28-DC5920E1AFFE} = {D41D2E74-AE52-4E51-85D9-9E5AB9183FE7}
+		{78CFCEA4-8A54-4C70-8152-7DCE52EB4995} = {D41D2E74-AE52-4E51-85D9-9E5AB9183FE7}
+		{C5727058-EE64-4D2C-B1E8-8A32FA87F9E9} = {D41D2E74-AE52-4E51-85D9-9E5AB9183FE7}
+		{5062512D-4B7D-4332-979F-B4FA01399571} = {D41D2E74-AE52-4E51-85D9-9E5AB9183FE7}
+		{CDF32D94-C7B2-428C-AD95-F546DE05F130} = {D41D2E74-AE52-4E51-85D9-9E5AB9183FE7}
+		{6D8D2D49-AB1C-47E0-BBB6-8AC3C2D94A90} = {D41D2E74-AE52-4E51-85D9-9E5AB9183FE7}
+		{91387DBA-994E-4BC4-8A6A-940611D24965} = {D41D2E74-AE52-4E51-85D9-9E5AB9183FE7}
+		{B4285EBB-070C-47A4-8CD4-C2B5407ECA03} = {D41D2E74-AE52-4E51-85D9-9E5AB9183FE7}
+		{8288D1E0-7DFF-4352-9B6B-063C66EA92C5} = {D41D2E74-AE52-4E51-85D9-9E5AB9183FE7}
+		{AF51BA50-B8CF-463D-9B89-D4195AC73719} = {D41D2E74-AE52-4E51-85D9-9E5AB9183FE7}
+		{6B41A13C-CFC7-4416-A896-2AD690C853FA} = {D41D2E74-AE52-4E51-85D9-9E5AB9183FE7}
+		{28297E9F-2255-44D6-A43F-56721CAB9359} = {21EE8128-FC89-48AF-B67F-0036B387BE59}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {7DF32072-E9E7-4FEC-9202-9CDE579848E9}
+	EndGlobalSection
+EndGlobal
