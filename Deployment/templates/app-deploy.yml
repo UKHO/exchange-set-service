@@ -90,6 +90,8 @@ jobs:
   pool: $(DeploymentPool)
   container: ${{parameters.Container}}
   condition: and(succeeded(), ${{parameters.RunTests}})
+  workspace:
+    clean: all
   variables:
     - group: "ESS-${{parameters.Environment}}${{parameters.v2Modifier}}-Variables"
     - group: "ESS-Deployment-Variables-${{parameters.Environment}}"
