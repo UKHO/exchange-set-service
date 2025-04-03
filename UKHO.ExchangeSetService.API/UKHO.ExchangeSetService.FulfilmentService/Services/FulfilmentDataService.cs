@@ -1,15 +1,15 @@
-﻿using FluentValidation.Results;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
-using Newtonsoft.Json;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Abstractions;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using FluentValidation.Results;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+using Newtonsoft.Json;
 using UKHO.ExchangeSetService.Common.Configuration;
 using UKHO.ExchangeSetService.Common.Extensions;
 using UKHO.ExchangeSetService.Common.Helpers;
@@ -235,7 +235,16 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             var exchangeSetInfoPath = Path.Combine(exchangeSetPath, fileShareServiceConfig.Value.Info);
 
             await CreateProductFile(batchId, exchangeSetInfoPath, correlationId, salesCatalogueEssDataResponse, scsRequestDateTime, encryption);
-            await CreateSerialEncFile(batchId, exchangeSetPath, correlationId);
+
+            if (encryption)
+            {
+                await CreateSerialEncFile(batchId, exchangeSetPath, correlationId);
+            }
+            else
+            {
+                logger.LogInformation(EventIds.SerialFileCreationSkipped.ToEventId(), "serial.enc is not created for BatchId:{BatchId} | _X-Correlation-ID : {CorrelationId}", batchId, correlationId);
+            }
+
             await DownloadReadMeFileAsync(batchId, exchangeSetRootPath, correlationId);
             await CreateCatalogFile(batchId, exchangeSetRootPath, correlationId, listFulfilmentData, salesCatalogueEssDataResponse, salecatalogueProductResponse);
         }
@@ -815,8 +824,8 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
                 monitorHelper.MonitorRequest("Query and Download ENC Files Task", queryAndDownloadEncFilesFromFileShareServiceTaskStartedAt, queryAndDownloadEncFilesFromFileShareServiceTaskCompletedAt, message.CorrelationId, fileShareServiceSearchQueryCount, downloadedENCFileCount, null, message.BatchId);
             }
 
-            bool encryption = string.Equals(businessUnit, fileShareServiceConfig.Value.S63BusinessUnit, StringComparison.OrdinalIgnoreCase);
-
+            var encryption = string.Equals(businessUnit, fileShareServiceConfig.Value.S63BusinessUnit, StringComparison.OrdinalIgnoreCase);
+            
             await CreateAncillaryFiles(message.BatchId, exchangeSetPath, message.CorrelationId, listFulfilmentData, response, message.ScsRequestDateTime, salesCatalogueEssDataResponse, encryption);
         }
 
