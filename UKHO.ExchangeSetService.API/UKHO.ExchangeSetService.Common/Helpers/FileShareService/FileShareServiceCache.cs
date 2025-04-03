@@ -65,7 +65,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
                     throw new OperationCanceledException();
                 }
 
-                
+
 
                 var updateNumbers = new List<int?>();
                 foreach (var itemUpdateNumber in item.UpdateNumbers)
@@ -188,20 +188,16 @@ namespace UKHO.ExchangeSetService.Common.Helpers
         private string GetFileDownloadPath(string exchangeSetRootPath, Products item, int? itemUpdateNumber)
         {
             string downloadPath;
-            if (aioConfiguration.IsAioEnabled)
-            {
-                var aioCells = !string.IsNullOrEmpty(aioConfiguration.AioCells) ? new(aioConfiguration.AioCells.Split(',')) : new List<string>();
+            var aioCells = !string.IsNullOrEmpty(aioConfiguration.AioCells) ? [.. aioConfiguration.AioCells.Split(',')] : new List<string>();
 
-                if (!aioCells.Contains(item.ProductName))
-                    downloadPath = Path.Combine(exchangeSetRootPath, item.ProductName.Substring(0, StringLength), item.ProductName, item.EditionNumber.Value.ToString());
-                else
-                    downloadPath = Path.Combine(exchangeSetRootPath, item.ProductName.Substring(0, StringLength), item.ProductName, item.EditionNumber.Value.ToString(), itemUpdateNumber.Value.ToString());
-            }
-            else
+            if (!aioCells.Contains(item.ProductName))
             {
                 downloadPath = Path.Combine(exchangeSetRootPath, item.ProductName.Substring(0, StringLength), item.ProductName, item.EditionNumber.Value.ToString());
             }
-
+            else
+            {
+                downloadPath = Path.Combine(exchangeSetRootPath, item.ProductName.Substring(0, StringLength), item.ProductName, item.EditionNumber.Value.ToString(), itemUpdateNumber.Value.ToString());
+            }
             return downloadPath;
         }
 

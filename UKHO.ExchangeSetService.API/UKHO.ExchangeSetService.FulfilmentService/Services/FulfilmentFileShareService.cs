@@ -140,6 +140,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
         {
             return await zip.CreateZipFileForExchangeSet(batchId, exchangeSetZipRootPath, correlationId);
         }
+
         public async Task<bool> UploadZipFileForExchangeSetToFileShareService(string batchId, string exchangeSetZipRootPath, string correlationId, string zipFileName)
         {
             return await fileShareUploadService.UploadFileToFileShareService(batchId, exchangeSetZipRootPath, correlationId, zipFileName);

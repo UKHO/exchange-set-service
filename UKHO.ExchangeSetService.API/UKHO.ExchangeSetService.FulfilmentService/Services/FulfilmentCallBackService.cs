@@ -136,7 +136,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
 
                 "Callback payload validation started for BatchId:{BatchId}, Payload: {Payload}", callBackResponse.Data.BatchId, payLoad);
 
-            return (callBackResponse.Data.RequestedProductCount >= 0 || callBackResponse.Data.RequestedAioProductCount is >= 0 )
+            return (callBackResponse.Data.RequestedProductCount >= 0 || callBackResponse.Data.RequestedAioProductCount is >= 0)
                    && !string.IsNullOrWhiteSpace(callBackResponse.Data.Links.ExchangeSetBatchStatusUri.Href)
                    && !string.IsNullOrWhiteSpace(callBackResponse.Data.Links.ExchangeSetBatchDetailsUri.Href)
                    && (!string.IsNullOrWhiteSpace(callBackResponse.Data.Links.ExchangeSetFileUri?.Href)
@@ -146,7 +146,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
 
         public bool ValidateCallbackErrorRequestPayload(CallBackResponse callBackResponse)
         {
-            var result =  (callBackResponse.Data.RequestedProductCount >= 0 || callBackResponse.Data.RequestedAioProductCount is >= 0)
+            var result = (callBackResponse.Data.RequestedProductCount >= 0 || callBackResponse.Data.RequestedAioProductCount is >= 0)
                     && !string.IsNullOrWhiteSpace(callBackResponse.Data.Links.ExchangeSetBatchStatusUri.Href)
                     && !string.IsNullOrWhiteSpace(callBackResponse.Data.Links.ExchangeSetBatchDetailsUri.Href)
                     && Links.Equals(callBackResponse.Data.Links.ExchangeSetFileUri, null)
@@ -196,32 +196,20 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
                 RequestedProductsNotInExchangeSet = GetRequestedProductsNotInExchangeSet(salesCatalogueProductResponse),
                 BatchId = scsResponseQueueMessage.BatchId
             };
-            
-            if (aioConfiguration.IsAioEnabled)
-            {
-                exchangeSetResponse.RequestedAioProductCount = scsResponseQueueMessage.RequestedAioProductCount;
-                exchangeSetResponse.RequestedProductCount = scsResponseQueueMessage.RequestedProductCount;
-                exchangeSetResponse.ExchangeSetCellCount -= validAioCells.Count;
-                exchangeSetResponse.AioExchangeSetCellCount = validAioCells.Count;
-                exchangeSetResponse.RequestedAioProductsAlreadyUpToDateCount = scsResponseQueueMessage.RequestedAioProductsAlreadyUpToDateCount;
-                exchangeSetResponse.RequestedProductsAlreadyUpToDateCount = scsResponseQueueMessage.RequestedProductsAlreadyUpToDateCount;
-            }
-            else
-            {
-                exchangeSetResponse.RequestedProductsNotInExchangeSet.AddRange(validAioCells.Select(x => new RequestedProductsNotInExchangeSet
-                {
-                    ProductName = x,
-                    Reason = "invalidProduct"
-                }));
-            }
-            
-            var hasExchangeSetFileUri = !aioConfiguration.IsAioEnabled
-                                        || exchangeSetResponse.ExchangeSetCellCount > 0
+
+            exchangeSetResponse.RequestedAioProductCount = scsResponseQueueMessage.RequestedAioProductCount;
+            exchangeSetResponse.RequestedProductCount = scsResponseQueueMessage.RequestedProductCount;
+            exchangeSetResponse.ExchangeSetCellCount -= validAioCells.Count;
+            exchangeSetResponse.AioExchangeSetCellCount = validAioCells.Count;
+            exchangeSetResponse.RequestedAioProductsAlreadyUpToDateCount = scsResponseQueueMessage.RequestedAioProductsAlreadyUpToDateCount;
+            exchangeSetResponse.RequestedProductsAlreadyUpToDateCount = scsResponseQueueMessage.RequestedProductsAlreadyUpToDateCount;
+
+
+            var hasExchangeSetFileUri = exchangeSetResponse.ExchangeSetCellCount > 0
                                         || exchangeSetResponse.RequestedProductsNotInExchangeSet.Any()
                                         || scsResponseQueueMessage.IsEmptyEncExchangeSet;
 
-            var hasAioExchangeSetFileUri = aioConfiguration.IsAioEnabled
-                                           && (exchangeSetResponse.AioExchangeSetCellCount > 0 || scsResponseQueueMessage.IsEmptyAioExchangeSet);
+            var hasAioExchangeSetFileUri = exchangeSetResponse.AioExchangeSetCellCount > 0 || scsResponseQueueMessage.IsEmptyAioExchangeSet;
 
             links.ExchangeSetFileUri = hasExchangeSetFileUri ? new LinkSetFileUri
             {
@@ -231,7 +219,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             links.AioExchangeSetFileUri = hasAioExchangeSetFileUri ? new LinkSetFileUri
             {
                 Href = $"{fileShareServiceConfig.Value.PublicBaseUrl}/batch/{scsResponseQueueMessage.BatchId}/files/{fileShareServiceConfig.Value.AioExchangeSetFileName}"
-                    
+
             } : null;
 
             exchangeSetResponse.Links = links;

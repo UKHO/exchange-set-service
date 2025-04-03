@@ -31,7 +31,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
         IOptions<FileShareServiceConfiguration> fileShareServiceConfig, IFileShareServiceClient fileShareServiceClient,
                                 IOptions<AioConfiguration> aioConfiguration, IFileSystemHelper fileSystemHelper,
                                 IOptions<CacheConfiguration> fssCacheConfiguration,
-                                IFileShareServiceCache fileShareServiceCache,   
+                                IFileShareServiceCache fileShareServiceCache,
                                 IFileShareDownloadService fileShareDownloadService) : IFileShareBatchService
     {
         private const string ZIPFILE = "zip";
@@ -479,21 +479,15 @@ namespace UKHO.ExchangeSetService.Common.Helpers
         {
             if (CommonHelper.IsPeriodicOutputService)
             {
-                if (aioConfiguration.Value.IsAioEnabled)
-                {
-                    if (!aioCells.Contains(productItem.ProductName))
-                    {
-                        await PerformBatchFileDownloadForLargeMediaExchangeSet(item, productItem, exchangeSetRootPath, message, cancellationTokenSource, cancellationToken);
-                    }
-                    else
-                    {
-                        await PerformBatchFileDownload(item, productItem, exchangeSetRootPath, message, cancellationTokenSource, cancellationToken);
-                    }
-                }
-                else
+                if (!aioCells.Contains(productItem.ProductName))
                 {
                     await PerformBatchFileDownloadForLargeMediaExchangeSet(item, productItem, exchangeSetRootPath, message, cancellationTokenSource, cancellationToken);
                 }
+                else
+                {
+                    await PerformBatchFileDownload(item, productItem, exchangeSetRootPath, message, cancellationTokenSource, cancellationToken);
+                }
+
             }
             else
             {
