@@ -217,14 +217,13 @@ stages:
                     arguments: '-aiocells $(AioConfiguration.AioCells_FT) -resourcegroup $(webAppResourceGroup) -webappname $(essWebAppName) -fulfilmentwebappsname $(essFulfilmentWebAppname)'
 
                 - task: DotNetCoreCLI@2
-                  displayName: "Run Functional tests AIOEnabled"
+                  displayName: "Run Functional tests"
                   inputs:
                     command: "test"
                     projects: |
                       **/*FunctionalTest*.dll
                       !**/*TestAdapter.dll
                       !**/obj/**
-                    arguments: '--filter Category=QCOnlyTest-AIOEnabled'
                     testRunTitle: "QC-AutomationTests"
                     workingDirectory: '$(Build.SourcesDirectory)/functionaltests'
 

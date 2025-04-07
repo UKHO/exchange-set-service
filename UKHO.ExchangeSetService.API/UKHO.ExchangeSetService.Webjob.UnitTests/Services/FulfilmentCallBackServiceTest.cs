@@ -407,8 +407,8 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
 
         #region SetExchangeSetResponse
 
-        [Test, TestCaseSource(nameof(GetExchangeSetResponseTestData), new object[] { true })]
-        public void WhenSetExchangeSetResponseWithAioEnabled_ThenReturnValidExchangeSetResponse(bool isAioReturned, bool isEncReturned, bool isEmptyEncExchangeSet, bool isEmptyAioExchangeSet)
+        [Test, TestCaseSource(nameof(GetExchangeSetResponseTestData))]
+        public void SetExchangeSetResponse_ThenReturnValidExchangeSetResponse(bool isAioReturned, bool isEncReturned, bool isEmptyEncExchangeSet, bool isEmptyAioExchangeSet)
         {
             var scProductResponse = GetSalesCatalogueProductResponse(a =>
             {
@@ -604,24 +604,8 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             return response;
         }
 
-        private static IEnumerable<TestCaseData> GetExchangeSetResponseTestData(bool isAioEnabled)
+        private static IEnumerable<TestCaseData> GetExchangeSetResponseTestData()
         {
-            if (!isAioEnabled)
-            {
-                yield return new TestCaseData(true, true, false)
-                    .SetName("When sales catalogue contains both AIO and ENCs");
-
-                yield return new TestCaseData(false, true, false)
-                    .SetName("When sales catalogue contains only ENCs");
-
-                yield return new TestCaseData(false, false, true)
-                    .SetName("When sales catalogue does not contains AIO or ENCs and empty exchange set is true");
-
-                yield return new TestCaseData(false, false, false)
-                    .SetName("When sales catalogue does not contains AIO or ENCs and empty exchange set is false");
-            }
-            else
-            {
                 yield return new TestCaseData(true, true, false, false)
                     .SetName("When sales catalogue contains both AIO and ENCs");
 
@@ -636,7 +620,6 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
 
                 yield return new TestCaseData(false, false, true, false)
                     .SetName("When sales catalogue does not contains AIO or ENCs and empty exchange set is true and empty AIO exchange set is false");
-            }
         }
 
         private static IEnumerable<TestCaseData> GetValidateCallbackRequestPayloadWithFileUriTestData()

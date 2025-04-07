@@ -87,27 +87,21 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
 
             var businessUnit = GetBusinessUnit(message.ExchangeSetStandard);
 
-            if (aioConfiguration.IsAioEnabled)
-            {
-                SalesCatalogueDataResponse salesCatalogueEssDataResponseForAio = (SalesCatalogueDataResponse)salesCatalogueEssDataResponse.Clone();
+            SalesCatalogueDataResponse salesCatalogueEssDataResponseForAio = (SalesCatalogueDataResponse)salesCatalogueEssDataResponse.Clone();
 
-                if (essItems != null && essItems.Any() || message.IsEmptyEncExchangeSet)
-                {
-                    salesCatalogueEssDataResponse.ResponseBody = salesCatalogueEssDataResponse.ResponseBody
-                                                                 .Where(x => !aioCells.Any(productName => productName.Equals(x.ProductName))).ToList();
-                    await CreateStandardExchangeSet(message, response, essItems, exchangeSetPath, salesCatalogueEssDataResponse, businessUnit);
-                }
-                if (aioItems != null && aioItems.Any() || message.IsEmptyAioExchangeSet)
-                {
-                    salesCatalogueEssDataResponseForAio.ResponseBody = salesCatalogueEssDataResponseForAio.ResponseBody
-                                                         .Where(x => aioCells.Any(productName => productName.Equals(x.ProductName))).ToList();
-                    await CreateAioExchangeSet(message, currentUtcDate, homeDirectoryPath, aioItems, salesCatalogueEssDataResponseForAio, response);
-                }
-            }
-            else
+            if (essItems != null && essItems.Any() || message.IsEmptyEncExchangeSet)
             {
+                salesCatalogueEssDataResponse.ResponseBody = salesCatalogueEssDataResponse.ResponseBody
+                                                             .Where(x => !aioCells.Any(productName => productName.Equals(x.ProductName))).ToList();
                 await CreateStandardExchangeSet(message, response, essItems, exchangeSetPath, salesCatalogueEssDataResponse, businessUnit);
             }
+            if (aioItems != null && aioItems.Any() || message.IsEmptyAioExchangeSet)
+            {
+                salesCatalogueEssDataResponseForAio.ResponseBody = salesCatalogueEssDataResponseForAio.ResponseBody
+                                                     .Where(x => aioCells.Any(productName => productName.Equals(x.ProductName))).ToList();
+                await CreateAioExchangeSet(message, currentUtcDate, homeDirectoryPath, aioItems, salesCatalogueEssDataResponseForAio, response);
+            }
+
 
             bool isZipFileUploaded = await PackageAndUploadExchangeSetZipFileToFileShareService(message.BatchId, exchangeSetZipFilePath, message.CorrelationId);
 
@@ -147,48 +141,35 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
                     .Where(product => aioCells.Any(aioCell => product.ProductName == aioCell))
                     .ToList();
 
-            if (aioConfiguration.IsAioEnabled)
+            var largeExchangeSetDataResponseForAio = new LargeExchangeSetDataResponse()
             {
-                var largeExchangeSetDataResponseForAio = new LargeExchangeSetDataResponse()
-                {
-                    SalesCatalogueDataResponse = (SalesCatalogueDataResponse)response.SalesCatalogueDataResponse.Clone(),
-                    SalesCatalogueProductResponse = response.SalesCatalogueProductResponse
-                };
+                SalesCatalogueDataResponse = (SalesCatalogueDataResponse)response.SalesCatalogueDataResponse.Clone(),
+                SalesCatalogueProductResponse = response.SalesCatalogueProductResponse
+            };
 
-                if (essItems.Count > 0)
-                {
-                    response.SalesCatalogueDataResponse.ResponseBody = response.SalesCatalogueDataResponse.ResponseBody
-                                                                       .Where(x => !aioCells.Any(productName => productName == x.ProductName)).ToList();
-                    isExchangeSetFolderCreated = await CreateStandardLargeMediaExchangeSet(message, homeDirectoryPath, currentUtcDate, response, largeExchangeSetFolderName, exchangeSetFilePath);
-
-                    if (!isExchangeSetFolderCreated)
-                    {
-                        logger.LogError(EventIds.LargeExchangeSetCreatedWithError.ToEventId(), "Large media exchange creation failed for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", message.BatchId, message.CorrelationId);
-                        throw new FulfilmentException(EventIds.LargeExchangeSetCreatedWithError.ToEventId());
-                    }
-                }
-
-                if (aioItems.Count > 0)
-                {
-                    largeExchangeSetDataResponseForAio.SalesCatalogueDataResponse.ResponseBody = largeExchangeSetDataResponseForAio.SalesCatalogueDataResponse.ResponseBody
-                                                                                        .Where(x => aioCells.Any(productName => productName == x.ProductName)).ToList();
-                    isExchangeSetFolderCreated = await CreateAioExchangeSet(message, currentUtcDate, homeDirectoryPath, aioItems, largeExchangeSetDataResponseForAio.SalesCatalogueDataResponse, largeExchangeSetDataResponseForAio.SalesCatalogueProductResponse);
-
-                    if (!isExchangeSetFolderCreated)
-                    {
-                        logger.LogError(EventIds.AIOExchangeSetCreatedWithError.ToEventId(), "AIO exchange creation failed for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", message.BatchId, message.CorrelationId);
-                        throw new FulfilmentException(EventIds.AIOExchangeSetCreatedWithError.ToEventId());
-                    }
-                }
-            }
-            else
+            if (essItems.Count > 0)
             {
+                response.SalesCatalogueDataResponse.ResponseBody = response.SalesCatalogueDataResponse.ResponseBody
+                                                                   .Where(x => !aioCells.Any(productName => productName == x.ProductName)).ToList();
                 isExchangeSetFolderCreated = await CreateStandardLargeMediaExchangeSet(message, homeDirectoryPath, currentUtcDate, response, largeExchangeSetFolderName, exchangeSetFilePath);
 
                 if (!isExchangeSetFolderCreated)
                 {
                     logger.LogError(EventIds.LargeExchangeSetCreatedWithError.ToEventId(), "Large media exchange creation failed for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", message.BatchId, message.CorrelationId);
                     throw new FulfilmentException(EventIds.LargeExchangeSetCreatedWithError.ToEventId());
+                }
+            }
+
+            if (aioItems.Count > 0)
+            {
+                largeExchangeSetDataResponseForAio.SalesCatalogueDataResponse.ResponseBody = largeExchangeSetDataResponseForAio.SalesCatalogueDataResponse.ResponseBody
+                                                                                    .Where(x => aioCells.Any(productName => productName == x.ProductName)).ToList();
+                isExchangeSetFolderCreated = await CreateAioExchangeSet(message, currentUtcDate, homeDirectoryPath, aioItems, largeExchangeSetDataResponseForAio.SalesCatalogueDataResponse, largeExchangeSetDataResponseForAio.SalesCatalogueProductResponse);
+
+                if (!isExchangeSetFolderCreated)
+                {
+                    logger.LogError(EventIds.AIOExchangeSetCreatedWithError.ToEventId(), "AIO exchange creation failed for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", message.BatchId, message.CorrelationId);
+                    throw new FulfilmentException(EventIds.AIOExchangeSetCreatedWithError.ToEventId());
                 }
             }
 
@@ -284,7 +265,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
                 if (!isDownloadReadMeFileSuccess)
                 {
                     logger.LogError(EventIds.ErrorInDownloadReadMeFile.ToEventId(), "Error while downloading readme.txt file for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", batchId, correlationId);
-                }                    
+                }
             }
             catch (Exception ex)
             {
