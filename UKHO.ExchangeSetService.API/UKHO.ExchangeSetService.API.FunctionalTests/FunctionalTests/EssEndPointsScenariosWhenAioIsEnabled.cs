@@ -9,12 +9,6 @@ using UKHO.ExchangeSetService.API.FunctionalTests.Models;
 
 namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
 {
-    ////Product Backlog Item 74325: ESS API Response Structure when AIO feature is ON and AIO cell is requested
-    //// Below config should be set in the "UKHO.ExchangeSetService.API >> AppSettings.json 
-    ////"AioConfiguration": {
-    ////  "AioEnabled": true,
-    ////  "AioCells": "GB800001" }
-
     public class EssEndPointsScenariosWhenAioIsEnabled : ObjectStorage
     {
         private readonly string SinceDateTime = DateTime.Now.AddDays(-12).ToString("ddd, dd MMM yyyy HH':'mm':'ss 'GMT'", CultureInfo.InvariantCulture);
@@ -33,7 +27,6 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
 
 
         [Test]
-        [Category("QCOnlyTest-AIOEnabled")]
         public async Task WhenICallTheProductIdentifiersApiWithValidAndGB800001ProductAndAioIsEnabled_ThenACorrectResponseIsReturned()
         {
             var apiResponse = await ExchangeSetApiClient.GetProductIdentifiersDataAsync(Datahelper.GetAioProductIdentifierData(), accessToken: EssJwtToken);
@@ -67,7 +60,6 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         }
 
         [Test]
-        [Category("QCOnlyTest-AIOEnabled")]
         public async Task WhenICallTheProductVersionApiWithValidAndGB800001ProductAndAioIsEnabled_ThenTheCorrectResponseIsReturned()
         {
             List<ProductVersionModel> ProductVersiondata = new List<ProductVersionModel>();
@@ -90,7 +82,6 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         }
 
         [Test]
-        [Category("QCOnlyTest-AIOEnabled")]
         public async Task WhenICallTheApiWithAValidRFC1123DateTimeAndAioIsEnabled_ThenACorrectResponseIsReturned()
         {
             var apiResponse = await ExchangeSetApiClient.GetExchangeSetBasedOnDateTimeAsync(SinceDateTime, accessToken: EssJwtToken);
@@ -106,7 +97,6 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         }
 
         [Test]
-        [Category("QCOnlyTest-AIOEnabled")]
         public async Task WhenICallTheProductIdentifiersApiWithValidAndGB800001AndAnInvalidProductAndAioIsEnabled_ThenACorrectResponseIsReturned()
         {
             var apiResponse = await ExchangeSetApiClient.GetProductIdentifiersDataAsync(Datahelper.GetAioProductIdentifierAndInvalidData(), accessToken: EssJwtToken);
@@ -143,7 +133,6 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         }
 
         [Test]
-        [Category("QCOnlyTest-AIOEnabled")]
         public async Task WhenICallTheProductVersionApiWithValidAndGB800001AndInvalidProductAndAioIsEnabled_ThenTheCorrectResponseIsReturned()
         {
             List<ProductVersionModel> ProductVersiondata = new List<ProductVersionModel>();
@@ -171,8 +160,6 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         }
 
         [Test]
-        [Category("QCOnlyTest-AIOEnabled")]
-
         public async Task WhenICallTheProductIdentifiersApiWithValidEncAndNoAioProductAndAioIsEnabled_ThenACorrectResponseIsReturned()
         {
             var apiResponse = await ExchangeSetApiClient.GetProductIdentifiersDataAsync(Datahelper.GetProductIdentifierData(), accessToken: EssJwtToken);
@@ -206,7 +193,6 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         }
 
         [Test]
-        [Category("QCOnlyTest-AIOEnabled")]
         public async Task WhenICallTheProductVersionApiWithValidEncAndNoAioProductAndAioIsEnabled_ThenTheCorrectResponseIsReturned()
         {
             List<ProductVersionModel> ProductVersiondata = new List<ProductVersionModel>();
@@ -228,7 +214,6 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         }
 
         [Test]
-        [Category("QCOnlyTest-AIOEnabled")]
         public async Task WhenICallTheProductIdentifiersApiWithOnlyAioProductAndAioIsEnabled_ThenACorrectResponseIsReturned()
         {
             var apiResponse = await ExchangeSetApiClient.GetProductIdentifiersDataAsync(Datahelper.GetProductIdentifiersForAioOnly(), accessToken: EssJwtToken);
@@ -261,7 +246,6 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         }
 
         [Test]
-        [Category("QCOnlyTest-AIOEnabled")]
         public async Task WhenICallTheProductVersionApiOnlyAioProductAndAioIsEnabled_ThenTheCorrectResponseIsReturned()
         {
             List<ProductVersionModel> ProductVersiondata = new List<ProductVersionModel>();
@@ -283,7 +267,6 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         }
 
         [Test]
-        [Category("QCOnlyTest-AIOEnabled")]
         public async Task WhenICallTheProductIdentifiersApiWithValidEncAndDuplicateAioProductAndAioIsEnabled_ThenACorrectResponseIsReturned()
         {
             var apiResponse = await ExchangeSetApiClient.GetProductIdentifiersDataAsync(Datahelper.GetDuplicateAioProductIdentifierData(), accessToken: EssJwtToken);
@@ -320,7 +303,6 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         }
 
         [Test]
-        [Category("QCOnlyTest-AIOEnabled")]
         public async Task WhenICallTheProductVersionApiWithValidEncAndDuplicateAioProductAndAioIsEnabled_ThenTheCorrectResponseIsReturned()
         {
             List<ProductVersionModel> ProductVersiondata = new List<ProductVersionModel>();
@@ -347,7 +329,6 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         }
 
         [Test]
-        [Category("QCOnlyTest-AIOEnabled")]
         public async Task WhenICallTheProductIdentifiersApiWithValidEncProductAndAioCellWhichIsNotAvailableAndAioIsEnabled_ThenACorrectResponseIsReturned()
         {
             var apiResponse = await ExchangeSetApiClient.GetProductIdentifiersDataAsync(Datahelper.GetAdditionalAioProductIdentifierData(), accessToken: EssJwtToken);
@@ -384,7 +365,6 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         }
 
         [Test]
-        [Category("QCOnlyTest-AIOEnabled")]
         public async Task WhenICallTheProductVersionApiWithValidEncAndAioIsEnabled_ThenTheCorrectResponseIsReturned()
         {
             List<ProductVersionModel> ProductVersiondata = new List<ProductVersionModel>();
@@ -427,7 +407,6 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         }
 
         [Test]
-        [Category("QCOnlyTest-AIOEnabled")]
         public async Task WhenICallTheProductIdentifiersApiWithLargeMediaCellsAndAioCellWhichIsNotAvailableAndAioIsEnabled_ThenACorrectResponseIsReturned()
         {
             var apiResponse = await ExchangeSetApiClient.GetProductIdentifiersDataAsync(Datahelper.GetProductIdentifiersForLargeMediaAndAioNotPresent(), accessToken: EssJwtToken);
@@ -463,7 +442,6 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         }
 
         [Test]
-        [Category("QCOnlyTest-AIOEnabled")]
         public async Task WhenICallTheProductIdentifiersApiWithLargeMediaCellsAndAioIsEnabled_ThenACorrectResponseIsReturned()
         {
             var apiResponse = await ExchangeSetApiClient.GetProductIdentifiersDataAsync(Datahelper.GetProductIdentifiersForLargeMedia(), accessToken: EssJwtToken);
