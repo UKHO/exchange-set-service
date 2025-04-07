@@ -367,10 +367,11 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         [Test]
         public async Task WhenICallTheProductVersionApiWithValidEncAndAioIsEnabled_ThenTheCorrectResponseIsReturned()
         {
-            List<ProductVersionModel> ProductVersiondata = new List<ProductVersionModel>();
-
-            ProductVersiondata.Add(Datahelper.GetProductVersionModelData(Config.AIOConfig.EncCellName, 9, 1));
-            ProductVersiondata.Add(Datahelper.GetProductVersionModelData(Config.AIOConfig.InvalidAioCellName, 4, 6));
+            List<ProductVersionModel> ProductVersiondata =
+            [
+                Datahelper.GetProductVersionModelData(Config.AIOConfig.EncCellName, 9, 1),
+                Datahelper.GetProductVersionModelData(Config.AIOConfig.InvalidAioCellName, 4, 6),
+            ];
 
             var apiResponse = await ExchangeSetApiClient.GetProductVersionsAsync(ProductVersiondata, accessToken: EssJwtToken);
             Assert.That((int)apiResponse.StatusCode, Is.EqualTo(200), $"Incorrect status code {apiResponse.StatusCode} is returned, instead of the expected 200.");
@@ -380,7 +381,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
 
             var apiResponseData = await apiResponse.ReadAsTypeAsync<ExchangeSetResponseModel>();
             //Verify requested product count
-            Assert.That(apiResponseData.RequestedProductCount, Is.EqualTo(1), $"Response body returned RequestedProductCount {apiResponseData.RequestedProductCount}, Instead of expected count is 2.");
+            Assert.That(apiResponseData.RequestedProductCount, Is.EqualTo(2), $"Response body returned RequestedProductCount {apiResponseData.RequestedProductCount}, Instead of expected count is 2.");
 
             //Verify requested product AlreadyUpToDate count
             Assert.That(apiResponseData.RequestedProductsAlreadyUpToDateCount, Is.EqualTo(0), $"Response body returned RequestedProductsAlreadyUpToDateCount : {apiResponseData.RequestedProductsAlreadyUpToDateCount}, Instead of expected RequestedProductsAlreadyUpToDateCount is 0.");
