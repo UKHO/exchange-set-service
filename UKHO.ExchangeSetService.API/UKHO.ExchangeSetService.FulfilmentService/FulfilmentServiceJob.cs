@@ -23,7 +23,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService
                                 IFulfilmentDataService fulFilmentDataService, ILogger<FulfilmentServiceJob> logger, IFileSystemHelper fileSystemHelper,
                                 IFileShareBatchService fileBatchShareService, IFileShareUploadService fileShareUploadService, IOptions<FileShareServiceConfiguration> fileShareServiceConfig,
                                 IAzureBlobStorageService azureBlobStorageService, IFulfilmentCallBackService fulfilmentCallBackService,
-                                IOptions<PeriodicOutputServiceConfiguration> periodicOutputServiceConfiguration, IOptions<AioConfiguration> aioConfiguration)
+                                IOptions<PeriodicOutputServiceConfiguration> periodicOutputServiceConfiguration)
     {
         protected IConfiguration configuration = configuration;
 
@@ -38,17 +38,10 @@ namespace UKHO.ExchangeSetService.FulfilmentService
             CommonHelper.IsPeriodicOutputService = fileSizeInMb > periodicOutputServiceConfiguration.Value.LargeMediaExchangeSetSizeInMB;
             try
             {
-                if (aioConfiguration.Value.IsAioEnabled)
-                {
-                    logger.LogInformation(EventIds.AIOToggleIsOn.ToEventId(), "ESS Webjob : AIO toggle is ON for BatchId:{BatchId} | _X-Correlation-ID : {CorrelationId}", fulfilmentServiceQueueMessage.BatchId, fulfilmentServiceQueueMessage.CorrelationId);
-                }
-                else
-                {
-                    logger.LogInformation(EventIds.AIOToggleIsOff.ToEventId(), "ESS Webjob : AIO toggle is OFF for BatchId:{BatchId} | _X-Correlation-ID : {CorrelationId}", fulfilmentServiceQueueMessage.BatchId, fulfilmentServiceQueueMessage.CorrelationId);
-                }
+                logger.LogInformation(EventIds.AIOToggleIsOn.ToEventId(), "ESS Webjob : AIO toggle is ON for BatchId:{BatchId} | _X-Correlation-ID : {CorrelationId}", fulfilmentServiceQueueMessage.BatchId, fulfilmentServiceQueueMessage.CorrelationId);
 
                 string transactionName =
-                    $"{System.Environment.GetEnvironmentVariable("WEBSITE_SITE_NAME")}-fulfilment-transaction";
+                    $"{Environment.GetEnvironmentVariable("WEBSITE_SITE_NAME")}-fulfilment-transaction";
 
                 await Agent.Tracer.CaptureTransaction(transactionName, ApiConstants.TypeRequest, async () =>
                 {

@@ -1,6 +1,5 @@
 ﻿using Newtonsoft.Json;
 using NUnit.Framework;
-using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
@@ -36,7 +35,6 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
 
         [Test]
         [TestCaseSource(nameof(TestDataForProductIdentifier))]
-        [Category("QCOnlyTest-AIOEnabled")]
         public async Task VerifyEmptyExchangeSetForProductIdentifier(List<string> product)
         {
             ApiEssResponse = await ExchangeSetApiClient.GetProductIdentifiersDataAsync(product, accessToken: objStorage.EssJwtToken);
