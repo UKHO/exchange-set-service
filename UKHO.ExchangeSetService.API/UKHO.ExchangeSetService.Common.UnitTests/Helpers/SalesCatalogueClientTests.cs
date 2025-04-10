@@ -1,7 +1,4 @@
-﻿// Licensed to the .NET Foundation under one or more agreements.
-// The .NET Foundation licenses this file to you under the MIT license.
-
-using System;
+﻿using System;
 using System.Net;
 using System.Net.Http;
 using System.Threading;
@@ -9,7 +6,7 @@ using System.Threading.Tasks;
 using FakeItEasy;
 using FluentAssertions;
 using NUnit.Framework;
-using UKHO.ExchangeSetService.Common.Helpers;
+using UKHO.ExchangeSetService.Common.Helpers.SalesCatalogue;
 
 namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
 {

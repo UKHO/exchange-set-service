@@ -1,6 +1,3 @@
-// Licensed to the .NET Foundation under one or more agreements.
-// The .NET Foundation licenses this file to you under the MIT license.
-
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -11,7 +8,6 @@ using System.Net.Http.Headers;
 using System.Reflection;
 using System.Security.Claims;
 using Azure.Identity;
-using Elastic.Apm.Api;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
@@ -35,14 +31,17 @@ using UKHO.ExchangeSetService.API.Validation.V2;
 using UKHO.ExchangeSetService.Common.Configuration;
 using UKHO.ExchangeSetService.Common.HealthCheck;
 using UKHO.ExchangeSetService.Common.Helpers;
+using UKHO.ExchangeSetService.Common.Helpers.Auth;
+using UKHO.ExchangeSetService.Common.Helpers.SalesCatalogue;
 using UKHO.ExchangeSetService.Common.Helpers.V2;
+using UKHO.ExchangeSetService.Common.Helpers.Zip;
 using UKHO.ExchangeSetService.Common.Logging;
 using UKHO.ExchangeSetService.Common.Storage;
 using UKHO.ExchangeSetService.Common.Storage.V2;
 using UKHO.Logging.EventHubLogProvider;
-using ISalesCatalogueService = UKHO.ExchangeSetService.Common.Helpers.ISalesCatalogueService;
+using ISalesCatalogueService = UKHO.ExchangeSetService.Common.Helpers.SalesCatalogue.ISalesCatalogueService;
 using ISalesCatalogueServiceV2 = UKHO.ExchangeSetService.Common.Helpers.V2.ISalesCatalogueService;
-using SalesCatalogueService = UKHO.ExchangeSetService.Common.Helpers.SalesCatalogueService;
+using SalesCatalogueService = UKHO.ExchangeSetService.Common.Helpers.SalesCatalogue.SalesCatalogueService;
 using SalesCatalogueServiceV2 = UKHO.ExchangeSetService.Common.Helpers.V2.SalesCatalogueService;
 
 namespace UKHO.ExchangeSetService.API
