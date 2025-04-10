@@ -1,6 +1,3 @@
-// Licensed to the .NET Foundation under one or more agreements.
-// The .NET Foundation licenses this file to you under the MIT license.
-
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -34,14 +31,17 @@ using UKHO.ExchangeSetService.API.Validation.V2;
 using UKHO.ExchangeSetService.Common.Configuration;
 using UKHO.ExchangeSetService.Common.HealthCheck;
 using UKHO.ExchangeSetService.Common.Helpers;
+using UKHO.ExchangeSetService.Common.Helpers.Auth;
+using UKHO.ExchangeSetService.Common.Helpers.SalesCatalogue;
 using UKHO.ExchangeSetService.Common.Helpers.V2;
+using UKHO.ExchangeSetService.Common.Helpers.Zip;
 using UKHO.ExchangeSetService.Common.Logging;
 using UKHO.ExchangeSetService.Common.Storage;
 using UKHO.ExchangeSetService.Common.Storage.V2;
 using UKHO.Logging.EventHubLogProvider;
-using ISalesCatalogueService = UKHO.ExchangeSetService.Common.Helpers.ISalesCatalogueService;
+using ISalesCatalogueService = UKHO.ExchangeSetService.Common.Helpers.SalesCatalogue.ISalesCatalogueService;
 using ISalesCatalogueServiceV2 = UKHO.ExchangeSetService.Common.Helpers.V2.ISalesCatalogueService;
-using SalesCatalogueService = UKHO.ExchangeSetService.Common.Helpers.SalesCatalogueService;
+using SalesCatalogueService = UKHO.ExchangeSetService.Common.Helpers.SalesCatalogue.SalesCatalogueService;
 using SalesCatalogueServiceV2 = UKHO.ExchangeSetService.Common.Helpers.V2.SalesCatalogueService;
 
 namespace UKHO.ExchangeSetService.API
@@ -59,7 +59,7 @@ namespace UKHO.ExchangeSetService.API
             if (!string.IsNullOrWhiteSpace(kvServiceUri))
             {
                 builder.Configuration.AddAzureKeyVault(new Uri(kvServiceUri),
-                    new DefaultAzureCredential(new DefaultAzureCredentialOptions { ManagedIdentityClientId = builder.Configuration["ESSManagedIdentity:ClientId"] }));
+                    new DefaultAzureCredential( new DefaultAzureCredentialOptions { ManagedIdentityClientId = builder.Configuration["ESSManagedIdentity:ClientId"] }));
             }
 
 #if DEBUG
@@ -179,9 +179,13 @@ namespace UKHO.ExchangeSetService.API
             }).AddHeaderPropagation().AddPolicyHandler((services, request) =>
                     CommonHelper.GetRetryPolicy(services.GetService<ILogger<IFileShareServiceClient>>(), "File Share", EventIds.RetryHttpClientFSSRequest, retryCount, sleepDuration));
 
-
-            builder.Services.AddScoped<IFileSystemHelper, FileSystemHelper>();
             builder.Services.AddScoped<IFileShareService, FileShareService>();
+            builder.Services.AddScoped<IFileSystemHelper, FileSystemHelper>();
+            builder.Services.AddScoped<IFileShareBatchService, FileShareBatchService>();
+            builder.Services.AddScoped<IFileShareUploadService, FileShareUploadService>();
+            builder.Services.AddScoped<IFileShareDownloadService, FileShareDownloadService>();
+            builder.Services.AddScoped<IFileShareSearchService, FileShareSearchService>();
+            builder.Services.AddScoped<IZip, FileZip>();
             builder.Services.AddScoped<IProductDataService, ProductDataService>();
             builder.Services.AddScoped<IMonitorHelper, MonitorHelper>();
             builder.Services.AddScoped<IProductIdentifierValidator, ProductIdentifierValidator>();
@@ -206,6 +210,7 @@ namespace UKHO.ExchangeSetService.API
             builder.Services.AddScoped<IUpdatesSinceValidator, UpdatesSinceValidator>();
             builder.Services.AddScoped<IProductVersionsValidator, ProductVersionsValidator>();
             builder.Services.AddScoped<ISalesCatalogueClient, SalesCatalogueClient>();
+
 
             builder.Services.AddHealthChecks()
                 .AddCheck<FileShareServiceHealthCheck>("FileShareServiceHealthCheck")

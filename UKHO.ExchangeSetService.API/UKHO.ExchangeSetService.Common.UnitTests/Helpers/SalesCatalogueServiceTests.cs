@@ -1,24 +1,25 @@
-﻿using FakeItEasy;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
-using NUnit.Framework;
-using System;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Net;
 using System.Net.Http;
 using System.Text;
-using System.Threading.Tasks;
-using UKHO.ExchangeSetService.Common.Configuration;
-using UKHO.ExchangeSetService.Common.Helpers;
-using System.Collections.Generic;
-using UKHO.ExchangeSetService.Common.Models.SalesCatalogue;
-using Newtonsoft.Json;
-using UKHO.ExchangeSetService.Common.Models.Request;
 using System.Threading;
+using System.Threading.Tasks;
+using FakeItEasy;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+using Newtonsoft.Json;
+using NUnit.Framework;
+using UKHO.ExchangeSetService.Common.Configuration;
+using UKHO.ExchangeSetService.Common.Helpers.Auth;
+using UKHO.ExchangeSetService.Common.Helpers.SalesCatalogue;
+using UKHO.ExchangeSetService.Common.Models.Request;
+using UKHO.ExchangeSetService.Common.Models.SalesCatalogue;
 
 namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
 {
-    public class SalesCatalougeServiceTests
+    public class SalesCatalogueServiceTests
     {
         private ILogger<SalesCatalogueService> fakeLogger;
         private IOptions<SalesCatalogueConfiguration> fakeSaleCatalogueConfig;
