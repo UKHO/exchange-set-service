@@ -1,6 +1,6 @@
 ﻿using System.Threading.Tasks;
 
-namespace UKHO.ExchangeSetService.Common.Helpers
+namespace UKHO.ExchangeSetService.Common.Helpers.Auth
 {
     public interface IAuthScsTokenProvider
     {

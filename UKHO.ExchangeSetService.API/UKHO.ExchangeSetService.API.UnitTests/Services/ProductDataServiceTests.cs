@@ -14,6 +14,7 @@ using UKHO.ExchangeSetService.API.Services;
 using UKHO.ExchangeSetService.API.Validation;
 using UKHO.ExchangeSetService.Common.Configuration;
 using UKHO.ExchangeSetService.Common.Helpers;
+using UKHO.ExchangeSetService.Common.Helpers.SalesCatalogue;
 using UKHO.ExchangeSetService.Common.Logging;
 using UKHO.ExchangeSetService.Common.Models.AzureADB2C;
 using UKHO.ExchangeSetService.Common.Models.Enums;
@@ -75,8 +76,6 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
 
         private ExchangeSetResponse GetExchangeSetResponse()
         {
-            bool isAioEnabled = fakeAioConfiguration.Value.IsAioEnabled;
-
             LinkSetBatchStatusUri linkSetBatchStatusUri = new()
             {
                 Href = @"http://fss.ukho.gov.uk/batch/7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272/status"
@@ -98,7 +97,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
                 ExchangeSetBatchStatusUri = linkSetBatchStatusUri,
                 ExchangeSetBatchDetailsUri = linkSetBatchDetailsUri,
                 ExchangeSetFileUri = linkSetFileUri,
-                AioExchangeSetFileUri = isAioEnabled ? AiolinkSetFileUri : null
+                AioExchangeSetFileUri = AiolinkSetFileUri
             };
             List<RequestedProductsNotInExchangeSet> lstRequestedProductsNotInExchangeSet = new List<RequestedProductsNotInExchangeSet>()
             {
@@ -123,12 +122,9 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
                 RequestedProductCount = 3
             };
 
-            if (isAioEnabled)
-            {
                 exchangeSetResponse.RequestedAioProductCount = 1;
                 exchangeSetResponse.AioExchangeSetCellCount = 1;
                 exchangeSetResponse.RequestedAioProductsAlreadyUpToDateCount = 0;
-            }
 
             return exchangeSetResponse;
         }
@@ -777,7 +773,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
             A.CallTo(logger).Where(call => call.Method.Name == "Log"
             && call.GetArgument<LogLevel>(0) == LogLevel.Information
             && call.GetArgument<EventId>(1) == EventIds.AIOToggleIsOn.ToEventId()
-            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2).ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "AIO toggle is ON, additional aio cell details for AioCells:{AioCells} | BatchId:{BatchId} | _X-Correlation-ID : {CorrelationId}").MustHaveHappenedOnceExactly();
+            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2).ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "Aio cell details for AioCells:{AioCells} | BatchId:{BatchId} | _X-Correlation-ID : {CorrelationId}").MustHaveHappenedOnceExactly();
 
             A.CallTo(logger).Where(call => call.Method.Name == "Log"
             && call.GetArgument<LogLevel>(0) == LogLevel.Information
@@ -1432,7 +1428,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
             A.CallTo(logger).Where(call => call.Method.Name == "Log"
             && call.GetArgument<LogLevel>(0) == LogLevel.Information
             && call.GetArgument<EventId>(1) == EventIds.AIOToggleIsOn.ToEventId()
-            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2).ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "AIO toggle is ON, additional aio cell details for AioCells:{AioCells} | BatchId:{BatchId} | _X-Correlation-ID : {CorrelationId}").MustHaveHappenedOnceExactly();
+            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2).ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "Aio cell details for AioCells:{AioCells} | BatchId:{BatchId} | _X-Correlation-ID : {CorrelationId}").MustHaveHappenedOnceExactly();
         }
 
         #endregion ProductVersions
@@ -1855,7 +1851,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
             A.CallTo(logger).Where(call => call.Method.Name == "Log"
             && call.GetArgument<LogLevel>(0) == LogLevel.Information
             && call.GetArgument<EventId>(1) == EventIds.AIOToggleIsOn.ToEventId()
-            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2).ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "AIO toggle is ON, additional aio cell details for AioCells:{AioCells} | BatchId:{BatchId} | _X-Correlation-ID : {CorrelationId}").MustHaveHappenedOnceExactly();
+            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2).ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "Aio cell details for AioCells:{AioCells} | BatchId:{BatchId} | _X-Correlation-ID : {CorrelationId}").MustHaveHappenedOnceExactly();
         }
 
         [Test]

@@ -1,4 +1,9 @@
-﻿using Azure.Extensions.AspNetCore.Configuration.Secrets;
+﻿using System;
+using System.Diagnostics.CodeAnalysis;
+using System.Linq;
+using System.Reflection;
+using System.Threading.Tasks;
+using Azure.Extensions.AspNetCore.Configuration.Secrets;
 using Azure.Identity;
 using Azure.Security.KeyVault.Secrets;
 using Elastic.Apm;
@@ -11,11 +16,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Serilog;
 using Serilog.Events;
-using System;
-using System.Diagnostics.CodeAnalysis;
-using System.Linq;
-using System.Reflection;
-using System.Threading.Tasks;
 using UKHO.ExchangeSetService.CleanUpJob.Configuration;
 using UKHO.ExchangeSetService.CleanUpJob.Helpers;
 using UKHO.ExchangeSetService.CleanUpJob.Services;
@@ -101,10 +101,10 @@ namespace UKHO.ExchangeSetService.CleanUpJob
                                                     new DefaultAzureCredentialOptions { ManagedIdentityClientId = tempConfig["ESSManagedIdentity:ClientId"] }));
                 configBuilder.AddAzureKeyVault(secretClient, new KeyVaultSecretManager());
             }
-            #if DEBUG
+#if DEBUG
             //Add development overrides configuration
             configBuilder.AddJsonFile("appsettings.local.overrides.json", true, true);
-            #endif
+#endif
 
             //Add environment variables
             configBuilder.AddEnvironmentVariables();
@@ -119,19 +119,20 @@ namespace UKHO.ExchangeSetService.CleanUpJob
             {
                 loggingBuilder.AddConfiguration(configuration.GetSection("Logging"));
 
-                string instrumentationKey = configuration["APPINSIGHTS_INSTRUMENTATIONKEY"];
-                if (!string.IsNullOrEmpty(instrumentationKey))
+                var connectionString = configuration["APPLICATIONINSIGHTS_CONNECTION_STRING"];
+
+                if (!string.IsNullOrEmpty(connectionString))
                 {
-                    loggingBuilder.AddApplicationInsightsWebJobs(o => o.InstrumentationKey = instrumentationKey);
+                    loggingBuilder.AddApplicationInsightsWebJobs(o => o.ConnectionString = connectionString);
                 }
 
-                #if DEBUG
+#if DEBUG
                 loggingBuilder.AddSerilog(new LoggerConfiguration()
                                 .WriteTo.File("Logs/UKHO.ExchangeSetService.CleanUpLogs-.txt", rollingInterval: RollingInterval.Day, outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss} [{Level}] [{SourceContext}] {Message}{NewLine}{Exception}")
                                 .MinimumLevel.Information()
                                 .MinimumLevel.Override("UKHO", LogEventLevel.Debug)
                                 .CreateLogger(), dispose: true);
-                #endif
+#endif
 
                 loggingBuilder.AddConsole();
                 loggingBuilder.AddDebug();
@@ -159,7 +160,7 @@ namespace UKHO.ExchangeSetService.CleanUpJob
                     });
                 }
             });
-            
+
             serviceCollection.Configure<EssFulfilmentStorageConfiguration>(configuration.GetSection("EssFulfilmentStorageConfiguration"));
             serviceCollection.Configure<CleanUpConfiguration>(configuration.GetSection("CleanUpConfiguration"));
 

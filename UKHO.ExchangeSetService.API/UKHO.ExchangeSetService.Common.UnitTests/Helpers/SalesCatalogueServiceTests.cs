@@ -9,7 +9,6 @@ using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 using UKHO.ExchangeSetService.Common.Configuration;
-using UKHO.ExchangeSetService.Common.Helpers;
 using System.Collections.Generic;
 using UKHO.ExchangeSetService.Common.Models.SalesCatalogue;
 using Newtonsoft.Json;
@@ -18,7 +17,7 @@ using System.Threading;
 
 namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
 {
-    public class SalesCatalougeServiceTests
+    public class SalesCatalogueServiceTests
     {
         private ILogger<SalesCatalogueService> fakeLogger;
         private IOptions<SalesCatalogueConfiguration> fakeSaleCatalogueConfig;

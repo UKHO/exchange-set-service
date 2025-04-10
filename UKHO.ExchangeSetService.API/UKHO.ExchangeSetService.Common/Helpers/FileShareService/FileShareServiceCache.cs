@@ -17,6 +17,7 @@ using UKHO.ExchangeSetService.Common.Models.AzureTableEntities;
 using UKHO.ExchangeSetService.Common.Models.FileShareService.Response;
 using UKHO.ExchangeSetService.Common.Models.SalesCatalogue;
 using UKHO.ExchangeSetService.Common.Storage;
+using UKHO.ExchangeSetService.Common.Helpers;
 
 namespace UKHO.ExchangeSetService.Common.Helpers
 {
@@ -29,7 +30,6 @@ namespace UKHO.ExchangeSetService.Common.Helpers
         private readonly IOptions<CacheConfiguration> fssCacheConfiguration;
         private readonly IFileSystemHelper fileSystemHelper;
         private readonly AioConfiguration aioConfiguration;
-        private const string CONTENT_TYPE = "application/json";
         private const int StringLength = 2;
         private const int responseFileSizeLimitInKb = 60;
 
@@ -65,9 +65,9 @@ namespace UKHO.ExchangeSetService.Common.Helpers
                     throw new OperationCanceledException();
                 }
 
-                
 
-                List<int?> updateNumbers = new List<int?>();
+
+                var updateNumbers = new List<int?>();
                 foreach (var itemUpdateNumber in item.UpdateNumbers)
                 {
                     updateNumbers.Clear();
@@ -93,7 +93,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
                         {
                             var internalBatchDetail = await CheckIfCacheProductsExistsInBlob(exchangeSetRootPath, queueMessage, item, updateNumbers, itemUpdateNumber, storageConnectionString, cacheInfo, businessUnit);
 
-                            int fileCount = internalBatchDetail.Files.Count();
+                            var fileCount = internalBatchDetail.Files.Count();
 
                             if (updateNumbers.Count == fileCount)
                             {
@@ -157,7 +157,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
                         var uriArray = fileItem.Split("/");
                         var fileName = uriArray[^1];
                         fileSystemHelper.CheckAndCreateFolder(downloadPath);
-                        string path = Path.Combine(downloadPath, fileName);
+                        var path = Path.Combine(downloadPath, fileName);
                         if (!fileSystemHelper.CheckFileExists(path))
                         {
                             var blobClient = await azureBlobStorageClient.GetBlobClient(fileName, storageConnectionString, internalBatchDetail.BatchId);
@@ -168,7 +168,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
                                 await fileSystemHelper.DownloadToFileAsync(blobClient, path);
                                 updateNumbers.Add(itemUpdateNumber.Value);
                             }
-                            catch (RequestFailedException requestFailedException) when(requestFailedException.ErrorCode == BlobErrorCode.BlobNotFound.ToString())
+                            catch (RequestFailedException requestFailedException) when (requestFailedException.ErrorCode == BlobErrorCode.BlobNotFound.ToString())
                             {
                                 logger.LogError(EventIds.GetBlobDetailsWithCacheContainerException.ToEventId(), "Error while download the file from blob for Product/CellName:{ProductName}, EditionNumber:{EditionNumber}, UpdateNumber:{UpdateNumber} and BusinessUnit:{BusinessUnit}. BatchId:{batchId} and _X-Correlation-ID:{CorrelationId} for blobName: {Name}, fileItem: {fileItem} with error: {Message}", item.ProductName, item.EditionNumber, itemUpdateNumber, businessUnit, queueMessage.BatchId, queueMessage.CorrelationId, blobClient.Name, fileItem, requestFailedException.Message);
                             }
@@ -188,20 +188,16 @@ namespace UKHO.ExchangeSetService.Common.Helpers
         private string GetFileDownloadPath(string exchangeSetRootPath, Products item, int? itemUpdateNumber)
         {
             string downloadPath;
-            if (aioConfiguration.IsAioEnabled)
-            {
-                List<string> aioCells = !string.IsNullOrEmpty(aioConfiguration.AioCells) ? new(aioConfiguration.AioCells.Split(',')) : new List<string>();
+            var aioCells = !string.IsNullOrEmpty(aioConfiguration.AioCells) ? [.. aioConfiguration.AioCells.Split(',')] : new List<string>();
 
-                if (!aioCells.Contains(item.ProductName))
-                    downloadPath = Path.Combine(exchangeSetRootPath, item.ProductName.Substring(0, StringLength), item.ProductName, item.EditionNumber.Value.ToString());
-                else
-                    downloadPath = Path.Combine(exchangeSetRootPath, item.ProductName.Substring(0, StringLength), item.ProductName, item.EditionNumber.Value.ToString(), itemUpdateNumber.Value.ToString());
-            }
-            else
+            if (!aioCells.Contains(item.ProductName))
             {
                 downloadPath = Path.Combine(exchangeSetRootPath, item.ProductName.Substring(0, StringLength), item.ProductName, item.EditionNumber.Value.ToString());
             }
-
+            else
+            {
+                downloadPath = Path.Combine(exchangeSetRootPath, item.ProductName.Substring(0, StringLength), item.ProductName, item.EditionNumber.Value.ToString(), itemUpdateNumber.Value.ToString());
+            }
             return downloadPath;
         }
 
@@ -218,14 +214,14 @@ namespace UKHO.ExchangeSetService.Common.Helpers
 
         public async Task InsertOrMergeFssCacheDetail(FssSearchResponseCache fssSearchResponseCache)
         {
-            int responseSizeInKb = fssSearchResponseCache.Response.Length / 1024;
+            var responseSizeInKb = fssSearchResponseCache.Response.Length / 1024;
 
             //If content size is more that responseFileSizeLimitInKb
             //then store content into json file to avoid azure table storage exception for column limit
             if (responseSizeInKb > responseFileSizeLimitInKb)
             {
                 // convert string to stream
-                byte[] byteArray = Encoding.ASCII.GetBytes(fssSearchResponseCache.Response);
+                var byteArray = Encoding.ASCII.GetBytes(fssSearchResponseCache.Response);
                 MemoryStream stream = new(byteArray);
 
                 await CopyFileToBlob(stream, $"{fssSearchResponseCache.BatchId}.json", fssSearchResponseCache.BatchId);
@@ -241,7 +237,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             var storageConnectionString = azureStorageService.GetStorageAccountConnectionString(fssCacheConfiguration.Value.CacheStorageAccountName, fssCacheConfiguration.Value.CacheStorageAccountKey);
             var blobClient = await azureBlobStorageClient.GetBlobClient(fileName, storageConnectionString, containerName);
 
-            MemoryStream memoryStream = new MemoryStream();
+            var memoryStream = new MemoryStream();
             if (await blobClient.ExistsAsync())
             {
                 await blobClient.DownloadToAsync(memoryStream);
