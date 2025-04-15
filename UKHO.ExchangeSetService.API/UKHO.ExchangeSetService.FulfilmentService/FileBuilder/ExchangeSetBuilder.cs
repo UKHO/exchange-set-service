@@ -30,7 +30,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.FileCreation
         IFulfilmentFileShareService fulfilmentFileShareService,
         IFulfilmentAncillaryFiles fulfilmentAncillaryFiles,
         IFileBuilder fileBuilder,
-        IDownloads download) : IExchangeSetBuilder
+        IDownloader download) : IExchangeSetBuilder
     {
 
         #region AIO Exchanges Set

@@ -14,12 +14,12 @@ using UKHO.ExchangeSetService.FulfilmentService.Services;
 
 namespace UKHO.ExchangeSetService.FulfilmentService.Downloads
 {
-    public class Downloads(
+    public class Downloader(
         ILogger<FulfilmentDataService> logger,
         IMonitorHelper monitorHelper,
         IFileSystemHelper fileSystemHelper,
         IFulfilmentFileShareService fulfilmentFileShareService,
-        IOptions<FileShareServiceConfiguration> fileShareServiceConfig) : IDownloads
+        IOptions<FileShareServiceConfiguration> fileShareServiceConfig) : IDownloader
     {
         public async Task<bool> DownloadReadMeFileAsync(string batchId, string exchangeSetRootPath, string correlationId)
         {

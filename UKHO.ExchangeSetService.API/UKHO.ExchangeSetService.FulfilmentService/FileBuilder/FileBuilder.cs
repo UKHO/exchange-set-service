@@ -20,7 +20,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.FileCreation
         ILogger<FulfilmentDataService> logger,
         IMonitorHelper monitorHelper,
         IFileSystemHelper fileSystemHelper,
-        IDownloads download,
+        IDownloader download,
         IFulfilmentAncillaryFiles fulfilmentAncillaryFiles,
         IOptions<FileShareServiceConfiguration> fileShareServiceConfig) : IFileBuilder
     {

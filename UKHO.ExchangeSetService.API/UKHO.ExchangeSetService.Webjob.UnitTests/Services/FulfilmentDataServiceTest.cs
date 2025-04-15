@@ -50,7 +50,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
         private const string EncExchangeSet = "V01X01";
         private const string AioExchangeSet = "AIO";
         private IExchangeSetBuilder exchangeSetBuilder;
-        private IDownloads download;
+        private IDownloader download;
 
         [SetUp]
         public void Setup()
@@ -97,7 +97,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             fakeFileSystemHelper = A.Fake<IFileSystemHelper>();
             fakeproductDataValidator = A.Fake<IProductDataValidator>();
             fakeAioConfiguration = A.Fake<IOptions<AioConfiguration>>();
-            download = new Downloads(fakeLogger, fakeMonitorHelper, fakeFileSystemHelper, fakeQueryFssService, fakeFileShareServiceConfig);
+            download = new Downloader(fakeLogger, fakeMonitorHelper, fakeFileSystemHelper, fakeQueryFssService, fakeFileShareServiceConfig);
             IFileBuilder file = new FileBuilder(fakeLogger, fakeMonitorHelper, fakeFileSystemHelper, download, fakeFulfilmentAncillaryFiles, fakeFileShareServiceConfig);
 
             exchangeSetBuilder = new ExchangeSetBuilder(fakeLogger, fakeMonitorHelper, fakeFileSystemHelper, fakeproductDataValidator, fakeFileShareServiceConfig, fakeAioConfiguration, fakeQueryFssService, fakeFulfilmentAncillaryFiles, file, download);

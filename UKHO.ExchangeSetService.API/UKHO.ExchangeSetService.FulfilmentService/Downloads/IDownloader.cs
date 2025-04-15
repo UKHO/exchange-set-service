@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace UKHO.ExchangeSetService.FulfilmentService.Downloads
 {
-    public interface IDownloads
+    public interface IDownloader
     {
         Task DownloadInfoFolderFiles(string batchId, string exchangeSetInfoPath, string correlationId);
         Task DownloadAdcFolderFiles(string batchId, string exchangeSetAdcPath, string correlationId);

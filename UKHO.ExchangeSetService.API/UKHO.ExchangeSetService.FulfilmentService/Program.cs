@@ -28,6 +28,8 @@ using UKHO.ExchangeSetService.Common.Helpers.Zip;
 using UKHO.ExchangeSetService.Common.Logging;
 using UKHO.ExchangeSetService.Common.Storage;
 using UKHO.ExchangeSetService.FulfilmentService.Configuration;
+using UKHO.ExchangeSetService.FulfilmentService.Downloads;
+using UKHO.ExchangeSetService.FulfilmentService.FileCreation;
 using UKHO.ExchangeSetService.FulfilmentService.Filters;
 using UKHO.ExchangeSetService.FulfilmentService.Services;
 using UKHO.ExchangeSetService.FulfilmentService.Validation;
@@ -154,6 +156,9 @@ namespace UKHO.ExchangeSetService.FulfilmentService
                  services.AddScoped<IAzureTableStorageClient, AzureTableStorageClient>();
                  services.AddScoped<IFileShareServiceCache, FileShareServiceCache>();
                  services.AddScoped<IProductDataValidator, ProductDataValidator>();
+                 services.AddSingleton<IFileBuilder,  FileBuilder>();
+                 services.AddSingleton<IDownloader, Downloader>();
+                 services.AddSingleton<IExchangeSetBuilder, ExchangeSetBuilder>();
 
                  var retryCount = Convert.ToInt32(ConfigurationBuilder["RetryConfiguration:RetryCount"]);
                  var sleepDuration = Convert.ToDouble(ConfigurationBuilder["RetryConfiguration:SleepDuration"]);
