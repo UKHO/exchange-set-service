@@ -156,9 +156,9 @@ namespace UKHO.ExchangeSetService.FulfilmentService
                  services.AddScoped<IAzureTableStorageClient, AzureTableStorageClient>();
                  services.AddScoped<IFileShareServiceCache, FileShareServiceCache>();
                  services.AddScoped<IProductDataValidator, ProductDataValidator>();
-                 services.AddSingleton<IFileBuilder,  FileBuilder>();
-                 services.AddSingleton<IDownloader, Downloader>();
-                 services.AddSingleton<IExchangeSetBuilder, ExchangeSetBuilder>();
+                 services.AddScoped<IFileBuilder,  FileBuilder>();
+                 services.AddScoped<IDownloader, Downloader>();
+                 services.AddScoped<IExchangeSetBuilder, ExchangeSetBuilder>();
 
                  var retryCount = Convert.ToInt32(ConfigurationBuilder["RetryConfiguration:RetryCount"]);
                  var sleepDuration = Convert.ToDouble(ConfigurationBuilder["RetryConfiguration:SleepDuration"]);
