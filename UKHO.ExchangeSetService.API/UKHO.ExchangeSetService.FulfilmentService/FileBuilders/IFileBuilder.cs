@@ -4,7 +4,7 @@ using System;
 using UKHO.ExchangeSetService.Common.Models.FileShareService.Response;
 using UKHO.ExchangeSetService.Common.Models.SalesCatalogue;
 
-namespace UKHO.ExchangeSetService.FulfilmentService.FileBuilder
+namespace UKHO.ExchangeSetService.FulfilmentService.FileBuilders
 {
     public interface IFileBuilder
     {

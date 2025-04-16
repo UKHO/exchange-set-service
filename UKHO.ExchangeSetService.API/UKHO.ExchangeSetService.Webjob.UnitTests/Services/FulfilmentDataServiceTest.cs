@@ -19,7 +19,7 @@ using UKHO.ExchangeSetService.Common.Models.Response;
 using UKHO.ExchangeSetService.Common.Models.SalesCatalogue;
 using UKHO.ExchangeSetService.Common.Storage;
 using UKHO.ExchangeSetService.FulfilmentService.Downloads;
-using UKHO.ExchangeSetService.FulfilmentService.FileCreation;
+using UKHO.ExchangeSetService.FulfilmentService.FileBuilders;
 using UKHO.ExchangeSetService.FulfilmentService.Services;
 using UKHO.ExchangeSetService.FulfilmentService.Validation;
 using Attribute = UKHO.ExchangeSetService.Common.Models.FileShareService.Response.Attribute;
