@@ -14,7 +14,7 @@ using UKHO.ExchangeSetService.Common.Models.SalesCatalogue;
 using UKHO.ExchangeSetService.FulfilmentService.Downloads;
 using UKHO.ExchangeSetService.FulfilmentService.Services;
 
-namespace UKHO.ExchangeSetService.FulfilmentService.FileCreation
+namespace UKHO.ExchangeSetService.FulfilmentService.FileBuilder
 {
     public class FileBuilder(
         ILogger<FulfilmentDataService> logger,

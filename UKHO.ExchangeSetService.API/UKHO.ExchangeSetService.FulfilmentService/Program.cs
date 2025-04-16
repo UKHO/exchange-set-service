@@ -29,7 +29,7 @@ using UKHO.ExchangeSetService.Common.Logging;
 using UKHO.ExchangeSetService.Common.Storage;
 using UKHO.ExchangeSetService.FulfilmentService.Configuration;
 using UKHO.ExchangeSetService.FulfilmentService.Downloads;
-using UKHO.ExchangeSetService.FulfilmentService.FileCreation;
+using UKHO.ExchangeSetService.FulfilmentService.FileBuilder;
 using UKHO.ExchangeSetService.FulfilmentService.Filters;
 using UKHO.ExchangeSetService.FulfilmentService.Services;
 using UKHO.ExchangeSetService.FulfilmentService.Validation;

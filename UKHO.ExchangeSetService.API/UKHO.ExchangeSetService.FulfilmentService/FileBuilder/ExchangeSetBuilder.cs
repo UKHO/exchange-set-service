@@ -19,7 +19,7 @@ using UKHO.ExchangeSetService.FulfilmentService.Downloads;
 using UKHO.ExchangeSetService.FulfilmentService.Services;
 using UKHO.ExchangeSetService.FulfilmentService.Validation;
 
-namespace UKHO.ExchangeSetService.FulfilmentService.FileCreation
+namespace UKHO.ExchangeSetService.FulfilmentService.FileBuilder
 {
     public class ExchangeSetBuilder(ILogger<FulfilmentDataService> logger,
         IMonitorHelper monitorHelper,

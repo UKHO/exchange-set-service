@@ -13,7 +13,7 @@ using UKHO.ExchangeSetService.Common.Helpers;
 using UKHO.ExchangeSetService.Common.Logging;
 using UKHO.ExchangeSetService.Common.Models.Response;
 using UKHO.ExchangeSetService.Common.Models.SalesCatalogue;
-using UKHO.ExchangeSetService.FulfilmentService.FileCreation;
+using UKHO.ExchangeSetService.FulfilmentService.FileBuilder;
 
 namespace UKHO.ExchangeSetService.FulfilmentService.Services
 {
