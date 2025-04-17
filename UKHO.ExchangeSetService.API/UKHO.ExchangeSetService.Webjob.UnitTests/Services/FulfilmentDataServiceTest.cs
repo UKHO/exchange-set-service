@@ -18,6 +18,8 @@ using UKHO.ExchangeSetService.Common.Models.FileShareService.Response;
 using UKHO.ExchangeSetService.Common.Models.Response;
 using UKHO.ExchangeSetService.Common.Models.SalesCatalogue;
 using UKHO.ExchangeSetService.Common.Storage;
+using UKHO.ExchangeSetService.FulfilmentService.Downloads;
+using UKHO.ExchangeSetService.FulfilmentService.FileBuilders;
 using UKHO.ExchangeSetService.FulfilmentService.Services;
 using UKHO.ExchangeSetService.FulfilmentService.Validation;
 using Attribute = UKHO.ExchangeSetService.Common.Models.FileShareService.Response.Attribute;
@@ -47,6 +49,8 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
         private IOptions<AioConfiguration> fakeAioConfiguration;
         private const string EncExchangeSet = "V01X01";
         private const string AioExchangeSet = "AIO";
+        private IExchangeSetBuilder exchangeSetBuilder;
+        private IDownloader download;
 
         [SetUp]
         public void Setup()
@@ -93,8 +97,11 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             fakeFileSystemHelper = A.Fake<IFileSystemHelper>();
             fakeproductDataValidator = A.Fake<IProductDataValidator>();
             fakeAioConfiguration = A.Fake<IOptions<AioConfiguration>>();
+            download = new Downloader(fakeLogger, fakeMonitorHelper, fakeFileSystemHelper, fakeQueryFssService, fakeFileShareServiceConfig);
+            IFileBuilder file = new FileBuilder(fakeLogger, fakeMonitorHelper, fakeFileSystemHelper, download, fakeFulfilmentAncillaryFiles, fakeFileShareServiceConfig);
 
-            fulfilmentDataService = new FulfilmentDataService(fakeAzureBlobStorageService, fakeQueryFssService, fakeLogger, fakeFileShareServiceConfig, fakeConfiguration, fakeFulfilmentAncillaryFiles, fakeFulfilmentSalesCatalogueService, fakeFulfilmentCallBackService, fakeMonitorHelper, fakeFileSystemHelper, fakeproductDataValidator, fakeAioConfiguration);
+            exchangeSetBuilder = new ExchangeSetBuilder(fakeLogger, fakeMonitorHelper, fakeFileSystemHelper, fakeproductDataValidator, fakeFileShareServiceConfig, fakeAioConfiguration, fakeQueryFssService, fakeFulfilmentAncillaryFiles, file, download);
+            fulfilmentDataService = new FulfilmentDataService(fakeAzureBlobStorageService, fakeQueryFssService, fakeLogger, fakeFileShareServiceConfig, fakeConfiguration, fakeFulfilmentSalesCatalogueService, fakeFulfilmentCallBackService, fakeMonitorHelper, fakeAioConfiguration, fakeFileSystemHelper, exchangeSetBuilder);
         }
 
         private static List<BatchFile> GetFiles()
@@ -424,7 +431,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             var cancellationToken = cancellationTokenSource.Token;
             A.CallTo(() => fakeAzureBlobStorageService.DownloadSalesCatalogueResponse(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(salesCatalogueProductResponse);
 
-            Assert.ThrowsAsync<TaskCanceledException>(async () => await fulfilmentDataService.QueryFileShareServiceFiles(scsResponseQueueMessage, productList, null, cancellationTokenSource, cancellationToken, businessUnit));
+            Assert.ThrowsAsync<TaskCanceledException>(async () => await exchangeSetBuilder.QueryFileShareServiceFiles(scsResponseQueueMessage, productList, null, cancellationTokenSource, cancellationToken, businessUnit));
         }
 
         [Test]
@@ -502,7 +509,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             const string exchangeSetRootPath = @"C:\\HOME";
             A.CallTo(() => fakeQueryFssService.DownloadReadMeFileFromCacheAsync(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(true);
 
-            var result = await fulfilmentDataService.DownloadReadMeFileAsync(batchId, exchangeSetRootPath, correlationId);
+            var result = await download.DownloadReadMeFileAsync(batchId, exchangeSetRootPath, correlationId);
 
             A.CallTo(fakeLogger).Where(call => call.Method.Name == "Log"
             && call.GetArgument<LogLevel>(0) == LogLevel.Information
@@ -533,7 +540,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             A.CallTo(() => fakeQueryFssService.SearchReadMeFilePath(A<string>.Ignored, A<string>.Ignored)).Returns(readmeFilePath);
             A.CallTo(() => fakeQueryFssService.DownloadReadMeFileFromFssAsync(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(true);
 
-            var result = await fulfilmentDataService.DownloadReadMeFileAsync(batchId, exchangeSetRootPath, correlationId);
+            var result = await download.DownloadReadMeFileAsync(batchId, exchangeSetRootPath, correlationId);
 
             A.CallTo(fakeLogger).Where(call => call.Method.Name == "Log"
             && call.GetArgument<LogLevel>(0) == LogLevel.Information
@@ -564,7 +571,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             A.CallTo(() => fakeQueryFssService.SearchReadMeFilePath(A<string>.Ignored, A<string>.Ignored)).Returns(readmeFilePath);
             A.CallTo(() => fakeQueryFssService.DownloadReadMeFileFromFssAsync(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(false);
 
-            var result = await fulfilmentDataService.DownloadReadMeFileAsync(batchId, exchangeSetRootPath, correlationId);
+            var result = await download.DownloadReadMeFileAsync(batchId, exchangeSetRootPath, correlationId);
 
             A.CallTo(fakeLogger).Where(call => call.Method.Name == "Log"
             && call.GetArgument<LogLevel>(0) == LogLevel.Information
@@ -600,7 +607,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             A.CallTo(() => fakeQueryFssService.SearchReadMeFilePath(A<string>.Ignored, A<string>.Ignored)).Returns(readmeFilePath);
             A.CallTo(() => fakeQueryFssService.DownloadReadMeFileFromFssAsync(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Throws<ApplicationException>().Once();
 
-            var result = await fulfilmentDataService.DownloadReadMeFileAsync(batchId, exchangeSetRootPath, correlationId);
+            var result = await download.DownloadReadMeFileAsync(batchId, exchangeSetRootPath, correlationId);
 
             A.CallTo(fakeLogger).Where(call => call.Method.Name == "Log"
             && call.GetArgument<LogLevel>(0) == LogLevel.Information
