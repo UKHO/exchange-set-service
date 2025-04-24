@@ -82,7 +82,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.FileBuilders
                 monitorHelper.MonitorRequest("Query and Download ENC Files Task", queryAndDownloadEncFilesFromFileShareServiceTaskStartedAt, queryAndDownloadEncFilesFromFileShareServiceTaskCompletedAt, message.CorrelationId, fileShareServiceSearchQueryCount, downloadedENCFileCount, null, message.BatchId);
             }
 
-            return await fileBuilder.CreateAncillaryFilesForAio(message.BatchId, aioExchangeSetPath, message.CorrelationId, salesCatalogueEssDataResponse, message.ScsRequestDateTime, salesCatalogueProductResponse, listFulfilmentAioData);
+            return await fileBuilder.CreateAncillaryFilesForAio(new BatchInfo(message.BatchId, aioExchangeSetPath, message.CorrelationId), salesCatalogueEssDataResponse, message.ScsRequestDateTime, salesCatalogueProductResponse, listFulfilmentAioData);
         }
 
         #endregion
@@ -135,7 +135,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.FileBuilders
 
             bool encryption = string.Equals(businessUnit, fileShareServiceConfig.Value.S63BusinessUnit, StringComparison.OrdinalIgnoreCase);
 
-            await fileBuilder.CreateAncillaryFiles(message.BatchId, exchangeSetPath, message.CorrelationId, listFulfilmentData, response, message.ScsRequestDateTime, salesCatalogueEssDataResponse, encryption);
+            await fileBuilder.CreateAncillaryFiles(new BatchInfo(message.BatchId, exchangeSetPath, message.CorrelationId), listFulfilmentData, response, message.ScsRequestDateTime, salesCatalogueEssDataResponse, encryption);
         }
 
         public async Task<bool> CreateStandardLargeMediaExchangeSet(SalesCatalogueServiceResponseQueueMessage message, string homeDirectoryPath, string currentUtcDate, LargeExchangeSetDataResponse largeExchangeSetDataResponse, string largeExchangeSetFolderName, string largeMediaExchangeSetFilePath)
@@ -156,14 +156,19 @@ namespace UKHO.ExchangeSetService.FulfilmentService.FileBuilders
             {
                 string dvdNumber = rootDirectoryFolder.ToString()[^4..].Remove(1, 3);
 
+                BatchInfo batchInfoRootDirectory = new BatchInfo(message.BatchId, rootDirectoryFolder.ToString(), message.CorrelationId);
+                BatchInfo batchInfolargeMediaExchangeSetFilePath = new BatchInfo(message.BatchId, largeMediaExchangeSetFilePath, message.CorrelationId);
+                BatchInfo batchInfoInfoFolder = new BatchInfo(message.BatchId, Path.Combine(rootDirectoryFolder.ToString(), fileShareServiceConfig.Value.Info), message.CorrelationId);
+                BatchInfo batchInfoInfoAdcFolder = new BatchInfo(message.BatchId, Path.Combine(rootDirectoryFolder.ToString(), fileShareServiceConfig.Value.Info), message.CorrelationId);
+
                 ParallelCreateFolderTasks.Add(CreatePosFolderStructure(rootDirectoryFolder.ToString()));
-                ParallelCreateFolderTasks.Add(fulfilmentAncillaryFiles.CreateMediaFile(message.BatchId, rootDirectoryFolder.ToString(), message.CorrelationId, dvdNumber.ToString()));
-                ParallelCreateFolderTasks.Add(download.DownloadLargeMediaReadMeFile(message.BatchId, rootDirectoryFolder.ToString(), message.CorrelationId));
-                ParallelCreateFolderTasks.Add(fileBuilder.CreateLargeMediaSerialEncFile(message.BatchId, largeMediaExchangeSetFilePath, string.Format(largeExchangeSetFolderName, dvdNumber), message.CorrelationId));
-                ParallelCreateFolderTasks.Add(fileBuilder.CreateProductFile(message.BatchId, Path.Combine(rootDirectoryFolder.ToString(), fileShareServiceConfig.Value.Info), message.CorrelationId, response.SalesCatalogueDataResponse, message.ScsRequestDateTime, true)); //encryption=true since we will only request S63 large media exchange set.
-                ParallelCreateFolderTasks.Add(download.DownloadInfoFolderFiles(message.BatchId, Path.Combine(rootDirectoryFolder.ToString(), fileShareServiceConfig.Value.Info), message.CorrelationId));
-                ParallelCreateFolderTasks.Add(download.DownloadAdcFolderFiles(message.BatchId, Path.Combine(rootDirectoryFolder.ToString(), fileShareServiceConfig.Value.Info, fileShareServiceConfig.Value.Adc), message.CorrelationId));
-                ParallelCreateFolderTasks.Add(fulfilmentAncillaryFiles.CreateEncUpdateCsv(response.SalesCatalogueDataResponse, Path.Combine(rootDirectoryFolder.ToString(), fileShareServiceConfig.Value.Info), message.BatchId, message.CorrelationId));
+                ParallelCreateFolderTasks.Add(fulfilmentAncillaryFiles.CreateMediaFile(batchInfoRootDirectory, dvdNumber.ToString()));
+                ParallelCreateFolderTasks.Add(download.DownloadLargeMediaReadMeFile(batchInfoRootDirectory));
+                ParallelCreateFolderTasks.Add(fileBuilder.CreateLargeMediaSerialEncFile(batchInfolargeMediaExchangeSetFilePath, string.Format(largeExchangeSetFolderName, dvdNumber)));
+                ParallelCreateFolderTasks.Add(fileBuilder.CreateProductFile(batchInfoInfoFolder, response.SalesCatalogueDataResponse, message.ScsRequestDateTime, true)); //encryption=true since we will only request S63 large media exchange set.
+                ParallelCreateFolderTasks.Add(download.DownloadInfoFolderFiles(batchInfoInfoFolder));
+                ParallelCreateFolderTasks.Add(download.DownloadAdcFolderFiles(batchInfoInfoAdcFolder));
+                ParallelCreateFolderTasks.Add(fulfilmentAncillaryFiles.CreateEncUpdateCsv(batchInfoInfoFolder, response.SalesCatalogueDataResponse));
             });
 
             await Task.WhenAll(ParallelCreateFolderTasks);
@@ -172,7 +177,8 @@ namespace UKHO.ExchangeSetService.FulfilmentService.FileBuilders
             var ParallelCreateFolderTaskForCatlogFile = new List<Task<bool>> { };
             Parallel.ForEach(rootDirectories, rootDirectoryFolder =>
             {
-                ParallelCreateFolderTaskForCatlogFile.Add(fileBuilder.CreateLargeMediaExchangesetCatalogFile(message.BatchId, rootDirectoryFolder.ToString(), message.CorrelationId, response.FulfilmentDataResponses, response.SalesCatalogueDataResponse, response.SalesCatalogueProductResponse));
+                BatchInfo batchInfoRootDirectory = new BatchInfo(message.BatchId, rootDirectoryFolder.ToString(), message.CorrelationId);
+                ParallelCreateFolderTaskForCatlogFile.Add(fileBuilder.CreateLargeMediaExchangesetCatalogFile(batchInfoRootDirectory, response.FulfilmentDataResponses, response.SalesCatalogueDataResponse, response.SalesCatalogueProductResponse));
             });
 
             await Task.WhenAll(ParallelCreateFolderTaskForCatlogFile);

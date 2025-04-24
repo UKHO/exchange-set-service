@@ -14,6 +14,7 @@ using UKHO.ExchangeSetService.Common.Helpers;
 using UKHO.ExchangeSetService.Common.Logging;
 using UKHO.ExchangeSetService.Common.Models.FileShareService.Response;
 using UKHO.ExchangeSetService.Common.Models.SalesCatalogue;
+using UKHO.ExchangeSetService.FulfilmentService;
 using UKHO.ExchangeSetService.FulfilmentService.Services;
 using Attribute = UKHO.ExchangeSetService.Common.Models.FileShareService.Response.Attribute;
 
@@ -208,7 +209,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             A.CallTo(() => fakeFileSystemHelper.CheckFileExists(A<string>.Ignored)).Returns(false);
 
             Assert.ThrowsAsync(Is.TypeOf<FulfilmentException>().And.Message.EqualTo(FulfilmentExceptionMessage),
-                  async delegate { await fulfilmentAncillaryFiles.CreateSerialEncFile(FakeBatchId, FakeExchangeSetInfoPath, null); });
+                  async delegate { await fulfilmentAncillaryFiles.CreateSerialEncFile(new BatchInfo(FakeBatchId, FakeExchangeSetInfoPath, null)); });
         }
 
         [Test]
@@ -219,7 +220,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             A.CallTo(() => fakeFileSystemHelper.CreateFileContent(A<string>.Ignored, A<string>.Ignored)).Returns(true);
             A.CallTo(() => fakeFileSystemHelper.CheckFileExists(A<string>.Ignored)).Returns(true);
 
-            var response = await fulfilmentAncillaryFiles.CreateSerialEncFile(FakeBatchId, fakeExchangeSetPath, null);
+            var response = await fulfilmentAncillaryFiles.CreateSerialEncFile(new BatchInfo(FakeBatchId, fakeExchangeSetPath, null));
 
             Assert.That(response, Is.EqualTo(true));
         }
@@ -232,7 +233,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             var salesCatalogueDataResponse = GetSalesCatalogueDataBadrequestResponse();
 
             Assert.ThrowsAsync(Is.TypeOf<FulfilmentException>().And.Message.EqualTo(FulfilmentExceptionMessage),
-                  async delegate { await fulfilmentAncillaryFiles.CreateProductFile(FakeBatchId, FakeExchangeSetInfoPath, null, salesCatalogueDataResponse, fakeScsRequestDateTime); });
+                  async delegate { await fulfilmentAncillaryFiles.CreateProductFile(new BatchInfo(FakeBatchId, FakeExchangeSetInfoPath, null), salesCatalogueDataResponse, fakeScsRequestDateTime); });
 
             A.CallTo(fakeLogger).Where(call => call.Method.Name == "Log"
             && call.GetArgument<LogLevel>(0) == LogLevel.Error
@@ -247,7 +248,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             A.CallTo(() => fakeFileSystemHelper.CreateFileContent(A<string>.Ignored, A<string>.Ignored)).Returns(false);
 
             Assert.ThrowsAsync(Is.TypeOf<FulfilmentException>().And.Message.EqualTo(FulfilmentExceptionMessage),
-                  async delegate { await fulfilmentAncillaryFiles.CreateProductFile(FakeBatchId, FakeExchangeSetInfoPath, null, salesCatalogueDataResponse, fakeScsRequestDateTime); });
+                  async delegate { await fulfilmentAncillaryFiles.CreateProductFile(new BatchInfo(FakeBatchId, FakeExchangeSetInfoPath, null), salesCatalogueDataResponse, fakeScsRequestDateTime); });
 
             A.CallTo(fakeLogger).Where(call => call.Method.Name == "Log"
             && call.GetArgument<LogLevel>(0) == LogLevel.Error
@@ -268,7 +269,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             A.CallTo(() => fakeFileSystemHelper.CheckAndCreateFolder(A<string>.Ignored));
             A.CallTo(() => fakeFileSystemHelper.CreateFileContent(A<string>.Ignored, A<string>.Ignored)).Returns(true);
 
-            var response = await fulfilmentAncillaryFiles.CreateProductFile(FakeBatchId, FakeExchangeSetInfoPath, null, salesCatalogueDataResponse, fakeScsRequestDateTime, encryption);
+            var response = await fulfilmentAncillaryFiles.CreateProductFile(new BatchInfo(FakeBatchId, FakeExchangeSetInfoPath, null), salesCatalogueDataResponse, fakeScsRequestDateTime, encryption);
 
             Assert.Multiple(() =>
             {
@@ -298,7 +299,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             A.CallTo(() => fakeFileSystemHelper.CheckFileExists(A<string>.Ignored)).Returns(true);
             A.CallTo(() => fakeFileSystemHelper.ReadAllBytes(A<string>.Ignored)).Returns(byteContent);
 
-            var response = await fulfilmentAncillaryFiles.CreateCatalogFile(FakeBatchId, FakeExchangeSetRootPath, null, fulfilmentDataResponse, salesCatalogueDataResponse, salesCatalogueProductResponse);
+            var response = await fulfilmentAncillaryFiles.CreateCatalogFile(new BatchInfo(FakeBatchId, FakeExchangeSetRootPath, null), fulfilmentDataResponse, salesCatalogueDataResponse, salesCatalogueProductResponse);
 
             Assert.Multiple(() =>
             {
@@ -315,7 +316,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             A.CallTo(() => fakeFileSystemHelper.CheckFileExists(A<string>.Ignored)).Returns(false);
 
             Assert.ThrowsAsync(Is.TypeOf<FulfilmentException>().And.Message.EqualTo(FulfilmentExceptionMessage),
-                  async delegate { await fulfilmentAncillaryFiles.CreateCatalogFile(FakeBatchId, FakeExchangeSetRootPath, null, null, null, null); });
+                  async delegate { await fulfilmentAncillaryFiles.CreateCatalogFile(new BatchInfo(FakeBatchId, FakeExchangeSetRootPath, null), null, null, null); });
             Assert.Multiple(() =>
             {
                 Assert.That(fakeFileHelper.CheckAndCreateFolderIsCalled, Is.EqualTo(false));
@@ -334,7 +335,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             A.CallTo(() => fakeFileSystemHelper.CheckFileExists(A<string>.Ignored)).Returns(false);
 
             Assert.ThrowsAsync(Is.TypeOf<FulfilmentException>().And.Message.EqualTo(FulfilmentExceptionMessage),
-                  async delegate { await fulfilmentAncillaryFiles.CreateMediaFile(FakeBatchId, FakeExchangeSetInfoPath, null, "1"); });
+                  async delegate { await fulfilmentAncillaryFiles.CreateMediaFile(new BatchInfo(FakeBatchId, FakeExchangeSetInfoPath, null), "1"); });
         }
 
         [Test]
@@ -354,7 +355,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             A.CallTo(() => fakeFileSystemHelper.GetDirectoryInfo(A<string>.Ignored)).Returns(directoryInfos);
             A.CallTo(() => fakeFileSystemHelper.GetDirectories(A<string>.Ignored)).Returns(subdirectoryPaths);
 
-            var response = await fulfilmentAncillaryFiles.CreateMediaFile(FakeBatchId, FakeExchangeSetInfoPath, null, "1");
+            var response = await fulfilmentAncillaryFiles.CreateMediaFile(new BatchInfo(FakeBatchId, FakeExchangeSetInfoPath, null), "1");
 
             Assert.That(response, Is.EqualTo(true));
         }
@@ -369,7 +370,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             A.CallTo(() => fakeFileSystemHelper.CheckFileExists(A<string>.Ignored)).Returns(false);
 
             Assert.ThrowsAsync(Is.TypeOf<FulfilmentException>().And.Message.EqualTo(FulfilmentExceptionMessage),
-                  async delegate { await fulfilmentAncillaryFiles.CreateLargeMediaSerialEncFile(FakeBatchId, FakeExchangeSetInfoPath, null, "1", "2"); });
+                  async delegate { await fulfilmentAncillaryFiles.CreateLargeMediaSerialEncFile(new BatchInfo(FakeBatchId, FakeExchangeSetInfoPath, null), "1", "2"); });
         }
 
         [Test]
@@ -379,7 +380,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             A.CallTo(() => fakeFileSystemHelper.CreateFileContent(A<string>.Ignored, A<string>.Ignored)).Returns(true);
             A.CallTo(() => fakeFileSystemHelper.CheckFileExists(A<string>.Ignored)).Returns(true);
 
-            var response = await fulfilmentAncillaryFiles.CreateLargeMediaSerialEncFile(FakeBatchId, FakeExchangeSetInfoPath, null, "1", "2");
+            var response = await fulfilmentAncillaryFiles.CreateLargeMediaSerialEncFile(new BatchInfo(FakeBatchId, FakeExchangeSetInfoPath, null), "1", "2");
 
             Assert.That(response, Is.EqualTo(true));
         }
@@ -404,7 +405,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             A.CallTo(() => fakeFileSystemHelper.CheckFileExists(A<string>.Ignored)).Returns(true);
             A.CallTo(() => fakeFileSystemHelper.ReadAllBytes(A<string>.Ignored)).Returns(byteContent);
             A.CallTo(() => fakeFileSystemHelper.GetParent(A<string>.Ignored)).Returns(directoryInfos);
-            var response = await fulfilmentAncillaryFiles.CreateLargeExchangeSetCatalogFile(FakeBatchId, FakeExchangeSetRootPath, null, fulfilmentDataResponse, salesCatalogueDataResponse, salesCatalogueProductResponse);
+            var response = await fulfilmentAncillaryFiles.CreateLargeExchangeSetCatalogFile(new BatchInfo(FakeBatchId, FakeExchangeSetRootPath, null), fulfilmentDataResponse, salesCatalogueDataResponse, salesCatalogueProductResponse);
 
             Assert.Multiple(() =>
             {
@@ -428,7 +429,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             A.CallTo(() => fakeFileSystemHelper.CheckFileExists(A<string>.Ignored)).Returns(false);
 
             Assert.ThrowsAsync(Is.TypeOf<FulfilmentException>().And.Message.EqualTo(FulfilmentExceptionMessage),
-                  async delegate { await fulfilmentAncillaryFiles.CreateLargeExchangeSetCatalogFile(FakeBatchId, FakeExchangeSetRootPath, null, fulfilmentDataResponse, salesCatalogueDataResponse, salesCatalogueProductResponse); });
+                  async delegate { await fulfilmentAncillaryFiles.CreateLargeExchangeSetCatalogFile(new BatchInfo(FakeBatchId, FakeExchangeSetRootPath, null), fulfilmentDataResponse, salesCatalogueDataResponse, salesCatalogueProductResponse); });
             Assert.Multiple(() =>
             {
                 Assert.That(fakeFileHelper.CheckAndCreateFolderIsCalled, Is.EqualTo(false));
@@ -440,7 +441,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
         public void WhenNullCreateLargeExchangeSetCatalogFileRequest_ThenReturnFulfilmentException()
         {
             Assert.ThrowsAsync(Is.TypeOf<FulfilmentException>().And.Message.EqualTo(FulfilmentExceptionMessage),
-                  async delegate { await fulfilmentAncillaryFiles.CreateLargeExchangeSetCatalogFile(FakeBatchId, FakeExchangeSetRootPath, null, null, null, null); });
+                  async delegate { await fulfilmentAncillaryFiles.CreateLargeExchangeSetCatalogFile(new BatchInfo(FakeBatchId, FakeExchangeSetRootPath, null), null, null, null); });
             Assert.Multiple(() =>
             {
                 Assert.That(fakeFileHelper.CheckAndCreateFolderIsCalled, Is.EqualTo(false));
@@ -463,7 +464,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             A.CallTo(() => fakeFileSystemHelper.CheckFileExists(A<string>.Ignored)).Returns(false);
 
             Assert.ThrowsAsync(Is.TypeOf<FulfilmentException>().And.Message.EqualTo(FulfilmentExceptionMessage),
-                 async delegate { await fulfilmentAncillaryFiles.CreateEncUpdateCsv(GetSalesCatalogueDataResponse(), filePath, FakeBatchId, null); });
+                 async delegate { await fulfilmentAncillaryFiles.CreateEncUpdateCsv(new BatchInfo(FakeBatchId, filePath, null), GetSalesCatalogueDataResponse()); });
         }
 
         [Test]
@@ -476,7 +477,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             A.CallTo(() => fakeFileSystemHelper.WriteStream(filePath)).Returns(textWriter);
             A.CallTo(() => fakeFileSystemHelper.CheckFileExists(A<string>.Ignored)).Returns(true);
 
-            var response = await fulfilmentAncillaryFiles.CreateEncUpdateCsv(GetSalesCatalogueDataResponse(), filePath, FakeBatchId, null);
+            var response = await fulfilmentAncillaryFiles.CreateEncUpdateCsv(new BatchInfo(FakeBatchId, filePath, null), GetSalesCatalogueDataResponse());
 
             Assert.That(response, Is.True);
         }
@@ -493,7 +494,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             A.CallTo(() => fakeFileSystemHelper.CheckFileExists(A<string>.Ignored)).Returns(true).Once().Then.Returns(checkAioSerialFileCreated);
 
             Assert.ThrowsAsync(Is.TypeOf<FulfilmentException>().And.Message.EqualTo(FulfilmentExceptionMessage),
-                  async delegate { await fulfilmentAncillaryFiles.CreateSerialAioFile(FakeBatchId, FakeExchangeSetRootPath, FakeCorrelationId, GetSalesCatalogueDataResponse()); });
+                  async delegate { await fulfilmentAncillaryFiles.CreateSerialAioFile(new BatchInfo(FakeBatchId, FakeExchangeSetRootPath, FakeCorrelationId), GetSalesCatalogueDataResponse()); });
 
             A.CallTo(fakeLogger).Where(call => call.Method.Name == "Log"
             && call.GetArgument<LogLevel>(0) == LogLevel.Error
@@ -513,7 +514,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
 
             A.CallTo(() => fakeFileSystemHelper.CheckFileExists(A<string>.Ignored)).Returns(checkAioSerialFileCreated).Twice();
 
-            checkAioSerialFileCreated = await fulfilmentAncillaryFiles.CreateSerialAioFile(FakeBatchId, FakeExchangeSetRootPath, FakeCorrelationId, GetSalesCatalogueDataResponse());
+            checkAioSerialFileCreated = await fulfilmentAncillaryFiles.CreateSerialAioFile(new BatchInfo(FakeBatchId, FakeExchangeSetRootPath, FakeCorrelationId), GetSalesCatalogueDataResponse());
 
             Assert.That(checkAioSerialFileCreated, Is.True);
 
@@ -528,7 +529,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
 
             A.CallTo(() => fakeFileSystemHelper.CheckFileExists(A<string>.Ignored)).Returns(false).Once().Then.Returns(checkAioSerialFileCreated);
 
-            checkAioSerialFileCreated = await fulfilmentAncillaryFiles.CreateSerialAioFile(FakeBatchId, FakeExchangeSetRootPath, FakeCorrelationId, GetSalesCatalogueDataResponse());
+            checkAioSerialFileCreated = await fulfilmentAncillaryFiles.CreateSerialAioFile(new BatchInfo(FakeBatchId, FakeExchangeSetRootPath, FakeCorrelationId), GetSalesCatalogueDataResponse());
 
             Assert.That(checkAioSerialFileCreated, Is.True);
 
@@ -539,7 +540,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
         [Test]
         public async Task WhenEmptyExchangeSetPathCreateSerialAioFileRequest_ThenReturnFalseResponse()
         {
-            var checkAioSerialFileCreated = await fulfilmentAncillaryFiles.CreateSerialAioFile(FakeBatchId, string.Empty, FakeCorrelationId, GetSalesCatalogueDataResponse());
+            var checkAioSerialFileCreated = await fulfilmentAncillaryFiles.CreateSerialAioFile(new BatchInfo(FakeBatchId, null, FakeCorrelationId), GetSalesCatalogueDataResponse());
 
             Assert.Multiple(() =>
             {

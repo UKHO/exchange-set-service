@@ -8,13 +8,13 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
 {
     public interface IFulfilmentAncillaryFiles
     {
-        Task<bool> CreateSerialEncFile(string batchId, string exchangeSetPath, string correlationId);
-        Task<bool> CreateCatalogFile(string batchId, string exchangeSetRootPath, string correlationId, List<FulfilmentDataResponse> listFulfilmentData, SalesCatalogueDataResponse salesCatalogueDataResponse, SalesCatalogueProductResponse salesCatalogueProductResponse);
-        Task<bool> CreateProductFile(string batchId, string exchangeSetInfoPath, string correlationId, SalesCatalogueDataResponse salesCatalogueDataResponse, DateTime scsRequestDateTime, bool encryption = true);
-        Task<bool> CreateMediaFile(string batchId, string folderpath, string correlationId, string baseNumber);
-        Task<bool> CreateLargeMediaSerialEncFile(string batchId, string exchangeSetPath, string correlationId, string baseNumber, string lastBaseDirectoryNumber);
-        Task<bool> CreateLargeExchangeSetCatalogFile(string batchId, string exchangeSetRootPath, string correlationId, List<FulfilmentDataResponse> listFulfilmentData, SalesCatalogueDataResponse salesCatalogueDataResponse, SalesCatalogueProductResponse salesCatalogueProductResponse);
-        Task<bool> CreateEncUpdateCsv(SalesCatalogueDataResponse salesCatalogueDataResponse, string filePath, string batchId, string correlationId);
-        Task<bool> CreateSerialAioFile(string batchId, string aioExchangeSetPath, string correlationId, SalesCatalogueDataResponse salesCatalogueDataResponse);
+        Task<bool> CreateSerialEncFile(BatchInfo batchInfo);
+        Task<bool> CreateCatalogFile(BatchInfo batchInfo, IEnumerable<FulfilmentDataResponse> listFulfilmentData, SalesCatalogueDataResponse salesCatalogueDataResponse, SalesCatalogueProductResponse salesCatalogueProductResponse);
+        Task<bool> CreateProductFile(BatchInfo batchInfo, SalesCatalogueDataResponse salesCatalogueDataResponse, DateTime scsRequestDateTime, bool encryption = true);
+        Task<bool> CreateMediaFile(BatchInfo batchInfo, string baseNumber);
+        Task<bool> CreateLargeMediaSerialEncFile(BatchInfo batchInfo, string baseNumber, string lastBaseDirectoryNumber);
+        Task<bool> CreateLargeExchangeSetCatalogFile(BatchInfo batchInfo, IEnumerable<FulfilmentDataResponse> listFulfilmentData, SalesCatalogueDataResponse salesCatalogueDataResponse, SalesCatalogueProductResponse salesCatalogueProductResponse);
+        Task<bool> CreateEncUpdateCsv(BatchInfo batchInfo, SalesCatalogueDataResponse salesCatalogueDataResponse);
+        Task<bool> CreateSerialAioFile(BatchInfo batchInfo, SalesCatalogueDataResponse salesCatalogueDataResponse);
     }
 }

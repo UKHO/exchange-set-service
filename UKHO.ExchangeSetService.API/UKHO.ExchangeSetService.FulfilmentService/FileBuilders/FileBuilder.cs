@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -24,40 +25,72 @@ namespace UKHO.ExchangeSetService.FulfilmentService.FileBuilders
         IFulfilmentAncillaryFiles fulfilmentAncillaryFiles,
         IOptions<FileShareServiceConfiguration> fileShareServiceConfig) : IFileBuilder
     {
-
-        public async Task<bool> CreateAncillaryFilesForAio(string batchId, string aioExchangeSetPath, string correlationId, SalesCatalogueDataResponse salesCatalogueDataResponse, DateTime scsRequestDateTime, SalesCatalogueProductResponse salesCatalogueProductResponse, List<FulfilmentDataResponse> listFulfilmentAioData)
+        public async Task CreateAncillaryFiles(BatchInfo batchInfo, IEnumerable<FulfilmentDataResponse> listFulfilmentData, SalesCatalogueProductResponse salecatalogueProductResponse, DateTime scsRequestDateTime, SalesCatalogueDataResponse salesCatalogueEssDataResponse, bool encryption)
         {
-            var exchangeSetRootPath = Path.Combine(aioExchangeSetPath, fileShareServiceConfig.Value.EncRoot);
-            var exchangeSetInfoPath = Path.Combine(aioExchangeSetPath, fileShareServiceConfig.Value.Info);
+            var exchangeSetRootPath = Path.Combine(batchInfo.Path, fileShareServiceConfig.Value.EncRoot);
+            var exchangeSetInfoPath = Path.Combine(batchInfo.Path, fileShareServiceConfig.Value.Info);
 
-            return
-            await download.DownloadReadMeFileAsync(batchId, exchangeSetRootPath, correlationId) &&
-            await download.DownloadIhoCrtFile(batchId, aioExchangeSetPath, correlationId) &&
-            await download.DownloadIhoPubFile(batchId, aioExchangeSetPath, correlationId) &&
-            await CreateSerialAioFile(batchId, aioExchangeSetPath, correlationId, salesCatalogueDataResponse) &&
-            await CreateProductFileForAio(batchId, exchangeSetInfoPath, correlationId, salesCatalogueDataResponse, scsRequestDateTime) &&
-            await CreateCatalogFileForAio(batchId, exchangeSetRootPath, correlationId, listFulfilmentAioData, salesCatalogueDataResponse, salesCatalogueProductResponse);
+            await CreateProductFile(batchInfo, salesCatalogueEssDataResponse, scsRequestDateTime, encryption);
+            await CreateSerialEncFile(batchInfo);
+            await download.DownloadReadMeFileAsync(batchInfo);
+            await CreateCatalogFile(batchInfo, listFulfilmentData, salesCatalogueEssDataResponse, salecatalogueProductResponse);
         }
 
-        public async Task<bool> CreateSerialAioFile(string batchId, string aioExchangeSetPath, string correlationId, SalesCatalogueDataResponse salesCatalogueDataResponse)
+        public async Task<bool> CreateAncillaryFilesForAio(BatchInfo batchInfo, SalesCatalogueDataResponse salesCatalogueDataResponse, DateTime scsRequestDateTime, SalesCatalogueProductResponse salesCatalogueProductResponse, IEnumerable<FulfilmentDataResponse> listFulfilmentAioData)
+        {
+            var exchangeSetRootPath = Path.Combine(batchInfo.Path, fileShareServiceConfig.Value.EncRoot);
+            var exchangeSetInfoPath = Path.Combine(batchInfo.Path, fileShareServiceConfig.Value.Info);
+
+            using CancellationTokenSource cts = new();
+
+            var tasks = new List<Task<bool>>()
+            {
+                download.DownloadReadMeFileAsync(batchInfo),
+                         download.DownloadIhoCrtFile(batchInfo),
+                         download.DownloadIhoPubFile(batchInfo),
+                         CreateSerialAioFile(batchInfo, salesCatalogueDataResponse),
+                         CreateProductFileForAio(new BatchInfo(batchInfo.BatchId, exchangeSetInfoPath, batchInfo.CorrelationId), salesCatalogueDataResponse, scsRequestDateTime),
+                         CreateCatalogFileForAio(new BatchInfo(batchInfo.BatchId, exchangeSetRootPath, batchInfo.CorrelationId), listFulfilmentAioData, salesCatalogueDataResponse, salesCatalogueProductResponse)
+        };
+
+            // Run all tasks in parallel, if one fails stop and return a false
+            Task<bool>[] enhancedTasks = [.. tasks.Select(async task =>
+            {
+                try
+                {
+                    bool result = await task.ConfigureAwait(false);
+                    if (!result) cts.Cancel();
+                    return result;
+                }
+                catch (OperationCanceledException) when (cts.IsCancellationRequested)
+                {
+                    return false;
+                }
+            })];
+
+            bool[] results = await Task.WhenAll(enhancedTasks).ConfigureAwait(false);
+            return results.All(x => x);
+        }
+
+        public async Task<bool> CreateSerialAioFile(BatchInfo batchInfo, SalesCatalogueDataResponse salesCatalogueDataResponse)
         {
             bool isSerialAioCreated = await logger.LogStartEndAndElapsedTimeAsync(EventIds.CreateSerialAioFileRequestStart,
                       EventIds.CreateSerialAioFileRequestCompleted,
                       "Create serial aio file request for BatchId:{batchId} and _X-Correlation-ID:{CorrelationId}",
                       async () =>
                       {
-                          return await fulfilmentAncillaryFiles.CreateSerialAioFile(batchId, aioExchangeSetPath, correlationId, salesCatalogueDataResponse);
+                          return await fulfilmentAncillaryFiles.CreateSerialAioFile(batchInfo, salesCatalogueDataResponse);
                       },
-                  batchId, correlationId);
+                  batchInfo.BatchId, batchInfo.CorrelationId);
 
             return isSerialAioCreated;
         }
 
-        public async Task<bool> CreateProductFileForAio(string batchId, string exchangeSetInfoPath, string correlationId, SalesCatalogueDataResponse salesCatalogueDataResponse, DateTime scsRequestDateTime)
+        public async Task<bool> CreateProductFileForAio(BatchInfo batchInfo, SalesCatalogueDataResponse salesCatalogueDataResponse, DateTime scsRequestDateTime)
         {
             bool isProductFileCreated = false;
 
-            if (!string.IsNullOrWhiteSpace(exchangeSetInfoPath))
+            if (!string.IsNullOrWhiteSpace(batchInfo.Path))
             {
                 DateTime createProductFileTaskStartedAt = DateTime.UtcNow;
                 isProductFileCreated = await logger.LogStartEndAndElapsedTimeAsync(EventIds.CreateProductFileRequestForAioStart,
@@ -65,22 +98,22 @@ namespace UKHO.ExchangeSetService.FulfilmentService.FileBuilders
                         "Create aio exchange set product file request for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}",
                         async () =>
                         {
-                            return await fulfilmentAncillaryFiles.CreateProductFile(batchId, exchangeSetInfoPath, correlationId, salesCatalogueDataResponse, scsRequestDateTime);
+                            return await fulfilmentAncillaryFiles.CreateProductFile(batchInfo, salesCatalogueDataResponse, scsRequestDateTime);
                         },
-                        batchId, correlationId);
+                        batchInfo.BatchId, batchInfo.CorrelationId);
 
                 DateTime createProductFileTaskCompletedAt = DateTime.UtcNow;
-                monitorHelper.MonitorRequest("Create Product File Task", createProductFileTaskStartedAt, createProductFileTaskCompletedAt, correlationId, null, null, null, batchId);
+                monitorHelper.MonitorRequest("Create Product File Task", createProductFileTaskStartedAt, createProductFileTaskCompletedAt, batchInfo.CorrelationId, null, null, null, batchInfo.BatchId);
             }
 
             return isProductFileCreated;
         }
 
-        public async Task<bool> CreateCatalogFileForAio(string batchId, string exchangeSetRootPath, string correlationId, List<FulfilmentDataResponse> listFulfilmentData, SalesCatalogueDataResponse salesCatalogueDataResponse, SalesCatalogueProductResponse salesCatalogueProductResponse)
+        public async Task<bool> CreateCatalogFileForAio(BatchInfo batchInfo, IEnumerable<FulfilmentDataResponse> listFulfilmentData, SalesCatalogueDataResponse salesCatalogueDataResponse, SalesCatalogueProductResponse salesCatalogueProductResponse)
         {
             bool isFileCreated = false;
 
-            if (!string.IsNullOrWhiteSpace(exchangeSetRootPath))
+            if (!string.IsNullOrWhiteSpace(batchInfo.Path))
             {
                 DateTime createCatalogFileForAioTaskStartedAt = DateTime.UtcNow;
                 isFileCreated = await logger.LogStartEndAndElapsedTimeAsync(EventIds.CreateCatalogFileForAioRequestStart,
@@ -88,18 +121,18 @@ namespace UKHO.ExchangeSetService.FulfilmentService.FileBuilders
                         "Create AIO exchange set catalog file request for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}",
                         async () =>
                         {
-                            return await fulfilmentAncillaryFiles.CreateCatalogFile(batchId, exchangeSetRootPath, correlationId, listFulfilmentData, salesCatalogueDataResponse, salesCatalogueProductResponse);
+                            return await fulfilmentAncillaryFiles.CreateCatalogFile(batchInfo, listFulfilmentData, salesCatalogueDataResponse, salesCatalogueProductResponse);
                         },
-                        batchId, correlationId);
+                        batchInfo.BatchId, batchInfo.CorrelationId);
 
                 DateTime createCatalogFileForAioTaskCompletedAt = DateTime.UtcNow;
-                monitorHelper.MonitorRequest("Create Catalog File Task", createCatalogFileForAioTaskStartedAt, createCatalogFileForAioTaskCompletedAt, correlationId, null, null, null, batchId);
+                monitorHelper.MonitorRequest("Create Catalog File Task", createCatalogFileForAioTaskStartedAt, createCatalogFileForAioTaskCompletedAt, batchInfo.CorrelationId, null, null, null, batchInfo.BatchId);
             }
 
             return isFileCreated;
         }
 
-        public async Task<bool> CreateLargeMediaSerialEncFile(string batchId, string exchangeSetPath, string rootfolder, string correlationId)
+        public async Task<bool> CreateLargeMediaSerialEncFile(BatchInfo batchInfo, string rootfolder)
         {
             DateTime createLargeMediaSerialEncFileTaskStartedAt = DateTime.UtcNow;
 
@@ -108,10 +141,10 @@ namespace UKHO.ExchangeSetService.FulfilmentService.FileBuilders
                       "Create large media serial enc file request for BatchId:{batchId} and _X-Correlation-ID:{CorrelationId}",
                       async () =>
                       {
-                          var rootLastDirectoryPath = fileSystemHelper.GetDirectoryInfo(exchangeSetPath)
+                          var rootLastDirectoryPath = fileSystemHelper.GetDirectoryInfo(batchInfo.Path)
                                                   .LastOrDefault(di => di.Name.StartsWith("M0"));
 
-                          var baseDirectoryies = fileSystemHelper.GetDirectoryInfo(Path.Combine(exchangeSetPath, rootfolder))
+                          var baseDirectoryies = fileSystemHelper.GetDirectoryInfo(Path.Combine(batchInfo.Path, rootfolder))
                                                   .Where(di => di.Name.StartsWith("B") && di.Name.Length <= 3 && CommonHelper.IsNumeric(di.Name[^(di.Name.Length - 1)..]));
 
                           var baseLastDirectory = fileSystemHelper.GetDirectoryInfo(rootLastDirectoryPath?.ToString())
@@ -122,22 +155,22 @@ namespace UKHO.ExchangeSetService.FulfilmentService.FileBuilders
                           var ParallelBaseFolderTasks = new List<Task<bool>> { };
                           Parallel.ForEach(baseDirectoryies, baseDirectoryFolder =>
                           {
-                              string baseDirectoryNumber = baseDirectoryFolder.ToString().Replace(Path.Combine(exchangeSetPath, rootfolder, "B"), "");
-                              ParallelBaseFolderTasks.Add(fulfilmentAncillaryFiles.CreateLargeMediaSerialEncFile(batchId, baseDirectoryFolder.ToString(), correlationId, baseDirectoryNumber.ToString(), lastBaseDirectoryNumber));
+                              string baseDirectoryNumber = baseDirectoryFolder.ToString().Replace(Path.Combine(batchInfo.Path, rootfolder, "B"), "");
+                              ParallelBaseFolderTasks.Add(fulfilmentAncillaryFiles.CreateLargeMediaSerialEncFile(new BatchInfo(batchInfo.BatchId, baseDirectoryFolder.ToString(), batchInfo.CorrelationId), baseDirectoryNumber, lastBaseDirectoryNumber));
                           });
                           await Task.WhenAll(ParallelBaseFolderTasks);
 
                           DateTime createLargeMediaSerialEncFileTaskCompletedAt = DateTime.UtcNow;
-                          monitorHelper.MonitorRequest("Create Large Media Serial Enc File Task", createLargeMediaSerialEncFileTaskStartedAt, createLargeMediaSerialEncFileTaskCompletedAt, correlationId, null, null, null, batchId);
+                          monitorHelper.MonitorRequest("Create Large Media Serial Enc File Task", createLargeMediaSerialEncFileTaskStartedAt, createLargeMediaSerialEncFileTaskCompletedAt, batchInfo.CorrelationId, null, null, null, batchInfo.BatchId);
 
                           return await Task.FromResult(ParallelBaseFolderTasks.All(x => x.Result.Equals(true)));
                       },
-                  batchId, correlationId);
+                  batchInfo.BatchId, batchInfo.CorrelationId);
         }
 
-        public async Task<bool> CreateLargeMediaExchangesetCatalogFile(string batchId, string exchangeSetPath, string correlationId, List<FulfilmentDataResponse> listFulfilmentData, SalesCatalogueDataResponse salesCatalogueDataResponse, SalesCatalogueProductResponse salesCatalogueProductResponse)
+        public async Task<bool> CreateLargeMediaExchangesetCatalogFile(BatchInfo batchInfo, IEnumerable<FulfilmentDataResponse> listFulfilmentData, SalesCatalogueDataResponse salesCatalogueDataResponse, SalesCatalogueProductResponse salesCatalogueProductResponse)
         {
-            var baseDirectory = fileSystemHelper.GetDirectoryInfo(exchangeSetPath)
+            var baseDirectory = fileSystemHelper.GetDirectoryInfo(batchInfo.Path)
                        .Where(di => di.Name.StartsWith("B") && di.Name.Length <= 3 && CommonHelper.IsNumeric(di.Name[^(di.Name.Length - 1)..]));
 
             var encFolderList = new List<string>();
@@ -154,7 +187,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.FileBuilders
                                    .Select(di => di.Name[^2..]).ToList();
 
                 var fulfilmentDataBasedonCountryCode = listFulfilmentData.Where(x => countryCodes.Any(z => x.ProductName.StartsWith(z))).ToList();
-                ParallelCreateFolderTasks.Add(fulfilmentAncillaryFiles.CreateLargeExchangeSetCatalogFile(batchId, encFolder, correlationId, fulfilmentDataBasedonCountryCode, salesCatalogueDataResponse, salesCatalogueProductResponse));
+                ParallelCreateFolderTasks.Add(fulfilmentAncillaryFiles.CreateLargeExchangeSetCatalogFile(new BatchInfo(batchInfo.BatchId, encFolder, batchInfo.CorrelationId), fulfilmentDataBasedonCountryCode, salesCatalogueDataResponse, salesCatalogueProductResponse));
             });
             await Task.WhenAll(ParallelCreateFolderTasks);
             var isCreateFolderTasksSuccessful = await Task.FromResult(ParallelCreateFolderTasks.All(x => x.Result.Equals(true)));
@@ -163,11 +196,11 @@ namespace UKHO.ExchangeSetService.FulfilmentService.FileBuilders
             return isCreateFolderTasksSuccessful;
         }
 
-        public async Task<bool> CreateCatalogFile(string batchId, string exchangeSetRootPath, string correlationId, List<FulfilmentDataResponse> listFulfilmentData, SalesCatalogueDataResponse salesCatalogueDataResponse, SalesCatalogueProductResponse salesCatalogueProductResponse)
+        public async Task<bool> CreateCatalogFile(BatchInfo batchInfo, IEnumerable<FulfilmentDataResponse> listFulfilmentData, SalesCatalogueDataResponse salesCatalogueDataResponse, SalesCatalogueProductResponse salesCatalogueProductResponse)
         {
             bool isFileCreated = false;
 
-            if (!string.IsNullOrWhiteSpace(exchangeSetRootPath))
+            if (!string.IsNullOrWhiteSpace(batchInfo.Path))
             {
                 DateTime createCatalogFileTaskStartedAt = DateTime.UtcNow;
                 isFileCreated = await logger.LogStartEndAndElapsedTimeAsync(EventIds.CreateCatalogFileRequestStart,
@@ -175,22 +208,22 @@ namespace UKHO.ExchangeSetService.FulfilmentService.FileBuilders
                         "Create catalog file request for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}",
                         async () =>
                         {
-                            return await fulfilmentAncillaryFiles.CreateCatalogFile(batchId, exchangeSetRootPath, correlationId, listFulfilmentData, salesCatalogueDataResponse, salesCatalogueProductResponse);
+                            return await fulfilmentAncillaryFiles.CreateCatalogFile(batchInfo, listFulfilmentData, salesCatalogueDataResponse, salesCatalogueProductResponse);
                         },
-                        batchId, correlationId);
+                        batchInfo.BatchId, batchInfo.CorrelationId);
 
                 DateTime createCatalogFileTaskCompletedAt = DateTime.UtcNow;
-                monitorHelper.MonitorRequest("Create Catalog File Task", createCatalogFileTaskStartedAt, createCatalogFileTaskCompletedAt, correlationId, null, null, null, batchId);
+                monitorHelper.MonitorRequest("Create Catalog File Task", createCatalogFileTaskStartedAt, createCatalogFileTaskCompletedAt, batchInfo.CorrelationId, null, null, null, batchInfo.BatchId);
             }
 
             return isFileCreated;
         }
 
-        public async Task<bool> CreateProductFile(string batchId, string exchangeSetInfoPath, string correlationId, SalesCatalogueDataResponse salesCatalogueDataResponse, DateTime scsRequestDateTime, bool encryption)
+        public async Task<bool> CreateProductFile(BatchInfo batchInfo, SalesCatalogueDataResponse salesCatalogueDataResponse, DateTime scsRequestDateTime, bool encryption)
         {
             bool isProductFileCreated = false;
 
-            if (!string.IsNullOrWhiteSpace(exchangeSetInfoPath))
+            if (!string.IsNullOrWhiteSpace(batchInfo.Path))
             {
                 DateTime createProductFileTaskStartedAt = DateTime.UtcNow;
                 isProductFileCreated = await logger.LogStartEndAndElapsedTimeAsync(EventIds.CreateProductFileRequestStart,
@@ -198,39 +231,27 @@ namespace UKHO.ExchangeSetService.FulfilmentService.FileBuilders
                         "Create product file request for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}",
                         async () =>
                         {
-                            return await fulfilmentAncillaryFiles.CreateProductFile(batchId, exchangeSetInfoPath, correlationId, salesCatalogueDataResponse, scsRequestDateTime, encryption);
+                            return await fulfilmentAncillaryFiles.CreateProductFile(batchInfo, salesCatalogueDataResponse, scsRequestDateTime, encryption);
                         },
-                        batchId, correlationId);
+                        batchInfo.BatchId, batchInfo.CorrelationId);
 
                 DateTime createProductFileTaskCompletedAt = DateTime.UtcNow;
-                monitorHelper.MonitorRequest("Create Product File Task", createProductFileTaskStartedAt, createProductFileTaskCompletedAt, correlationId, null, null, null, batchId);
+                monitorHelper.MonitorRequest("Create Product File Task", createProductFileTaskStartedAt, createProductFileTaskCompletedAt, batchInfo.CorrelationId, null, null, null, batchInfo.BatchId);
             }
 
             return isProductFileCreated;
         }
 
-        public async Task CreateSerialEncFile(string batchId, string exchangeSetPath, string correlationId)
+        public async Task CreateSerialEncFile(BatchInfo batchInfo)
         {
             await logger.LogStartEndAndElapsedTimeAsync(EventIds.CreateSerialFileRequestStart,
                       EventIds.CreateSerialFileRequestCompleted,
                       "Create serial enc file request for BatchId:{batchId} and _X-Correlation-ID:{CorrelationId}",
                       async () =>
                       {
-                          return await fulfilmentAncillaryFiles.CreateSerialEncFile(batchId, exchangeSetPath, correlationId);
+                          return await fulfilmentAncillaryFiles.CreateSerialEncFile(batchInfo);
                       },
-                  batchId, correlationId);
-        }
-
-
-        public async Task CreateAncillaryFiles(string batchId, string exchangeSetPath, string correlationId, List<FulfilmentDataResponse> listFulfilmentData, SalesCatalogueProductResponse salecatalogueProductResponse, DateTime scsRequestDateTime, SalesCatalogueDataResponse salesCatalogueEssDataResponse, bool encryption)
-        {
-            var exchangeSetRootPath = Path.Combine(exchangeSetPath, fileShareServiceConfig.Value.EncRoot);
-            var exchangeSetInfoPath = Path.Combine(exchangeSetPath, fileShareServiceConfig.Value.Info);
-
-            await CreateProductFile(batchId, exchangeSetInfoPath, correlationId, salesCatalogueEssDataResponse, scsRequestDateTime, encryption);
-            await CreateSerialEncFile(batchId, exchangeSetPath, correlationId);
-            await download.DownloadReadMeFileAsync(batchId, exchangeSetRootPath, correlationId);
-            await CreateCatalogFile(batchId, exchangeSetRootPath, correlationId, listFulfilmentData, salesCatalogueEssDataResponse, salecatalogueProductResponse);
+                  batchInfo.BatchId, batchInfo.CorrelationId);
         }
     }
 }
