@@ -46,7 +46,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
                     checkSerialEncFileCreated = true;
                 else
                 {
-                    logger.LogError(EventIds.SerialFileIsNotCreated.ToEventId(), "Error in creating serial.enc file for batchInfo.BatchId:{batchInfo.BatchId} and _X-Correlation-ID:{batchInfo.CorrelationId} - Invalid Exchange Set Path", batchInfo.BatchId, batchInfo.CorrelationId);
+                    logger.LogError(EventIds.SerialFileIsNotCreated.ToEventId(), "Error in creating serial.enc file for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId} - Invalid Exchange Set Path", batchInfo.BatchId, batchInfo.CorrelationId);
                     throw new FulfilmentException(EventIds.SerialFileIsNotCreated.ToEventId());
                 }
             }

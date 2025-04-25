@@ -199,6 +199,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService
                  services.AddSingleton<ILargeExchangeSetInstance, LargeExchangeSetInstance>();
                  services.AddScoped<IFulfilmentCallBackService, FulfilmentCallBackService>();
                  services.AddScoped<IFileSystem, FileSystem>();
+                 services.AddApplicationInsightsTelemetry();
 
                  services.Configure<FileShareServiceConfiguration>(ConfigurationBuilder.GetSection("FileShareService"));
                  services.Configure<EssManagedIdentityConfiguration>(ConfigurationBuilder.GetSection("ESSManagedIdentity"));
