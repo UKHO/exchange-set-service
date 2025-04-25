@@ -58,9 +58,9 @@ namespace UKHO.ExchangeSetService.FulfilmentService
                 host.Run();
             }
         }
+
         private static HostBuilder BuildHostConfiguration()
         {
-
             HostBuilder hostBuilder = new HostBuilder();
             hostBuilder.ConfigureAppConfiguration((hostContext, builder) =>
             {
@@ -89,11 +89,12 @@ namespace UKHO.ExchangeSetService.FulfilmentService
                 //Add environment variables
                 builder.AddEnvironmentVariables();
 
-                Program.ConfigurationBuilder = builder.Build();
+                ConfigurationBuilder = builder.Build();
             })
              .ConfigureLogging((hostContext, builder) =>
              {
                  builder.AddConfiguration(ConfigurationBuilder.GetSection("Logging"));
+                 builder.AddApplicationInsightsWebJobs();
 
 #if DEBUG
                  builder.AddSerilog(new LoggerConfiguration()
@@ -139,8 +140,6 @@ namespace UKHO.ExchangeSetService.FulfilmentService
              })
              .ConfigureServices((hostContext, services) =>
              {
-                 var buildServiceProvider = services.BuildServiceProvider();
-
                  services.Configure<EssFulfilmentStorageConfiguration>(ConfigurationBuilder.GetSection("EssFulfilmentStorageConfiguration"));
                  services.Configure<CacheConfiguration>(ConfigurationBuilder.GetSection("CacheConfiguration"));
                  services.Configure<AioConfiguration>(ConfigurationBuilder.GetSection("AioConfiguration"));
@@ -199,7 +198,6 @@ namespace UKHO.ExchangeSetService.FulfilmentService
                  services.AddSingleton<ILargeExchangeSetInstance, LargeExchangeSetInstance>();
                  services.AddScoped<IFulfilmentCallBackService, FulfilmentCallBackService>();
                  services.AddScoped<IFileSystem, FileSystem>();
-                 services.AddApplicationInsightsTelemetry();
 
                  services.Configure<FileShareServiceConfiguration>(ConfigurationBuilder.GetSection("FileShareService"));
                  services.Configure<EssManagedIdentityConfiguration>(ConfigurationBuilder.GetSection("ESSManagedIdentity"));
@@ -209,6 +207,9 @@ namespace UKHO.ExchangeSetService.FulfilmentService
                  services.AddDistributedMemoryCache();
 
                  // Add App Insights Telemetry Filter
+                 services.AddApplicationInsightsTelemetry();
+                 services.AddApplicationInsightsTelemetryWorkerService();
+                 var buildServiceProvider = services.BuildServiceProvider();
                  var telemetryConfiguration = buildServiceProvider.GetRequiredService<TelemetryConfiguration>();
                  var telemetryProcessorChainBuilder = telemetryConfiguration.TelemetryProcessorChainBuilder;
                  telemetryProcessorChainBuilder.Use(next => new AzureDependencyFilterTelemetryProcessor(next));
