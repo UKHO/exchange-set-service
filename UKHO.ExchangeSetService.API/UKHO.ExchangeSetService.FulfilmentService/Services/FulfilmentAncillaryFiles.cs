@@ -500,21 +500,18 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
         /// <returns> Returns CdType BASE/UPDATE </returns>
         private string GetCdType(List<SalesCatalogueDataProductResponse> salesCatalogueDataAioProductResponse, string aioExchangeSetPath)
         {
-            var cdType = "UPDATE";
-
+            string cdType = "UPDATE";
             foreach (var response in salesCatalogueDataAioProductResponse)
             {
-                var path = Path.Combine(aioExchangeSetPath, fileShareServiceConfig.Value.EncRoot, response.ProductName[..2],
+                string path = Path.Combine(aioExchangeSetPath, fileShareServiceConfig.Value.EncRoot, response.ProductName[..2],
                                            response.ProductName, Convert.ToString(response.BaseCellEditionNumber), "0",
                                            response.ProductName + ".000");
-
                 if (fileSystemHelper.CheckFileExists(path))
                 {
                     cdType = "BASE";
                     break;
                 }
             }
-
             return cdType;
         }
     }

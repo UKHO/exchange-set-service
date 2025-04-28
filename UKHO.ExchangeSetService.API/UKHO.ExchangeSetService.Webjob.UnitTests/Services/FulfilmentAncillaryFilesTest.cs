@@ -21,7 +21,7 @@ using Attribute = UKHO.ExchangeSetService.Common.Models.FileShareService.Respons
 namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
 {
     [TestFixture]
-    public class FulfilmentAncillaryFilesTest
+    public partial class FulfilmentAncillaryFilesTest
     {
         private IOptions<FileShareServiceConfiguration> fakeFileShareServiceConfig;
         private ILogger<FulfilmentAncillaryFiles> fakeLogger;
@@ -504,7 +504,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             Assert.That(checkAioSerialFileCreated, Is.False);
 
             A.CallTo(() => fakeFileSystemHelper.CheckAndCreateFolder(A<string>.Ignored)).MustHaveHappenedOnceExactly();
-            A.CallTo(() => fakeFileSystemHelper.CreateFileContent(A<string>.Ignored, A<string>.That.Matches(x => CheckSerialFileContent(x, true)))).MustHaveHappenedOnceExactly();
+            A.CallTo(() => fakeFileSystemHelper.CreateFileContent(A<string>.Ignored, A<string>.That.Matches(x => BaseRegex().Match(x).Success))).MustHaveHappenedOnceExactly();
         }
 
         [Test]
@@ -519,7 +519,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             Assert.That(checkAioSerialFileCreated, Is.True);
 
             A.CallTo(() => fakeFileSystemHelper.CheckAndCreateFolder(A<string>.Ignored)).MustHaveHappenedOnceExactly();
-            A.CallTo(() => fakeFileSystemHelper.CreateFileContent(A<string>.Ignored, A<string>.That.Matches(x => CheckSerialFileContent(x, true)))).MustHaveHappenedOnceExactly();
+            A.CallTo(() => fakeFileSystemHelper.CreateFileContent(A<string>.Ignored, A<string>.That.Matches(x => BaseRegex().Match(x).Success))).MustHaveHappenedOnceExactly();
         }
 
         [Test]
@@ -534,7 +534,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             Assert.That(checkAioSerialFileCreated, Is.True);
 
             A.CallTo(() => fakeFileSystemHelper.CheckAndCreateFolder(A<string>.Ignored)).MustHaveHappenedOnceExactly();
-            A.CallTo(() => fakeFileSystemHelper.CreateFileContent(A<string>.Ignored, A<string>.That.Matches(x => CheckSerialFileContent(x, false)))).MustHaveHappenedOnceExactly();
+            A.CallTo(() => fakeFileSystemHelper.CreateFileContent(A<string>.Ignored, A<string>.That.Matches(x => UpdateRegex().Match(x).Success))).MustHaveHappenedOnceExactly();
         }
 
         [Test]
@@ -552,14 +552,11 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             A.CallTo(() => fakeFileSystemHelper.CreateFileContent(A<string>.Ignored, A<string>.Ignored)).MustNotHaveHappened();
         }
 
-        private static bool CheckSerialFileContent(string serialFileContent, bool baseType)
-        {
-            var pattern = baseType
-                ? @"GBWK\d{2}-\d{2}   \d{8}BASE      \d{2}[.]00\x0b\x0d\x0a"
-                : @"GBWK\d{2}-\d{2}   \d{8}UPDATE    \d{2}[.]00\x0b\x0d\x0a";
-            var match = Regex.Match(serialFileContent, pattern);
-            return match.Success;
-        }
+        [GeneratedRegex(@"GBWK\d{2}-\d{2}   \d{8}BASE      \d{2}[.]00\x0b\x0d\x0a")]
+        private static partial Regex BaseRegex();
+
+        [GeneratedRegex(@"GBWK\d{2}-\d{2}   \d{8}UPDATE    \d{2}[.]00\x0b\x0d\x0a")]
+        private static partial Regex UpdateRegex();
 
         #endregion
     }
