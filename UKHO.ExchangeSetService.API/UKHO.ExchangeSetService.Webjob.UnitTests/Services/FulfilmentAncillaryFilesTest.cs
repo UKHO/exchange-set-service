@@ -4,6 +4,7 @@ using System.IO;
 using System.IO.Abstractions;
 using System.Linq;
 using System.Net;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using FakeItEasy;
 using Microsoft.Extensions.Logging;
@@ -490,7 +491,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
         {
             var checkAioSerialFileCreated = false;
 
-            A.CallTo(() => fakeFileSystemHelper.CheckFileExists(A<string>.Ignored)).Returns(true).Once().Then.Returns(checkAioSerialFileCreated);
+            A.CallTo(() => fakeFileSystemHelper.CheckFileExists(A<string>.Ignored)).Returns(true).Once().Then.Returns(false);
 
             Assert.ThrowsAsync(Is.TypeOf<FulfilmentException>().And.Message.EqualTo(FulfilmentExceptionMessage),
                   async delegate { await fulfilmentAncillaryFiles.CreateSerialAioFile(FakeBatchId, FakeExchangeSetRootPath, FakeCorrelationId, GetSalesCatalogueDataResponse()); });
@@ -503,22 +504,22 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             Assert.That(checkAioSerialFileCreated, Is.False);
 
             A.CallTo(() => fakeFileSystemHelper.CheckAndCreateFolder(A<string>.Ignored)).MustHaveHappenedOnceExactly();
-            A.CallTo(() => fakeFileSystemHelper.CreateFileContent(A<string>.Ignored, A<string>.Ignored)).MustHaveHappenedOnceExactly();
+            A.CallTo(() => fakeFileSystemHelper.CreateFileContent(A<string>.Ignored, A<string>.That.Matches(x => CheckSerialFileContent(x, true)))).MustHaveHappenedOnceExactly();
         }
 
         [Test]
-        public async Task WhenValidCreateSerialAioFileRequest_ThenReturnTrueResponse()
+        public async Task WhenValidCreateSerialAioFileRequest_CdTypeBase_ThenReturnTrueResponse()
         {
             var checkAioSerialFileCreated = true;
 
-            A.CallTo(() => fakeFileSystemHelper.CheckFileExists(A<string>.Ignored)).Returns(checkAioSerialFileCreated).Twice();
+            A.CallTo(() => fakeFileSystemHelper.CheckFileExists(A<string>.Ignored)).Returns(true).Twice();
 
             checkAioSerialFileCreated = await fulfilmentAncillaryFiles.CreateSerialAioFile(FakeBatchId, FakeExchangeSetRootPath, FakeCorrelationId, GetSalesCatalogueDataResponse());
 
             Assert.That(checkAioSerialFileCreated, Is.True);
 
             A.CallTo(() => fakeFileSystemHelper.CheckAndCreateFolder(A<string>.Ignored)).MustHaveHappenedOnceExactly();
-            A.CallTo(() => fakeFileSystemHelper.CreateFileContent(A<string>.Ignored, A<string>.Ignored)).MustHaveHappenedOnceExactly();
+            A.CallTo(() => fakeFileSystemHelper.CreateFileContent(A<string>.Ignored, A<string>.That.Matches(x => CheckSerialFileContent(x, true)))).MustHaveHappenedOnceExactly();
         }
 
         [Test]
@@ -526,14 +527,14 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
         {
             var checkAioSerialFileCreated = true;
 
-            A.CallTo(() => fakeFileSystemHelper.CheckFileExists(A<string>.Ignored)).Returns(false).Once().Then.Returns(checkAioSerialFileCreated);
+            A.CallTo(() => fakeFileSystemHelper.CheckFileExists(A<string>.Ignored)).Returns(false).Twice().Then.Returns(true).Once();
 
             checkAioSerialFileCreated = await fulfilmentAncillaryFiles.CreateSerialAioFile(FakeBatchId, FakeExchangeSetRootPath, FakeCorrelationId, GetSalesCatalogueDataResponse());
 
             Assert.That(checkAioSerialFileCreated, Is.True);
 
             A.CallTo(() => fakeFileSystemHelper.CheckAndCreateFolder(A<string>.Ignored)).MustHaveHappenedOnceExactly();
-            A.CallTo(() => fakeFileSystemHelper.CreateFileContent(A<string>.Ignored, A<string>.Ignored)).MustHaveHappenedOnceExactly();
+            A.CallTo(() => fakeFileSystemHelper.CreateFileContent(A<string>.Ignored, A<string>.That.Matches(x => CheckSerialFileContent(x, false)))).MustHaveHappenedOnceExactly();
         }
 
         [Test]
@@ -549,6 +550,15 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
 
             A.CallTo(() => fakeFileSystemHelper.CheckAndCreateFolder(A<string>.Ignored)).MustNotHaveHappened();
             A.CallTo(() => fakeFileSystemHelper.CreateFileContent(A<string>.Ignored, A<string>.Ignored)).MustNotHaveHappened();
+        }
+
+        private static bool CheckSerialFileContent(string serialFileContent, bool baseType)
+        {
+            var pattern = baseType
+                ? @"GBWK\d{2}-\d{2}   \d{8}BASE      \d{2}[.]00\x0b\x0d\x0a"
+                : @"GBWK\d{2}-\d{2}   \d{8}UPDATE    \d{2}[.]00\x0b\x0d\x0a";
+            var match = Regex.Match(serialFileContent, pattern);
+            return match.Success;
         }
 
         #endregion
