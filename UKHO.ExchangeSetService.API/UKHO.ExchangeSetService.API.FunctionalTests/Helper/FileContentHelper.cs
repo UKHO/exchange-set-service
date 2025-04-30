@@ -5,9 +5,9 @@ using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
-using Azure.Storage.Blobs.Models;
-using Azure.Storage.Blobs;
 using Azure;
+using Azure.Storage.Blobs;
+using Azure.Storage.Blobs.Models;
 using NUnit.Framework;
 using UKHO.ExchangeSetService.API.FunctionalTests.Models;
 
@@ -450,44 +450,32 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
             Assert.That(fileContent[4].Contains("GB800001"), Is.True, $"Product File returned {fileContent[4]}, which does not contain expected GB800001.");
         }
 
-        public static void CheckSerialAioFileContentForAioBase(string inputFile)
+        public static void CheckSerialAioFileContentForAioBase(string inputFile) => CheckSerialAioFileContentForAioCommon(inputFile, "BASE");
+
+        public static void CheckSerialAioFileContentForAioUpdate(string inputFile) => CheckSerialAioFileContentForAioCommon(inputFile, "UPDATE");
+
+        private static void CheckSerialAioFileContentForAioCommon(string inputFile, string cdType)
         {
-            string[] lines = File.ReadAllLines(inputFile);
+            var lines = File.ReadAllLines(inputFile);
 
             //Store file content here
-            string[] fileContent = lines[0].Split(" ");
+            var fileContent = lines[0].Split(' ', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
+            Assert.That(fileContent, Has.Length.GreaterThanOrEqualTo(3), $"Unexpected first line of SERIAL.AIO file: {lines[0]}");
 
-            string dataServerAndWeek = fileContent[0];
-            string dateAndCdType = fileContent[3];
-            string formatVersionAndExchangeSetNumber = fileContent[9];
+            var dataServerAndWeek = fileContent[0];
+            var dateAndCdType = fileContent[1];
+            var formatVersionAndExchangeSetNumber = fileContent[2];
 
-            string weekNumber = CultureInfo.InvariantCulture.Calendar.GetWeekOfYear(DateTime.UtcNow, CalendarWeekRule.FirstFullWeek, DayOfWeek.Thursday).ToString().PadLeft(2, '0');
-            string year = DateTime.UtcNow.Year.ToString().Substring(DateTime.UtcNow.Year.ToString().Length - 2);
-            string currentDate = DateTime.UtcNow.ToString("yyyyMMdd");
+            var weekNumber = CultureInfo.InvariantCulture.Calendar.GetWeekOfYear(DateTime.UtcNow, CalendarWeekRule.FirstFullWeek, DayOfWeek.Thursday).ToString().PadLeft(2, '0');
+            var year = DateTime.UtcNow.Year.ToString().Substring(DateTime.UtcNow.Year.ToString().Length - 2);
+            var currentDate = DateTime.UtcNow.ToString("yyyyMMdd");
 
-            Assert.That($"GBWK{weekNumber}-{year}", Is.EqualTo(dataServerAndWeek), $"Incorrect weeknumber and year is returned 'GBWK{weekNumber}-{year}', instead of the expected {dataServerAndWeek}.");
-            Assert.That($"{currentDate}BASE", Is.EqualTo(dateAndCdType), $"Incorrect date is returned '{currentDate}UPDATE', instead of the expected {dateAndCdType}.");
-            Assert.That(formatVersionAndExchangeSetNumber.StartsWith("02.00"), Is.True, $"Expected format version {formatVersionAndExchangeSetNumber}");
-        }
-
-        public static void CheckSerialAioFileContentForAioUpdate(string inputFile)
-        {
-            string[] lines = File.ReadAllLines(inputFile);
-
-            //Store file content here
-            string[] fileContent = lines[0].Split(" ");
-
-            string dataServerAndWeek = fileContent[0];
-            string dateAndCdType = fileContent[3];
-            string formatVersionAndExchangeSetNumber = fileContent[9];
-
-            string weekNumber = CultureInfo.InvariantCulture.Calendar.GetWeekOfYear(DateTime.UtcNow, CalendarWeekRule.FirstFullWeek, DayOfWeek.Thursday).ToString().PadLeft(2, '0');
-            string year = DateTime.UtcNow.Year.ToString().Substring(DateTime.UtcNow.Year.ToString().Length - 2);
-            string currentDate = DateTime.UtcNow.ToString("yyyyMMdd");
-
-            Assert.That($"GBWK{weekNumber}-{year}", Is.EqualTo(dataServerAndWeek), $"Incorrect weeknumber and year is returned 'GBWK{weekNumber}-{year}', instead of the expected {dataServerAndWeek}.");
-            Assert.That($"{currentDate}UPDATE", Is.EqualTo(dateAndCdType), $"Incorrect date is returned '{currentDate}UPDATE', instead of the expected {dateAndCdType}.");
-            Assert.That(formatVersionAndExchangeSetNumber.StartsWith("02.00"), Is.True, $"Expected format version {formatVersionAndExchangeSetNumber}");
+            Assert.Multiple(() =>
+            {
+                Assert.That($"GBWK{weekNumber}-{year}", Is.EqualTo(dataServerAndWeek), $"Incorrect weeknumber and year is returned 'GBWK{weekNumber}-{year}', instead of the expected {dataServerAndWeek}.");
+                Assert.That($"{currentDate}{cdType}", Is.EqualTo(dateAndCdType), $"Incorrect date is returned '{currentDate}UPDATE', instead of the expected {dateAndCdType}.");
+                Assert.That(formatVersionAndExchangeSetNumber, Does.StartWith("02.00"), $"Expected format version {formatVersionAndExchangeSetNumber}");
+            });
         }
 
         public static async Task<bool> WaitForContainerAsync(BlobServiceClient blobServiceClient, string containerName, int maxAttempts, int delayInMilliSeconds)
