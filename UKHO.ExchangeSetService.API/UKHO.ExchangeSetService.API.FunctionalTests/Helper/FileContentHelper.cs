@@ -472,6 +472,10 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
 
         public static void CheckSerialAioFileContentForAioUpdate(string inputFile)
         {
+            Console.WriteLine(inputFile);
+            var fileText = File.ReadAllText(inputFile);
+            Console.WriteLine(fileText);
+
             string[] lines = File.ReadAllLines(inputFile);
 
             //Store file content here
