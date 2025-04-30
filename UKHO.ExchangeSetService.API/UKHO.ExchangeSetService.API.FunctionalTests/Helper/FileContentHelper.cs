@@ -457,6 +457,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
         private static void CheckSerialAioFileContentForAioCommon(string inputFile, string cdType)
         {
             var lines = File.ReadAllLines(inputFile);
+            Assert.That(lines, Has.Length.EqualTo(1), $"Expecting one line in SERIAL.AIO file, but found {lines.Length}");
 
             //Store file content here
             var fileContent = lines[0].Split(' ', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
