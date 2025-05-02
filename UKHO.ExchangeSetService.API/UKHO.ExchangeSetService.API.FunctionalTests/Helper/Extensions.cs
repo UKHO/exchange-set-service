@@ -29,7 +29,5 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
             string bodyJson = await httpResponseMessage.Content.ReadAsStringAsync();
             return bodyJson;
         }
-
-
     }
 }

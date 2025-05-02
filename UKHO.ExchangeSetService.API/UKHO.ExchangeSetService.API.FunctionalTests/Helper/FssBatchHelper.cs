@@ -28,7 +28,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
             var startTime = DateTime.UtcNow;
             while (DateTime.UtcNow - startTime < TimeSpan.FromMinutes(Config.BatchCommitWaitTime))
             {
-                await Task.Delay(5000);
+                await Task.Delay(2000);
                 var batchStatusResponse = await FssApiClient.GetBatchStatusAsync(batchStatusUri, jwtToken);
                 Assert.That((int)batchStatusResponse.StatusCode, Is.EqualTo(200), $"Incorrect status code is returned {batchStatusResponse.StatusCode}, instead of the expected status 200 for url {batchStatusUri}.");
 
@@ -139,7 +139,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
         public static async Task<string> ExtractDownloadedAioFolder(string downloadFileUrl, string jwtToken)
         {
             //Mock api fullfillment process takes more time to upload file for the cancellation product and tests are intermittently failing,therefore we have added delay 'Task.Delay()' to avoid intermittent failure in the pipe.
-            await Task.Delay(40000);
+            await Task.Delay(5000);
             string tempFilePath = Path.Combine(Path.GetTempPath(), EssConfig.AIOConfig.AioExchangeSetFileName);
 
             var response = await FssApiClient.GetFileDownloadAsync(downloadFileUrl, accessToken: jwtToken);

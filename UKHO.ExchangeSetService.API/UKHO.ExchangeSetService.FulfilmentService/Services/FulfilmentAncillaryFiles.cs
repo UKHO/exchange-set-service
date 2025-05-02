@@ -67,7 +67,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
                     Implementation = "TXT"
                 });
             }
-            
+
             if (listFulfilmentData != null && listFulfilmentData.Any())
             {
                 listFulfilmentData = listFulfilmentData.OrderBy(a => a.ProductName).ThenBy(b => b.EditionNumber).ThenBy(c => c.UpdateNumber).ToList();
@@ -303,7 +303,6 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
                 logger.LogError(EventIds.CatalogFileIsNotCreated.ToEventId(), "Error in creating catalog.031 file for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", batchInfo.BatchId, batchInfo.CorrelationId);
                 throw new FulfilmentException(EventIds.CatalogFileIsNotCreated.ToEventId());
             }
-
         }
 
         public async Task<bool> CreateSerialAioFile(BatchInfo batchInfo, SalesCatalogueDataResponse salesCatalogueDataResponse)
@@ -318,7 +317,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
                 string cdType = GetCdType(salesCatalogueDataResponse.ResponseBody, batchInfo.Path); //Get cdType BASE/UPDATE
                 int weekNumber = CommonHelper.GetCurrentWeekNumber(DateTime.UtcNow);
 
-                var serialFileContent = $"GBWK{weekNumber:D2}-{DateTime.UtcNow:yy}   {DateTime.UtcNow.Year:D4}{DateTime.UtcNow.Month:D2}{DateTime.UtcNow.Day:D2}{cdType}      {2:D2}.00\x0b\x0d\x0a";
+                var serialFileContent = $"GBWK{weekNumber:D2}-{DateTime.UtcNow:yy}   {DateTime.UtcNow.Year:D4}{DateTime.UtcNow.Month:D2}{DateTime.UtcNow.Day:D2}{cdType,-10}{2:D2}.00\x0b\x0d\x0a";
 
                 fileSystemHelper.CreateFileContent(serialFilePath, serialFileContent);
                 await Task.CompletedTask;
@@ -434,7 +433,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
                 cancelledUpdateNumber = salescatalogProductResponse.Cancellation.UpdateNumber;
             }
 
-            //BoundingRectangle and Comment only required for BIN
+          //BoundingRectangle and Comment only required for BIN
             return salescatalogProduct.BaseCellEditionNumber == 0 && cancelledUpdateNumber == listItem.UpdateNumber
                 ? $"{fileShareServiceConfig.Value.CommentVersion},EDTN={salescatalogProduct.BaseCellEditionNumber},UPDN={listItem.UpdateNumber},{getIssueAndUpdateDate}"
                 : $"{fileShareServiceConfig.Value.CommentVersion},EDTN={listItem.EditionNumber},UPDN={listItem.UpdateNumber},{getIssueAndUpdateDate}";
@@ -496,7 +495,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             string cdType = "UPDATE";
             foreach (var response in salesCatalogueDataAioProductResponse)
             {
-                string path = Path.Combine(aioExchangeSetPath, fileShareServiceConfig.Value.EncRoot, response.ProductName[..2], 
+                string path = Path.Combine(aioExchangeSetPath, fileShareServiceConfig.Value.EncRoot, response.ProductName[..2],
                                            response.ProductName, Convert.ToString(response.BaseCellEditionNumber), "0",
                                            response.ProductName + ".000");
                 if (fileSystemHelper.CheckFileExists(path))

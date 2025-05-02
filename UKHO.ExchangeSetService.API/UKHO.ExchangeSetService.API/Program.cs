@@ -19,6 +19,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.IO.Abstractions;
 using System.Linq;
+using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Reflection;
 using System.Security.Claims;
@@ -62,7 +63,6 @@ namespace UKHO.ExchangeSetService.API
 
             // Add services to the container.
             builder.Logging.AddAzureWebAppDiagnostics();
-            builder.Services.AddApplicationInsightsTelemetry();
 
             builder.Services.AddControllers(o =>
             {
@@ -130,7 +130,7 @@ namespace UKHO.ExchangeSetService.API
             builder.Services.AddScoped<IAzureAdB2CHelper, AzureAdB2CHelper>();
             builder.Services.AddAutoMapper(Assembly.GetExecutingAssembly());
             builder.Services.AddApplicationInsightsTelemetry();
-            builder.Services.AddAllElasticApm();
+            //builder.Services.AddAllElasticApm();
 
             builder.Services.AddHeaderPropagation(options =>
             {

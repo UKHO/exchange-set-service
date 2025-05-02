@@ -16,7 +16,6 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         [SetUp]
         public async Task SetupAsync()
         {
-            await Task.Delay(30000);//// Delay is required to allow the API to re-run post AIO value swapping
             Config = new TestConfiguration();
             ExchangeSetApiClient = new ExchangeSetApiClient(Config.EssBaseAddress);
             ProductIdentifierModel = new ProductIdentifierModel();
