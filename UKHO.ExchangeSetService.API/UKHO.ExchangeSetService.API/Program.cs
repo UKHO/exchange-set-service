@@ -195,7 +195,6 @@ namespace UKHO.ExchangeSetService.API
             builder.Services.AddScoped<IScsProductIdentifierValidator, ScsProductIdentifierValidator>();
             builder.Services.AddScoped<IScsDataSinceDateTimeValidator, ScsDataSinceDateTimeValidator>();
 
-
             builder.Services.AddHealthChecks()
                 .AddCheck<FileShareServiceHealthCheck>("FileShareServiceHealthCheck")
                 .AddCheck<SalesCatalogueServiceHealthCheck>("SalesCatalogueServiceHealthCheck")
@@ -269,7 +268,7 @@ namespace UKHO.ExchangeSetService.API
                         Scheme = "bearer",
                         BearerFormat = "JWT"
                     });
-                    c.OperationFilter<UKHO.ExchangeSetService.API.Filters.SecurityRequirementsOperationFilter>();
+                    c.OperationFilter<Filters.SecurityRequirementsOperationFilter>();
                 });
             }
 
