@@ -1,68 +1,35 @@
-﻿using System;
+﻿using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Abstractions;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
-using FluentValidation.Results;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
-using Newtonsoft.Json;
 using UKHO.ExchangeSetService.Common.Configuration;
 using UKHO.ExchangeSetService.Common.Extensions;
 using UKHO.ExchangeSetService.Common.Helpers;
 using UKHO.ExchangeSetService.Common.Logging;
-using UKHO.ExchangeSetService.Common.Models.Enums;
-using UKHO.ExchangeSetService.Common.Models.FileShareService.Response;
 using UKHO.ExchangeSetService.Common.Models.Response;
 using UKHO.ExchangeSetService.Common.Models.SalesCatalogue;
-using UKHO.ExchangeSetService.FulfilmentService.Validation;
+using UKHO.ExchangeSetService.FulfilmentService.FileBuilders;
 
 namespace UKHO.ExchangeSetService.FulfilmentService.Services
 {
-    public class FulfilmentDataService : IFulfilmentDataService
+    public class FulfilmentDataService(IAzureBlobStorageService azureBlobStorageService,
+                                IFulfilmentFileShareService fulfilmentFileShareService,
+                                ILogger<FulfilmentDataService> logger,
+                                IOptions<FileShareServiceConfiguration> fileShareServiceConfig,
+                                IConfiguration configuration,
+                                IFulfilmentSalesCatalogueService fulfilmentSalesCatalogueService,
+                                IFulfilmentCallBackService fulfilmentCallBackService,
+                                IMonitorHelper monitorHelper,
+                                IOptions<AioConfiguration> aioConfiguration,
+                                IFileSystemHelper fileSystemHelper,
+                                IExchangeSetBuilder exchangeSetBuilder) : IFulfilmentDataService
     {
-        private readonly IAzureBlobStorageService azureBlobStorageService;
-        private readonly IFulfilmentFileShareService fulfilmentFileShareService;
-        private readonly ILogger<FulfilmentDataService> logger;
-        private readonly IOptions<FileShareServiceConfiguration> fileShareServiceConfig;
-        private readonly IConfiguration configuration;
-        private readonly IFulfilmentAncillaryFiles fulfilmentAncillaryFiles;
-        private readonly IFulfilmentSalesCatalogueService fulfilmentSalesCatalogueService;
-        private readonly IFulfilmentCallBackService fulfilmentCallBackService;
-        private readonly IMonitorHelper monitorHelper;
-        private readonly IFileSystemHelper fileSystemHelper;
-        private readonly IProductDataValidator productDataValidator;
-        private readonly AioConfiguration aioConfiguration;
-
-        public FulfilmentDataService(IAzureBlobStorageService azureBlobStorageService,
-                                    IFulfilmentFileShareService fulfilmentFileShareService,
-                                    ILogger<FulfilmentDataService> logger,
-                                    IOptions<FileShareServiceConfiguration> fileShareServiceConfig,
-                                    IConfiguration configuration,
-                                    IFulfilmentAncillaryFiles fulfilmentAncillaryFiles,
-                                    IFulfilmentSalesCatalogueService fulfilmentSalesCatalogueService,
-                                    IFulfilmentCallBackService fulfilmentCallBackService,
-                                    IMonitorHelper monitorHelper,
-                                    IFileSystemHelper fileSystemHelper,
-                                    IProductDataValidator productDataValidator,
-                                    IOptions<AioConfiguration> aioConfiguration)
-        {
-            this.azureBlobStorageService = azureBlobStorageService;
-            this.fulfilmentFileShareService = fulfilmentFileShareService;
-            this.logger = logger;
-            this.fileShareServiceConfig = fileShareServiceConfig;
-            this.configuration = configuration;
-            this.fulfilmentAncillaryFiles = fulfilmentAncillaryFiles;
-            this.fulfilmentSalesCatalogueService = fulfilmentSalesCatalogueService;
-            this.fulfilmentCallBackService = fulfilmentCallBackService;
-            this.monitorHelper = monitorHelper;
-            this.fileSystemHelper = fileSystemHelper;
-            this.productDataValidator = productDataValidator;
-            this.aioConfiguration = aioConfiguration.Value;
-        }
+        private readonly AioConfiguration aioConfiguration = aioConfiguration.Value;
 
         public async Task<string> CreateExchangeSet(SalesCatalogueServiceResponseQueueMessage message, string currentUtcDate)
         {
@@ -85,7 +52,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
                     .Where(product => aioCells.Any(aioCell => product.ProductName == aioCell))
                     .ToList();
 
-            var businessUnit = GetBusinessUnit(message.ExchangeSetStandard);
+            var businessUnit = message.ExchangeSetStandard.GetBusinessUnit(fileShareServiceConfig.Value);
 
             SalesCatalogueDataResponse salesCatalogueEssDataResponseForAio = (SalesCatalogueDataResponse)salesCatalogueEssDataResponse.Clone();
 
@@ -93,13 +60,13 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             {
                 salesCatalogueEssDataResponse.ResponseBody = salesCatalogueEssDataResponse.ResponseBody
                                                              .Where(x => !aioCells.Any(productName => productName.Equals(x.ProductName))).ToList();
-                await CreateStandardExchangeSet(message, response, essItems, exchangeSetPath, salesCatalogueEssDataResponse, businessUnit);
+                await exchangeSetBuilder.CreateStandardExchangeSet(message, response, essItems, exchangeSetPath, salesCatalogueEssDataResponse, businessUnit);
             }
             if (aioItems != null && aioItems.Any() || message.IsEmptyAioExchangeSet)
             {
                 salesCatalogueEssDataResponseForAio.ResponseBody = salesCatalogueEssDataResponseForAio.ResponseBody
                                                      .Where(x => aioCells.Any(productName => productName.Equals(x.ProductName))).ToList();
-                await CreateAioExchangeSet(message, currentUtcDate, homeDirectoryPath, aioItems, salesCatalogueEssDataResponseForAio, response);
+                await exchangeSetBuilder.CreateAioExchangeSet(message, currentUtcDate, homeDirectoryPath, aioItems, salesCatalogueEssDataResponseForAio, response);
             }
 
 
@@ -151,7 +118,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             {
                 response.SalesCatalogueDataResponse.ResponseBody = response.SalesCatalogueDataResponse.ResponseBody
                                                                    .Where(x => !aioCells.Any(productName => productName == x.ProductName)).ToList();
-                isExchangeSetFolderCreated = await CreateStandardLargeMediaExchangeSet(message, homeDirectoryPath, currentUtcDate, response, largeExchangeSetFolderName, exchangeSetFilePath);
+                isExchangeSetFolderCreated = await exchangeSetBuilder.CreateStandardLargeMediaExchangeSet(message, homeDirectoryPath, currentUtcDate, response, largeExchangeSetFolderName, exchangeSetFilePath);
 
                 if (!isExchangeSetFolderCreated)
                 {
@@ -164,7 +131,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             {
                 largeExchangeSetDataResponseForAio.SalesCatalogueDataResponse.ResponseBody = largeExchangeSetDataResponseForAio.SalesCatalogueDataResponse.ResponseBody
                                                                                     .Where(x => aioCells.Any(productName => productName == x.ProductName)).ToList();
-                isExchangeSetFolderCreated = await CreateAioExchangeSet(message, currentUtcDate, homeDirectoryPath, aioItems, largeExchangeSetDataResponseForAio.SalesCatalogueDataResponse, largeExchangeSetDataResponseForAio.SalesCatalogueProductResponse);
+                isExchangeSetFolderCreated = await exchangeSetBuilder.CreateAioExchangeSet(message, currentUtcDate, homeDirectoryPath, aioItems, largeExchangeSetDataResponseForAio.SalesCatalogueDataResponse, largeExchangeSetDataResponseForAio.SalesCatalogueProductResponse);
 
                 if (!isExchangeSetFolderCreated)
                 {
@@ -211,181 +178,40 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             return "Large Media Exchange Set Is Not Created";
         }
 
-
-        public async Task<SalesCatalogueProductResponse> DownloadSalesCatalogueResponse(SalesCatalogueServiceResponseQueueMessage message)
+        private async Task<SalesCatalogueProductResponse> DownloadSalesCatalogueResponse(SalesCatalogueServiceResponseQueueMessage message)
         {
             return await azureBlobStorageService.DownloadSalesCatalogueResponse(message.ScsResponseUri, message.BatchId, message.CorrelationId);
         }
 
-        public async Task<List<FulfilmentDataResponse>> QueryFileShareServiceFiles(SalesCatalogueServiceResponseQueueMessage message, List<Products> products, string exchangeSetRootPath, CancellationTokenSource cancellationTokenSource, CancellationToken cancellationToken, string businessUnit)
+        private async Task<SalesCatalogueDataResponse> GetSalesCatalogueDataResponse(string batchId, string correlationId)
         {
-            return await logger.LogStartEndAndElapsedTimeAsync(EventIds.QueryFileShareServiceENCFilesRequestStart,
-                   EventIds.QueryFileShareServiceENCFilesRequestCompleted,
-                   "File share service search query and download request for ENC files from BusinessUnit:{businessUnit} for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}",
-                   async () =>
-                   {
-                       return await fulfilmentFileShareService.QueryFileShareServiceData(products, message, cancellationTokenSource, cancellationToken, exchangeSetRootPath, businessUnit);
-                   },
-                   businessUnit, message.BatchId, message.CorrelationId);
+            SalesCatalogueDataResponse salesCatalogueTypeResponse = await fulfilmentSalesCatalogueService.GetSalesCatalogueDataResponse(batchId, correlationId);
+            return salesCatalogueTypeResponse;
         }
 
-        private async Task CreateAncillaryFiles(string batchId, string exchangeSetPath, string correlationId, List<FulfilmentDataResponse> listFulfilmentData, SalesCatalogueProductResponse salecatalogueProductResponse, DateTime scsRequestDateTime, SalesCatalogueDataResponse salesCatalogueEssDataResponse, bool encryption)
+        private async Task<bool> PackageAndUploadLargeMediaExchangeSetZipFileToFileShareService(string batchId, string exchangeSetPath, string exchangeSetZipFilePath, string correlationId, string mediaZipFileName)
         {
-            var exchangeSetRootPath = Path.Combine(exchangeSetPath, fileShareServiceConfig.Value.EncRoot);
-            var exchangeSetInfoPath = Path.Combine(exchangeSetPath, fileShareServiceConfig.Value.Info);
+            bool isZipFileUploaded = false;
+            bool isZipFileCreated = false;
+            DateTime createZipFileTaskStartedAt = DateTime.UtcNow;
 
-            await CreateProductFile(batchId, exchangeSetInfoPath, correlationId, salesCatalogueEssDataResponse, scsRequestDateTime, encryption);
+            isZipFileCreated = await logger.LogStartEndAndElapsedTimeAsync(EventIds.CreateZipFileRequestStart,
+                       EventIds.CreateZipFileRequestCompleted,
+                       "Create large media exchange set zip file request for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}",
+                       async () => await fulfilmentFileShareService.CreateZipFileForExchangeSet(batchId, exchangeSetPath, correlationId),
+                       batchId, correlationId);
 
-            if (encryption)
+            monitorHelper.MonitorRequest("Create Zip File Task", createZipFileTaskStartedAt, DateTime.UtcNow, correlationId, null, null, null, batchId);
+
+            if (isZipFileCreated)
             {
-                await CreateSerialEncFile(batchId, exchangeSetPath, correlationId);
+                isZipFileUploaded = await logger.LogStartEndAndElapsedTimeAsync(EventIds.UploadExchangeSetToFssStart,
+                      EventIds.UploadExchangeSetToFssCompleted,
+                      "Upload large media exchange set zip file request for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}",
+                      async () => await fulfilmentFileShareService.UploadZipFileForLargeMediaExchangeSetToFileShareService(batchId, exchangeSetZipFilePath, correlationId, $"{mediaZipFileName}.zip"),
+                      batchId, correlationId);
             }
-            else
-            {
-                logger.LogInformation(EventIds.SerialFileCreationSkipped.ToEventId(), "serial.enc is not created for BatchId:{BatchId} | _X-Correlation-ID : {CorrelationId}", batchId, correlationId);
-            }
-
-            await DownloadReadMeFileAsync(batchId, exchangeSetRootPath, correlationId);
-            await CreateCatalogFile(batchId, exchangeSetRootPath, correlationId, listFulfilmentData, salesCatalogueEssDataResponse, salecatalogueProductResponse);
-        }
-
-        public async Task<bool> DownloadReadMeFileAsync(string batchId, string exchangeSetRootPath, string correlationId)
-        {
-            bool isDownloadReadMeFileSuccess = false;
-            DateTime createReadMeFileTaskStartedAt = DateTime.UtcNow;
-
-            logger.LogInformation(EventIds.SearchDownloadReadmeCacheEventStart.ToEventId(), "Cache Search and Download readme.txt file started for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", batchId, correlationId);
-
-            try
-            {
-                isDownloadReadMeFileSuccess = await fulfilmentFileShareService.DownloadReadMeFileFromCacheAsync(batchId, exchangeSetRootPath, correlationId);
-                if (isDownloadReadMeFileSuccess)
-                {
-                    logger.LogInformation(EventIds.SearchDownloadReadmeCacheEventCompleted.ToEventId(), "Cache Search and Download readme.txt file completed for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", batchId, correlationId);
-                    DateTime createReadMeFileTaskCompletedAt = DateTime.UtcNow;
-                    monitorHelper.MonitorRequest("Download ReadMe File Task", createReadMeFileTaskStartedAt, createReadMeFileTaskCompletedAt, correlationId, null, null, null, batchId);
-                }
-                else
-                {
-                    logger.LogInformation(EventIds.ReadMeTextFileNotFound.ToEventId(), "Cache Search and Download readme.txt file not found in blob cache for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", batchId, correlationId);
-                    isDownloadReadMeFileSuccess = await DownloadReadMeFileFromFssAsync(batchId, exchangeSetRootPath, correlationId);
-                }
-
-                if (!isDownloadReadMeFileSuccess)
-                {
-                    logger.LogError(EventIds.ErrorInDownloadReadMeFile.ToEventId(), "Error while downloading readme.txt file for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", batchId, correlationId);
-                }
-            }
-            catch (Exception ex)
-            {
-                logger.LogError(EventIds.ErrorInDownloadReadMeFile.ToEventId(), ex, "Error while downloading readme.txt file for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId} and Exception:{Message}", batchId, correlationId, ex.Message);
-            }
-            return isDownloadReadMeFileSuccess;
-        }
-
-        private async Task<bool> DownloadReadMeFileFromFssAsync(string batchId, string exchangeSetRootPath, string correlationId)
-        {
-            bool isDownloadReadMeFileSuccess = false;
-            string readMeFilePath = await logger.LogStartEndAndElapsedTimeAsync(EventIds.QueryFileShareServiceReadMeFileRequestStart,
-                EventIds.QueryFileShareServiceReadMeFileRequestCompleted,
-                "File share service search query request for readme file for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}",
-                async () =>
-                {
-                    return await fulfilmentFileShareService.SearchReadMeFilePath(batchId, correlationId);
-                },
-                batchId, correlationId);
-
-            if (!string.IsNullOrWhiteSpace(readMeFilePath))
-            {
-                DateTime createReadMeFileTaskStartedAt = DateTime.UtcNow;
-                isDownloadReadMeFileSuccess = await logger.LogStartEndAndElapsedTimeAsync(EventIds.DownloadReadMeFileRequestStart,
-                   EventIds.DownloadReadMeFileRequestCompleted,
-                   "File share service download request for readme file for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}",
-                   async () =>
-                   {
-                       return await fulfilmentFileShareService.DownloadReadMeFileFromFssAsync(readMeFilePath, batchId, exchangeSetRootPath, correlationId);
-                   },
-                batchId, correlationId);
-
-                DateTime createReadMeFileTaskCompletedAt = DateTime.UtcNow;
-                monitorHelper.MonitorRequest("Download ReadMe File Task", createReadMeFileTaskStartedAt, createReadMeFileTaskCompletedAt, correlationId, null, null, null, batchId);
-            }
-
-            return isDownloadReadMeFileSuccess;
-        }
-
-        public async Task<bool> DownloadIhoCrtFile(string batchId, string aioExchangeSetPath, string correlationId)
-        {
-            bool isDownloadIhoCrtFileSuccess = false;
-            string ihoCrtFilePath = await logger.LogStartEndAndElapsedTimeAsync(EventIds.QueryFileShareServiceIhoCrtFileRequestStart,
-                EventIds.QueryFileShareServiceIhoCrtFileRequestCompleted,
-                "File share service search query request for IHO.crt file for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}",
-                async () =>
-                {
-                    return await fulfilmentFileShareService.SearchIhoCrtFilePath(batchId, correlationId);
-                },
-                batchId, correlationId);
-
-            if (!string.IsNullOrWhiteSpace(ihoCrtFilePath))
-            {
-                DateTime createIhoCrtFileTaskStartedAt = DateTime.UtcNow;
-                isDownloadIhoCrtFileSuccess = await logger.LogStartEndAndElapsedTimeAsync(EventIds.DownloadIhoCrtFileRequestStart,
-                    EventIds.DownloadIhoCrtFileRequestCompleted,
-                    "File share service download request for IHO.crt file for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}",
-                    async () =>
-                    {
-                        return await fulfilmentFileShareService.DownloadIhoCrtFile(ihoCrtFilePath, batchId, aioExchangeSetPath, correlationId);
-                    },
-                    batchId, correlationId);
-
-                DateTime createIhoCrtFileTaskCompletedAt = DateTime.UtcNow;
-                monitorHelper.MonitorRequest("Download IHO.crt File Task", createIhoCrtFileTaskStartedAt, createIhoCrtFileTaskCompletedAt, correlationId, null, null, null, batchId);
-            }
-
-            return isDownloadIhoCrtFileSuccess;
-        }
-
-        public async Task<bool> DownloadIhoPubFile(string batchId, string exchangeSetRootPath, string correlationId)
-        {
-            bool isDownloadIhoPubFileSuccess = false;
-            string ihoPubFilePath = await logger.LogStartEndAndElapsedTimeAsync(EventIds.QueryFileShareServiceIhoPubFileRequestStart,
-                EventIds.QueryFileShareServiceIhoPubFileRequestCompleted,
-                "File share service search query request for IHO.pub file for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}",
-                async () =>
-                {
-                    return await fulfilmentFileShareService.SearchIhoPubFilePath(batchId, correlationId);
-                },
-                batchId, correlationId);
-
-            if (!string.IsNullOrWhiteSpace(ihoPubFilePath))
-            {
-                DateTime createIhoPubFileTaskStartedAt = DateTime.UtcNow;
-                isDownloadIhoPubFileSuccess = await logger.LogStartEndAndElapsedTimeAsync(EventIds.DownloadIhoPubFileRequestStart,
-                    EventIds.DownloadIhoPubFileRequestCompleted,
-                    "File share service download request for IHO.pub file for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}",
-                    async () =>
-                    {
-                        return await fulfilmentFileShareService.DownloadIhoPubFile(ihoPubFilePath, batchId, exchangeSetRootPath, correlationId);
-                    },
-                    batchId, correlationId);
-
-                DateTime createIhoPubFileTaskCompletedAt = DateTime.UtcNow;
-                monitorHelper.MonitorRequest("Download Iho Pub File Task", createIhoPubFileTaskStartedAt, createIhoPubFileTaskCompletedAt, correlationId, null, null, null, batchId);
-            }
-
-            return isDownloadIhoPubFileSuccess;
-        }
-
-        public async Task CreateSerialEncFile(string batchId, string exchangeSetPath, string correlationId)
-        {
-            await logger.LogStartEndAndElapsedTimeAsync(EventIds.CreateSerialFileRequestStart,
-                      EventIds.CreateSerialFileRequestCompleted,
-                      "Create serial enc file request for BatchId:{batchId} and _X-Correlation-ID:{CorrelationId}",
-                      async () =>
-                      {
-                          return await fulfilmentAncillaryFiles.CreateSerialEncFile(batchId, exchangeSetPath, correlationId);
-                      },
-                  batchId, correlationId);
+            return isZipFileUploaded;
         }
 
         private async Task<bool> PackageAndUploadExchangeSetZipFileToFileShareService(string batchId, string exchangeSetZipFilePath, string correlationId)
@@ -440,528 +266,6 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             }
 
             return isBatchCommitted;
-        }
-
-        public async Task<bool> CreateCatalogFile(string batchId, string exchangeSetRootPath, string correlationId, List<FulfilmentDataResponse> listFulfilmentData, SalesCatalogueDataResponse salesCatalogueDataResponse, SalesCatalogueProductResponse salesCatalogueProductResponse)
-        {
-            bool isFileCreated = false;
-
-            if (!string.IsNullOrWhiteSpace(exchangeSetRootPath))
-            {
-                DateTime createCatalogFileTaskStartedAt = DateTime.UtcNow;
-                isFileCreated = await logger.LogStartEndAndElapsedTimeAsync(EventIds.CreateCatalogFileRequestStart,
-                        EventIds.CreateCatalogFileRequestCompleted,
-                        "Create catalog file request for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}",
-                        async () =>
-                        {
-                            return await fulfilmentAncillaryFiles.CreateCatalogFile(batchId, exchangeSetRootPath, correlationId, listFulfilmentData, salesCatalogueDataResponse, salesCatalogueProductResponse);
-                        },
-                        batchId, correlationId);
-
-                DateTime createCatalogFileTaskCompletedAt = DateTime.UtcNow;
-                monitorHelper.MonitorRequest("Create Catalog File Task", createCatalogFileTaskStartedAt, createCatalogFileTaskCompletedAt, correlationId, null, null, null, batchId);
-            }
-
-            return isFileCreated;
-        }
-
-        public async Task<bool> CreateProductFile(string batchId, string exchangeSetInfoPath, string correlationId, SalesCatalogueDataResponse salesCatalogueDataResponse, DateTime scsRequestDateTime, bool encryption)
-        {
-            bool isProductFileCreated = false;
-
-            if (!string.IsNullOrWhiteSpace(exchangeSetInfoPath))
-            {
-                DateTime createProductFileTaskStartedAt = DateTime.UtcNow;
-                isProductFileCreated = await logger.LogStartEndAndElapsedTimeAsync(EventIds.CreateProductFileRequestStart,
-                        EventIds.CreateProductFileRequestCompleted,
-                        "Create product file request for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}",
-                        async () =>
-                        {
-                            return await fulfilmentAncillaryFiles.CreateProductFile(batchId, exchangeSetInfoPath, correlationId, salesCatalogueDataResponse, scsRequestDateTime, encryption);
-                        },
-                        batchId, correlationId);
-
-                DateTime createProductFileTaskCompletedAt = DateTime.UtcNow;
-                monitorHelper.MonitorRequest("Create Product File Task", createProductFileTaskStartedAt, createProductFileTaskCompletedAt, correlationId, null, null, null, batchId);
-            }
-
-            return isProductFileCreated;
-        }
-
-        public async Task<SalesCatalogueDataResponse> GetSalesCatalogueDataResponse(string batchId, string correlationId)
-        {
-            SalesCatalogueDataResponse salesCatalogueTypeResponse = await fulfilmentSalesCatalogueService.GetSalesCatalogueDataResponse(batchId, correlationId);
-            return salesCatalogueTypeResponse;
-        }
-
-        private async Task CreatePosFolderStructure(string largeMediaExchangeSetPath)
-        {
-            fileSystemHelper.CheckAndCreateFolder(largeMediaExchangeSetPath);
-            var largeMediaExchangeSetInfoPath = Path.Combine(largeMediaExchangeSetPath, "INFO");
-            fileSystemHelper.CheckAndCreateFolder(largeMediaExchangeSetInfoPath);
-            var largeMediaExchangeSetAdcPath = Path.Combine(largeMediaExchangeSetInfoPath, "ADC");
-            fileSystemHelper.CheckAndCreateFolder(largeMediaExchangeSetAdcPath);
-            await Task.CompletedTask;
-        }
-
-        //Search and download ENC files for large media exchange set
-        private async Task<LargeExchangeSetDataResponse> SearchAndDownloadEncFilesFromFss(SalesCatalogueServiceResponseQueueMessage message, string homeDirectoryPath, string currentUtcDate, string largeExchangeSetFolderName, LargeExchangeSetDataResponse largeExchangeSetDataResponse)
-        {
-            var batchPath = Path.Combine(homeDirectoryPath, currentUtcDate, message.BatchId, largeExchangeSetFolderName);
-            var exchangeSetRootPath = Path.Combine(batchPath, "{1}", fileShareServiceConfig.Value.EncRoot);
-            var listFulfilmentData = new List<FulfilmentDataResponse>();
-
-            List<string> aioCells = !string.IsNullOrEmpty(aioConfiguration.AioCells) ? new(aioConfiguration.AioCells.Split(',')) : new List<string>();
-
-            var essItems = largeExchangeSetDataResponse.SalesCatalogueProductResponse.Products
-                .Where(product => aioCells.All(aioCell => product.ProductName != aioCell))
-                .ToList();
-
-            Task<ValidationResult> validationResult = productDataValidator.Validate(essItems);
-
-            if (!validationResult.Result.IsValid)
-            {
-                largeExchangeSetDataResponse.ValidationtFailedMessage = validationResult.Result.Errors[0].ToString();
-                return largeExchangeSetDataResponse;
-            }
-
-            if (essItems != null && essItems.Any())
-            {
-                DateTime queryAndDownloadEncFilesFromFileShareServiceTaskStartedAt = DateTime.UtcNow;
-                int parallelSearchTaskCount = fileShareServiceConfig.Value.ParallelSearchTaskCount;
-                int productGroupCount = essItems.Count % parallelSearchTaskCount == 0 ? essItems.Count / parallelSearchTaskCount : (essItems.Count / parallelSearchTaskCount) + 1;
-                var productsList = CommonHelper.SplitList(essItems, productGroupCount);
-                var fulfilmentDataResponse = new List<FulfilmentDataResponse>();
-                var sync = new object();
-                int fileShareServiceSearchQueryCount = 0;
-                var cancellationTokenSource = new CancellationTokenSource();
-                CancellationToken cancellationToken = cancellationTokenSource.Token;
-
-                var tasks = productsList.Select(async item =>
-                {
-                    //Only S63 data will be fetched
-                    fulfilmentDataResponse = await QueryFileShareServiceFiles(message, item, exchangeSetRootPath, cancellationTokenSource, cancellationToken, fileShareServiceConfig.Value.S63BusinessUnit);
-                    int queryCount = fulfilmentDataResponse.Any() ? fulfilmentDataResponse.First().FileShareServiceSearchQueryCount : 0;
-                    lock (sync)
-                    {
-                        fileShareServiceSearchQueryCount += queryCount;
-                    }
-                    if (cancellationToken.IsCancellationRequested)
-                    {
-                        cancellationTokenSource.Cancel();
-                        logger.LogError(EventIds.CancellationTokenEvent.ToEventId(), "Operation is cancelled as IsCancellationRequested flag is true in QueryFileShareServiceFiles with {cancellationTokenSource.Token} and batchId:{message.BatchId} and CorrelationId:{message.CorrelationId}", JsonConvert.SerializeObject(cancellationTokenSource.Token), message.BatchId, message.CorrelationId);
-                        throw new OperationCanceledException();
-                    }
-                    listFulfilmentData.AddRange(fulfilmentDataResponse);
-                });
-
-                await Task.WhenAll(tasks);
-
-                DateTime queryAndDownloadEncFilesFromFileShareServiceTaskCompletedAt = DateTime.UtcNow;
-                int downloadedENCFileCount = 0;
-                foreach (var item in listFulfilmentData)
-                {
-                    downloadedENCFileCount += item.Files.Count();
-                }
-                monitorHelper.MonitorRequest("Query and Download ENC Files Task", queryAndDownloadEncFilesFromFileShareServiceTaskStartedAt, queryAndDownloadEncFilesFromFileShareServiceTaskCompletedAt, message.CorrelationId, fileShareServiceSearchQueryCount, downloadedENCFileCount, null, message.BatchId);
-                largeExchangeSetDataResponse.FulfilmentDataResponses = listFulfilmentData;
-            }
-
-            return largeExchangeSetDataResponse;
-        }
-
-        private async Task DownloadLargeMediaReadMeFile(string batchId, string exchangeSetPath, string correlationId)
-        {
-            var baseDirectory = fileSystemHelper.GetDirectoryInfo(exchangeSetPath)
-                       .Where(di => di.Name.StartsWith("B") && di.Name.Length <= 3 && CommonHelper.IsNumeric(di.Name[^(di.Name.Length - 1)..]));
-
-            var encFolderList = new List<string>();
-            foreach (var directory in baseDirectory)
-            {
-                var encFolder = Path.Combine(directory.ToString(), fileShareServiceConfig.Value.EncRoot);
-                encFolderList.Add(encFolder);
-            }
-            var ParallelCreateFolderTasks = new List<Task> { };
-
-            Parallel.ForEach(encFolderList, encFolder =>
-            {
-                ParallelCreateFolderTasks.Add(DownloadReadMeFileAsync(batchId, encFolder, correlationId));
-            });
-            await Task.WhenAll(ParallelCreateFolderTasks);
-            ParallelCreateFolderTasks.Clear();
-        }
-
-        private async Task<bool> CreateLargeMediaSerialEncFile(string batchId, string exchangeSetPath, string rootfolder, string correlationId)
-        {
-            DateTime createLargeMediaSerialEncFileTaskStartedAt = DateTime.UtcNow;
-
-            return await logger.LogStartEndAndElapsedTimeAsync(EventIds.CreateSerialFileRequestStart,
-                      EventIds.CreateSerialFileRequestCompleted,
-                      "Create large media serial enc file request for BatchId:{batchId} and _X-Correlation-ID:{CorrelationId}",
-                      async () =>
-                      {
-                          var rootLastDirectoryPath = fileSystemHelper.GetDirectoryInfo(exchangeSetPath)
-                                                  .LastOrDefault(di => di.Name.StartsWith("M0"));
-
-                          var baseDirectoryies = fileSystemHelper.GetDirectoryInfo(Path.Combine(exchangeSetPath, rootfolder))
-                                                  .Where(di => di.Name.StartsWith("B") && di.Name.Length <= 3 && CommonHelper.IsNumeric(di.Name[^(di.Name.Length - 1)..]));
-
-                          var baseLastDirectory = fileSystemHelper.GetDirectoryInfo(rootLastDirectoryPath?.ToString())
-                                                  .LastOrDefault(di => di.Name.StartsWith("B") && di.Name.Length <= 3 && CommonHelper.IsNumeric(di.Name[^(di.Name.Length - 1)..]));
-
-                          string lastBaseDirectoryNumber = baseLastDirectory.ToString().Replace(Path.Combine(rootLastDirectoryPath.ToString(), "B"), "");
-
-                          var ParallelBaseFolderTasks = new List<Task<bool>> { };
-                          Parallel.ForEach(baseDirectoryies, baseDirectoryFolder =>
-                          {
-                              string baseDirectoryNumber = baseDirectoryFolder.ToString().Replace(Path.Combine(exchangeSetPath, rootfolder, "B"), "");
-                              ParallelBaseFolderTasks.Add(fulfilmentAncillaryFiles.CreateLargeMediaSerialEncFile(batchId, baseDirectoryFolder.ToString(), correlationId, baseDirectoryNumber.ToString(), lastBaseDirectoryNumber));
-                          });
-                          await Task.WhenAll(ParallelBaseFolderTasks);
-
-                          DateTime createLargeMediaSerialEncFileTaskCompletedAt = DateTime.UtcNow;
-                          monitorHelper.MonitorRequest("Create Large Media Serial Enc File Task", createLargeMediaSerialEncFileTaskStartedAt, createLargeMediaSerialEncFileTaskCompletedAt, correlationId, null, null, null, batchId);
-
-                          return await Task.FromResult(ParallelBaseFolderTasks.All(x => x.Result.Equals(true)));
-                      },
-                  batchId, correlationId);
-        }
-
-        private async Task<bool> CreateLargeMediaExchangesetCatalogFile(string batchId, string exchangeSetPath, string correlationId, List<FulfilmentDataResponse> listFulfilmentData, SalesCatalogueDataResponse salesCatalogueDataResponse, SalesCatalogueProductResponse salesCatalogueProductResponse)
-        {
-            var baseDirectory = fileSystemHelper.GetDirectoryInfo(exchangeSetPath)
-                       .Where(di => di.Name.StartsWith("B") && di.Name.Length <= 3 && CommonHelper.IsNumeric(di.Name[^(di.Name.Length - 1)..]));
-
-            var encFolderList = new List<string>();
-            foreach (var directory in baseDirectory)
-            {
-                var encFolder = Path.Combine(directory.ToString(), fileShareServiceConfig.Value.EncRoot);
-                encFolderList.Add(encFolder);
-            }
-            var ParallelCreateFolderTasks = new List<Task<bool>> { };
-
-            Parallel.ForEach(encFolderList, encFolder =>
-            {
-                var countryCodes = fileSystemHelper.GetDirectoryInfo(encFolder)
-                                   .Select(di => di.Name[^2..]).ToList();
-
-                var fulfilmentDataBasedonCountryCode = listFulfilmentData.Where(x => countryCodes.Any(z => x.ProductName.StartsWith(z))).ToList();
-                ParallelCreateFolderTasks.Add(fulfilmentAncillaryFiles.CreateLargeExchangeSetCatalogFile(batchId, encFolder, correlationId, fulfilmentDataBasedonCountryCode, salesCatalogueDataResponse, salesCatalogueProductResponse));
-            });
-            await Task.WhenAll(ParallelCreateFolderTasks);
-            var isCreateFolderTasksSuccessful = await Task.FromResult(ParallelCreateFolderTasks.All(x => x.Result.Equals(true)));
-            ParallelCreateFolderTasks.Clear();
-
-            return isCreateFolderTasksSuccessful;
-        }
-
-        private async Task<bool> PackageAndUploadLargeMediaExchangeSetZipFileToFileShareService(string batchId, string exchangeSetPath, string exchangeSetZipFilePath, string correlationId, string mediaZipFileName)
-        {
-            bool isZipFileUploaded = false;
-            bool isZipFileCreated = false;
-            DateTime createZipFileTaskStartedAt = DateTime.UtcNow;
-
-            isZipFileCreated = await logger.LogStartEndAndElapsedTimeAsync(EventIds.CreateZipFileRequestStart,
-                       EventIds.CreateZipFileRequestCompleted,
-                       "Create large media exchange set zip file request for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}",
-                       async () => await fulfilmentFileShareService.CreateZipFileForExchangeSet(batchId, exchangeSetPath, correlationId),
-                       batchId, correlationId);
-
-            monitorHelper.MonitorRequest("Create Zip File Task", createZipFileTaskStartedAt, DateTime.UtcNow, correlationId, null, null, null, batchId);
-
-            if (isZipFileCreated)
-            {
-                isZipFileUploaded = await logger.LogStartEndAndElapsedTimeAsync(EventIds.UploadExchangeSetToFssStart,
-                      EventIds.UploadExchangeSetToFssCompleted,
-                      "Upload large media exchange set zip file request for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}",
-                      async () => await fulfilmentFileShareService.UploadZipFileForLargeMediaExchangeSetToFileShareService(batchId, exchangeSetZipFilePath, correlationId, $"{mediaZipFileName}.zip"),
-                      batchId, correlationId);
-            }
-            return isZipFileUploaded;
-        }
-
-        public async Task DownloadInfoFolderFiles(string batchId, string exchangeSetInfoPath, string correlationId)
-        {
-            IEnumerable<BatchFile> fileDetails = await logger.LogStartEndAndElapsedTimeAsync(EventIds.DownloadInfoFolderRequestStart,
-                  EventIds.DownloadInfoFolderRequestCompleted,
-                  "File share service search query request for Info folder files for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}",
-                  async () => await fulfilmentFileShareService.SearchFolderDetails(batchId, correlationId, fileShareServiceConfig.Value.Info),
-                  batchId, correlationId);
-
-            if (fileDetails != null && fileDetails.Any())
-            {
-                DateTime createInfoFolderFileTaskStartedAt = DateTime.UtcNow;
-                await logger.LogStartEndAndElapsedTimeAsync(EventIds.DownloadInfoFolderRequestStart,
-                   EventIds.DownloadInfoFolderRequestCompleted,
-                   "File share service download request for Info folder files for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}",
-                   async () => await fulfilmentFileShareService.DownloadFolderDetails(batchId, correlationId, fileDetails, exchangeSetInfoPath),
-                   batchId, correlationId);
-
-                DateTime createInfoFolderFileTaskCompletedAt = DateTime.UtcNow;
-                monitorHelper.MonitorRequest("Download Info Folder File Task", createInfoFolderFileTaskStartedAt, createInfoFolderFileTaskCompletedAt, correlationId, null, null, null, batchId);
-            }
-        }
-
-        public async Task DownloadAdcFolderFiles(string batchId, string exchangeSetAdcPath, string correlationId)
-        {
-            IEnumerable<BatchFile> fileDetails = await logger.LogStartEndAndElapsedTimeAsync(EventIds.QueryFileShareServiceAdcFolderFilesRequestStart,
-                  EventIds.QueryFileShareServiceAdcFolderFilesRequestCompleted,
-                  "File share service search query request for Adc folder files for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}",
-                  async () => await fulfilmentFileShareService.SearchFolderDetails(batchId, correlationId, fileShareServiceConfig.Value.Adc),
-                  batchId, correlationId);
-
-            if (fileDetails != null && fileDetails.Any())
-            {
-                DateTime createAdcFolderFilesTaskStartedAt = DateTime.UtcNow;
-                await logger.LogStartEndAndElapsedTimeAsync(EventIds.DownloadAdcFolderFilesStart,
-                   EventIds.DownloadAdcFolderFilesCompleted,
-                   "File share service download request for Adc folder files for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}",
-                   async () => await fulfilmentFileShareService.DownloadFolderDetails(batchId, correlationId, fileDetails, exchangeSetAdcPath),
-                   batchId, correlationId);
-
-                DateTime createAdcFolderFilesTaskCompletedAt = DateTime.UtcNow;
-                monitorHelper.MonitorRequest("Download Adc Folder File Task", createAdcFolderFilesTaskStartedAt, createAdcFolderFilesTaskCompletedAt, correlationId, null, null, null, batchId);
-            }
-        }
-
-        #region AIO Exchanges Set
-
-        private async Task<bool> CreateAioExchangeSet(SalesCatalogueServiceResponseQueueMessage message, string currentUtcDate, string homeDirectoryPath, List<Products> aioItems, SalesCatalogueDataResponse salesCatalogueEssDataResponse, SalesCatalogueProductResponse salesCatalogueProductResponse)
-        {
-            var aioExchangeSetPath = Path.Combine(homeDirectoryPath, currentUtcDate, message.BatchId, fileShareServiceConfig.Value.AioExchangeSetFileFolder);
-            var aioExchangeSetRootPath = Path.Combine(aioExchangeSetPath, fileShareServiceConfig.Value.EncRoot);
-            var listFulfilmentAioData = new List<FulfilmentDataResponse>();
-
-            if (aioItems != null && aioItems.Any())
-            {
-                DateTime queryAndDownloadEncFilesFromFileShareServiceTaskStartedAt = DateTime.UtcNow;
-                int parallelSearchTaskCount = fileShareServiceConfig.Value.ParallelSearchTaskCount;
-                int productGroupCount = aioItems.Count % parallelSearchTaskCount == 0 ? aioItems.Count / parallelSearchTaskCount : (aioItems.Count / parallelSearchTaskCount) + 1;
-                var productsList = CommonHelper.SplitList(aioItems, productGroupCount);
-                var fulfilmentDataResponse = new List<FulfilmentDataResponse>();
-                var sync = new object();
-                int fileShareServiceSearchQueryCount = 0;
-                var cancellationTokenSource = new CancellationTokenSource();
-                CancellationToken cancellationToken = cancellationTokenSource.Token;
-
-                var tasks = productsList.Select(async item =>
-                {
-                    //Only S63 data will be fetched
-                    fulfilmentDataResponse = await QueryFileShareServiceFiles(message, item, aioExchangeSetRootPath, cancellationTokenSource, cancellationToken, fileShareServiceConfig.Value.S63BusinessUnit);
-                    int queryCount = fulfilmentDataResponse.Any() ? fulfilmentDataResponse.First().FileShareServiceSearchQueryCount : 0;
-                    lock (sync)
-                    {
-                        fileShareServiceSearchQueryCount += queryCount;
-                    }
-                    if (cancellationToken.IsCancellationRequested)
-                    {
-                        cancellationTokenSource.Cancel();
-                        logger.LogError(EventIds.CancellationTokenEvent.ToEventId(), "Operation is cancelled as IsCancellationRequested flag is true in QueryFileShareServiceFiles with {cancellationTokenSource.Token} and batchId:{message.BatchId} and CorrelationId:{message.CorrelationId}", JsonConvert.SerializeObject(cancellationTokenSource.Token), message.BatchId, message.CorrelationId);
-                        throw new OperationCanceledException();
-                    }
-                    listFulfilmentAioData.AddRange(fulfilmentDataResponse);
-                });
-
-                await Task.WhenAll(tasks);
-
-                DateTime queryAndDownloadEncFilesFromFileShareServiceTaskCompletedAt = DateTime.UtcNow;
-                int downloadedENCFileCount = 0;
-                foreach (var item in listFulfilmentAioData)
-                {
-                    downloadedENCFileCount += item.Files.Count();
-                }
-                monitorHelper.MonitorRequest("Query and Download ENC Files Task", queryAndDownloadEncFilesFromFileShareServiceTaskStartedAt, queryAndDownloadEncFilesFromFileShareServiceTaskCompletedAt, message.CorrelationId, fileShareServiceSearchQueryCount, downloadedENCFileCount, null, message.BatchId);
-            }
-
-            return await CreateAncillaryFilesForAio(message.BatchId, aioExchangeSetPath, message.CorrelationId, salesCatalogueEssDataResponse, message.ScsRequestDateTime, salesCatalogueProductResponse, listFulfilmentAioData);
-        }
-
-        #endregion
-
-        private async Task CreateStandardExchangeSet(SalesCatalogueServiceResponseQueueMessage message, SalesCatalogueProductResponse response, List<Products> essItems, string exchangeSetPath, SalesCatalogueDataResponse salesCatalogueEssDataResponse, string businessUnit)
-        {
-            var exchangeSetRootPath = Path.Combine(exchangeSetPath, fileShareServiceConfig.Value.EncRoot);
-            var listFulfilmentData = new List<FulfilmentDataResponse>();
-
-            if (essItems != null && essItems.Any())
-            {
-                DateTime queryAndDownloadEncFilesFromFileShareServiceTaskStartedAt = DateTime.UtcNow;
-                int parallelSearchTaskCount = fileShareServiceConfig.Value.ParallelSearchTaskCount;
-                int productGroupCount = essItems.Count % parallelSearchTaskCount == 0 ? essItems.Count / parallelSearchTaskCount : (essItems.Count / parallelSearchTaskCount) + 1;
-                var productsList = CommonHelper.SplitList(essItems, productGroupCount);
-                var fulfilmentDataResponse = new List<FulfilmentDataResponse>();
-                var sync = new object();
-                int fileShareServiceSearchQueryCount = 0;
-                var cancellationTokenSource = new CancellationTokenSource();
-                CancellationToken cancellationToken = cancellationTokenSource.Token;
-
-                var tasks = productsList.Select(async item =>
-                {
-                    //S63 or S57 data will be fetched
-                    fulfilmentDataResponse = await QueryFileShareServiceFiles(message, item, exchangeSetRootPath, cancellationTokenSource, cancellationToken, businessUnit);
-                    int queryCount = fulfilmentDataResponse.Any() ? fulfilmentDataResponse.First().FileShareServiceSearchQueryCount : 0;
-                    lock (sync)
-                    {
-                        fileShareServiceSearchQueryCount += queryCount;
-                    }
-                    if (cancellationToken.IsCancellationRequested)
-                    {
-                        cancellationTokenSource.Cancel();
-                        logger.LogError(EventIds.CancellationTokenEvent.ToEventId(), "Operation is cancelled as IsCancellationRequested flag is true in QueryFileShareServiceFiles with {cancellationTokenSource.Token} and batchId:{message.BatchId} and CorrelationId:{message.CorrelationId}", JsonConvert.SerializeObject(cancellationTokenSource.Token), message.BatchId, message.CorrelationId);
-                        throw new OperationCanceledException();
-                    }
-                    listFulfilmentData.AddRange(fulfilmentDataResponse);
-                });
-
-                await Task.WhenAll(tasks);
-
-                DateTime queryAndDownloadEncFilesFromFileShareServiceTaskCompletedAt = DateTime.UtcNow;
-                int downloadedENCFileCount = 0;
-                foreach (var item in listFulfilmentData)
-                {
-                    downloadedENCFileCount += item.Files.Count();
-                }
-                monitorHelper.MonitorRequest("Query and Download ENC Files Task", queryAndDownloadEncFilesFromFileShareServiceTaskStartedAt, queryAndDownloadEncFilesFromFileShareServiceTaskCompletedAt, message.CorrelationId, fileShareServiceSearchQueryCount, downloadedENCFileCount, null, message.BatchId);
-            }
-
-            var encryption = string.Equals(businessUnit, fileShareServiceConfig.Value.S63BusinessUnit, StringComparison.OrdinalIgnoreCase);
-            
-            await CreateAncillaryFiles(message.BatchId, exchangeSetPath, message.CorrelationId, listFulfilmentData, response, message.ScsRequestDateTime, salesCatalogueEssDataResponse, encryption);
-        }
-
-        private async Task<bool> CreateStandardLargeMediaExchangeSet(SalesCatalogueServiceResponseQueueMessage message, string homeDirectoryPath, string currentUtcDate, LargeExchangeSetDataResponse largeExchangeSetDataResponse, string largeExchangeSetFolderName, string largeMediaExchangeSetFilePath)
-        {
-            LargeExchangeSetDataResponse response = await SearchAndDownloadEncFilesFromFss(message, homeDirectoryPath, currentUtcDate, largeExchangeSetFolderName, largeExchangeSetDataResponse);
-            if (!string.IsNullOrWhiteSpace(response.ValidationtFailedMessage))
-            {
-                logger.LogError(EventIds.LargeExchangeSetCreatedWithError.ToEventId(), "Large media exchange set is not created for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", message.BatchId, message.CorrelationId);
-                logger.LogError(EventIds.LargeExchangeSetCreatedWithError.ToEventId(), "Operation Cancelled as product validation failed for BatchId:{BatchId}, _X-Correlation-ID:{CorrelationId} and Validation message :{Message}", message.BatchId, message.CorrelationId, response.ValidationtFailedMessage);
-                throw new FulfilmentException(EventIds.BundleInfoValidationFailed.ToEventId());
-            }
-
-            var rootDirectories = fileSystemHelper.GetDirectoryInfo(Path.Combine(homeDirectoryPath, currentUtcDate, message.BatchId))
-                                                  .Where(di => di.Name.StartsWith("M0"));
-
-            var ParallelCreateFolderTasks = new List<Task> { };
-            Parallel.ForEach(rootDirectories, rootDirectoryFolder =>
-            {
-                string dvdNumber = rootDirectoryFolder.ToString()[^4..].Remove(1, 3);
-
-                ParallelCreateFolderTasks.Add(CreatePosFolderStructure(rootDirectoryFolder.ToString()));
-                ParallelCreateFolderTasks.Add(fulfilmentAncillaryFiles.CreateMediaFile(message.BatchId, rootDirectoryFolder.ToString(), message.CorrelationId, dvdNumber.ToString()));
-                ParallelCreateFolderTasks.Add(DownloadLargeMediaReadMeFile(message.BatchId, rootDirectoryFolder.ToString(), message.CorrelationId));
-                ParallelCreateFolderTasks.Add(CreateLargeMediaSerialEncFile(message.BatchId, largeMediaExchangeSetFilePath, string.Format(largeExchangeSetFolderName, dvdNumber), message.CorrelationId));
-                ParallelCreateFolderTasks.Add(CreateProductFile(message.BatchId, Path.Combine(rootDirectoryFolder.ToString(), fileShareServiceConfig.Value.Info), message.CorrelationId, response.SalesCatalogueDataResponse, message.ScsRequestDateTime, true)); //encryption=true since we will only request S63 large media exchange set.
-                ParallelCreateFolderTasks.Add(DownloadInfoFolderFiles(message.BatchId, Path.Combine(rootDirectoryFolder.ToString(), fileShareServiceConfig.Value.Info), message.CorrelationId));
-                ParallelCreateFolderTasks.Add(DownloadAdcFolderFiles(message.BatchId, Path.Combine(rootDirectoryFolder.ToString(), fileShareServiceConfig.Value.Info, fileShareServiceConfig.Value.Adc), message.CorrelationId));
-                ParallelCreateFolderTasks.Add(fulfilmentAncillaryFiles.CreateEncUpdateCsv(response.SalesCatalogueDataResponse, Path.Combine(rootDirectoryFolder.ToString(), fileShareServiceConfig.Value.Info), message.BatchId, message.CorrelationId));
-            });
-
-            await Task.WhenAll(ParallelCreateFolderTasks);
-            ParallelCreateFolderTasks.Clear();
-
-            var ParallelCreateFolderTaskForCatlogFile = new List<Task<bool>> { };
-            Parallel.ForEach(rootDirectories, rootDirectoryFolder =>
-            {
-                ParallelCreateFolderTaskForCatlogFile.Add(CreateLargeMediaExchangesetCatalogFile(message.BatchId, rootDirectoryFolder.ToString(), message.CorrelationId, response.FulfilmentDataResponses, response.SalesCatalogueDataResponse, response.SalesCatalogueProductResponse));
-            });
-
-            await Task.WhenAll(ParallelCreateFolderTaskForCatlogFile);
-            bool isExchangeSetFolderCreated = await Task.FromResult(ParallelCreateFolderTaskForCatlogFile.All(x => x.Result.Equals(true)));
-            ParallelCreateFolderTaskForCatlogFile.Clear();
-
-            return isExchangeSetFolderCreated;
-        }
-
-        private async Task<bool> CreateAncillaryFilesForAio(string batchId, string aioExchangeSetPath, string correlationId, SalesCatalogueDataResponse salesCatalogueDataResponse, DateTime scsRequestDateTime, SalesCatalogueProductResponse salesCatalogueProductResponse, List<FulfilmentDataResponse> listFulfilmentAioData)
-        {
-            var exchangeSetRootPath = Path.Combine(aioExchangeSetPath, fileShareServiceConfig.Value.EncRoot);
-            var exchangeSetInfoPath = Path.Combine(aioExchangeSetPath, fileShareServiceConfig.Value.Info);
-
-            return
-            await DownloadReadMeFileAsync(batchId, exchangeSetRootPath, correlationId) &&
-            await DownloadIhoCrtFile(batchId, aioExchangeSetPath, correlationId) &&
-            await DownloadIhoPubFile(batchId, aioExchangeSetPath, correlationId) &&
-            await CreateSerialAioFile(batchId, aioExchangeSetPath, correlationId, salesCatalogueDataResponse) &&
-            await CreateProductFileForAio(batchId, exchangeSetInfoPath, correlationId, salesCatalogueDataResponse, scsRequestDateTime) &&
-            await CreateCatalogFileForAio(batchId, exchangeSetRootPath, correlationId, listFulfilmentAioData, salesCatalogueDataResponse, salesCatalogueProductResponse);
-        }
-
-        private async Task<bool> CreateSerialAioFile(string batchId, string aioExchangeSetPath, string correlationId, SalesCatalogueDataResponse salesCatalogueDataResponse)
-        {
-            bool isSerialAioCreated = await logger.LogStartEndAndElapsedTimeAsync(EventIds.CreateSerialAioFileRequestStart,
-                      EventIds.CreateSerialAioFileRequestCompleted,
-                      "Create serial aio file request for BatchId:{batchId} and _X-Correlation-ID:{CorrelationId}",
-                      async () =>
-                      {
-                          return await fulfilmentAncillaryFiles.CreateSerialAioFile(batchId, aioExchangeSetPath, correlationId, salesCatalogueDataResponse);
-                      },
-                  batchId, correlationId);
-
-            return isSerialAioCreated;
-        }
-
-        private async Task<bool> CreateProductFileForAio(string batchId, string exchangeSetInfoPath, string correlationId, SalesCatalogueDataResponse salesCatalogueDataResponse, DateTime scsRequestDateTime)
-        {
-            bool isProductFileCreated = false;
-
-            if (!string.IsNullOrWhiteSpace(exchangeSetInfoPath))
-            {
-                DateTime createProductFileTaskStartedAt = DateTime.UtcNow;
-                isProductFileCreated = await logger.LogStartEndAndElapsedTimeAsync(EventIds.CreateProductFileRequestForAioStart,
-                        EventIds.CreateProductFileRequestForAioCompleted,
-                        "Create aio exchange set product file request for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}",
-                        async () =>
-                        {
-                            return await fulfilmentAncillaryFiles.CreateProductFile(batchId, exchangeSetInfoPath, correlationId, salesCatalogueDataResponse, scsRequestDateTime);
-                        },
-                        batchId, correlationId);
-
-                DateTime createProductFileTaskCompletedAt = DateTime.UtcNow;
-                monitorHelper.MonitorRequest("Create Product File Task", createProductFileTaskStartedAt, createProductFileTaskCompletedAt, correlationId, null, null, null, batchId);
-            }
-
-            return isProductFileCreated;
-        }
-
-        public async Task<bool> CreateCatalogFileForAio(string batchId, string exchangeSetRootPath, string correlationId, List<FulfilmentDataResponse> listFulfilmentData, SalesCatalogueDataResponse salesCatalogueDataResponse, SalesCatalogueProductResponse salesCatalogueProductResponse)
-        {
-            bool isFileCreated = false;
-
-            if (!string.IsNullOrWhiteSpace(exchangeSetRootPath))
-            {
-                DateTime createCatalogFileForAioTaskStartedAt = DateTime.UtcNow;
-                isFileCreated = await logger.LogStartEndAndElapsedTimeAsync(EventIds.CreateCatalogFileForAioRequestStart,
-                        EventIds.CreateCatalogFileForAioRequestCompleted,
-                        "Create AIO exchange set catalog file request for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}",
-                        async () =>
-                        {
-                            return await fulfilmentAncillaryFiles.CreateCatalogFile(batchId, exchangeSetRootPath, correlationId, listFulfilmentData, salesCatalogueDataResponse, salesCatalogueProductResponse);
-                        },
-                        batchId, correlationId);
-
-                DateTime createCatalogFileForAioTaskCompletedAt = DateTime.UtcNow;
-                monitorHelper.MonitorRequest("Create Catalog File Task", createCatalogFileForAioTaskStartedAt, createCatalogFileForAioTaskCompletedAt, correlationId, null, null, null, batchId);
-            }
-
-            return isFileCreated;
-        }
-
-        private string GetBusinessUnit(string standard)
-        {
-            if (Enum.TryParse(standard, out ExchangeSetStandard exchangeSetStandard))
-            {
-                var businessUnit = exchangeSetStandard switch
-                {
-                    ExchangeSetStandard.s63 => fileShareServiceConfig.Value.S63BusinessUnit,
-                    ExchangeSetStandard.s57 => fileShareServiceConfig.Value.S57BusinessUnit,
-                    _ => throw new FulfilmentException(EventIds.InvalidFssBusinessUnit.ToEventId()) //Exception will be log if fss business unit is not configured
-                };
-
-                return businessUnit;
-            }
-
-            throw new FulfilmentException(EventIds.InvalidFssBusinessUnit.ToEventId()); //Exception will be log if fss business unit is not configured
         }
     }
 }
