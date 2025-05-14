@@ -51,6 +51,14 @@ variables:
   - name: WindowPool
     value: "NautilusBuild"
 
+resources:
+  repositories:
+  - repository: TriggerAddsAutoTestsPipeline
+    type: github
+    endpoint: ukho
+    name: ukho/devops-trigger-adds-autotest-pipeline
+    ref: refs/heads/main 
+
 stages:
   - stage: Stryker_Mutator
     displayName: "Stryker Mutator"
@@ -493,6 +501,7 @@ stages:
           ContinueEvenIfResourcesAreGettingDestroyed: ${{ parameters.ContinueEvenIfResourcesAreGettingDestroyed }}
           AzureSubscription: "Exchange-Set-Service-vNext-IAT-A.011.08"
           Container: ${{variables.Container}}
+          RunAddsTests: vNextIAT
 
   - stage: vnexte2eDeploy
     dependsOn: 
@@ -519,6 +528,7 @@ stages:
           ContinueEvenIfResourcesAreGettingDestroyed: ${{ parameters.ContinueEvenIfResourcesAreGettingDestroyed }}
           AzureSubscription: "Exchange-Set-Service-IAT-A.011.08"
           Container: ${{variables.Container}}
+          RunAddsTests: IAT
 
   - stage: PreProdDeploy
     dependsOn: 

@@ -20,6 +20,14 @@ parameters:
 - name: v2Modifier
   type: string
   default: ""
+# Run ADDS tests by specifying the environment to run the tests in. Leave as the default value if you don't want to run them.
+- name: RunAddsTests
+  type: string
+  default: 'skip'
+  values:
+  - 'skip'
+  - 'vNextIAT'
+  - 'IAT'
 
 jobs:
 - deployment: DeployApp${{parameters.v2Modifier}}
@@ -82,3 +90,11 @@ jobs:
               APIMResourceGroup: $(APIM_RESOURCE_GROUP_NAME)
               APIMServiceInstance: $(APIM_SERVICE_NAME)
               tfstateStorageAccountName: $(APIM_TFSTATE_STORAGE_ACCOUNT_NAME)
+
+- ${{ if ne(parameters.RunAddsTests, 'skip') }}:
+  - template:  template.yml@TriggerAddsAutoTestsPipeline
+    parameters:
+      serviceConnection: 'addse2eauto Test - A.011.13'
+      environment: ${{ parameters.RunAddsTests }}
+      dependsOn:
+      - DeployApp${{parameters.v2Modifier}}
