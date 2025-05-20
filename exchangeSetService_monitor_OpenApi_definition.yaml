@@ -1,0 +1,20 @@
+openapi: 3.0.1
+info:
+  title: UKHO Exchange Set Service Monitor APIs
+  description: |
+    This is a light weight open api spec for UKHO Exchange Set Service Monitor and it should not be used as formal API documentation. One of its main purpose is to allow importing ESS Monitor APIs in APIM.
+  contact:
+    email: AbzuDeliveryTeam@ukho.gov.uk
+    name: Abzu Team
+  version: 0.0.1
+paths:
+  /health:
+    get:
+      summary: "Health Check."
+      operationId: "healthCheck"
+      description: "Returns the health status of the application"
+      responses:
+        200:
+          description: "Healthy"
+        503:
+          description: "Unhealthy"

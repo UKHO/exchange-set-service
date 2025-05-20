@@ -131,6 +131,26 @@ variable "pathsuffix" {
     default = ""
 }
 
+variable "monitor_product_name" {
+    type = string
+    default = "ESS Monitor"
+}
+
+variable "monitor_product_description" {
+    type = string
+    default = "Provides the ability to monitor Exchange Set Service"
+}
+
+variable "monitor_api_name" {
+    type = string
+    default = "Exchange Set Service Monitor API"
+}
+
+variable "monitor_api_description" {
+    type = string
+    default = "The ESS Monitor API provides the ability to monitor the API."
+}
+
 locals {
   env_name              = lower(terraform.workspace)
   service_name          = "ess"
@@ -146,4 +166,10 @@ locals {
   apim_ui_openapi       = file("${path.module}/exchangeSetService_Ui_OpenApi_definition.yaml")
 
   cors_origins          = split(";", var.cors_origin_values)
+
+  monitor_product_name      = local.env_name == "prod" ? "${var.monitor_product_name}${var.suffix}" : "${var.monitor_product_name} ${var.env_suffix[local.env_name]}${var.suffix}"
+  monitor_api_name          = local.env_name == "prod" ? "${var.monitor_api_name}${var.suffix}" : "${var.monitor_api_name} ${var.env_suffix[local.env_name]}${var.suffix}"
+  apim_monitor_api_openapi  = file("${path.module}/exchangeSetService_monitor_OpenApi_definition.yaml")
+  monitor_service_name      = "ess-monitor"
+  apim_monitor_api_path     = local.env_name == "prod" ? "${local.monitor_service_name}${var.pathsuffix}" : "${local.monitor_service_name}-${local.env_name}${var.pathsuffix}"
 }
