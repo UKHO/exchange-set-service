@@ -315,3 +315,55 @@ resource "azurerm_api_management_product_policy" "ess_ui_product_policy" {
 	</policies>
    XML
 }
+
+# Create ESS Monitor API
+resource "azurerm_api_management_api" "ess_monitor_api" {
+  resource_group_name = data.azurerm_resource_group.rg.name
+  api_management_name = data.azurerm_api_management.apim_instance.name
+  name                = lower(replace(var.apim_monitor_api_name, " ", "-"))
+  display_name        = var.apim_monitor_api_name
+  description         = var.apim_monitor_api_description
+  revision            = "1"
+  path                = var.apim_monitor_api_path
+  protocols           = ["https"]
+  service_url         = var.apim_api_backend_url
+
+  subscription_key_parameter_names {
+    header = "Ocp-Apim-Subscription-Key"
+    query  = "subscription-key"
+  }
+
+  import {
+    content_format = "openapi"
+    content_value  = var.apim_monitor_api_openapi
+  }
+}
+
+# Create ESS Monitor Product
+resource "azurerm_api_management_product" "ess_monitor_product" {
+  resource_group_name   = data.azurerm_resource_group.rg.name
+  api_management_name   = data.azurerm_api_management.apim_instance.name
+  product_id            = lower(replace(var.apim_ess_monitor_product_name, " ", "-"))
+  display_name          = title(var.apim_ess_monitor_product_name)
+  description           = var.apim_ess_monitor_product_description
+  subscription_required = true
+  approval_required     = true
+  published             = true
+  subscriptions_limit   = 1
+}
+
+# Add ESS Monitor API to ESS Product
+resource "azurerm_api_management_product_api" "ess_monitor_product_api_mapping" {
+  resource_group_name = data.azurerm_resource_group.rg.name
+  api_management_name = data.azurerm_api_management.apim_instance.name
+  api_name            = azurerm_api_management_api.ess_monitor_api.name
+  product_id          = azurerm_api_management_product.ess_monitor_product.product_id
+}
+
+# ESS monitor product-Group mapping
+resource "azurerm_api_management_product_group" "monitor_product_group_mappping" {
+  resource_group_name = data.azurerm_resource_group.rg.name
+  api_management_name = data.azurerm_api_management.apim_instance.name
+  product_id          = azurerm_api_management_product.ess_monitor_product.product_id
+  group_name          = azurerm_api_management_group.ess_management_group.name
+}
