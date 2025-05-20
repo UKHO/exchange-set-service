@@ -29,4 +29,11 @@ module "exchange_set_service" {
   ess_b2c_token_issuer               = var.b2c_token_issuer
   ess_b2c_client_id                  = var.b2c_client_id
   cors_origins                       = local.cors_origins
+
+  apim_ess_monitor_product_name          = local.monitor_product_name
+  apim_ess_monitor_product_description   = var.monitor_product_description
+  apim_monitor_api_name                  = local.monitor_api_name
+  apim_monitor_api_description           = var.monitor_api_description
+  apim_monitor_api_openapi               = local.apim_monitor_api_openapi
+  apim_monitor_api_path                  = local.apim_monitor_api_path
 }
