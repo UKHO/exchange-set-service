@@ -228,7 +228,16 @@ namespace UKHO.ExchangeSetService.FulfilmentService.FileBuilders
             var exchangeSetInfoPath = Path.Combine(exchangeSetPath, fileShareServiceConfig.Value.Info);
 
             await CreateProductFile(batchId, exchangeSetInfoPath, correlationId, salesCatalogueEssDataResponse, scsRequestDateTime, encryption);
-            await CreateSerialEncFile(batchId, exchangeSetPath, correlationId);
+
+            if (encryption)
+            {
+                await CreateSerialEncFile(batchId, exchangeSetPath, correlationId);
+            }
+            else
+            {
+                logger.LogInformation(EventIds.SerialFileCreationSkipped.ToEventId(), "serial.enc is not created for BatchId:{BatchId} | _X-Correlation-ID : {CorrelationId}", batchId, correlationId);
+            }
+
             await download.DownloadReadMeFileAsync(batchId, exchangeSetRootPath, correlationId);
             await CreateCatalogFile(batchId, exchangeSetRootPath, correlationId, listFulfilmentData, salesCatalogueEssDataResponse, salecatalogueProductResponse);
         }

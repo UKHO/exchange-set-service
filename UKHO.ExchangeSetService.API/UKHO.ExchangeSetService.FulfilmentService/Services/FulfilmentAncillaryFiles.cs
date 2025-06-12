@@ -81,6 +81,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
 
                 var orderPreference = new List<Tuple<string, string>> {
                     new Tuple<string, string>("application/s63", "BIN"),
+                    new Tuple<string, string>("application/s57", "BIN"),
                     new Tuple<string, string>("text/plain", "ASC"),
                     new Tuple<string, string>("text/plain", "TXT"),
                     new Tuple<string, string>("image/tiff", "TIF") };
@@ -177,8 +178,9 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             switch (mimeType)
             {
                 case "application/s63":
+                case "application/s57":
                     return "BIN";
-
+                    
                 case "text/plain":
                     if (fileExtension == ".txt")
                         return "TXT";

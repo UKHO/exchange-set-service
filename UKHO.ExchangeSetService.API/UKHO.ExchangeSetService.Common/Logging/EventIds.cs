@@ -856,9 +856,11 @@ namespace UKHO.ExchangeSetService.Common.Logging
         /// <summary>
         /// 805211 - Download readme.txt file is failed.
         /// </summary>
-        ErrorInDownloadReadMeFile = 805211
-
-
+        ErrorInDownloadReadMeFile = 805211,
+        /// <summary>
+        /// 805213 - serial.enc file creation is skipped
+        /// </summary>
+        SerialFileCreationSkipped = 805212
     }
 
     public static class EventIdExtensions
