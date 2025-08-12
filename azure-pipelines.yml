@@ -9,6 +9,10 @@ parameters:
     displayName: "Disable Stryker"
     type: boolean
     default: false
+  - name: skipDeploymentOfUIInstance
+    displayName: "Skip deployment of UI instance"
+    type: boolean
+    default: false
 
 trigger:
   - main
@@ -121,15 +125,16 @@ stages:
           Container: ${{variables.Container}} 
           RunTests: true
 
-      - template: Deployment/templates/app-deploy.yml
-        parameters:
-          Environment: "dev"
-          ContinueEvenIfResourcesAreGettingDestroyed: ${{ parameters.ContinueEvenIfResourcesAreGettingDestroyed }}
-          AzureSubscription: "Exchange-Set-Service-Dev-A-008-02"
-          Container: ${{variables.Container}} 
-          RunTests: false
-          pathSuffix: "-v2"
-          v2Modifier: "2"
+      - ${{ if eq(parameters.skipDeploymentOfUIInstance, false) }}:  
+        - template: Deployment/templates/app-deploy.yml  
+          parameters:  
+            Environment: "dev"  
+            ContinueEvenIfResourcesAreGettingDestroyed: ${{ parameters.ContinueEvenIfResourcesAreGettingDestroyed }}  
+            AzureSubscription: "Exchange-Set-Service-Dev-A-008-02"  
+            Container: ${{variables.Container}}   
+            RunTests: false  
+            pathSuffix: "-v2"  
+            v2Modifier: "2"
 
   - stage: QCdeploy
     dependsOn:
@@ -341,56 +346,57 @@ stages:
                     scriptPath: "$(Build.SourcesDirectory)/terraformartifact/set_api_webjob_aio_feature_configuration.ps1"
                     arguments: '-aiocells $(AioConfiguration.AioCells) -resourcegroup $(RESOURCE_GROUP_NAME) -webappname $(WEB_APP_NAME) -fulfilmentwebappsname $(fulfilmentWebAppsName)'
 
-      - deployment: QADeployApp2
-        dependsOn:
-        - QADeployApp
-        displayName: "QA - deploy terraform and dotnet App for FSS UI"
-        environment: "Ess-Qa"
-        pool: $(DeploymentPool)
-        container: ${{variables.Container}}
-        workspace:
-          clean: all
-        variables:
-          - group: "ESS-Deployment-Variables-QA"
-          - group: "ESS-QA2-Variables"
-          - name: "ESSAzureADConfiguration.ClientId"
-            value: $(ESSClientId)
-          - name: "ESSAzureADConfiguration.TenantId"
-            value: $(TenantId)
-          - name: "EssAuthorizationConfiguration.TenantId"
-            value: $(TenantId)
-          - name: "EssAuthorizationConfiguration.AutoTestClientId"
-            value: $(AutoTestClientId_Authed)
-          - name: "EssAuthorizationConfiguration.AutoTestClientSecret"
-            value: $(AutoTestClientSecret_Authed)
-          - name: "EssAuthorizationConfiguration.EssClientId"
-            value: $(ESSClientId)
-          - name: "EssAuthorizationConfiguration.AutoTestClientIdNoAuth"
-            value: $(AutoTestClientId_NoAuth)
-          - name: "EssAuthorizationConfiguration.AutoTestClientSecretNoAuth"
-            value: $(AutoTestClientSecret_NoAuth)
-          - name: "AzureAdB2CTestConfiguration.ClientSecret"
-            value: $(AUTOTEST-ESS-SECRET)
-        strategy:
-          runOnce:
-            deploy:
-              steps:
-                - checkout: self
-                  submodules: recursive
+      - ${{ if eq(parameters.skipDeploymentOfUIInstance, false) }}:  
+        - deployment: QADeployApp2  
+          dependsOn:  
+          - QADeployApp  
+          displayName: "QA - deploy terraform and dotnet App for FSS UI"  
+          environment: "Ess-Qa"  
+          pool: $(DeploymentPool)  
+          container: ${{variables.Container}}  
+          workspace:  
+            clean: all  
+          variables:  
+            - group: "ESS-Deployment-Variables-QA"  
+            - group: "ESS-QA2-Variables"  
+            - name: "ESSAzureADConfiguration.ClientId"  
+              value: $(ESSClientId)  
+            - name: "ESSAzureADConfiguration.TenantId"  
+              value: $(TenantId)  
+            - name: "EssAuthorizationConfiguration.TenantId"  
+              value: $(TenantId)  
+            - name: "EssAuthorizationConfiguration.AutoTestClientId"  
+              value: $(AutoTestClientId_Authed)  
+            - name: "EssAuthorizationConfiguration.AutoTestClientSecret"  
+              value: $(AutoTestClientSecret_Authed)  
+            - name: "EssAuthorizationConfiguration.EssClientId"  
+              value: $(ESSClientId)  
+            - name: "EssAuthorizationConfiguration.AutoTestClientIdNoAuth"  
+              value: $(AutoTestClientId_NoAuth)  
+            - name: "EssAuthorizationConfiguration.AutoTestClientSecretNoAuth"  
+              value: $(AutoTestClientSecret_NoAuth)  
+            - name: "AzureAdB2CTestConfiguration.ClientSecret"  
+              value: $(AUTOTEST-ESS-SECRET)  
+          strategy:  
+            runOnce:  
+              deploy:  
+                steps:  
+                  - checkout: self  
+                    submodules: recursive  
 
-                - template: Deployment/templates/continuous-deployment-v2.yml
-                  parameters:
-                    ContinueEvenIfResourcesAreGettingDestroyed: ${{ parameters.ContinueEvenIfResourcesAreGettingDestroyed }}
-                    AzureSubscription: "Exchange-Set-Service-QA-A-008-02"
+                  - template: Deployment/templates/continuous-deployment-v2.yml  
+                    parameters:  
+                      ContinueEvenIfResourcesAreGettingDestroyed: ${{ parameters.ContinueEvenIfResourcesAreGettingDestroyed }}  
+                      AzureSubscription: "Exchange-Set-Service-QA-A-008-02"  
 
-                - template: Deployment/templates/continuous-deployment-apim-v2.yml
-                  parameters:
-                     ContinueEvenIfResourcesAreGettingDestroyed: ${{ parameters.ContinueEvenIfResourcesAreGettingDestroyed }}
-                     AzureSubscription: "UKHO-APIM-SOLAS-NonLive"
-                     TerraformKeyVault: $(APIM_TERRAFORM_KEYVAULT)
-                     APIMResourceGroup: $(APIM_RESOURCE_GROUP_NAME)
-                     APIMServiceInstance: $(APIM_SERVICE_NAME)
-                     tfstateStorageAccountName: $(APIM_TFSTATE_STORAGE_ACCOUNT_NAME)
+                  - template: Deployment/templates/continuous-deployment-apim-v2.yml  
+                    parameters:  
+                      ContinueEvenIfResourcesAreGettingDestroyed: ${{ parameters.ContinueEvenIfResourcesAreGettingDestroyed }}  
+                      AzureSubscription: "UKHO-APIM-SOLAS-NonLive"  
+                      TerraformKeyVault: $(APIM_TERRAFORM_KEYVAULT)  
+                      APIMResourceGroup: $(APIM_RESOURCE_GROUP_NAME)  
+                      APIMServiceInstance: $(APIM_SERVICE_NAME)  
+                      tfstateStorageAccountName: $(APIM_TFSTATE_STORAGE_ACCOUNT_NAME)
 
       - job: Run_ADDS_E2E_tests
         displayName: Run ADDS E2E tests
@@ -446,44 +452,47 @@ stages:
                     APIMServiceInstance: $(APIM_SERVICE_NAME)
                     tfstateStorageAccountName: $(APIM_TFSTATE_STORAGE_ACCOUNT_NAME)
 
-      - deployment: LiveDeployApp2
-        dependsOn:
-        - LiveDeployApp
-        displayName: "Live - deploy terraform and dotnet App for FSS UI"
-        environment: "Ess-Live"
-        pool: $(DeploymentPool)
-        container: ${{variables.Container}}
-        workspace:
-          clean: all
-        variables:
-          - group: "ESS-Deployment-Variables-LIVE"
-          - group: "ESS-Live2-Variables"
-          - name: "ESSAzureADConfiguration.ClientId"
-            value: $(ESSClientId)
-          - name: "ESSAzureADConfiguration.TenantId"
-            value: $(TenantId)
-        strategy:
-         runOnce:
-          deploy:
-            steps:
-              - template: Deployment/templates/continuous-deployment-v2.yml
-                parameters:
-                  ContinueEvenIfResourcesAreGettingDestroyed: ${{ parameters.ContinueEvenIfResourcesAreGettingDestroyed }}
-                  AzureSubscription: "Exchange-Set-Service-Live-A-008-02"
-
-              - template: Deployment/templates/continuous-deployment-apim-v2.yml
-                parameters:
+      - ${{ if eq(parameters.skipDeploymentOfUIInstance, false) }}:
+        - deployment: LiveDeployApp2
+          dependsOn:
+          - LiveDeployApp
+          displayName: "Live - deploy terraform and dotnet App for FSS UI"
+          environment: "Ess-Live"
+          pool: $(DeploymentPool)
+          container: ${{variables.Container}}
+          workspace:
+            clean: all
+          variables:
+            - group: "ESS-Deployment-Variables-LIVE"
+            - group: "ESS-Live2-Variables"
+            - name: "ESSAzureADConfiguration.ClientId"
+              value: $(ESSClientId)
+            - name: "ESSAzureADConfiguration.TenantId"
+              value: $(TenantId)
+          strategy:
+           runOnce:
+            deploy:
+              steps:
+                - template: Deployment/templates/continuous-deployment-v2.yml
+                  parameters:
                     ContinueEvenIfResourcesAreGettingDestroyed: ${{ parameters.ContinueEvenIfResourcesAreGettingDestroyed }}
-                    AzureSubscription: "UKHO-APIM-SOLAS-Live"
-                    TerraformKeyVault: $(APIM_TERRAFORM_KEYVAULT)
-                    APIMResourceGroup: $(APIM_RESOURCE_GROUP_NAME)
-                    APIMServiceInstance: $(APIM_SERVICE_NAME)
-                    tfstateStorageAccountName: $(APIM_TFSTATE_STORAGE_ACCOUNT_NAME)
+                    AzureSubscription: "Exchange-Set-Service-Live-A-008-02"
+
+                - template: Deployment/templates/continuous-deployment-apim-v2.yml
+                  parameters:
+                      ContinueEvenIfResourcesAreGettingDestroyed: ${{ parameters.ContinueEvenIfResourcesAreGettingDestroyed }}
+                      AzureSubscription: "UKHO-APIM-SOLAS-Live"
+                      TerraformKeyVault: $(APIM_TERRAFORM_KEYVAULT)
+                      APIMResourceGroup: $(APIM_RESOURCE_GROUP_NAME)
+                      APIMServiceInstance: $(APIM_SERVICE_NAME)
+                      tfstateStorageAccountName: $(APIM_TFSTATE_STORAGE_ACCOUNT_NAME)
 
       - job: PostDeploymentActions
         dependsOn:
         - LiveDeployApp            
-        - LiveDeployApp2 
+        - ${{ if eq(parameters.skipDeploymentOfUIInstance, false) }}:  
+          - LiveDeployApp2
+        
         pool: $(WindowPool)        
         displayName: Post Deployment Actions
         steps:
