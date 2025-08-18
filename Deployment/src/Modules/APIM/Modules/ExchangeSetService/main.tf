@@ -359,11 +359,3 @@ resource "azurerm_api_management_product_api" "ess_monitor_product_api_mapping" 
   api_name            = azurerm_api_management_api.ess_monitor_api.name
   product_id          = azurerm_api_management_product.ess_monitor_product.product_id
 }
-
-# ESS monitor product-Group mapping
-resource "azurerm_api_management_product_group" "monitor_product_group_mappping" {
-  resource_group_name = data.azurerm_resource_group.rg.name
-  api_management_name = data.azurerm_api_management.apim_instance.name
-  product_id          = azurerm_api_management_product.ess_monitor_product.product_id
-  group_name          = azurerm_api_management_group.ess_management_group.name
-}
