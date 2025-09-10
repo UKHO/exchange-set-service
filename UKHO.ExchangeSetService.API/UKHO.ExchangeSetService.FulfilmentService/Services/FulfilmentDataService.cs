@@ -78,14 +78,22 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
                 logger.LogInformation(EventIds.ExchangeSetCreated.ToEventId(), "Exchange set is created for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", message.BatchId, message.CorrelationId);
                 await fulfilmentCallBackService.SendCallBackResponse(response, message);
                 monitorHelper.MonitorRequest("Create Exchange Set Task", createExchangeSetTaskStartedAt, createExchangeSetTaskCompletedAt, message.CorrelationId, null, null, null, message.BatchId);
-                Directory.Delete(homeDirectoryPath, true);
+                Cleanup();
                 return "Exchange Set Created Successfully";
             }
             else
             {
                 monitorHelper.MonitorRequest("Create Exchange Set Task", createExchangeSetTaskStartedAt, createExchangeSetTaskCompletedAt, message.CorrelationId, null, null, null, message.BatchId);
-                Directory.Delete(homeDirectoryPath, true);
+                Cleanup();
                 return "Exchange Set Is Not Created";
+            }
+
+            void Cleanup()
+            {
+                if (Directory.Exists(homeDirectoryPath))
+                {
+                    Directory.Delete(homeDirectoryPath, true);
+                }
             }
         }
 
