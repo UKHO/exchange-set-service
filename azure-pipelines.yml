@@ -416,7 +416,7 @@ stages:
 
   - stage: Livedeploy
     dependsOn:
-    - QAdeploy
+    - PreProdDeploy
     displayName: Livedeploy (inc terraform, webapp deploy)
     condition: and(succeeded(), or(eq(variables['Build.SourceBranch'], 'refs/heads/main'),startsWith(variables['Build.SourceBranch'], 'refs/heads/release/')))
     jobs:
