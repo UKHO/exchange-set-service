@@ -414,9 +414,73 @@ stages:
               filePath: '$(System.DefaultWorkingDirectory)/Deployment/ADDS-e2e-tests.ps1'
               arguments: '-queueSecret $(QueueSecret) -pollSecret $(PollSecret) -pollTimeInSecs $(PollTimeInSecs) -functionEndPoint $(FunctionEndPoint)'
 
+  - stage: vnextiatDeploy
+    dependsOn:
+      - Devdeploy
+    displayName: vNext IAT Deploy (inc terraform, webapp deploy)
+    condition: and(succeeded(), or(eq(variables['Build.SourceBranch'], 'refs/heads/develop'), startsWith(variables['Build.SourceBranch'], 'refs/heads/dev/')))
+    jobs:
+      - template: Deployment/templates/app-deploy.yml
+        parameters:
+          Environment: "vnextiat"
+          ContinueEvenIfResourcesAreGettingDestroyed: ${{ parameters.ContinueEvenIfResourcesAreGettingDestroyed }}
+          AzureSubscription: "Exchange-Set-Service-vNext-IAT-A.011.08"
+          Container: ${{variables.Container}}
+          RunAddsTests: vNextIAT
+
+  - stage: vnexte2eDeploy
+    dependsOn: 
+      - vnextiatDeploy
+    displayName: vNext E2E Deploy (inc terraform, webapp deploy)
+    condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/develop'))
+    jobs:
+      - template: Deployment/templates/app-deploy.yml
+        parameters:
+          Environment: "vnexte2e"
+          ContinueEvenIfResourcesAreGettingDestroyed: ${{ parameters.ContinueEvenIfResourcesAreGettingDestroyed }}
+          AzureSubscription: "Exchange-Set-Service-vNext-E2E-A.011.08"
+          Container: ${{variables.Container}}
+
+  - stage: IatDeploy
+    dependsOn: 
+    - Devdeploy
+    displayName: IAT Deploy (inc terraform, webapp deploy)
+    condition: and(succeeded(), or(eq(variables['Build.SourceBranch'], 'refs/heads/main'), startsWith(variables['Build.SourceBranch'], 'refs/heads/release/')))
+    jobs:
+      - template: Deployment/templates/app-deploy.yml
+        parameters:
+          Environment: "iat"
+          ContinueEvenIfResourcesAreGettingDestroyed: ${{ parameters.ContinueEvenIfResourcesAreGettingDestroyed }}
+          AzureSubscription: "Exchange-Set-Service-IAT-A.011.08"
+          Container: ${{variables.Container}}
+          RunAddsTests: IAT
+
+  - stage: PreProdDeploy
+    dependsOn: 
+    - IatDeploy
+    displayName: PreProd Deploy (inc terraform, webapp deploy)
+    condition: and(succeeded(), or(eq(variables['Build.SourceBranch'], 'refs/heads/main'), startsWith(variables['Build.SourceBranch'], 'refs/heads/release/')))
+    jobs:
+      - template: Deployment/templates/app-deploy.yml
+        parameters:
+          Environment: "preprod"
+          ContinueEvenIfResourcesAreGettingDestroyed: ${{ parameters.ContinueEvenIfResourcesAreGettingDestroyed }}
+          AzureSubscription: "Exchange-Set-Service-Pre-A.011.08"
+          Container: ${{variables.Container}} 
+
+      - template: Deployment/templates/app-deploy.yml
+        parameters:
+          Environment: "preprod"
+          ContinueEvenIfResourcesAreGettingDestroyed: ${{ parameters.ContinueEvenIfResourcesAreGettingDestroyed }}
+          AzureSubscription: "Exchange-Set-Service-Pre-A.011.08"
+          Container: ${{variables.Container}} 
+          RunTests: false
+          pathSuffix: "-v2"
+          v2Modifier: "2"
+
   - stage: Livedeploy
     dependsOn:
-    - QAdeploy
+    - PreProdDeploy
     displayName: Livedeploy (inc terraform, webapp deploy)
     condition: and(succeeded(), or(eq(variables['Build.SourceBranch'], 'refs/heads/main'),startsWith(variables['Build.SourceBranch'], 'refs/heads/release/')))
     jobs:
@@ -497,67 +561,3 @@ stages:
         displayName: Post Deployment Actions
         steps:
           - template: Deployment/templates/retain-pipeline.yml
-
-  - stage: vnextiatDeploy
-    dependsOn:
-      - Devdeploy
-    displayName: vNext IAT Deploy (inc terraform, webapp deploy)
-    condition: and(succeeded(), or(eq(variables['Build.SourceBranch'], 'refs/heads/develop'), startsWith(variables['Build.SourceBranch'], 'refs/heads/dev/')))
-    jobs:
-      - template: Deployment/templates/app-deploy.yml
-        parameters:
-          Environment: "vnextiat"
-          ContinueEvenIfResourcesAreGettingDestroyed: ${{ parameters.ContinueEvenIfResourcesAreGettingDestroyed }}
-          AzureSubscription: "Exchange-Set-Service-vNext-IAT-A.011.08"
-          Container: ${{variables.Container}}
-          RunAddsTests: vNextIAT
-
-  - stage: vnexte2eDeploy
-    dependsOn: 
-      - vnextiatDeploy
-    displayName: vNext E2E Deploy (inc terraform, webapp deploy)
-    condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/develop'))
-    jobs:
-      - template: Deployment/templates/app-deploy.yml
-        parameters:
-          Environment: "vnexte2e"
-          ContinueEvenIfResourcesAreGettingDestroyed: ${{ parameters.ContinueEvenIfResourcesAreGettingDestroyed }}
-          AzureSubscription: "Exchange-Set-Service-vNext-E2E-A.011.08"
-          Container: ${{variables.Container}}
-
-  - stage: IatDeploy
-    dependsOn: 
-    - Devdeploy
-    displayName: IAT Deploy (inc terraform, webapp deploy)
-    condition: and(succeeded(), or(eq(variables['Build.SourceBranch'], 'refs/heads/main'), startsWith(variables['Build.SourceBranch'], 'refs/heads/release/')))
-    jobs:
-      - template: Deployment/templates/app-deploy.yml
-        parameters:
-          Environment: "iat"
-          ContinueEvenIfResourcesAreGettingDestroyed: ${{ parameters.ContinueEvenIfResourcesAreGettingDestroyed }}
-          AzureSubscription: "Exchange-Set-Service-IAT-A.011.08"
-          Container: ${{variables.Container}}
-          RunAddsTests: IAT
-
-  - stage: PreProdDeploy
-    dependsOn: 
-    - IatDeploy
-    displayName: PreProd Deploy (inc terraform, webapp deploy)
-    condition: and(succeeded(), or(eq(variables['Build.SourceBranch'], 'refs/heads/main'), startsWith(variables['Build.SourceBranch'], 'refs/heads/release/')))
-    jobs:
-      - template: Deployment/templates/app-deploy.yml
-        parameters:
-          Environment: "preprod"
-          ContinueEvenIfResourcesAreGettingDestroyed: ${{ parameters.ContinueEvenIfResourcesAreGettingDestroyed }}
-          AzureSubscription: "Exchange-Set-Service-Pre-A.011.08"
-          Container: ${{variables.Container}} 
-
-      - template: Deployment/templates/app-deploy.yml
-        parameters:
-          Environment: "preprod"
-          ContinueEvenIfResourcesAreGettingDestroyed: ${{ parameters.ContinueEvenIfResourcesAreGettingDestroyed }}
-          AzureSubscription: "Exchange-Set-Service-Pre-A.011.08"
-          Container: ${{variables.Container}} 
-          RunTests: false
-          pathSuffix: "-v2"
-          v2Modifier: "2"
