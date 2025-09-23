@@ -1,18 +1,19 @@
-﻿using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Abstractions;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using UKHO.ExchangeSetService.Common.Configuration;
 using UKHO.ExchangeSetService.Common.Extensions;
 using UKHO.ExchangeSetService.Common.Helpers;
 using UKHO.ExchangeSetService.Common.Logging;
 using UKHO.ExchangeSetService.Common.Models.Response;
 using UKHO.ExchangeSetService.Common.Models.SalesCatalogue;
+using UKHO.ExchangeSetService.Common.Models.WebJobs;
 using UKHO.ExchangeSetService.FulfilmentService.FileBuilders;
 
 namespace UKHO.ExchangeSetService.FulfilmentService.Services
@@ -31,17 +32,17 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
     {
         private readonly AioConfiguration aioConfiguration = aioConfiguration.Value;
 
-        public async Task<string> CreateExchangeSet(SalesCatalogueServiceResponseQueueMessage message, string currentUtcDate)
+        public async Task<string> CreateExchangeSet(FulfilmentServiceBatch batch)
         {
             DateTime createExchangeSetTaskStartedAt = DateTime.UtcNow;
-            string homeDirectoryPath = configuration["HOME"];
-            var exchangeSetPath = Path.Combine(homeDirectoryPath, currentUtcDate, message.BatchId, fileShareServiceConfig.Value.ExchangeSetFileFolder);
-            var exchangeSetZipFilePath = Path.Combine(homeDirectoryPath, currentUtcDate, message.BatchId);
+            //string homeDirectoryPath = configuration["HOME"];
+            //var exchangeSetPath = Path.Combine(homeDirectoryPath, currentUtcDate, message.BatchId, fileShareServiceConfig.Value.ExchangeSetFileFolder);
+            //var exchangeSetZipFilePath = Path.Combine(homeDirectoryPath, currentUtcDate, message.BatchId);
 
             //Get SCS catalogue essData response
-            SalesCatalogueDataResponse salesCatalogueEssDataResponse = await GetSalesCatalogueDataResponse(message.BatchId, message.CorrelationId);
+            var salesCatalogueEssDataResponse = await GetSalesCatalogueDataResponse(batch.BatchId, batch.CorrelationId);
 
-            var response = await DownloadSalesCatalogueResponse(message);
+            var response = await DownloadSalesCatalogueResponse(batch.Message);
 
             List<string> aioCells = !string.IsNullOrEmpty(aioConfiguration.AioCells) ? new(aioConfiguration.AioCells.Split(',')) : new List<string>();
             var essItems = response.Products
@@ -52,39 +53,39 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
                     .Where(product => aioCells.Any(aioCell => product.ProductName == aioCell))
                     .ToList();
 
-            var businessUnit = message.ExchangeSetStandard.GetBusinessUnit(fileShareServiceConfig.Value);
+            var businessUnit = batch.Message.ExchangeSetStandard.GetBusinessUnit(fileShareServiceConfig.Value);
 
             SalesCatalogueDataResponse salesCatalogueEssDataResponseForAio = (SalesCatalogueDataResponse)salesCatalogueEssDataResponse.Clone();
 
-            if (essItems != null && essItems.Any() || message.IsEmptyEncExchangeSet)
+            if (essItems != null && essItems.Any() || batch.Message.IsEmptyEncExchangeSet)
             {
                 salesCatalogueEssDataResponse.ResponseBody = salesCatalogueEssDataResponse.ResponseBody
                                                              .Where(x => !aioCells.Any(productName => productName.Equals(x.ProductName))).ToList();
-                await exchangeSetBuilder.CreateStandardExchangeSet(message, response, essItems, exchangeSetPath, salesCatalogueEssDataResponse, businessUnit);
+                await exchangeSetBuilder.CreateStandardExchangeSet(batch.Message, response, essItems, batch.ExchangeSetDirectory, salesCatalogueEssDataResponse, businessUnit);
             }
-            if (aioItems != null && aioItems.Any() || message.IsEmptyAioExchangeSet)
+            if (aioItems != null && aioItems.Any() || batch.Message.IsEmptyAioExchangeSet)
             {
                 salesCatalogueEssDataResponseForAio.ResponseBody = salesCatalogueEssDataResponseForAio.ResponseBody
                                                      .Where(x => aioCells.Any(productName => productName.Equals(x.ProductName))).ToList();
-                await exchangeSetBuilder.CreateAioExchangeSet(message, currentUtcDate, homeDirectoryPath, aioItems, salesCatalogueEssDataResponseForAio, response);
+                await exchangeSetBuilder.CreateAioExchangeSet(batch, aioItems, salesCatalogueEssDataResponseForAio, response);
             }
 
 
-            bool isZipFileUploaded = await PackageAndUploadExchangeSetZipFileToFileShareService(message.BatchId, exchangeSetZipFilePath, message.CorrelationId);
+            bool isZipFileUploaded = await PackageAndUploadExchangeSetZipFileToFileShareService(batch.BatchId, batch.BatchDirectory, batch.CorrelationId);
 
             DateTime createExchangeSetTaskCompletedAt = DateTime.UtcNow;
             if (isZipFileUploaded)
             {
-                logger.LogInformation(EventIds.ExchangeSetCreated.ToEventId(), "Exchange set is created for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", message.BatchId, message.CorrelationId);
-                await fulfilmentCallBackService.SendCallBackResponse(response, message);
-                monitorHelper.MonitorRequest("Create Exchange Set Task", createExchangeSetTaskStartedAt, createExchangeSetTaskCompletedAt, message.CorrelationId, null, null, null, message.BatchId);
+                logger.LogInformation(EventIds.ExchangeSetCreated.ToEventId(), "Exchange set is created for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", batch.BatchId, batch.CorrelationId);
+                await fulfilmentCallBackService.SendCallBackResponse(response, batch.Message);
+                monitorHelper.MonitorRequest("Create Exchange Set Task", createExchangeSetTaskStartedAt, createExchangeSetTaskCompletedAt, batch.CorrelationId, null, null, null, batch.BatchId);
                 return "Exchange Set Created Successfully";
             }
-            monitorHelper.MonitorRequest("Create Exchange Set Task", createExchangeSetTaskStartedAt, createExchangeSetTaskCompletedAt, message.CorrelationId, null, null, null, message.BatchId);
+            monitorHelper.MonitorRequest("Create Exchange Set Task", createExchangeSetTaskStartedAt, createExchangeSetTaskCompletedAt, batch.CorrelationId, null, null, null, batch.BatchId);
             return "Exchange Set Is Not Created";
         }
 
-        public async Task<string> CreateLargeExchangeSet(SalesCatalogueServiceResponseQueueMessage message, string currentUtcDate, string largeExchangeSetFolderName)
+        public async Task<string> CreateLargeExchangeSet(FulfilmentServiceBatch batch, SalesCatalogueServiceResponseQueueMessage message, string currentUtcDate, string largeExchangeSetFolderName)
         {
             DateTime createExchangeSetTaskStartedAt = DateTime.UtcNow;
             string homeDirectoryPath = configuration["HOME"];
@@ -131,7 +132,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             {
                 largeExchangeSetDataResponseForAio.SalesCatalogueDataResponse.ResponseBody = largeExchangeSetDataResponseForAio.SalesCatalogueDataResponse.ResponseBody
                                                                                     .Where(x => aioCells.Any(productName => productName == x.ProductName)).ToList();
-                isExchangeSetFolderCreated = await exchangeSetBuilder.CreateAioExchangeSet(message, currentUtcDate, homeDirectoryPath, aioItems, largeExchangeSetDataResponseForAio.SalesCatalogueDataResponse, largeExchangeSetDataResponseForAio.SalesCatalogueProductResponse);
+                isExchangeSetFolderCreated = await exchangeSetBuilder.CreateAioExchangeSet(batch, aioItems, largeExchangeSetDataResponseForAio.SalesCatalogueDataResponse, largeExchangeSetDataResponseForAio.SalesCatalogueProductResponse);
 
                 if (!isExchangeSetFolderCreated)
                 {

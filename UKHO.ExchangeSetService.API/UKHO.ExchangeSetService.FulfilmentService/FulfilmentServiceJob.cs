@@ -60,7 +60,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService
                             "Create Large Exchange Set web job request for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}",
                             async () =>
                             {
-                                return await fulFilmentDataService.CreateLargeExchangeSet(fulfilmentServiceQueueMessage, currentUtcDate, periodicOutputServiceConfiguration.Value.LargeExchangeSetFolderName);
+                                return await fulFilmentDataService.CreateLargeExchangeSet(batch, batch.Message, batch.CurrentUtcDate, periodicOutputServiceConfiguration.Value.LargeExchangeSetFolderName);
                             },
                             batch.BatchId, batch.CorrelationId);
                     }
@@ -71,7 +71,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService
                             "Create Exchange Set web job request for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}",
                             async () =>
                             {
-                                return await fulFilmentDataService.CreateExchangeSet(fulfilmentServiceQueueMessage, currentUtcDate);
+                                return await fulFilmentDataService.CreateExchangeSet(batch);
                             },
                             batch.BatchId, batch.CorrelationId);
                     }

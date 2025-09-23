@@ -1,13 +1,13 @@
-﻿using FluentValidation.Results;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
-using Newtonsoft.Json;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using FluentValidation.Results;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+using Newtonsoft.Json;
 using UKHO.ExchangeSetService.Common.Configuration;
 using UKHO.ExchangeSetService.Common.Extensions;
 using UKHO.ExchangeSetService.Common.Helpers;
@@ -15,6 +15,7 @@ using UKHO.ExchangeSetService.Common.Logging;
 using UKHO.ExchangeSetService.Common.Models.FileShareService.Response;
 using UKHO.ExchangeSetService.Common.Models.Response;
 using UKHO.ExchangeSetService.Common.Models.SalesCatalogue;
+using UKHO.ExchangeSetService.Common.Models.WebJobs;
 using UKHO.ExchangeSetService.FulfilmentService.Downloads;
 using UKHO.ExchangeSetService.FulfilmentService.Services;
 using UKHO.ExchangeSetService.FulfilmentService.Validation;
@@ -35,10 +36,10 @@ namespace UKHO.ExchangeSetService.FulfilmentService.FileBuilders
 
         #region AIO Exchanges Set
 
-        public async Task<bool> CreateAioExchangeSet(SalesCatalogueServiceResponseQueueMessage message, string currentUtcDate, string homeDirectoryPath, List<Products> aioItems, SalesCatalogueDataResponse salesCatalogueEssDataResponse, SalesCatalogueProductResponse salesCatalogueProductResponse)
+        public async Task<bool> CreateAioExchangeSet(FulfilmentServiceBatch batch, List<Products> aioItems, SalesCatalogueDataResponse salesCatalogueEssDataResponse, SalesCatalogueProductResponse salesCatalogueProductResponse)
         {
-            var aioExchangeSetPath = Path.Combine(homeDirectoryPath, currentUtcDate, message.BatchId, fileShareServiceConfig.Value.AioExchangeSetFileFolder);
-            var aioExchangeSetRootPath = Path.Combine(aioExchangeSetPath, fileShareServiceConfig.Value.EncRoot);
+            //var aioExchangeSetPath = Path.Combine(homeDirectoryPath, currentUtcDate, message.BatchId, fileShareServiceConfig.Value.AioExchangeSetFileFolder);
+            //var aioExchangeSetRootPath = Path.Combine(aioExchangeSetPath, fileShareServiceConfig.Value.EncRoot);
             var listFulfilmentAioData = new List<FulfilmentDataResponse>();
 
             if (aioItems != null && aioItems.Any())
@@ -56,7 +57,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.FileBuilders
                 var tasks = productsList.Select(async item =>
                 {
                     //Only S63 data will be fetched
-                    fulfilmentDataResponse = await QueryFileShareServiceFiles(message, item, aioExchangeSetRootPath, cancellationTokenSource, cancellationToken, fileShareServiceConfig.Value.S63BusinessUnit);
+                    fulfilmentDataResponse = await QueryFileShareServiceFiles(batch.Message, item, batch.AioExchangeSetEncRootDirectory, cancellationTokenSource, cancellationToken, fileShareServiceConfig.Value.S63BusinessUnit);
                     int queryCount = fulfilmentDataResponse.Any() ? fulfilmentDataResponse.First().FileShareServiceSearchQueryCount : 0;
                     lock (sync)
                     {
@@ -65,7 +66,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.FileBuilders
                     if (cancellationToken.IsCancellationRequested)
                     {
                         cancellationTokenSource.Cancel();
-                        logger.LogError(EventIds.CancellationTokenEvent.ToEventId(), "Operation is cancelled as IsCancellationRequested flag is true in QueryFileShareServiceFiles with {cancellationTokenSource.Token} and batchId:{message.BatchId} and CorrelationId:{message.CorrelationId}", JsonConvert.SerializeObject(cancellationTokenSource.Token), message.BatchId, message.CorrelationId);
+                        logger.LogError(EventIds.CancellationTokenEvent.ToEventId(), "Operation is cancelled as IsCancellationRequested flag is true in QueryFileShareServiceFiles with {cancellationTokenSource.Token} and batchId:{message.BatchId} and CorrelationId:{message.CorrelationId}", JsonConvert.SerializeObject(cancellationTokenSource.Token), batch.BatchId, batch.CorrelationId);
                         throw new OperationCanceledException();
                     }
                     listFulfilmentAioData.AddRange(fulfilmentDataResponse);
@@ -79,10 +80,10 @@ namespace UKHO.ExchangeSetService.FulfilmentService.FileBuilders
                 {
                     downloadedENCFileCount += item.Files.Count();
                 }
-                monitorHelper.MonitorRequest("Query and Download ENC Files Task", queryAndDownloadEncFilesFromFileShareServiceTaskStartedAt, queryAndDownloadEncFilesFromFileShareServiceTaskCompletedAt, message.CorrelationId, fileShareServiceSearchQueryCount, downloadedENCFileCount, null, message.BatchId);
+                monitorHelper.MonitorRequest("Query and Download ENC Files Task", queryAndDownloadEncFilesFromFileShareServiceTaskStartedAt, queryAndDownloadEncFilesFromFileShareServiceTaskCompletedAt, batch.CorrelationId, fileShareServiceSearchQueryCount, downloadedENCFileCount, null, batch.BatchId);
             }
 
-            return await fileBuilder.CreateAncillaryFilesForAio(message.BatchId, aioExchangeSetPath, message.CorrelationId, salesCatalogueEssDataResponse, message.ScsRequestDateTime, salesCatalogueProductResponse, listFulfilmentAioData);
+            return await fileBuilder.CreateAncillaryFilesForAio(batch.BatchId, batch.AioExchangeSetDirectory, batch.CorrelationId, salesCatalogueEssDataResponse, batch.Message.ScsRequestDateTime, salesCatalogueProductResponse, listFulfilmentAioData);
         }
 
         #endregion
