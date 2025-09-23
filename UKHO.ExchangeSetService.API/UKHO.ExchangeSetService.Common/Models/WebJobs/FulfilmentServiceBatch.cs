@@ -53,6 +53,11 @@ namespace UKHO.ExchangeSetService.Common.Models.WebJobs
         public string ExchangeSetDirectory { get; }
 
         /// <summary>
+        /// eg. C:\Temp\xqcve9YzMkuU0sDJ0eE0Dg\20250615\635219b9-43b6-4e96-9b33-72759ac6d5c2\V01X01\ENC_ROOT
+        /// </summary>
+        public string ExchangeSetEncRootDirectory { get; }
+
+        /// <summary>
         /// eg. C:\Temp\xqcve9YzMkuU0sDJ0eE0Dg\20250615\635219b9-43b6-4e96-9b33-72759ac6d5c2\AIO
         /// </summary>
         public string AioExchangeSetDirectory { get; }
@@ -91,6 +96,7 @@ namespace UKHO.ExchangeSetService.Common.Models.WebJobs
             CorrelationId = fulfilmentServiceQueueMessage.CorrelationId;
             BatchDirectory = Path.Combine(baseWorkDirectory, fulfilmentServiceQueueMessage.BatchId);
             ExchangeSetDirectory = Path.Combine(BatchDirectory, fileShareServiceConfiguration.ExchangeSetFileFolder);
+            ExchangeSetEncRootDirectory = Path.Combine(ExchangeSetDirectory, fileShareServiceConfiguration.EncRoot);
             AioExchangeSetDirectory = Path.Combine(BatchDirectory, fileShareServiceConfiguration.AioExchangeSetFileFolder);
             AioExchangeSetEncRootDirectory = Path.Combine(AioExchangeSetDirectory, fileShareServiceConfiguration.EncRoot);
             LargeExchangeSetDirectory = Path.Combine(BatchDirectory, periodicOutputServiceConfiguration.LargeExchangeSetFolderName);

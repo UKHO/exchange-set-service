@@ -88,9 +88,9 @@ namespace UKHO.ExchangeSetService.FulfilmentService.FileBuilders
 
         #endregion
 
-        public async Task CreateStandardExchangeSet(SalesCatalogueServiceResponseQueueMessage message, SalesCatalogueProductResponse response, List<Products> essItems, string exchangeSetPath, SalesCatalogueDataResponse salesCatalogueEssDataResponse, string businessUnit)
+        public async Task CreateStandardExchangeSet(FulfilmentServiceBatch batch, SalesCatalogueProductResponse response, List<Products> essItems, SalesCatalogueDataResponse salesCatalogueEssDataResponse, string businessUnit)
         {
-            var exchangeSetRootPath = Path.Combine(exchangeSetPath, fileShareServiceConfig.Value.EncRoot);
+            //var exchangeSetRootPath = Path.Combine(exchangeSetPath, fileShareServiceConfig.Value.EncRoot);
             var listFulfilmentData = new List<FulfilmentDataResponse>();
 
             if (essItems != null && essItems.Any())
@@ -108,7 +108,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.FileBuilders
                 var tasks = productsList.Select(async item =>
                 {
                     //S63 or S57 data will be fetched
-                    fulfilmentDataResponse = await QueryFileShareServiceFiles(message, item, exchangeSetRootPath, cancellationTokenSource, cancellationToken, businessUnit);
+                    fulfilmentDataResponse = await QueryFileShareServiceFiles(batch.Message, item, batch.ExchangeSetEncRootDirectory, cancellationTokenSource, cancellationToken, businessUnit);
                     int queryCount = fulfilmentDataResponse.Any() ? fulfilmentDataResponse.First().FileShareServiceSearchQueryCount : 0;
                     lock (sync)
                     {
@@ -117,7 +117,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.FileBuilders
                     if (cancellationToken.IsCancellationRequested)
                     {
                         cancellationTokenSource.Cancel();
-                        logger.LogError(EventIds.CancellationTokenEvent.ToEventId(), "Operation is cancelled as IsCancellationRequested flag is true in QueryFileShareServiceFiles with {cancellationTokenSource.Token} and batchId:{message.BatchId} and CorrelationId:{message.CorrelationId}", JsonConvert.SerializeObject(cancellationTokenSource.Token), message.BatchId, message.CorrelationId);
+                        logger.LogError(EventIds.CancellationTokenEvent.ToEventId(), "Operation is cancelled as IsCancellationRequested flag is true in QueryFileShareServiceFiles with {cancellationTokenSource.Token} and batchId:{message.BatchId} and CorrelationId:{message.CorrelationId}", JsonConvert.SerializeObject(cancellationTokenSource.Token), batch.BatchId, batch.CorrelationId);
                         throw new OperationCanceledException();
                     }
                     listFulfilmentData.AddRange(fulfilmentDataResponse);
@@ -131,12 +131,12 @@ namespace UKHO.ExchangeSetService.FulfilmentService.FileBuilders
                 {
                     downloadedENCFileCount += item.Files.Count();
                 }
-                monitorHelper.MonitorRequest("Query and Download ENC Files Task", queryAndDownloadEncFilesFromFileShareServiceTaskStartedAt, queryAndDownloadEncFilesFromFileShareServiceTaskCompletedAt, message.CorrelationId, fileShareServiceSearchQueryCount, downloadedENCFileCount, null, message.BatchId);
+                monitorHelper.MonitorRequest("Query and Download ENC Files Task", queryAndDownloadEncFilesFromFileShareServiceTaskStartedAt, queryAndDownloadEncFilesFromFileShareServiceTaskCompletedAt, batch.CorrelationId, fileShareServiceSearchQueryCount, downloadedENCFileCount, null, batch.BatchId);
             }
 
             bool encryption = string.Equals(businessUnit, fileShareServiceConfig.Value.S63BusinessUnit, StringComparison.OrdinalIgnoreCase);
 
-            await fileBuilder.CreateAncillaryFiles(message.BatchId, exchangeSetPath, message.CorrelationId, listFulfilmentData, response, message.ScsRequestDateTime, salesCatalogueEssDataResponse, encryption);
+            await fileBuilder.CreateAncillaryFiles(batch.BatchId, batch.ExchangeSetDirectory, batch.CorrelationId, listFulfilmentData, response, batch.Message.ScsRequestDateTime, salesCatalogueEssDataResponse, encryption);
         }
 
         public async Task<bool> CreateStandardLargeMediaExchangeSet(SalesCatalogueServiceResponseQueueMessage message, string homeDirectoryPath, string currentUtcDate, LargeExchangeSetDataResponse largeExchangeSetDataResponse, string largeExchangeSetFolderName, string largeMediaExchangeSetFilePath)

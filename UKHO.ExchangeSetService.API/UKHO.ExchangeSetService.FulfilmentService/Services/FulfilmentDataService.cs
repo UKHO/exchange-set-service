@@ -61,7 +61,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             {
                 salesCatalogueEssDataResponse.ResponseBody = salesCatalogueEssDataResponse.ResponseBody
                                                              .Where(x => !aioCells.Any(productName => productName.Equals(x.ProductName))).ToList();
-                await exchangeSetBuilder.CreateStandardExchangeSet(batch.Message, response, essItems, batch.ExchangeSetDirectory, salesCatalogueEssDataResponse, businessUnit);
+                await exchangeSetBuilder.CreateStandardExchangeSet(batch, response, essItems, salesCatalogueEssDataResponse, businessUnit);
             }
             if (aioItems != null && aioItems.Any() || batch.Message.IsEmptyAioExchangeSet)
             {
