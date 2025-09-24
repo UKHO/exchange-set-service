@@ -139,41 +139,44 @@ namespace UKHO.ExchangeSetService.FulfilmentService.FileBuilders
             await fileBuilder.CreateAncillaryFiles(batch.BatchId, batch.ExchangeSetDirectory, batch.CorrelationId, listFulfilmentData, response, batch.Message.ScsRequestDateTime, salesCatalogueEssDataResponse, encryption);
         }
 
-        public async Task<bool> CreateStandardLargeMediaExchangeSet(SalesCatalogueServiceResponseQueueMessage message, string homeDirectoryPath, string currentUtcDate, LargeExchangeSetDataResponse largeExchangeSetDataResponse, string largeExchangeSetFolderName, string largeMediaExchangeSetFilePath)
+        public async Task<bool> CreateStandardLargeMediaExchangeSet(FulfilmentServiceBatch batch, LargeExchangeSetDataResponse largeExchangeSetDataResponse)
         {
-            LargeExchangeSetDataResponse response = await SearchAndDownloadEncFilesFromFss(message, homeDirectoryPath, currentUtcDate, largeExchangeSetFolderName, largeExchangeSetDataResponse);
+            //string homeDirectoryPath = configuration["HOME"];
+            //var exchangeSetFilePath = Path.Combine(homeDirectoryPath, currentUtcDate, message.BatchId);
+            //isExchangeSetFolderCreated = await exchangeSetBuilder.CreateStandardLargeMediaExchangeSet(message, homeDirectoryPath, currentUtcDate, response, largeExchangeSetFolderName, exchangeSetFilePath);
+            LargeExchangeSetDataResponse response = await SearchAndDownloadEncFilesFromFss(batch, largeExchangeSetDataResponse);
             if (!string.IsNullOrWhiteSpace(response.ValidationtFailedMessage))
             {
-                logger.LogError(EventIds.LargeExchangeSetCreatedWithError.ToEventId(), "Large media exchange set is not created for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", message.BatchId, message.CorrelationId);
-                logger.LogError(EventIds.LargeExchangeSetCreatedWithError.ToEventId(), "Operation Cancelled as product validation failed for BatchId:{BatchId}, _X-Correlation-ID:{CorrelationId} and Validation message :{Message}", message.BatchId, message.CorrelationId, response.ValidationtFailedMessage);
+                logger.LogError(EventIds.LargeExchangeSetCreatedWithError.ToEventId(), "Large media exchange set is not created for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", batch.BatchId, batch.CorrelationId);
+                logger.LogError(EventIds.LargeExchangeSetCreatedWithError.ToEventId(), "Operation Cancelled as product validation failed for BatchId:{BatchId}, _X-Correlation-ID:{CorrelationId} and Validation message :{Message}", batch.BatchId, batch.CorrelationId, response.ValidationtFailedMessage);
                 throw new FulfilmentException(EventIds.BundleInfoValidationFailed.ToEventId());
             }
 
-            var rootDirectories = fileSystemHelper.GetDirectoryInfo(Path.Combine(homeDirectoryPath, currentUtcDate, message.BatchId))
+            var rootDirectories = fileSystemHelper.GetDirectoryInfo(batch.BatchDirectory)
                                                   .Where(di => di.Name.StartsWith("M0"));
 
-            var ParallelCreateFolderTasks = new List<Task> { };
+            var parallelCreateFolderTasks = new List<Task> { };
             Parallel.ForEach(rootDirectories, rootDirectoryFolder =>
             {
                 string dvdNumber = rootDirectoryFolder.ToString()[^4..].Remove(1, 3);
 
-                ParallelCreateFolderTasks.Add(CreatePosFolderStructure(rootDirectoryFolder.ToString()));
-                ParallelCreateFolderTasks.Add(fulfilmentAncillaryFiles.CreateMediaFile(message.BatchId, rootDirectoryFolder.ToString(), message.CorrelationId, dvdNumber.ToString()));
-                ParallelCreateFolderTasks.Add(download.DownloadLargeMediaReadMeFile(message.BatchId, rootDirectoryFolder.ToString(), message.CorrelationId));
-                ParallelCreateFolderTasks.Add(fileBuilder.CreateLargeMediaSerialEncFile(message.BatchId, largeMediaExchangeSetFilePath, string.Format(largeExchangeSetFolderName, dvdNumber), message.CorrelationId));
-                ParallelCreateFolderTasks.Add(fileBuilder.CreateProductFile(message.BatchId, Path.Combine(rootDirectoryFolder.ToString(), fileShareServiceConfig.Value.Info), message.CorrelationId, response.SalesCatalogueDataResponse, message.ScsRequestDateTime, true)); //encryption=true since we will only request S63 large media exchange set.
-                ParallelCreateFolderTasks.Add(download.DownloadInfoFolderFiles(message.BatchId, Path.Combine(rootDirectoryFolder.ToString(), fileShareServiceConfig.Value.Info), message.CorrelationId));
-                ParallelCreateFolderTasks.Add(download.DownloadAdcFolderFiles(message.BatchId, Path.Combine(rootDirectoryFolder.ToString(), fileShareServiceConfig.Value.Info, fileShareServiceConfig.Value.Adc), message.CorrelationId));
-                ParallelCreateFolderTasks.Add(fulfilmentAncillaryFiles.CreateEncUpdateCsv(response.SalesCatalogueDataResponse, Path.Combine(rootDirectoryFolder.ToString(), fileShareServiceConfig.Value.Info), message.BatchId, message.CorrelationId));
+                parallelCreateFolderTasks.Add(CreatePosFolderStructure(rootDirectoryFolder.ToString()));
+                parallelCreateFolderTasks.Add(fulfilmentAncillaryFiles.CreateMediaFile(batch.BatchId, rootDirectoryFolder.ToString(), batch.CorrelationId, dvdNumber.ToString()));
+                parallelCreateFolderTasks.Add(download.DownloadLargeMediaReadMeFile(batch.BatchId, rootDirectoryFolder.ToString(), batch.CorrelationId));
+                parallelCreateFolderTasks.Add(fileBuilder.CreateLargeMediaSerialEncFile(batch.BatchId, batch.BatchDirectory, string.Format(batch.LargeExchangeSetFolderName, dvdNumber), batch.CorrelationId));
+                parallelCreateFolderTasks.Add(fileBuilder.CreateProductFile(batch.BatchId, Path.Combine(rootDirectoryFolder.ToString(), fileShareServiceConfig.Value.Info), batch.CorrelationId, response.SalesCatalogueDataResponse, batch.Message.ScsRequestDateTime, true)); //encryption=true since we will only request S63 large media exchange set.
+                parallelCreateFolderTasks.Add(download.DownloadInfoFolderFiles(batch.BatchId, Path.Combine(rootDirectoryFolder.ToString(), fileShareServiceConfig.Value.Info), batch.CorrelationId));
+                parallelCreateFolderTasks.Add(download.DownloadAdcFolderFiles(batch.BatchId, Path.Combine(rootDirectoryFolder.ToString(), fileShareServiceConfig.Value.Info, fileShareServiceConfig.Value.Adc), batch.CorrelationId));
+                parallelCreateFolderTasks.Add(fulfilmentAncillaryFiles.CreateEncUpdateCsv(response.SalesCatalogueDataResponse, Path.Combine(rootDirectoryFolder.ToString(), fileShareServiceConfig.Value.Info), batch.BatchId, batch.CorrelationId));
             });
 
-            await Task.WhenAll(ParallelCreateFolderTasks);
-            ParallelCreateFolderTasks.Clear();
+            await Task.WhenAll(parallelCreateFolderTasks);
+            parallelCreateFolderTasks.Clear();
 
             var ParallelCreateFolderTaskForCatlogFile = new List<Task<bool>> { };
             Parallel.ForEach(rootDirectories, rootDirectoryFolder =>
             {
-                ParallelCreateFolderTaskForCatlogFile.Add(fileBuilder.CreateLargeMediaExchangesetCatalogFile(message.BatchId, rootDirectoryFolder.ToString(), message.CorrelationId, response.FulfilmentDataResponses, response.SalesCatalogueDataResponse, response.SalesCatalogueProductResponse));
+                ParallelCreateFolderTaskForCatlogFile.Add(fileBuilder.CreateLargeMediaExchangesetCatalogFile(batch.BatchId, rootDirectoryFolder.ToString(), batch.CorrelationId, response.FulfilmentDataResponses, response.SalesCatalogueDataResponse, response.SalesCatalogueProductResponse));
             });
 
             await Task.WhenAll(ParallelCreateFolderTaskForCatlogFile);
@@ -193,10 +196,10 @@ namespace UKHO.ExchangeSetService.FulfilmentService.FileBuilders
         }
 
         //Search and download ENC files for large media exchange set
-        private async Task<LargeExchangeSetDataResponse> SearchAndDownloadEncFilesFromFss(SalesCatalogueServiceResponseQueueMessage message, string homeDirectoryPath, string currentUtcDate, string largeExchangeSetFolderName, LargeExchangeSetDataResponse largeExchangeSetDataResponse)
+        private async Task<LargeExchangeSetDataResponse> SearchAndDownloadEncFilesFromFss(FulfilmentServiceBatch batch, LargeExchangeSetDataResponse largeExchangeSetDataResponse)
         {
-            var batchPath = Path.Combine(homeDirectoryPath, currentUtcDate, message.BatchId, largeExchangeSetFolderName);
-            var exchangeSetRootPath = Path.Combine(batchPath, "{1}", fileShareServiceConfig.Value.EncRoot);
+            //var batchPath = Path.Combine(homeDirectoryPath, currentUtcDate, message.BatchId, largeExchangeSetFolderName);
+            //var exchangeSetRootPath = Path.Combine(batchPath, "{1}", fileShareServiceConfig.Value.EncRoot);
             var listFulfilmentData = new List<FulfilmentDataResponse>();
 
             List<string> aioCells = !string.IsNullOrEmpty(aioConfiguration.Value.AioCells) ? new(aioConfiguration.Value.AioCells.Split(',')) : new List<string>();
@@ -228,7 +231,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.FileBuilders
                 var tasks = productsList.Select(async item =>
                 {
                     //Only S63 data will be fetched
-                    fulfilmentDataResponse = await QueryFileShareServiceFiles(message, item, exchangeSetRootPath, cancellationTokenSource, cancellationToken, fileShareServiceConfig.Value.S63BusinessUnit);
+                    fulfilmentDataResponse = await QueryFileShareServiceFiles(batch.Message, item, batch.LargeExchangeSetEncRootDirectory, cancellationTokenSource, cancellationToken, fileShareServiceConfig.Value.S63BusinessUnit);
                     int queryCount = fulfilmentDataResponse.Any() ? fulfilmentDataResponse.First().FileShareServiceSearchQueryCount : 0;
                     lock (sync)
                     {
@@ -237,7 +240,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.FileBuilders
                     if (cancellationToken.IsCancellationRequested)
                     {
                         cancellationTokenSource.Cancel();
-                        logger.LogError(EventIds.CancellationTokenEvent.ToEventId(), "Operation is cancelled as IsCancellationRequested flag is true in QueryFileShareServiceFiles with {cancellationTokenSource.Token} and batchId:{message.BatchId} and CorrelationId:{message.CorrelationId}", JsonConvert.SerializeObject(cancellationTokenSource.Token), message.BatchId, message.CorrelationId);
+                        logger.LogError(EventIds.CancellationTokenEvent.ToEventId(), "Operation is cancelled as IsCancellationRequested flag is true in QueryFileShareServiceFiles with {cancellationTokenSource.Token} and batchId:{message.BatchId} and CorrelationId:{message.CorrelationId}", JsonConvert.SerializeObject(cancellationTokenSource.Token), batch.BatchId, batch.CorrelationId);
                         throw new OperationCanceledException();
                     }
                     listFulfilmentData.AddRange(fulfilmentDataResponse);
@@ -251,7 +254,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.FileBuilders
                 {
                     downloadedENCFileCount += item.Files.Count();
                 }
-                monitorHelper.MonitorRequest("Query and Download ENC Files Task", queryAndDownloadEncFilesFromFileShareServiceTaskStartedAt, queryAndDownloadEncFilesFromFileShareServiceTaskCompletedAt, message.CorrelationId, fileShareServiceSearchQueryCount, downloadedENCFileCount, null, message.BatchId);
+                monitorHelper.MonitorRequest("Query and Download ENC Files Task", queryAndDownloadEncFilesFromFileShareServiceTaskStartedAt, queryAndDownloadEncFilesFromFileShareServiceTaskCompletedAt, batch.CorrelationId, fileShareServiceSearchQueryCount, downloadedENCFileCount, null, batch.BatchId);
                 largeExchangeSetDataResponse.FulfilmentDataResponses = listFulfilmentData;
             }
 

@@ -68,6 +68,11 @@ namespace UKHO.ExchangeSetService.Common.Models.WebJobs
         public string AioExchangeSetEncRootDirectory { get; }
 
         /// <summary>
+        /// eg. M0{0}X02
+        /// </summary>
+        public string LargeExchangeSetFolderName { get; }
+
+        /// <summary>
         /// eg. C:\Temp\xqcve9YzMkuU0sDJ0eE0Dg\20250615\635219b9-43b6-4e96-9b33-72759ac6d5c2\M0{0}X02
         /// </summary>
         public string LargeExchangeSetDirectory { get; }
@@ -99,6 +104,7 @@ namespace UKHO.ExchangeSetService.Common.Models.WebJobs
             ExchangeSetEncRootDirectory = Path.Combine(ExchangeSetDirectory, fileShareServiceConfiguration.EncRoot);
             AioExchangeSetDirectory = Path.Combine(BatchDirectory, fileShareServiceConfiguration.AioExchangeSetFileFolder);
             AioExchangeSetEncRootDirectory = Path.Combine(AioExchangeSetDirectory, fileShareServiceConfiguration.EncRoot);
+            LargeExchangeSetFolderName = periodicOutputServiceConfiguration.LargeExchangeSetFolderName;
             LargeExchangeSetDirectory = Path.Combine(BatchDirectory, periodicOutputServiceConfiguration.LargeExchangeSetFolderName);
             LargeExchangeSetEncRootDirectory = Path.Combine(LargeExchangeSetDirectory, "{1}", fileShareServiceConfiguration.EncRoot);
             ErrorFile = Path.Combine(BatchDirectory, fileShareServiceConfiguration.ErrorFileName);
