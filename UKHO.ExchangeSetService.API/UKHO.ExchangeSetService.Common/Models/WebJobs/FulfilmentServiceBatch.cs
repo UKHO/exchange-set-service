@@ -8,25 +8,10 @@ using UKHO.ExchangeSetService.Common.Models.SalesCatalogue;
 namespace UKHO.ExchangeSetService.Common.Models.WebJobs
 {
     /// <summary>
-    /// Store paths used during exchange set creation.
+    /// Store batch data used during exchange set creation.
     /// </summary>
     public class FulfilmentServiceBatch
     {
-        /// <summary>
-        /// A unique identifier for the ESS fulfilment folder.
-        /// </summary>
-        public const string JobFolder = "xqcve9YzMkuU0sDJ0eE0Dg";
-
-        /// <summary>
-        /// eg. C:\Temp
-        /// </summary>
-        public string BaseWorkDirectory { get; }
-
-        /// <summary>
-        /// eg. 20250615
-        /// </summary>
-        public string CurrentUtcDate { get; }
-
         /// <summary>
         /// Queue message
         /// </summary>
@@ -94,12 +79,11 @@ namespace UKHO.ExchangeSetService.Common.Models.WebJobs
             PeriodicOutputServiceConfiguration periodicOutputServiceConfiguration
             )
         {
-            CurrentUtcDate = DateTime.UtcNow.ToString("yyyyMMdd");
-            BaseWorkDirectory = Path.Combine(baseWorkDirectory, JobFolder, CurrentUtcDate);
+            // The BatchDirectory is in the format {baseWorkDirectory}/{uniqueId}/{yyyyMMdd}/{batchId}, where {uniqueId} is used to identify the fulfilment job itself.
+            BatchDirectory = Path.Combine(baseWorkDirectory, "xqcve9YzMkuU0sDJ0eE0Dg", DateTime.UtcNow.ToString("yyyyMMdd"), fulfilmentServiceQueueMessage.BatchId);
             Message = fulfilmentServiceQueueMessage;
             BatchId = fulfilmentServiceQueueMessage.BatchId;
             CorrelationId = fulfilmentServiceQueueMessage.CorrelationId;
-            BatchDirectory = Path.Combine(baseWorkDirectory, fulfilmentServiceQueueMessage.BatchId);
             ExchangeSetDirectory = Path.Combine(BatchDirectory, fileShareServiceConfiguration.ExchangeSetFileFolder);
             ExchangeSetEncRootDirectory = Path.Combine(ExchangeSetDirectory, fileShareServiceConfiguration.EncRoot);
             AioExchangeSetDirectory = Path.Combine(BatchDirectory, fileShareServiceConfiguration.AioExchangeSetFileFolder);
