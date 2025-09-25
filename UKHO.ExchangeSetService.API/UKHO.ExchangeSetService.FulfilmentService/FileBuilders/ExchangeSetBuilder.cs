@@ -1,13 +1,14 @@
-﻿using FluentValidation.Results;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
-using Newtonsoft.Json;
-using System;
+﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
+using System.IO.Abstractions;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+using Newtonsoft.Json;
 using UKHO.ExchangeSetService.Common.Configuration;
 using UKHO.ExchangeSetService.Common.Extensions;
 using UKHO.ExchangeSetService.Common.Helpers;
@@ -138,9 +139,15 @@ namespace UKHO.ExchangeSetService.FulfilmentService.FileBuilders
             await fileBuilder.CreateAncillaryFiles(message.BatchId, exchangeSetPath, message.CorrelationId, listFulfilmentData, response, message.ScsRequestDateTime, salesCatalogueEssDataResponse, encryption);
         }
 
-        public async Task<bool> CreateStandardLargeMediaExchangeSet(SalesCatalogueServiceResponseQueueMessage message, string homeDirectoryPath, string currentUtcDate, LargeExchangeSetDataResponse largeExchangeSetDataResponse, string largeExchangeSetFolderName, string largeMediaExchangeSetFilePath)
+        public async Task<bool> CreateStandardLargeMediaExchangeSet(SalesCatalogueServiceResponseQueueMessage message, string homeDirectoryPath, string currentUtcDate, LargeExchangeSetDataResponse largeExchangeSetDataResponse, string largeExchangeSetFolderName, string largeMediaExchangeSetFilePath,
+            CancellationToken cancellationToken)
         {
-            LargeExchangeSetDataResponse response = await SearchAndDownloadEncFilesFromFss(message, homeDirectoryPath, currentUtcDate, largeExchangeSetFolderName, largeExchangeSetDataResponse);
+            cancellationToken.ThrowIfCancellationRequested();
+
+            LargeExchangeSetDataResponse response = await SearchAndDownloadEncFilesFromFss(message, homeDirectoryPath, currentUtcDate, largeExchangeSetFolderName, largeExchangeSetDataResponse, cancellationToken);
+
+            cancellationToken.ThrowIfCancellationRequested();
+
             if (!string.IsNullOrWhiteSpace(response.ValidationtFailedMessage))
             {
                 logger.LogError(EventIds.LargeExchangeSetCreatedWithError.ToEventId(), "Large media exchange set is not created for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", message.BatchId, message.CorrelationId);
@@ -151,36 +158,76 @@ namespace UKHO.ExchangeSetService.FulfilmentService.FileBuilders
             var rootDirectories = fileSystemHelper.GetDirectoryInfo(Path.Combine(homeDirectoryPath, currentUtcDate, message.BatchId))
                                                   .Where(di => di.Name.StartsWith("M0"));
 
-            var ParallelCreateFolderTasks = new List<Task> { };
-            Parallel.ForEach(rootDirectories, rootDirectoryFolder =>
-            {
-                string dvdNumber = rootDirectoryFolder.ToString()[^4..].Remove(1, 3);
+            // Build each volume sequentially in definition but concurrently in execution.
+            var volumeTasks = rootDirectories.Select(rd =>
+                BuildLargeMediaVolumeAsync(message, rd, response,
+                    largeExchangeSetFolderName, largeMediaExchangeSetFilePath, cancellationToken));
 
-                ParallelCreateFolderTasks.Add(CreatePosFolderStructure(rootDirectoryFolder.ToString()));
-                ParallelCreateFolderTasks.Add(fulfilmentAncillaryFiles.CreateMediaFile(message.BatchId, rootDirectoryFolder.ToString(), message.CorrelationId, dvdNumber.ToString()));
-                ParallelCreateFolderTasks.Add(download.DownloadLargeMediaReadMeFile(message.BatchId, rootDirectoryFolder.ToString(), message.CorrelationId));
-                ParallelCreateFolderTasks.Add(fileBuilder.CreateLargeMediaSerialEncFile(message.BatchId, largeMediaExchangeSetFilePath, string.Format(largeExchangeSetFolderName, dvdNumber), message.CorrelationId));
-                ParallelCreateFolderTasks.Add(fileBuilder.CreateProductFile(message.BatchId, Path.Combine(rootDirectoryFolder.ToString(), fileShareServiceConfig.Value.Info), message.CorrelationId, response.SalesCatalogueDataResponse, message.ScsRequestDateTime, true)); //encryption=true since we will only request S63 large media exchange set.
-                ParallelCreateFolderTasks.Add(download.DownloadInfoFolderFiles(message.BatchId, Path.Combine(rootDirectoryFolder.ToString(), fileShareServiceConfig.Value.Info), message.CorrelationId));
-                ParallelCreateFolderTasks.Add(download.DownloadAdcFolderFiles(message.BatchId, Path.Combine(rootDirectoryFolder.ToString(), fileShareServiceConfig.Value.Info, fileShareServiceConfig.Value.Adc), message.CorrelationId));
-                ParallelCreateFolderTasks.Add(fulfilmentAncillaryFiles.CreateEncUpdateCsv(response.SalesCatalogueDataResponse, Path.Combine(rootDirectoryFolder.ToString(), fileShareServiceConfig.Value.Info), message.BatchId, message.CorrelationId));
-            });
-
-            await Task.WhenAll(ParallelCreateFolderTasks);
-            ParallelCreateFolderTasks.Clear();
-
-            var ParallelCreateFolderTaskForCatlogFile = new List<Task<bool>> { };
-            Parallel.ForEach(rootDirectories, rootDirectoryFolder =>
-            {
-                ParallelCreateFolderTaskForCatlogFile.Add(fileBuilder.CreateLargeMediaExchangesetCatalogFile(message.BatchId, rootDirectoryFolder.ToString(), message.CorrelationId, response.FulfilmentDataResponses, response.SalesCatalogueDataResponse, response.SalesCatalogueProductResponse));
-            });
-
-            await Task.WhenAll(ParallelCreateFolderTaskForCatlogFile);
-            bool isExchangeSetFolderCreated = await Task.FromResult(ParallelCreateFolderTaskForCatlogFile.All(x => x.Result.Equals(true)));
-            ParallelCreateFolderTaskForCatlogFile.Clear();
-
-            return isExchangeSetFolderCreated;
+            var results = await Task.WhenAll(volumeTasks);
+            return results.All(r => r);
         }
+
+        private async Task<bool> BuildLargeMediaVolumeAsync(SalesCatalogueServiceResponseQueueMessage message, IDirectoryInfo rootDirectoryFolder, LargeExchangeSetDataResponse response,
+                    string largeExchangeSetFolderName, string largeMediaExchangeSetFilePath, CancellationToken cancellationToken)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+
+            var volumePath = rootDirectoryFolder.FullName;
+            var dvdNumber = ParseDvdNumber(rootDirectoryFolder.Name);
+
+            // Run ancillary tasks concurrently per volume.
+            var tasks = new List<Task>
+            {
+                CreatePosFolderStructure(volumePath),
+                fulfilmentAncillaryFiles.CreateMediaFile(message.BatchId, volumePath, message.CorrelationId, dvdNumber),
+                download.DownloadLargeMediaReadMeFile(message.BatchId, volumePath, message.CorrelationId),
+                fileBuilder.CreateLargeMediaSerialEncFile(message.BatchId, largeMediaExchangeSetFilePath,
+                    string.Format(largeExchangeSetFolderName, dvdNumber), message.CorrelationId),
+                fileBuilder.CreateProductFile(message.BatchId,
+                    Path.Combine(volumePath, fileShareServiceConfig.Value.Info),
+                    message.CorrelationId,
+                    response.SalesCatalogueDataResponse,
+                    message.ScsRequestDateTime,
+                    true), // encryption=true
+                download.DownloadInfoFolderFiles(message.BatchId,
+                    Path.Combine(volumePath, fileShareServiceConfig.Value.Info),
+                    message.CorrelationId),
+                download.DownloadAdcFolderFiles(message.BatchId,
+                    Path.Combine(volumePath, fileShareServiceConfig.Value.Info, fileShareServiceConfig.Value.Adc),
+                    message.CorrelationId),
+                fulfilmentAncillaryFiles.CreateEncUpdateCsv(response.SalesCatalogueDataResponse,
+                    Path.Combine(volumePath, fileShareServiceConfig.Value.Info),
+                    message.BatchId,
+                    message.CorrelationId)
+            };
+
+            await Task.WhenAll(tasks);
+
+            cancellationToken.ThrowIfCancellationRequested();
+
+            // Catalog file (returns bool)
+            bool catalogCreated = await fileBuilder.CreateLargeMediaExchangesetCatalogFile(
+                message.BatchId,
+                volumePath,
+                message.CorrelationId,
+                response.FulfilmentDataResponses,
+                response.SalesCatalogueDataResponse,
+                response.SalesCatalogueProductResponse);
+
+            return catalogCreated;
+        }
+        private static string ParseDvdNumber(string directoryName)
+        {
+            // Expect pattern M00..Mxx. Fallback to "01" if unexpected.
+            if (!string.IsNullOrEmpty(directoryName) &&
+                directoryName.Length >= 3 &&
+                directoryName.StartsWith("M", StringComparison.OrdinalIgnoreCase))
+            {
+                return directoryName[1..]; // drop leading 'M'
+            }
+            return "01";
+        }
+
         private async Task CreatePosFolderStructure(string largeMediaExchangeSetPath)
         {
             fileSystemHelper.CheckAndCreateFolder(largeMediaExchangeSetPath);
@@ -192,8 +239,10 @@ namespace UKHO.ExchangeSetService.FulfilmentService.FileBuilders
         }
 
         //Search and download ENC files for large media exchange set
-        private async Task<LargeExchangeSetDataResponse> SearchAndDownloadEncFilesFromFss(SalesCatalogueServiceResponseQueueMessage message, string homeDirectoryPath, string currentUtcDate, string largeExchangeSetFolderName, LargeExchangeSetDataResponse largeExchangeSetDataResponse)
+        private async Task<LargeExchangeSetDataResponse> SearchAndDownloadEncFilesFromFss(SalesCatalogueServiceResponseQueueMessage message, string homeDirectoryPath, string currentUtcDate, string largeExchangeSetFolderName, LargeExchangeSetDataResponse largeExchangeSetDataResponse, CancellationToken cancellationToken)
         {
+            cancellationToken.ThrowIfCancellationRequested();
+
             var batchPath = Path.Combine(homeDirectoryPath, currentUtcDate, message.BatchId, largeExchangeSetFolderName);
             var exchangeSetRootPath = Path.Combine(batchPath, "{1}", fileShareServiceConfig.Value.EncRoot);
             var listFulfilmentData = new List<FulfilmentDataResponse>();
@@ -204,57 +253,101 @@ namespace UKHO.ExchangeSetService.FulfilmentService.FileBuilders
                 .Where(product => aioCells.All(aioCell => product.ProductName != aioCell))
                 .ToList();
 
-            Task<ValidationResult> validationResult = productDataValidator.Validate(essItems);
+            cancellationToken.ThrowIfCancellationRequested();
 
-            if (!validationResult.Result.IsValid)
+            var validationResult = await productDataValidator.Validate(essItems);
+            if (!validationResult.IsValid)
             {
-                largeExchangeSetDataResponse.ValidationtFailedMessage = validationResult.Result.Errors[0].ToString();
+                largeExchangeSetDataResponse.ValidationtFailedMessage = validationResult.Errors[0].ToString();
                 return largeExchangeSetDataResponse;
             }
 
-            if (essItems != null && essItems.Any())
+            if (!essItems.Any())
+                return largeExchangeSetDataResponse;
+
+            DateTime started = DateTime.UtcNow;
+
+            int parallelism = fileShareServiceConfig.Value.ParallelSearchTaskCount <= 0
+                ? 4
+                : fileShareServiceConfig.Value.ParallelSearchTaskCount;
+
+            int productGroupCount = essItems.Count % parallelism == 0
+                ? essItems.Count / parallelism
+                : (essItems.Count / parallelism) + 1;
+
+            var chunks = CommonHelper.SplitList(essItems, productGroupCount);
+            var bag = new ConcurrentBag<FulfilmentDataResponse>();
+            int totalQueries = 0;
+
+            using var throttler = new SemaphoreSlim(parallelism);
+
+            var tasks = chunks.Select(async chunk =>
             {
-                DateTime queryAndDownloadEncFilesFromFileShareServiceTaskStartedAt = DateTime.UtcNow;
-                int parallelSearchTaskCount = fileShareServiceConfig.Value.ParallelSearchTaskCount;
-                int productGroupCount = essItems.Count % parallelSearchTaskCount == 0 ? essItems.Count / parallelSearchTaskCount : (essItems.Count / parallelSearchTaskCount) + 1;
-                var productsList = CommonHelper.SplitList(essItems, productGroupCount);
-                var fulfilmentDataResponse = new List<FulfilmentDataResponse>();
-                var sync = new object();
-                int fileShareServiceSearchQueryCount = 0;
-                var cancellationTokenSource = new CancellationTokenSource();
-                CancellationToken cancellationToken = cancellationTokenSource.Token;
-
-                var tasks = productsList.Select(async item =>
+                await throttler.WaitAsync(cancellationToken);
+                try
                 {
-                    //Only S63 data will be fetched
-                    fulfilmentDataResponse = await QueryFileShareServiceFiles(message, item, exchangeSetRootPath, cancellationTokenSource, cancellationToken, fileShareServiceConfig.Value.S63BusinessUnit);
-                    int queryCount = fulfilmentDataResponse.Any() ? fulfilmentDataResponse.First().FileShareServiceSearchQueryCount : 0;
-                    lock (sync)
-                    {
-                        fileShareServiceSearchQueryCount += queryCount;
-                    }
-                    if (cancellationToken.IsCancellationRequested)
-                    {
-                        cancellationTokenSource.Cancel();
-                        logger.LogError(EventIds.CancellationTokenEvent.ToEventId(), "Operation is cancelled as IsCancellationRequested flag is true in QueryFileShareServiceFiles with {cancellationTokenSource.Token} and batchId:{message.BatchId} and CorrelationId:{message.CorrelationId}", JsonConvert.SerializeObject(cancellationTokenSource.Token), message.BatchId, message.CorrelationId);
-                        throw new OperationCanceledException();
-                    }
-                    listFulfilmentData.AddRange(fulfilmentDataResponse);
-                });
+                    var result = await QueryFileShareServiceFiles(
+                        message,
+                        chunk,
+                        exchangeSetRootPath,
+                        fileShareServiceConfig.Value.S63BusinessUnit,
+                        cancellationToken);
 
-                await Task.WhenAll(tasks);
-
-                DateTime queryAndDownloadEncFilesFromFileShareServiceTaskCompletedAt = DateTime.UtcNow;
-                int downloadedENCFileCount = 0;
-                foreach (var item in listFulfilmentData)
-                {
-                    downloadedENCFileCount += item.Files.Count();
+                    if (result.Any())
+                    {
+                        Interlocked.Add(ref totalQueries, result.First().FileShareServiceSearchQueryCount);
+                        foreach (var r in result)
+                            bag.Add(r);
+                    }
                 }
-                monitorHelper.MonitorRequest("Query and Download ENC Files Task", queryAndDownloadEncFilesFromFileShareServiceTaskStartedAt, queryAndDownloadEncFilesFromFileShareServiceTaskCompletedAt, message.CorrelationId, fileShareServiceSearchQueryCount, downloadedENCFileCount, null, message.BatchId);
-                largeExchangeSetDataResponse.FulfilmentDataResponses = listFulfilmentData;
-            }
+                finally
+                {
+                    throttler.Release();
+                }
+            }).ToList();
 
+            await Task.WhenAll(tasks);
+
+            cancellationToken.ThrowIfCancellationRequested();
+
+            int downloadedCount = bag.Sum(r => r.FileUri?.Count() ?? 0);
+            monitorHelper.MonitorRequest("Query and Download ENC Files Task",
+                started,
+                DateTime.UtcNow,
+                message.CorrelationId,
+                totalQueries,
+                downloadedCount,
+                null,
+                message.BatchId);
+
+            largeExchangeSetDataResponse.FulfilmentDataResponses = bag.ToList();
             return largeExchangeSetDataResponse;
+        }
+
+        public async Task<List<FulfilmentDataResponse>> QueryFileShareServiceFiles(
+            SalesCatalogueServiceResponseQueueMessage message,
+            List<Products> products,
+            string exchangeSetRootPath,
+            string businessUnit,
+            CancellationToken cancellationToken)
+        {
+            return await logger.LogStartEndAndElapsedTimeAsync(
+                EventIds.QueryFileShareServiceENCFilesRequestStart,
+                EventIds.QueryFileShareServiceENCFilesRequestCompleted,
+                "File share service search & download for ENC files BusinessUnit:{businessUnit} BatchId:{BatchId} _X-Correlation-ID:{CorrelationId}",
+                async () =>
+                {
+                    return await fulfilmentFileShareService.QueryFileShareServiceData(
+                        products,
+                        message,
+                        cancellationTokenSource: null,          // no longer passing internal CTS
+                        cancellationToken: cancellationToken,
+                        exchangeSetRootPath,
+                        businessUnit);
+                },
+                businessUnit,
+                message.BatchId,
+                message.CorrelationId);
         }
 
         public async Task<List<FulfilmentDataResponse>> QueryFileShareServiceFiles(SalesCatalogueServiceResponseQueueMessage message, List<Products> products, string exchangeSetRootPath, CancellationTokenSource cancellationTokenSource, CancellationToken cancellationToken, string businessUnit)

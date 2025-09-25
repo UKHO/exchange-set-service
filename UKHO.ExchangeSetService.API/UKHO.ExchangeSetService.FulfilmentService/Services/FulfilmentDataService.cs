@@ -1,12 +1,13 @@
-﻿using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Abstractions;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using UKHO.ExchangeSetService.Common.Configuration;
 using UKHO.ExchangeSetService.Common.Extensions;
 using UKHO.ExchangeSetService.Common.Helpers;
@@ -92,6 +93,9 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             bool isExchangeSetFolderCreated = false;
             bool isZipAndUploadSuccessful = false;
 
+            var cancellationTokenSource = new CancellationTokenSource();
+            var cancellationToken = cancellationTokenSource.Token;
+
             var response = new LargeExchangeSetDataResponse
             {
                 //Get SCS catalogue essData response
@@ -118,7 +122,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             {
                 response.SalesCatalogueDataResponse.ResponseBody = response.SalesCatalogueDataResponse.ResponseBody
                                                                    .Where(x => !aioCells.Any(productName => productName == x.ProductName)).ToList();
-                isExchangeSetFolderCreated = await exchangeSetBuilder.CreateStandardLargeMediaExchangeSet(message, homeDirectoryPath, currentUtcDate, response, largeExchangeSetFolderName, exchangeSetFilePath);
+                isExchangeSetFolderCreated = await exchangeSetBuilder.CreateStandardLargeMediaExchangeSet(message, homeDirectoryPath, currentUtcDate, response, largeExchangeSetFolderName, exchangeSetFilePath, cancellationToken);
 
                 if (!isExchangeSetFolderCreated)
                 {
