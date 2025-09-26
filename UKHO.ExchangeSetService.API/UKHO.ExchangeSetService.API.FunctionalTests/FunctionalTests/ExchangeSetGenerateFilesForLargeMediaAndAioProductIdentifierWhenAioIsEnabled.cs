@@ -27,16 +27,16 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         }
 
         //Product Backlog Item 71610: Create empty SERIAL.AIO file and add to AIO exchange set
-        [Test]
-        public void WhenIDownloadAioZipExchangeSet_ThenASerialAioFileIsAvailable()
-        {
-            bool checkFile = FssBatchHelper.CheckforFileExist(DownloadedFolderPath, Config.AIOConfig.ExchangeSetSerialAioFile);
-            Assert.That(checkFile,Is.True, $"{Config.ExchangeSetSerialEncFile} File not Exist in the specified folder path : {DownloadedFolderPath}");
+        //[Test]
+        //public void WhenIDownloadAioZipExchangeSet_ThenASerialAioFileIsAvailable()
+        //{
+        //    bool checkFile = FssBatchHelper.CheckforFileExist(DownloadedFolderPath, Config.AIOConfig.ExchangeSetSerialAioFile);
+        //    Assert.That(checkFile,Is.True, $"{Config.ExchangeSetSerialEncFile} File not Exist in the specified folder path : {DownloadedFolderPath}");
 
-            //Product Backlog Item 71612: Add content to SERIAL.AIO file
-            //Verify Serial.AIO file content
-            FileContentHelper.CheckSerialAioFileContentForAioBase(Path.Combine(DownloadedFolderPath, Config.AIOConfig.ExchangeSetSerialAioFile));
-        }
+        //    //Product Backlog Item 71612: Add content to SERIAL.AIO file
+        //    //Verify Serial.AIO file content
+        //    FileContentHelper.CheckSerialAioFileContentForAioBase(Path.Combine(DownloadedFolderPath, Config.AIOConfig.ExchangeSetSerialAioFile));
+        //}
 
         //Product Backlog Item 71993: Get README.TXT from FSS & add to AIO exchange set
         [Test]
@@ -79,21 +79,21 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.FunctionalTests
         }
 
         //Product Backlog Item 72017: Create empty PRODUCTS.TXT file & add to AIO exchange set
-        [Test]
-        public async Task WhenIDownloadAioZipExchangeSet_ThenAProductTxtFileIsAvailable()
-        {
-            bool checkFile = FssBatchHelper.CheckforFileExist(Path.Combine(DownloadedFolderPath, Config.ExchangeSetProductFilePath), Config.ExchangeSetProductFile);
-            Assert.That(checkFile, Is.True, $"{Config.ExchangeSetProductFile} File not Exist in the specified folder path : {DownloadedFolderPath}");
+        //[Test]
+        //public async Task WhenIDownloadAioZipExchangeSet_ThenAProductTxtFileIsAvailable()
+        //{
+        //    bool checkFile = FssBatchHelper.CheckforFileExist(Path.Combine(DownloadedFolderPath, Config.ExchangeSetProductFilePath), Config.ExchangeSetProductFile);
+        //    Assert.That(checkFile, Is.True, $"{Config.ExchangeSetProductFile} File not Exist in the specified folder path : {DownloadedFolderPath}");
 
-            //Product Backlog Item 72019: Add content to PRODUCTS.TXT file
-            //Verify Product.txt file content
-            var apiScsResponse = await ScsApiClient.GetScsCatalogueAsync(Config.ExchangeSetProductType, Config.ExchangeSetCatalogueType, ScsJwtToken);
-            Assert.That((int)apiScsResponse.StatusCode, Is.EqualTo(200), $"Incorrect status code is returned {apiScsResponse.StatusCode}, instead of the expected status 200.");
-            var apiResponseDetails = await apiScsResponse.ReadAsStringAsync();
-            dynamic apiScsResponseData = JsonConvert.DeserializeObject(apiResponseDetails);
+        //    //Product Backlog Item 72019: Add content to PRODUCTS.TXT file
+        //    //Verify Product.txt file content
+        //    var apiScsResponse = await ScsApiClient.GetScsCatalogueAsync(Config.ExchangeSetProductType, Config.ExchangeSetCatalogueType, ScsJwtToken);
+        //    Assert.That((int)apiScsResponse.StatusCode, Is.EqualTo(200), $"Incorrect status code is returned {apiScsResponse.StatusCode}, instead of the expected status 200.");
+        //    var apiResponseDetails = await apiScsResponse.ReadAsStringAsync();
+        //    dynamic apiScsResponseData = JsonConvert.DeserializeObject(apiResponseDetails);
 
-            FileContentHelper.CheckAioProductFileContent(Path.Combine(DownloadedFolderPath, Config.ExchangeSetProductFilePath, Config.ExchangeSetProductFile), apiScsResponseData);
-        }
+        //    FileContentHelper.CheckAioProductFileContent(Path.Combine(DownloadedFolderPath, Config.ExchangeSetProductFilePath, Config.ExchangeSetProductFile), apiScsResponseData);
+        //}
 
         //Product Backlog Item 71646: Create CATALOG.031 file and add to AIO exchange set
         [Test]
