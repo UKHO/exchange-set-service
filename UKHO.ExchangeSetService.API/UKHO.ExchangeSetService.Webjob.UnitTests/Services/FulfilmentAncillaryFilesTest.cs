@@ -388,7 +388,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
         public async Task WhenValidCreateLargeMediaSerialEncFileRequest_ThenReturnTrueResponse()
         {
             var baseFolderPath = Path.Combine(FakeBatchValue.ExchangeSetMediaPath, "B1");
-            var serialFilePath = Path.Combine(baseFolderPath, "SERIAL.ENC");
+            var serialFilePath = Path.Combine(baseFolderPath, FakeBatchValue.SerialFileName);
             var baseNumber = "1";
             A.CallTo(() => fakeFileSystemHelper.CreateFileContent(serialFilePath, A<string>.Ignored)).Returns(true);
             A.CallTo(() => fakeFileSystemHelper.CheckFileExists(serialFilePath)).Returns(true);
@@ -612,6 +612,6 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
         [GeneratedRegex(@"GBWK\d{2}-\d{2}   \d{8}UPDATE    \d{2}[.]00\x0b\x0d\x0a")]
         private static partial Regex UpdateRegex();
 
-        #endregion
+        #endregion AIO
     }
 }
