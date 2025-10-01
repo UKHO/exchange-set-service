@@ -23,56 +23,15 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
     [TestFixture]
     public partial class FulfilmentAncillaryFilesTest
     {
-        //private IOptions<FileShareServiceConfiguration> fakeFileShareServiceConfig;
         private ILogger<FulfilmentAncillaryFiles> fakeLogger;
         private IFileSystemHelper fakeFileSystemHelper;
         private FulfilmentAncillaryFiles fulfilmentAncillaryFiles;
-        //private const string FakeBatchValue.BatchId = "7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272";
-        //private const string FakeBatchValue.CorrelationId = "48f53a95-0bd2-4c0c-a6ba-afded2bdffac";
-        //private const string FakeBatchPath = $@"C:\HOME\25SEP2025\{FakeBatchValue.BatchId}";
-        //private const string FakeBatchValue.ExchangeSetPath = $@"{FakeBatchPath}\V01X01";
-        //private const string FakeBatchValue.ExchangeSetEncRootPath = $@"{FakeBatchValue.ExchangeSetPath}\ENC_ROOT";
-        //private const string FakeBatchValue.ExchangeSetInfoPath = $@"{FakeBatchValue.ExchangeSetPath}\INFO";
-        //private const string FakeBatchValue.ExchangeSetMediaBaseNumber = "5";
-        //private const string FakeBatchValue.ExchangeSetMediaPath = $@"{FakeBatchPath}\M0{FakeBatchValue.ExchangeSetMediaBaseNumber}X02";
-        //private const string FakeExchangeSetMediaInfoPath = $@"{FakeBatchPath}\M0{FakeBatchValue.ExchangeSetMediaBaseNumber}X02\INFO";
-        //private const string FakeBatchValue.ExchangeSetMediaFilePath = $@"{FakeBatchValue.ExchangeSetMediaPath}\MEDIA.TXT";
-        //private const string FakeBatchValue.SerialFilePath = $@"{FakeBatchValue.ExchangeSetPath}\SERIAL.ENC";
-        //private const string FakeBatchValue.ProductFilePath = $@"{FakeBatchValue.ExchangeSetInfoPath}\PRODUCT.TXT";
-        //private const string FakeBatchValue.ReadMeFilePath = $@"{FakeBatchValue.ExchangeSetEncRootPath}\ReadMe.txt";
-        //private const string FakeBatchValue.CatalogFilePath = $@"{FakeBatchValue.ExchangeSetEncRootPath}\CATALOG.031";
-        //private const string FakeBatchValue.AioExchangeSetPath = $@"{FakeBatchPath}\AIO";
-        //private const string FakeBatchValue.AioExchangeSetEncRootPath = $@"{FakeBatchValue.AioExchangeSetPath}\ENC_ROOT";
-        //private const string FakeBatchValue.SerialAioFilePath = $@"{FakeBatchValue.AioExchangeSetPath}\SERIAL.AIO";
         private const string FulfilmentExceptionMessage = "There has been a problem in creating your exchange set, so we are unable to fulfil your request at this time. Please contact UKHO Customer Services quoting error code : {0} and correlation ID : {1}";
         private readonly DateTime fakeScsRequestDateTime = DateTime.UtcNow;
 
         [SetUp]
         public void Setup()
         {
-            //fakeFileShareServiceConfig = Options.Create(new FileShareServiceConfiguration()
-            //{
-            //    BaseUrl = "http://tempuri.org",
-            //    CellName = "DE260001",
-            //    EditionNumber = "1",
-            //    Limit = 10,
-            //    Start = 0,
-            //    ProductCode = "AVCS",
-            //    ProductLimit = 4,
-            //    UpdateNumber = "0",
-            //    UpdateNumberLimit = 10,
-            //    ParallelSearchTaskCount = 10,
-            //    EncRoot = "ENC_ROOT",
-            //    ExchangeSetFileFolder = "V01X01",
-            //    ReadMeFileName = "ReadMe.txt",
-            //    CatalogFileName = "CATALOG.031",
-            //    SerialFileName = "SERIAL.ENC",
-            //    SerialAioFileName = "SERIAL.AIO",
-            //    ProductFileName = "PRODUCT.TXT",
-            //    CommentVersion = "VERSION=1.0",
-            //    Info = "INFO",
-            //    AioExchangeSetFileFolder = "AIO",
-            //});
             fakeLogger = A.Fake<ILogger<FulfilmentAncillaryFiles>>();
             fakeFileSystemHelper = A.Fake<IFileSystemHelper>();
 
@@ -373,8 +332,8 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
         {
             var baseFolderPath1 = Path.Combine(FakeBatchValue.ExchangeSetMediaPath, "B1");
             var baseFolderPath2 = Path.Combine(FakeBatchValue.ExchangeSetMediaPath, "B2");
-            var baseEncFolderPath1 = Path.Combine(baseFolderPath1, "ENC_ROOT");
-            var baseEncFolderPath2 = Path.Combine(baseFolderPath2, "ENC_ROOT");
+            var baseEncFolderPath1 = Path.Combine(baseFolderPath1, FakeBatchValue.EncRoot);
+            var baseEncFolderPath2 = Path.Combine(baseFolderPath2, FakeBatchValue.EncRoot);
             var baseFolder1 = A.Fake<IDirectoryInfo>();
             var baseFolder2 = A.Fake<IDirectoryInfo>();
             A.CallTo(() => baseFolder1.Name).Returns("B1");
@@ -450,9 +409,9 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
         public async Task WhenValidCreateLargeExchangeSetCatalogFileRequest_ThenReturnTrueReponse()
         {
             var b1Path = Path.Combine(FakeBatchValue.ExchangeSetMediaPath, "B1");
-            var exchangeSetRootPath = Path.Combine(b1Path, "ENC_ROOT");
-            var readMeFileName = Path.Combine(exchangeSetRootPath, fakeFileShareServiceConfig.Value.ReadMeFileName);
-            var outputFileName = Path.Combine(exchangeSetRootPath, fakeFileShareServiceConfig.Value.CatalogFileName);
+            var exchangeSetRootPath = Path.Combine(b1Path, FakeBatchValue.EncRoot);
+            var readMeFileName = Path.Combine(exchangeSetRootPath, FakeBatchValue.ReadMeFileName);
+            var outputFileName = Path.Combine(exchangeSetRootPath, FakeBatchValue.CatalogFileName);
             var byteContent = new byte[100];
             var salesCatalogueDataResponse = GetSalesCatalogueDataResponse();
             var salesCatalogueProductResponse = GetSalesCatalogueProductResponse();
@@ -492,9 +451,9 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
         public void WhenInvalidCreateLargeExchangeSetCatalogFileRequest_ThenReturnFulfilmentException()
         {
             var b1Path = Path.Combine(FakeBatchValue.ExchangeSetMediaPath, "B1");
-            var exchangeSetRootPath = Path.Combine(b1Path, "ENC_ROOT");
-            var readMeFileName = Path.Combine(exchangeSetRootPath, fakeFileShareServiceConfig.Value.ReadMeFileName);
-            var outputFileName = Path.Combine(exchangeSetRootPath, fakeFileShareServiceConfig.Value.CatalogFileName);
+            var exchangeSetRootPath = Path.Combine(b1Path, FakeBatchValue.EncRoot);
+            var readMeFileName = Path.Combine(exchangeSetRootPath, FakeBatchValue.ReadMeFileName);
+            var outputFileName = Path.Combine(exchangeSetRootPath, FakeBatchValue.CatalogFileName);
             var byteContent = new byte[100];
             var salesCatalogueDataResponse = GetSalesCatalogueDataResponse();
             var salesCatalogueProductResponse = GetSalesCatalogueProductResponse();
@@ -520,9 +479,9 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
         public void WhenNullCreateLargeExchangeSetCatalogFileRequest_ThenReturnFulfilmentException()
         {
             var b1Path = Path.Combine(FakeBatchValue.ExchangeSetMediaPath, "B1");
-            var exchangeSetRootPath = Path.Combine(b1Path, "ENC_ROOT");
-            var readMeFileName = Path.Combine(exchangeSetRootPath, fakeFileShareServiceConfig.Value.ReadMeFileName);
-            var outputFileName = Path.Combine(exchangeSetRootPath, fakeFileShareServiceConfig.Value.CatalogFileName);
+            var exchangeSetRootPath = Path.Combine(b1Path, FakeBatchValue.EncRoot);
+            var readMeFileName = Path.Combine(exchangeSetRootPath, FakeBatchValue.ReadMeFileName);
+            var outputFileName = Path.Combine(exchangeSetRootPath, FakeBatchValue.CatalogFileName);
             A.CallTo(() => fakeFileSystemHelper.CheckFileExists(readMeFileName)).Returns(true);
 
             Assert.ThrowsAsync(Is.TypeOf<FulfilmentException>().And.Message.EqualTo(FulfilmentExceptionMessage),
@@ -595,23 +554,6 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             A.CallTo(() => fakeFileSystemHelper.CheckFileExists(typeCheckPath2)).MustNotHaveHappened();
             A.CallTo(() => fakeFileSystemHelper.CheckFileExists(FakeBatchValue.SerialAioFilePath)).MustHaveHappenedOnceExactly();
         }
-
-        //private string GetCdType(List<SalesCatalogueDataProductResponse> salesCatalogueDataAioProductResponse, string aioExchangeSetPath)
-        //{
-        //    string cdType = "UPDATE";
-        //    foreach (var response in salesCatalogueDataAioProductResponse)
-        //    {
-        //        string path = Path.Combine(aioExchangeSetPath, fileShareServiceConfig.Value.EncRoot, response.ProductName[..2],
-        //                                   response.ProductName, Convert.ToString(response.BaseCellEditionNumber), "0",
-        //                                   response.ProductName + ".000");
-        //        if (fileSystemHelper.CheckFileExists(path))
-        //        {
-        //            cdType = "BASE";
-        //            break;
-        //        }
-        //    }
-        //    return cdType;
-        //}
 
         [Test]
         public async Task WhenValidCreateSerialAioFileRequest_CdTypeBase_ThenReturnTrueResponse()
