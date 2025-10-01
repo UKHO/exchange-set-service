@@ -46,6 +46,14 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.TestHelper
         /// </summary>
         public const string Info = "INFO";
         /// <summary>
+        /// Catalogue
+        /// </summary>
+        public const string Content = "Catalogue";
+        /// <summary>
+        /// DVD INFO
+        /// </summary>
+        public const string ContentInfo = "DVD INFO";
+        /// <summary>
         /// README.TXT
         /// </summary>
         public const string ReadMeFileName = "README.TXT";
@@ -160,8 +168,8 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.TestHelper
                 CatalogFileName = CatalogFileName,
                 CellName = "$batch(CellName) eq '{0}' and ",
                 CommentVersion = "VERSION=1.0",
-                Content = "Catalogue",
-                ContentInfo = "DVD INFO",
+                Content = Content,
+                ContentInfo = ContentInfo,
                 EditionNumber = "$batch(EditionNumber) eq '{0}' and ",
                 EncRoot = EncRoot,
                 ErrorFileName = "error.txt",
