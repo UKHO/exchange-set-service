@@ -347,13 +347,13 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             var salesCatalogueProductResponse = GetSalesCatalogueResponse();
 
             const string storageAccountConnectionString = "DefaultEndpointsProtocol = https; AccountName = testessdevstorage2; AccountKey =testaccountkey; EndpointSuffix = core.windows.net";
-            fakeConfiguration["HOME"] = @"D:\Downloads";
+            fakeConfiguration["HOME"] = @"D:\\Downloads";
             fakeFileShareServiceConfig.Value.ExchangeSetFileFolder = "V01X01";
             fakeFileShareServiceConfig.Value.EncRoot = "ENC_ROOT";
             var salesCatalogueDataResponse = GetSalesCatalogueDataResponse();
 
             A.CallTo(() => fakeScsStorageService.GetStorageAccountConnectionString(null, null)).Returns(storageAccountConnectionString);
-            const string filePath = @"D:\Downloads";
+            const string filePath = @"D:\\Downloads";
             A.CallTo(() => fakeAzureBlobStorageService.DownloadSalesCatalogueResponse(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(salesCatalogueProductResponse);
             A.CallTo(() => fakeQueryFssService.SearchReadMeFilePath(A<string>.Ignored, A<string>.Ignored)).Returns(filePath);
             A.CallTo(() => fakeQueryFssService.DownloadReadMeFileFromFssAsync(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(true);
@@ -425,7 +425,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             var salesCatalogueProductResponse = GetSalesCatalogueResponse();
 
             const string storageAccountConnectionString = "DefaultEndpointsProtocol = https; AccountName = testessdevstorage2; AccountKey =testaccountkey; EndpointSuffix = core.windows.net";
-            fakeConfiguration["HOME"] = @"D:\Downloads";
+            fakeConfiguration["HOME"] = @"D:\\Downloads";
 
             A.CallTo(() => fakeScsStorageService.GetStorageAccountConnectionString(null, null)).Returns(storageAccountConnectionString);
             var productList = new List<Products>
@@ -454,7 +454,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             var salesCatalogueProductResponse = GetSalesCatalogueResponse();
 
             var salesCatalogueDataResponse = GetSalesCatalogueDataResponse();
-            var filePath = @"D:\Downloads";
+            var filePath = @"D:\\Downloads";
 
             A.CallTo(() => fakeAzureBlobStorageService.DownloadSalesCatalogueResponse(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(salesCatalogueProductResponse);
             A.CallTo(() => fakeQueryFssService.SearchReadMeFilePath(A<string>.Ignored, A<string>.Ignored)).Returns(filePath);
@@ -664,7 +664,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             var salesCatalogueDataResponse = GetSalesCatalogueDataResponse();
 
             A.CallTo(() => fakeScsStorageService.GetStorageAccountConnectionString(null, null)).Returns(storageAccountConnectionString);
-            const string filePath = @"D:\Downloads";
+            const string filePath = @"D:\\Downloads";
             A.CallTo(() => fakeAzureBlobStorageService.DownloadSalesCatalogueResponse(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(salesCatalogueProductResponse);
             A.CallTo(() => fakeQueryFssService.SearchReadMeFilePath(A<string>.Ignored, A<string>.Ignored)).Returns(filePath);
             A.CallTo(() => fakeQueryFssService.SearchIhoCrtFilePath(A<string>.Ignored, A<string>.Ignored)).Returns(filePath);
@@ -746,7 +746,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             var salesCatalogueDataResponse = GetSalesCatalogueDataResponse();
 
             A.CallTo(() => fakeScsStorageService.GetStorageAccountConnectionString(null, null)).Returns(storageAccountConnectionString);
-            const string filePath = @"D:\Downloads";
+            const string filePath = @"D:\\Downloads";
             A.CallTo(() => fakeAzureBlobStorageService.DownloadSalesCatalogueResponse(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(salesCatalogueProductResponse);
             A.CallTo(() => fakeQueryFssService.SearchReadMeFilePath(A<string>.Ignored, A<string>.Ignored)).Returns(filePath);
             A.CallTo(() => fakeQueryFssService.DownloadReadMeFileFromFssAsync(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(true);
@@ -799,7 +799,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             var salesCatalogueDataResponse = GetSalesCatalogueDataResponseForAio();
 
             A.CallTo(() => fakeScsStorageService.GetStorageAccountConnectionString(null, null)).Returns(storageAccountConnectionString);
-            const string filePath = @"D:\Downloads";
+            const string filePath = @"D:\\Downloads";
             A.CallTo(() => fakeAzureBlobStorageService.DownloadSalesCatalogueResponse(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(salesCatalogueProductResponse);
             A.CallTo(() => fakeQueryFssService.SearchReadMeFilePath(A<string>.Ignored, A<string>.Ignored)).Returns(filePath);
             A.CallTo(() => fakeQueryFssService.SearchIhoCrtFilePath(A<string>.Ignored, A<string>.Ignored)).Returns(filePath);
@@ -865,7 +865,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             var salesCatalogueDataResponse = GetSalesCatalogueDataResponse();
 
             A.CallTo(() => fakeScsStorageService.GetStorageAccountConnectionString(null, null)).Returns(storageAccountConnectionString);
-            const string filePath = @"D:\Downloads";
+            const string filePath = @"D:\\Downloads";
             A.CallTo(() => fakeAzureBlobStorageService.DownloadSalesCatalogueResponse(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(salesCatalogueProductResponse);
             A.CallTo(() => fakeQueryFssService.SearchReadMeFilePath(A<string>.Ignored, A<string>.Ignored)).Returns(filePath);
             A.CallTo(() => fakeQueryFssService.DownloadReadMeFileFromFssAsync(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(true);
@@ -937,7 +937,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             var salesCatalogueDataResponse = GetSalesCatalogueDataResponse();
 
             A.CallTo(() => fakeScsStorageService.GetStorageAccountConnectionString(null, null)).Returns(storageAccountConnectionString);
-            const string filePath = @"D:\Downloads";
+            const string filePath = @"D:\\Downloads";
             A.CallTo(() => fakeAzureBlobStorageService.DownloadSalesCatalogueResponse(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(salesCatalogueProductResponse);
             A.CallTo(() => fakeQueryFssService.SearchReadMeFilePath(A<string>.Ignored, A<string>.Ignored)).Returns(filePath);
             A.CallTo(() => fakeQueryFssService.SearchIhoCrtFilePath(A<string>.Ignored, A<string>.Ignored)).Returns(filePath);
@@ -985,7 +985,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
         [TestCase("s63")]
         public async Task WhenValidMessageQueueTrigger_ThenReturnsLargeMediaAndAioExchangeSetCreatedSuccessfully(string exchangeSetStandard)
         {
-            const string filePath = @"D:\Downloads";
+            const string filePath = @"D:\\Downloads";
             var b1 = A.Fake<IDirectoryInfo>();
             var b2 = A.Fake<IDirectoryInfo>();
             var m1 = A.Fake<IDirectoryInfo>();
@@ -1069,7 +1069,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
         [TestCase("s63")]
         public void WhenSerialAIOCreationFails_ThenReturnsLargeMediaAndAioExchangeSetIsNotCreated(string exchangeSetStandard)
         {
-            const string filePath = @"D:\Downloads";
+            const string filePath = @"D:\\Downloads";
             var b1 = A.Fake<IDirectoryInfo>();
             var b2 = A.Fake<IDirectoryInfo>();
             var m1 = A.Fake<IDirectoryInfo>();
@@ -1131,7 +1131,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
         [TestCase("s63")]
         public async Task WhenValidMessageQueueTrigger_ThenReturnsLargeMediaEncExchangeSetCreatedSuccessfully(string exchangeSetStandard)
         {
-            const string filePath = @"D:\Downloads";
+            const string filePath = @"D:\\Downloads";
             var b1 = A.Fake<IDirectoryInfo>();
             var b2 = A.Fake<IDirectoryInfo>();
             var m1 = A.Fake<IDirectoryInfo>();
@@ -1216,7 +1216,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             var salesCatalogueDataResponse = GetSalesCatalogueDataResponseForAio();
 
             A.CallTo(() => fakeScsStorageService.GetStorageAccountConnectionString(null, null)).Returns(storageAccountConnectionString);
-            const string filePath = @"D:\Downloads";
+            const string filePath = @"D:\\Downloads";
             A.CallTo(() => fakeAzureBlobStorageService.DownloadSalesCatalogueResponse(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(salesCatalogueProductResponse);
             A.CallTo(() => fakeQueryFssService.SearchReadMeFilePath(A<string>.Ignored, A<string>.Ignored)).Returns(filePath);
             A.CallTo(() => fakeQueryFssService.SearchIhoCrtFilePath(A<string>.Ignored, A<string>.Ignored)).Returns(filePath);
@@ -1275,7 +1275,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
         [TestCase("s63")]
         public void WhenCreationOfCatalogueFileForAIOFails_ThenThrowsException(string exchangeSetStandard)
         {
-            const string filePath = @"D:\Downloads";
+            const string filePath = @"D:\\Downloads";
             var b1 = A.Fake<IDirectoryInfo>();
             var b2 = A.Fake<IDirectoryInfo>();
             var m1 = A.Fake<IDirectoryInfo>();

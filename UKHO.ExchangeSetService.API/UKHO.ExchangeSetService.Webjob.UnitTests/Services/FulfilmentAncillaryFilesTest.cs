@@ -8,7 +8,6 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using FakeItEasy;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using NUnit.Framework;
 using UKHO.ExchangeSetService.Common.Configuration;
 using UKHO.ExchangeSetService.Common.Helpers;
@@ -16,6 +15,7 @@ using UKHO.ExchangeSetService.Common.Logging;
 using UKHO.ExchangeSetService.Common.Models.FileShareService.Response;
 using UKHO.ExchangeSetService.Common.Models.SalesCatalogue;
 using UKHO.ExchangeSetService.FulfilmentService.Services;
+using UKHO.ExchangeSetService.Webjob.UnitTests.TestHelper;
 using Attribute = UKHO.ExchangeSetService.Common.Models.FileShareService.Response.Attribute;
 
 namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
@@ -23,60 +23,60 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
     [TestFixture]
     public partial class FulfilmentAncillaryFilesTest
     {
-        private IOptions<FileShareServiceConfiguration> fakeFileShareServiceConfig;
+        //private IOptions<FileShareServiceConfiguration> fakeFileShareServiceConfig;
         private ILogger<FulfilmentAncillaryFiles> fakeLogger;
         private IFileSystemHelper fakeFileSystemHelper;
         private FulfilmentAncillaryFiles fulfilmentAncillaryFiles;
-        private const string FakeBatchId = "7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272";
-        private const string FakeCorrelationId = "48f53a95-0bd2-4c0c-a6ba-afded2bdffac";
-        private const string FakeBatchPath = $@"C:\HOME\25SEP2025\{FakeBatchId}";
-        private const string FakeExchangeSetPath = $@"{FakeBatchPath}\V01X01";
-        private const string FakeExchangeSetEncRootPath = $@"{FakeExchangeSetPath}\ENC_ROOT";
-        private const string FakeExchangeSetInfoPath = $@"{FakeExchangeSetPath}\INFO";
-        private const string FakeExchangeSetMediaBaseNumber = "5";
-        private const string FakeExchangeSetMediaPath = $@"{FakeBatchPath}\M0{FakeExchangeSetMediaBaseNumber}X02";
-        private const string FakeExchangeSetMediaInfoPath = $@"{FakeBatchPath}\M0{FakeExchangeSetMediaBaseNumber}X02\INFO";
-        private const string FakeExchangeSetMediaFilePath = $@"{FakeExchangeSetMediaPath}\MEDIA.TXT";
-        private const string FakeSerialFilePath = $@"{FakeExchangeSetPath}\SERIAL.ENC";
-        private const string FakeProductFilePath = $@"{FakeExchangeSetInfoPath}\PRODUCT.TXT";
-        private const string FakeReadMeFilePath = $@"{FakeExchangeSetEncRootPath}\ReadMe.txt";
-        private const string FakeCatalogFilePath = $@"{FakeExchangeSetEncRootPath}\CATALOG.031";
-        private const string FakeAioExchangeSetPath = $@"{FakeBatchPath}\AIO";
-        private const string FakeAioExchangeSetEncRootPath = $@"{FakeAioExchangeSetPath}\ENC_ROOT";
-        private const string FakeSerialAioFilePath = $@"{FakeAioExchangeSetPath}\SERIAL.AIO";
+        //private const string FakeBatchValue.BatchId = "7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272";
+        //private const string FakeBatchValue.CorrelationId = "48f53a95-0bd2-4c0c-a6ba-afded2bdffac";
+        //private const string FakeBatchPath = $@"C:\HOME\25SEP2025\{FakeBatchValue.BatchId}";
+        //private const string FakeBatchValue.ExchangeSetPath = $@"{FakeBatchPath}\V01X01";
+        //private const string FakeBatchValue.ExchangeSetEncRootPath = $@"{FakeBatchValue.ExchangeSetPath}\ENC_ROOT";
+        //private const string FakeBatchValue.ExchangeSetInfoPath = $@"{FakeBatchValue.ExchangeSetPath}\INFO";
+        //private const string FakeBatchValue.ExchangeSetMediaBaseNumber = "5";
+        //private const string FakeBatchValue.ExchangeSetMediaPath = $@"{FakeBatchPath}\M0{FakeBatchValue.ExchangeSetMediaBaseNumber}X02";
+        //private const string FakeExchangeSetMediaInfoPath = $@"{FakeBatchPath}\M0{FakeBatchValue.ExchangeSetMediaBaseNumber}X02\INFO";
+        //private const string FakeBatchValue.ExchangeSetMediaFilePath = $@"{FakeBatchValue.ExchangeSetMediaPath}\MEDIA.TXT";
+        //private const string FakeBatchValue.SerialFilePath = $@"{FakeBatchValue.ExchangeSetPath}\SERIAL.ENC";
+        //private const string FakeBatchValue.ProductFilePath = $@"{FakeBatchValue.ExchangeSetInfoPath}\PRODUCT.TXT";
+        //private const string FakeBatchValue.ReadMeFilePath = $@"{FakeBatchValue.ExchangeSetEncRootPath}\ReadMe.txt";
+        //private const string FakeBatchValue.CatalogFilePath = $@"{FakeBatchValue.ExchangeSetEncRootPath}\CATALOG.031";
+        //private const string FakeBatchValue.AioExchangeSetPath = $@"{FakeBatchPath}\AIO";
+        //private const string FakeBatchValue.AioExchangeSetEncRootPath = $@"{FakeBatchValue.AioExchangeSetPath}\ENC_ROOT";
+        //private const string FakeBatchValue.SerialAioFilePath = $@"{FakeBatchValue.AioExchangeSetPath}\SERIAL.AIO";
         private const string FulfilmentExceptionMessage = "There has been a problem in creating your exchange set, so we are unable to fulfil your request at this time. Please contact UKHO Customer Services quoting error code : {0} and correlation ID : {1}";
         private readonly DateTime fakeScsRequestDateTime = DateTime.UtcNow;
 
         [SetUp]
         public void Setup()
         {
-            fakeFileShareServiceConfig = Options.Create(new FileShareServiceConfiguration()
-            {
-                BaseUrl = "http://tempuri.org",
-                CellName = "DE260001",
-                EditionNumber = "1",
-                Limit = 10,
-                Start = 0,
-                ProductCode = "AVCS",
-                ProductLimit = 4,
-                UpdateNumber = "0",
-                UpdateNumberLimit = 10,
-                ParallelSearchTaskCount = 10,
-                EncRoot = "ENC_ROOT",
-                ExchangeSetFileFolder = "V01X01",
-                ReadMeFileName = "ReadMe.txt",
-                CatalogFileName = "CATALOG.031",
-                SerialFileName = "SERIAL.ENC",
-                SerialAioFileName = "SERIAL.AIO",
-                ProductFileName = "PRODUCT.TXT",
-                CommentVersion = "VERSION=1.0",
-                Info = "INFO",
-                AioExchangeSetFileFolder = "AIO",
-            });
+            //fakeFileShareServiceConfig = Options.Create(new FileShareServiceConfiguration()
+            //{
+            //    BaseUrl = "http://tempuri.org",
+            //    CellName = "DE260001",
+            //    EditionNumber = "1",
+            //    Limit = 10,
+            //    Start = 0,
+            //    ProductCode = "AVCS",
+            //    ProductLimit = 4,
+            //    UpdateNumber = "0",
+            //    UpdateNumberLimit = 10,
+            //    ParallelSearchTaskCount = 10,
+            //    EncRoot = "ENC_ROOT",
+            //    ExchangeSetFileFolder = "V01X01",
+            //    ReadMeFileName = "ReadMe.txt",
+            //    CatalogFileName = "CATALOG.031",
+            //    SerialFileName = "SERIAL.ENC",
+            //    SerialAioFileName = "SERIAL.AIO",
+            //    ProductFileName = "PRODUCT.TXT",
+            //    CommentVersion = "VERSION=1.0",
+            //    Info = "INFO",
+            //    AioExchangeSetFileFolder = "AIO",
+            //});
             fakeLogger = A.Fake<ILogger<FulfilmentAncillaryFiles>>();
             fakeFileSystemHelper = A.Fake<IFileSystemHelper>();
 
-            fulfilmentAncillaryFiles = new FulfilmentAncillaryFiles(fakeLogger, fakeFileShareServiceConfig, fakeFileSystemHelper);
+            fulfilmentAncillaryFiles = new FulfilmentAncillaryFiles(fakeLogger, FakeBatchValue.FileShareServiceConfiguration, fakeFileSystemHelper);
         }
 
         private static List<BatchFile> GetFiles()
@@ -222,22 +222,22 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             A.CallTo(() => fakeFileSystemHelper.CheckFileExists(A<string>.Ignored)).Returns(false);
 
             Assert.ThrowsAsync(Is.TypeOf<FulfilmentException>().And.Message.EqualTo(FulfilmentExceptionMessage),
-                async delegate { await fulfilmentAncillaryFiles.CreateSerialEncFile(FakeBatchId, FakeExchangeSetInfoPath, null); });
+                async delegate { await fulfilmentAncillaryFiles.CreateSerialEncFile(FakeBatchValue.BatchId, FakeBatchValue.ExchangeSetInfoPath, null); });
         }
 
         [Test]
         public async Task WhenValidCreateSerialEncFileRequest_ThenReturnTrueResponse()
         {
-            A.CallTo(() => fakeFileSystemHelper.CheckAndCreateFolder(FakeExchangeSetPath));
-            A.CallTo(() => fakeFileSystemHelper.CreateFileContent(FakeSerialFilePath, A<string>.Ignored)).Returns(true);
-            A.CallTo(() => fakeFileSystemHelper.CheckFileExists(FakeSerialFilePath)).Returns(true);
+            A.CallTo(() => fakeFileSystemHelper.CheckAndCreateFolder(FakeBatchValue.ExchangeSetPath));
+            A.CallTo(() => fakeFileSystemHelper.CreateFileContent(FakeBatchValue.SerialFilePath, A<string>.Ignored)).Returns(true);
+            A.CallTo(() => fakeFileSystemHelper.CheckFileExists(FakeBatchValue.SerialFilePath)).Returns(true);
 
-            var response = await fulfilmentAncillaryFiles.CreateSerialEncFile(FakeBatchId, FakeExchangeSetPath, FakeCorrelationId);
+            var response = await fulfilmentAncillaryFiles.CreateSerialEncFile(FakeBatchValue.BatchId, FakeBatchValue.ExchangeSetPath, FakeBatchValue.CorrelationId);
 
             Assert.That(response, Is.True);
-            A.CallTo(() => fakeFileSystemHelper.CheckAndCreateFolder(FakeExchangeSetPath)).MustHaveHappenedOnceExactly();
-            A.CallTo(() => fakeFileSystemHelper.CreateFileContent(FakeSerialFilePath, A<string>.Ignored)).MustHaveHappenedOnceExactly();
-            A.CallTo(() => fakeFileSystemHelper.CheckFileExists(FakeSerialFilePath)).MustHaveHappenedOnceExactly();
+            A.CallTo(() => fakeFileSystemHelper.CheckAndCreateFolder(FakeBatchValue.ExchangeSetPath)).MustHaveHappenedOnceExactly();
+            A.CallTo(() => fakeFileSystemHelper.CreateFileContent(FakeBatchValue.SerialFilePath, A<string>.Ignored)).MustHaveHappenedOnceExactly();
+            A.CallTo(() => fakeFileSystemHelper.CheckFileExists(FakeBatchValue.SerialFilePath)).MustHaveHappenedOnceExactly();
         }
 
         #region CreateProductFile
@@ -248,7 +248,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             var salesCatalogueDataResponse = GetSalesCatalogueDataBadrequestResponse();
 
             Assert.ThrowsAsync(Is.TypeOf<FulfilmentException>().And.Message.EqualTo(FulfilmentExceptionMessage),
-                async delegate { await fulfilmentAncillaryFiles.CreateProductFile(FakeBatchId, FakeExchangeSetInfoPath, null, salesCatalogueDataResponse, fakeScsRequestDateTime); });
+                async delegate { await fulfilmentAncillaryFiles.CreateProductFile(FakeBatchValue.BatchId, FakeBatchValue.ExchangeSetInfoPath, null, salesCatalogueDataResponse, fakeScsRequestDateTime); });
 
             A.CallTo(fakeLogger).Where(call => call.Method.Name == "Log"
             && call.GetArgument<LogLevel>(0) == LogLevel.Error
@@ -266,7 +266,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             A.CallTo(() => fakeFileSystemHelper.CreateFileContent(A<string>.Ignored, A<string>.Ignored)).Returns(false);
 
             Assert.ThrowsAsync(Is.TypeOf<FulfilmentException>().And.Message.EqualTo(FulfilmentExceptionMessage),
-                async delegate { await fulfilmentAncillaryFiles.CreateProductFile(FakeBatchId, FakeExchangeSetInfoPath, null, salesCatalogueDataResponse, fakeScsRequestDateTime); });
+                async delegate { await fulfilmentAncillaryFiles.CreateProductFile(FakeBatchValue.BatchId, FakeBatchValue.ExchangeSetInfoPath, null, salesCatalogueDataResponse, fakeScsRequestDateTime); });
 
             A.CallTo(fakeLogger).Where(call => call.Method.Name == "Log"
             && call.GetArgument<LogLevel>(0) == LogLevel.Error
@@ -283,14 +283,14 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
         public async Task WhenValidCreateProductFileRequest_ThenReturnTrueResponseAsync(bool encryption)
         {
             var salesCatalogueDataResponse = GetSalesCatalogueDataResponse();
-            A.CallTo(() => fakeFileSystemHelper.CheckAndCreateFolder(FakeExchangeSetInfoPath));
-            A.CallTo(() => fakeFileSystemHelper.CreateFileContent(FakeProductFilePath, A<string>.Ignored)).Returns(true);
+            A.CallTo(() => fakeFileSystemHelper.CheckAndCreateFolder(FakeBatchValue.ExchangeSetInfoPath));
+            A.CallTo(() => fakeFileSystemHelper.CreateFileContent(FakeBatchValue.ProductFilePath, A<string>.Ignored)).Returns(true);
 
-            var response = await fulfilmentAncillaryFiles.CreateProductFile(FakeBatchId, FakeExchangeSetInfoPath, FakeCorrelationId, salesCatalogueDataResponse, fakeScsRequestDateTime, encryption);
+            var response = await fulfilmentAncillaryFiles.CreateProductFile(FakeBatchValue.BatchId, FakeBatchValue.ExchangeSetInfoPath, FakeBatchValue.CorrelationId, salesCatalogueDataResponse, fakeScsRequestDateTime, encryption);
 
             Assert.That(response, Is.True);
-            A.CallTo(() => fakeFileSystemHelper.CheckAndCreateFolder(FakeExchangeSetInfoPath)).MustHaveHappenedOnceExactly();
-            A.CallTo(() => fakeFileSystemHelper.CreateFileContent(FakeProductFilePath, A<string>.Ignored)).MustHaveHappenedOnceExactly();
+            A.CallTo(() => fakeFileSystemHelper.CheckAndCreateFolder(FakeBatchValue.ExchangeSetInfoPath)).MustHaveHappenedOnceExactly();
+            A.CallTo(() => fakeFileSystemHelper.CreateFileContent(FakeBatchValue.ProductFilePath, A<string>.Ignored)).MustHaveHappenedOnceExactly();
         }
 
         #endregion
@@ -308,42 +308,42 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
                 new() { BatchId = "63d38bde-5191-4a59-82d5-aa22ca1cc6dc", EditionNumber = 10, ProductName = "10000002", UpdateNumber = 3, FileUri = new List<string> { "http://ffs-demo.azurewebsites.net" }, Files = GetFiles() },
                 new() { BatchId = "63d38bde-5191-4a59-82d5-aa22ca1cc6dc", EditionNumber = 10, ProductName = "10000003", UpdateNumber = 3, FileUri = new List<string> { "http://ffs-demo.azurewebsites.net" }, Files = GetFiles() }
             };
-            A.CallTo(() => fakeFileSystemHelper.CheckFileExists(FakeReadMeFilePath)).Returns(true);
-            A.CallTo(() => fakeFileSystemHelper.CheckFileExists(FakeCatalogFilePath)).Returns(true);
+            A.CallTo(() => fakeFileSystemHelper.CheckFileExists(FakeBatchValue.ReadMeFilePath)).Returns(true);
+            A.CallTo(() => fakeFileSystemHelper.CheckFileExists(FakeBatchValue.CatalogFilePath)).Returns(true);
             A.CallTo(() => fakeFileSystemHelper.ReadAllBytes(A<string>.Ignored)).Returns(byteContent);
 
-            var response = await fulfilmentAncillaryFiles.CreateCatalogFile(FakeBatchId, FakeExchangeSetEncRootPath, FakeCorrelationId, fulfilmentDataResponse, salesCatalogueDataResponse, salesCatalogueProductResponse);
+            var response = await fulfilmentAncillaryFiles.CreateCatalogFile(FakeBatchValue.BatchId, FakeBatchValue.ExchangeSetEncRootPath, FakeBatchValue.CorrelationId, fulfilmentDataResponse, salesCatalogueDataResponse, salesCatalogueProductResponse);
 
             Assert.That(response, Is.True);
-            A.CallTo(() => fakeFileSystemHelper.CheckFileExists(FakeReadMeFilePath)).MustHaveHappenedOnceExactly();
+            A.CallTo(() => fakeFileSystemHelper.CheckFileExists(FakeBatchValue.ReadMeFilePath)).MustHaveHappenedOnceExactly();
 
             foreach (var item in fulfilmentDataResponse)
             {
                 foreach (var file in item.Files.Where(x => x.MimeType != "application/s57" && x.MimeType != "application/s63"))
                 {
-                    var filePath = Path.Combine(FakeExchangeSetEncRootPath, item.ProductName.Substring(0, 2), item.ProductName, item.EditionNumber.ToString(), item.UpdateNumber.ToString(), file.Filename);
+                    var filePath = Path.Combine(FakeBatchValue.ExchangeSetEncRootPath, item.ProductName.Substring(0, 2), item.ProductName, item.EditionNumber.ToString(), item.UpdateNumber.ToString(), file.Filename);
                     A.CallTo(() => fakeFileSystemHelper.ReadAllBytes(filePath)).MustHaveHappenedOnceExactly();
                 }
             }
 
-            A.CallTo(() => fakeFileSystemHelper.CheckAndCreateFolder(FakeExchangeSetEncRootPath)).MustHaveHappenedOnceExactly();
-            A.CallTo(() => fakeFileSystemHelper.CreateFileContentWithBytes(FakeCatalogFilePath, A<byte[]>.Ignored)).MustHaveHappenedOnceExactly();
-            A.CallTo(() => fakeFileSystemHelper.CheckFileExists(FakeCatalogFilePath)).MustHaveHappenedOnceExactly();
+            A.CallTo(() => fakeFileSystemHelper.CheckAndCreateFolder(FakeBatchValue.ExchangeSetEncRootPath)).MustHaveHappenedOnceExactly();
+            A.CallTo(() => fakeFileSystemHelper.CreateFileContentWithBytes(FakeBatchValue.CatalogFilePath, A<byte[]>.Ignored)).MustHaveHappenedOnceExactly();
+            A.CallTo(() => fakeFileSystemHelper.CheckFileExists(FakeBatchValue.CatalogFilePath)).MustHaveHappenedOnceExactly();
         }
 
         [Test]
         public void WhenInvalidCreateCatalogFileRequest_ThenReturnFulfilmentException()
         {
-            A.CallTo(() => fakeFileSystemHelper.CheckFileExists(FakeReadMeFilePath)).Returns(true);
-            A.CallTo(() => fakeFileSystemHelper.CheckFileExists(FakeCatalogFilePath)).Returns(false);
+            A.CallTo(() => fakeFileSystemHelper.CheckFileExists(FakeBatchValue.ReadMeFilePath)).Returns(true);
+            A.CallTo(() => fakeFileSystemHelper.CheckFileExists(FakeBatchValue.CatalogFilePath)).Returns(false);
 
             Assert.ThrowsAsync(Is.TypeOf<FulfilmentException>().And.Message.EqualTo(FulfilmentExceptionMessage),
-                async delegate { await fulfilmentAncillaryFiles.CreateCatalogFile(FakeBatchId, FakeExchangeSetEncRootPath, FakeCorrelationId, null, null, null); });
+                async delegate { await fulfilmentAncillaryFiles.CreateCatalogFile(FakeBatchValue.BatchId, FakeBatchValue.ExchangeSetEncRootPath, FakeBatchValue.CorrelationId, null, null, null); });
 
-            A.CallTo(() => fakeFileSystemHelper.CheckFileExists(FakeReadMeFilePath)).MustHaveHappenedOnceExactly();
-            A.CallTo(() => fakeFileSystemHelper.CheckAndCreateFolder(FakeExchangeSetEncRootPath)).MustHaveHappenedOnceExactly();
-            A.CallTo(() => fakeFileSystemHelper.CreateFileContentWithBytes(FakeCatalogFilePath, A<byte[]>.Ignored)).MustHaveHappenedOnceExactly();
-            A.CallTo(() => fakeFileSystemHelper.CheckFileExists(FakeCatalogFilePath)).MustHaveHappenedOnceExactly();
+            A.CallTo(() => fakeFileSystemHelper.CheckFileExists(FakeBatchValue.ReadMeFilePath)).MustHaveHappenedOnceExactly();
+            A.CallTo(() => fakeFileSystemHelper.CheckAndCreateFolder(FakeBatchValue.ExchangeSetEncRootPath)).MustHaveHappenedOnceExactly();
+            A.CallTo(() => fakeFileSystemHelper.CreateFileContentWithBytes(FakeBatchValue.CatalogFilePath, A<byte[]>.Ignored)).MustHaveHappenedOnceExactly();
+            A.CallTo(() => fakeFileSystemHelper.CheckFileExists(FakeBatchValue.CatalogFilePath)).MustHaveHappenedOnceExactly();
         }
 
         #endregion
@@ -353,17 +353,17 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
         [Test]
         public void WhenInvalidCreateMediaFileRequest_ThenReturnFulfilmentException()
         {
-            A.CallTo(() => fakeFileSystemHelper.CreateFileContent(FakeExchangeSetMediaFilePath, A<string>.Ignored)).Returns(true);
-            A.CallTo(() => fakeFileSystemHelper.CheckFileExists(FakeExchangeSetMediaFilePath)).Returns(false);
+            A.CallTo(() => fakeFileSystemHelper.CreateFileContent(FakeBatchValue.ExchangeSetMediaFilePath, A<string>.Ignored)).Returns(true);
+            A.CallTo(() => fakeFileSystemHelper.CheckFileExists(FakeBatchValue.ExchangeSetMediaFilePath)).Returns(false);
 
             Assert.ThrowsAsync(Is.TypeOf<FulfilmentException>().And.Message.EqualTo(FulfilmentExceptionMessage),
-                async delegate { await fulfilmentAncillaryFiles.CreateMediaFile(FakeBatchId, FakeExchangeSetMediaPath, FakeCorrelationId, FakeExchangeSetMediaBaseNumber); });
+                async delegate { await fulfilmentAncillaryFiles.CreateMediaFile(FakeBatchValue.BatchId, FakeBatchValue.ExchangeSetMediaPath, FakeBatchValue.CorrelationId, FakeBatchValue.ExchangeSetMediaBaseNumber); });
         }
 
         [Test]
         public async Task WhenInvalidCreateMediaFileRequest_WithEmptyPath_ThenReturnFalseResponse()
         {
-            var response = await fulfilmentAncillaryFiles.CreateMediaFile(FakeBatchId, string.Empty, FakeCorrelationId, FakeExchangeSetMediaBaseNumber);
+            var response = await fulfilmentAncillaryFiles.CreateMediaFile(FakeBatchValue.BatchId, string.Empty, FakeBatchValue.CorrelationId, FakeBatchValue.ExchangeSetMediaBaseNumber);
 
             Assert.That(response, Is.False);
         }
@@ -371,8 +371,8 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
         [Test]
         public async Task WhenValidCreateMediaFileRequest_ThenReturnTrueResponse()
         {
-            var baseFolderPath1 = Path.Combine(FakeExchangeSetMediaPath, "B1");
-            var baseFolderPath2 = Path.Combine(FakeExchangeSetMediaPath, "B2");
+            var baseFolderPath1 = Path.Combine(FakeBatchValue.ExchangeSetMediaPath, "B1");
+            var baseFolderPath2 = Path.Combine(FakeBatchValue.ExchangeSetMediaPath, "B2");
             var baseEncFolderPath1 = Path.Combine(baseFolderPath1, "ENC_ROOT");
             var baseEncFolderPath2 = Path.Combine(baseFolderPath2, "ENC_ROOT");
             var baseFolder1 = A.Fake<IDirectoryInfo>();
@@ -384,21 +384,21 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             IDirectoryInfo[] baseFolders = [baseFolder1, baseFolder2];
             string[] subdirectoryPaths1 = [Path.Combine(baseEncFolderPath1, "GB"), Path.Combine(baseEncFolderPath1, "FR")];
             string[] subdirectoryPaths2 = [Path.Combine(baseEncFolderPath2, "DE")];
-            A.CallTo(() => fakeFileSystemHelper.GetDirectoryInfo(FakeExchangeSetMediaPath)).Returns(baseFolders);
+            A.CallTo(() => fakeFileSystemHelper.GetDirectoryInfo(FakeBatchValue.ExchangeSetMediaPath)).Returns(baseFolders);
             A.CallTo(() => fakeFileSystemHelper.GetDirectories(baseEncFolderPath1)).Returns(subdirectoryPaths1);
             A.CallTo(() => fakeFileSystemHelper.GetDirectories(baseEncFolderPath2)).Returns(subdirectoryPaths2);
-            A.CallTo(() => fakeFileSystemHelper.CreateFileContent(FakeExchangeSetMediaFilePath, A<string>.Ignored)).Returns(true);
-            A.CallTo(() => fakeFileSystemHelper.CheckFileExists(FakeExchangeSetMediaFilePath)).Returns(true);
+            A.CallTo(() => fakeFileSystemHelper.CreateFileContent(FakeBatchValue.ExchangeSetMediaFilePath, A<string>.Ignored)).Returns(true);
+            A.CallTo(() => fakeFileSystemHelper.CheckFileExists(FakeBatchValue.ExchangeSetMediaFilePath)).Returns(true);
 
-            var response = await fulfilmentAncillaryFiles.CreateMediaFile(FakeBatchId, FakeExchangeSetMediaPath, FakeCorrelationId, FakeExchangeSetMediaBaseNumber);
+            var response = await fulfilmentAncillaryFiles.CreateMediaFile(FakeBatchValue.BatchId, FakeBatchValue.ExchangeSetMediaPath, FakeBatchValue.CorrelationId, FakeBatchValue.ExchangeSetMediaBaseNumber);
 
             Assert.That(response, Is.True);
-            A.CallTo(() => fakeFileSystemHelper.CheckAndCreateFolder(FakeExchangeSetMediaPath)).MustHaveHappenedOnceExactly();
-            A.CallTo(() => fakeFileSystemHelper.GetDirectoryInfo(FakeExchangeSetMediaPath)).MustHaveHappenedOnceExactly();
+            A.CallTo(() => fakeFileSystemHelper.CheckAndCreateFolder(FakeBatchValue.ExchangeSetMediaPath)).MustHaveHappenedOnceExactly();
+            A.CallTo(() => fakeFileSystemHelper.GetDirectoryInfo(FakeBatchValue.ExchangeSetMediaPath)).MustHaveHappenedOnceExactly();
             A.CallTo(() => fakeFileSystemHelper.GetDirectories(baseEncFolderPath1)).MustHaveHappenedOnceExactly();
             A.CallTo(() => fakeFileSystemHelper.GetDirectories(baseEncFolderPath2)).MustHaveHappenedOnceExactly();
-            A.CallTo(() => fakeFileSystemHelper.CreateFileContent(FakeExchangeSetMediaFilePath, A<string>.Ignored)).MustHaveHappenedOnceExactly();
-            A.CallTo(() => fakeFileSystemHelper.CheckFileExists(FakeExchangeSetMediaFilePath)).MustHaveHappenedOnceExactly();
+            A.CallTo(() => fakeFileSystemHelper.CreateFileContent(FakeBatchValue.ExchangeSetMediaFilePath, A<string>.Ignored)).MustHaveHappenedOnceExactly();
+            A.CallTo(() => fakeFileSystemHelper.CheckFileExists(FakeBatchValue.ExchangeSetMediaFilePath)).MustHaveHappenedOnceExactly();
         }
 
         #endregion
@@ -408,19 +408,19 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
         [Test]
         public void WhenInvalidCreateLargeMediaSerialEncFileRequest_ThenReturnFulfilmentException()
         {
-            var baseFolderPath = Path.Combine(FakeExchangeSetMediaPath, "B1");
+            var baseFolderPath = Path.Combine(FakeBatchValue.ExchangeSetMediaPath, "B1");
             A.CallTo(() => fakeFileSystemHelper.CheckAndCreateFolder(A<string>.Ignored));
             A.CallTo(() => fakeFileSystemHelper.CreateFileContent(A<string>.Ignored, A<string>.Ignored)).Returns(true);
             A.CallTo(() => fakeFileSystemHelper.CheckFileExists(A<string>.Ignored)).Returns(false);
 
             Assert.ThrowsAsync(Is.TypeOf<FulfilmentException>().And.Message.EqualTo(FulfilmentExceptionMessage),
-                async delegate { await fulfilmentAncillaryFiles.CreateLargeMediaSerialEncFile(FakeBatchId, baseFolderPath, FakeCorrelationId, "1", "2"); });
+                async delegate { await fulfilmentAncillaryFiles.CreateLargeMediaSerialEncFile(FakeBatchValue.BatchId, baseFolderPath, FakeBatchValue.CorrelationId, "1", "2"); });
         }
 
         [Test]
         public async Task WhenInvalidCreateLargeMediaSerialEncFileRequest_WithEmptyPath_ThenReturnFalseResponse()
         {
-            var response = await fulfilmentAncillaryFiles.CreateLargeMediaSerialEncFile(FakeBatchId, string.Empty, FakeCorrelationId, "1", "2");
+            var response = await fulfilmentAncillaryFiles.CreateLargeMediaSerialEncFile(FakeBatchValue.BatchId, string.Empty, FakeBatchValue.CorrelationId, "1", "2");
 
             Assert.That(response, Is.False);
         }
@@ -428,13 +428,13 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
         [Test]
         public async Task WhenValidCreateLargeMediaSerialEncFileRequest_ThenReturnTrueResponse()
         {
-            var baseFolderPath = Path.Combine(FakeExchangeSetMediaPath, "B1");
+            var baseFolderPath = Path.Combine(FakeBatchValue.ExchangeSetMediaPath, "B1");
             var serialFilePath = Path.Combine(baseFolderPath, "SERIAL.ENC");
             var baseNumber = "1";
             A.CallTo(() => fakeFileSystemHelper.CreateFileContent(serialFilePath, A<string>.Ignored)).Returns(true);
             A.CallTo(() => fakeFileSystemHelper.CheckFileExists(serialFilePath)).Returns(true);
 
-            var response = await fulfilmentAncillaryFiles.CreateLargeMediaSerialEncFile(FakeBatchId, baseFolderPath, FakeCorrelationId, baseNumber, "2");
+            var response = await fulfilmentAncillaryFiles.CreateLargeMediaSerialEncFile(FakeBatchValue.BatchId, baseFolderPath, FakeBatchValue.CorrelationId, baseNumber, "2");
 
             Assert.That(response, Is.True);
             A.CallTo(() => fakeFileSystemHelper.CheckAndCreateFolder(baseFolderPath)).MustHaveHappenedOnceExactly();
@@ -449,7 +449,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
         [Test]
         public async Task WhenValidCreateLargeExchangeSetCatalogFileRequest_ThenReturnTrueReponse()
         {
-            var b1Path = Path.Combine(FakeExchangeSetMediaPath, "B1");
+            var b1Path = Path.Combine(FakeBatchValue.ExchangeSetMediaPath, "B1");
             var exchangeSetRootPath = Path.Combine(b1Path, "ENC_ROOT");
             var readMeFileName = Path.Combine(exchangeSetRootPath, fakeFileShareServiceConfig.Value.ReadMeFileName);
             var outputFileName = Path.Combine(exchangeSetRootPath, fakeFileShareServiceConfig.Value.CatalogFileName);
@@ -462,13 +462,13 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
                 new() { BatchId = "63d38bde-5191-4a59-82d5-aa22ca1cc6dc", EditionNumber = 10, ProductName = "10000003", UpdateNumber = 3, FileUri = new List<string> { "http://ffs-demo.azurewebsites.net" }, Files = GetFiles() }
             };
             var directoryInfo = A.Fake<IDirectoryInfo>();
-            A.CallTo(() => directoryInfo.Name).Returns($"M0{FakeExchangeSetMediaBaseNumber}X02");
+            A.CallTo(() => directoryInfo.Name).Returns($"M0{FakeBatchValue.ExchangeSetMediaBaseNumber}X02");
             A.CallTo(() => fakeFileSystemHelper.CheckFileExists(readMeFileName)).Returns(true);
             A.CallTo(() => fakeFileSystemHelper.CheckFileExists(outputFileName)).Returns(true);
             A.CallTo(() => fakeFileSystemHelper.ReadAllBytes(A<string>.Ignored)).Returns(byteContent);
             A.CallTo(() => fakeFileSystemHelper.GetParent(b1Path)).Returns(directoryInfo);
 
-            var response = await fulfilmentAncillaryFiles.CreateLargeExchangeSetCatalogFile(FakeBatchId, exchangeSetRootPath, FakeCorrelationId, fulfilmentDataResponse, salesCatalogueDataResponse, salesCatalogueProductResponse);
+            var response = await fulfilmentAncillaryFiles.CreateLargeExchangeSetCatalogFile(FakeBatchValue.BatchId, exchangeSetRootPath, FakeBatchValue.CorrelationId, fulfilmentDataResponse, salesCatalogueDataResponse, salesCatalogueProductResponse);
 
             Assert.That(response, Is.True);
             A.CallTo(() => fakeFileSystemHelper.CheckFileExists(readMeFileName)).MustHaveHappenedOnceExactly();
@@ -491,7 +491,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
         [Test]
         public void WhenInvalidCreateLargeExchangeSetCatalogFileRequest_ThenReturnFulfilmentException()
         {
-            var b1Path = Path.Combine(FakeExchangeSetMediaPath, "B1");
+            var b1Path = Path.Combine(FakeBatchValue.ExchangeSetMediaPath, "B1");
             var exchangeSetRootPath = Path.Combine(b1Path, "ENC_ROOT");
             var readMeFileName = Path.Combine(exchangeSetRootPath, fakeFileShareServiceConfig.Value.ReadMeFileName);
             var outputFileName = Path.Combine(exchangeSetRootPath, fakeFileShareServiceConfig.Value.CatalogFileName);
@@ -504,14 +504,14 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
                 new() { BatchId = "63d38bde-5191-4a59-82d5-aa22ca1cc6dc", EditionNumber = 10, ProductName = "10000003", UpdateNumber = 3, FileUri = new List<string> { "http://ffs-demo.azurewebsites.net" }, Files = GetFiles() }
             };
             var directoryInfo = A.Fake<IDirectoryInfo>();
-            A.CallTo(() => directoryInfo.Name).Returns($"M0{FakeExchangeSetMediaBaseNumber}X02");
+            A.CallTo(() => directoryInfo.Name).Returns($"M0{FakeBatchValue.ExchangeSetMediaBaseNumber}X02");
             A.CallTo(() => fakeFileSystemHelper.CheckFileExists(readMeFileName)).Returns(true);
             A.CallTo(() => fakeFileSystemHelper.CheckFileExists(outputFileName)).Returns(false);
             A.CallTo(() => fakeFileSystemHelper.ReadAllBytes(A<string>.Ignored)).Returns(byteContent);
             A.CallTo(() => fakeFileSystemHelper.GetParent(b1Path)).Returns(directoryInfo);
 
             Assert.ThrowsAsync(Is.TypeOf<FulfilmentException>().And.Message.EqualTo(FulfilmentExceptionMessage),
-                async delegate { await fulfilmentAncillaryFiles.CreateLargeExchangeSetCatalogFile(FakeBatchId, exchangeSetRootPath, FakeCorrelationId, fulfilmentDataResponse, salesCatalogueDataResponse, salesCatalogueProductResponse); });
+                async delegate { await fulfilmentAncillaryFiles.CreateLargeExchangeSetCatalogFile(FakeBatchValue.BatchId, exchangeSetRootPath, FakeBatchValue.CorrelationId, fulfilmentDataResponse, salesCatalogueDataResponse, salesCatalogueProductResponse); });
 
             A.CallTo(() => fakeFileSystemHelper.CheckFileExists(outputFileName)).MustHaveHappenedOnceExactly();
         }
@@ -519,14 +519,14 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
         [Test]
         public void WhenNullCreateLargeExchangeSetCatalogFileRequest_ThenReturnFulfilmentException()
         {
-            var b1Path = Path.Combine(FakeExchangeSetMediaPath, "B1");
+            var b1Path = Path.Combine(FakeBatchValue.ExchangeSetMediaPath, "B1");
             var exchangeSetRootPath = Path.Combine(b1Path, "ENC_ROOT");
             var readMeFileName = Path.Combine(exchangeSetRootPath, fakeFileShareServiceConfig.Value.ReadMeFileName);
             var outputFileName = Path.Combine(exchangeSetRootPath, fakeFileShareServiceConfig.Value.CatalogFileName);
             A.CallTo(() => fakeFileSystemHelper.CheckFileExists(readMeFileName)).Returns(true);
 
             Assert.ThrowsAsync(Is.TypeOf<FulfilmentException>().And.Message.EqualTo(FulfilmentExceptionMessage),
-                async delegate { await fulfilmentAncillaryFiles.CreateLargeExchangeSetCatalogFile(FakeBatchId, exchangeSetRootPath, FakeCorrelationId, null, null, null); });
+                async delegate { await fulfilmentAncillaryFiles.CreateLargeExchangeSetCatalogFile(FakeBatchValue.BatchId, exchangeSetRootPath, FakeBatchValue.CorrelationId, null, null, null); });
 
             A.CallTo(() => fakeFileSystemHelper.CheckFileExists(readMeFileName)).MustHaveHappenedOnceExactly();
             A.CallTo(() => fakeFileSystemHelper.ReadAllBytes(A<string>.Ignored)).MustNotHaveHappened();
@@ -543,31 +543,29 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
         [Test]
         public void WhenInvalidCreateEncUpdateCsvFileRequest_ThenReturnFulfilmentException()
         {
-            var updateListPath = Path.Combine(FakeExchangeSetMediaInfoPath, "ENC Update List.csv");
             var textWriter = A.Fake<TextWriter>();
-            A.CallTo(() => fakeFileSystemHelper.WriteStream(updateListPath)).Returns(textWriter);
-            A.CallTo(() => fakeFileSystemHelper.CheckFileExists(updateListPath)).Returns(false);
+            A.CallTo(() => fakeFileSystemHelper.WriteStream(FakeBatchValue.UpdateListFilePath)).Returns(textWriter);
+            A.CallTo(() => fakeFileSystemHelper.CheckFileExists(FakeBatchValue.UpdateListFilePath)).Returns(false);
 
             Assert.ThrowsAsync(Is.TypeOf<FulfilmentException>().And.Message.EqualTo(FulfilmentExceptionMessage),
-                async delegate { await fulfilmentAncillaryFiles.CreateEncUpdateCsv(GetSalesCatalogueDataResponse(), FakeExchangeSetMediaInfoPath, FakeBatchId, FakeCorrelationId); });
+                async delegate { await fulfilmentAncillaryFiles.CreateEncUpdateCsv(GetSalesCatalogueDataResponse(), FakeBatchValue.ExchangeSetMediaInfoPath, FakeBatchValue.BatchId, FakeBatchValue.CorrelationId); });
 
-            A.CallTo(() => fakeFileSystemHelper.WriteStream(updateListPath)).MustHaveHappenedOnceExactly();
-            A.CallTo(() => fakeFileSystemHelper.CheckFileExists(updateListPath)).MustHaveHappenedOnceExactly();
+            A.CallTo(() => fakeFileSystemHelper.WriteStream(FakeBatchValue.UpdateListFilePath)).MustHaveHappenedOnceExactly();
+            A.CallTo(() => fakeFileSystemHelper.CheckFileExists(FakeBatchValue.UpdateListFilePath)).MustHaveHappenedOnceExactly();
         }
 
         [Test]
         public async Task WhenValidCreateEncUpdateCsvFileRequest_ThenReturnTrueResponse()
         {
-            var updateListPath = Path.Combine(FakeExchangeSetMediaInfoPath, "ENC Update List.csv");
             var textWriter = A.Fake<TextWriter>();
-            A.CallTo(() => fakeFileSystemHelper.WriteStream(updateListPath)).Returns(textWriter);
-            A.CallTo(() => fakeFileSystemHelper.CheckFileExists(updateListPath)).Returns(true);
+            A.CallTo(() => fakeFileSystemHelper.WriteStream(FakeBatchValue.UpdateListFilePath)).Returns(textWriter);
+            A.CallTo(() => fakeFileSystemHelper.CheckFileExists(FakeBatchValue.UpdateListFilePath)).Returns(true);
 
-            var response = await fulfilmentAncillaryFiles.CreateEncUpdateCsv(GetSalesCatalogueDataResponse(), FakeExchangeSetMediaInfoPath, FakeBatchId, FakeCorrelationId);
+            var response = await fulfilmentAncillaryFiles.CreateEncUpdateCsv(GetSalesCatalogueDataResponse(), FakeBatchValue.ExchangeSetMediaInfoPath, FakeBatchValue.BatchId, FakeBatchValue.CorrelationId);
 
             Assert.That(response, Is.True);
-            A.CallTo(() => fakeFileSystemHelper.WriteStream(updateListPath)).MustHaveHappenedOnceExactly();
-            A.CallTo(() => fakeFileSystemHelper.CheckFileExists(updateListPath)).MustHaveHappenedOnceExactly();
+            A.CallTo(() => fakeFileSystemHelper.WriteStream(FakeBatchValue.UpdateListFilePath)).MustHaveHappenedOnceExactly();
+            A.CallTo(() => fakeFileSystemHelper.CheckFileExists(FakeBatchValue.UpdateListFilePath)).MustHaveHappenedOnceExactly();
         }
 
         #endregion
@@ -578,70 +576,87 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
         public void WhenInvalidCreateSerialAioFileRequest_ThenReturnFulfilmentException()
         {
             var salesCatalogueDataResponse = GetSalesCatalogueDataResponse();
-            var typeCheckPath1 = Path.Combine(FakeAioExchangeSetEncRootPath, "10", "10000002", "3", "0", "10000002.000");
-            var typeCheckPath2 = Path.Combine(FakeAioExchangeSetEncRootPath, "10", "10000003", "3", "0", "10000003.000");
+            var typeCheckPath1 = Path.Combine(FakeBatchValue.AioExchangeSetEncRootPath, "10", "10000002", "3", "0", "10000002.000");
+            var typeCheckPath2 = Path.Combine(FakeBatchValue.AioExchangeSetEncRootPath, "10", "10000003", "3", "0", "10000003.000");
             A.CallTo(() => fakeFileSystemHelper.CheckFileExists(typeCheckPath1)).Returns(true);
             A.CallTo(() => fakeFileSystemHelper.CheckFileExists(typeCheckPath2)).Returns(false);
-            A.CallTo(() => fakeFileSystemHelper.CheckFileExists(FakeSerialAioFilePath)).Returns(false);
+            A.CallTo(() => fakeFileSystemHelper.CheckFileExists(FakeBatchValue.SerialAioFilePath)).Returns(false);
 
             Assert.ThrowsAsync(Is.TypeOf<FulfilmentException>().And.Message.EqualTo(FulfilmentExceptionMessage),
-                async delegate { await fulfilmentAncillaryFiles.CreateSerialAioFile(FakeBatchId, FakeAioExchangeSetPath, FakeCorrelationId, salesCatalogueDataResponse); });
+                async delegate { await fulfilmentAncillaryFiles.CreateSerialAioFile(FakeBatchValue.BatchId, FakeBatchValue.AioExchangeSetPath, FakeBatchValue.CorrelationId, salesCatalogueDataResponse); });
 
             A.CallTo(fakeLogger).Where(call => call.Method.Name == "Log"
                 && call.GetArgument<LogLevel>(0) == LogLevel.Error
                 && call.GetArgument<EventId>(1) == EventIds.SerialAioFileIsNotCreated.ToEventId()
                 && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "Error in creating serial.aio file for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId} - Invalid Exchange Set Path").MustHaveHappenedOnceExactly();
-            A.CallTo(() => fakeFileSystemHelper.CheckAndCreateFolder(FakeAioExchangeSetPath)).MustHaveHappenedOnceExactly();
-            A.CallTo(() => fakeFileSystemHelper.CreateFileContent(FakeSerialAioFilePath, A<string>.That.Matches(x => BaseRegex().Match(x).Success))).MustHaveHappenedOnceExactly();
+            A.CallTo(() => fakeFileSystemHelper.CheckAndCreateFolder(FakeBatchValue.AioExchangeSetPath)).MustHaveHappenedOnceExactly();
+            A.CallTo(() => fakeFileSystemHelper.CreateFileContent(FakeBatchValue.SerialAioFilePath, A<string>.That.Matches(x => BaseRegex().Match(x).Success))).MustHaveHappenedOnceExactly();
             A.CallTo(() => fakeFileSystemHelper.CheckFileExists(typeCheckPath1)).MustHaveHappenedOnceExactly();
             A.CallTo(() => fakeFileSystemHelper.CheckFileExists(typeCheckPath2)).MustNotHaveHappened();
-            A.CallTo(() => fakeFileSystemHelper.CheckFileExists(FakeSerialAioFilePath)).MustHaveHappenedOnceExactly();
+            A.CallTo(() => fakeFileSystemHelper.CheckFileExists(FakeBatchValue.SerialAioFilePath)).MustHaveHappenedOnceExactly();
         }
+
+        //private string GetCdType(List<SalesCatalogueDataProductResponse> salesCatalogueDataAioProductResponse, string aioExchangeSetPath)
+        //{
+        //    string cdType = "UPDATE";
+        //    foreach (var response in salesCatalogueDataAioProductResponse)
+        //    {
+        //        string path = Path.Combine(aioExchangeSetPath, fileShareServiceConfig.Value.EncRoot, response.ProductName[..2],
+        //                                   response.ProductName, Convert.ToString(response.BaseCellEditionNumber), "0",
+        //                                   response.ProductName + ".000");
+        //        if (fileSystemHelper.CheckFileExists(path))
+        //        {
+        //            cdType = "BASE";
+        //            break;
+        //        }
+        //    }
+        //    return cdType;
+        //}
 
         [Test]
         public async Task WhenValidCreateSerialAioFileRequest_CdTypeBase_ThenReturnTrueResponse()
         {
             var salesCatalogueDataResponse = GetSalesCatalogueDataResponse();
-            var typeCheckPath1 = Path.Combine(FakeAioExchangeSetEncRootPath, "10", "10000002", "3", "0", "10000002.000");
-            var typeCheckPath2 = Path.Combine(FakeAioExchangeSetEncRootPath, "10", "10000003", "3", "0", "10000003.000");
+            var typeCheckPath1 = Path.Combine(FakeBatchValue.AioExchangeSetEncRootPath, "10", "10000002", "3", "0", "10000002.000");
+            var typeCheckPath2 = Path.Combine(FakeBatchValue.AioExchangeSetEncRootPath, "10", "10000003", "3", "0", "10000003.000");
             A.CallTo(() => fakeFileSystemHelper.CheckFileExists(typeCheckPath1)).Returns(true);
             A.CallTo(() => fakeFileSystemHelper.CheckFileExists(typeCheckPath2)).Returns(false);
-            A.CallTo(() => fakeFileSystemHelper.CheckFileExists(FakeSerialAioFilePath)).Returns(true);
+            A.CallTo(() => fakeFileSystemHelper.CheckFileExists(FakeBatchValue.SerialAioFilePath)).Returns(true);
 
-            var response = await fulfilmentAncillaryFiles.CreateSerialAioFile(FakeBatchId, FakeAioExchangeSetPath, FakeCorrelationId, salesCatalogueDataResponse);
+            var response = await fulfilmentAncillaryFiles.CreateSerialAioFile(FakeBatchValue.BatchId, FakeBatchValue.AioExchangeSetPath, FakeBatchValue.CorrelationId, salesCatalogueDataResponse);
 
             Assert.That(response, Is.True);
-            A.CallTo(() => fakeFileSystemHelper.CheckAndCreateFolder(FakeAioExchangeSetPath)).MustHaveHappenedOnceExactly();
-            A.CallTo(() => fakeFileSystemHelper.CreateFileContent(FakeSerialAioFilePath, A<string>.That.Matches(x => BaseRegex().Match(x).Success))).MustHaveHappenedOnceExactly();
+            A.CallTo(() => fakeFileSystemHelper.CheckAndCreateFolder(FakeBatchValue.AioExchangeSetPath)).MustHaveHappenedOnceExactly();
+            A.CallTo(() => fakeFileSystemHelper.CreateFileContent(FakeBatchValue.SerialAioFilePath, A<string>.That.Matches(x => BaseRegex().Match(x).Success))).MustHaveHappenedOnceExactly();
             A.CallTo(() => fakeFileSystemHelper.CheckFileExists(typeCheckPath1)).MustHaveHappenedOnceExactly();
             A.CallTo(() => fakeFileSystemHelper.CheckFileExists(typeCheckPath2)).MustNotHaveHappened();
-            A.CallTo(() => fakeFileSystemHelper.CheckFileExists(FakeSerialAioFilePath)).MustHaveHappenedOnceExactly();
+            A.CallTo(() => fakeFileSystemHelper.CheckFileExists(FakeBatchValue.SerialAioFilePath)).MustHaveHappenedOnceExactly();
         }
 
         [Test]
         public async Task WhenValidCreateSerialAioFileRequest_CdTypeUpdate_ThenReturnTrueResponse()
         {
             var salesCatalogueDataResponse = GetSalesCatalogueDataResponse();
-            var typeCheckPath1 = Path.Combine(FakeAioExchangeSetEncRootPath, "10", "10000002", "3", "0", "10000002.000");
-            var typeCheckPath2 = Path.Combine(FakeAioExchangeSetEncRootPath, "10", "10000003", "3", "0", "10000003.000");
+            var typeCheckPath1 = Path.Combine(FakeBatchValue.AioExchangeSetEncRootPath, "10", "10000002", "3", "0", "10000002.000");
+            var typeCheckPath2 = Path.Combine(FakeBatchValue.AioExchangeSetEncRootPath, "10", "10000003", "3", "0", "10000003.000");
             A.CallTo(() => fakeFileSystemHelper.CheckFileExists(typeCheckPath1)).Returns(false);
             A.CallTo(() => fakeFileSystemHelper.CheckFileExists(typeCheckPath2)).Returns(false);
-            A.CallTo(() => fakeFileSystemHelper.CheckFileExists(FakeSerialAioFilePath)).Returns(true);
+            A.CallTo(() => fakeFileSystemHelper.CheckFileExists(FakeBatchValue.SerialAioFilePath)).Returns(true);
 
-            var response = await fulfilmentAncillaryFiles.CreateSerialAioFile(FakeBatchId, FakeAioExchangeSetPath, FakeCorrelationId, salesCatalogueDataResponse);
+            var response = await fulfilmentAncillaryFiles.CreateSerialAioFile(FakeBatchValue.BatchId, FakeBatchValue.AioExchangeSetPath, FakeBatchValue.CorrelationId, salesCatalogueDataResponse);
 
             Assert.That(response, Is.True);
-            A.CallTo(() => fakeFileSystemHelper.CheckAndCreateFolder(FakeAioExchangeSetPath)).MustHaveHappenedOnceExactly();
-            A.CallTo(() => fakeFileSystemHelper.CreateFileContent(FakeSerialAioFilePath, A<string>.That.Matches(x => UpdateRegex().Match(x).Success))).MustHaveHappenedOnceExactly();
+            A.CallTo(() => fakeFileSystemHelper.CheckAndCreateFolder(FakeBatchValue.AioExchangeSetPath)).MustHaveHappenedOnceExactly();
+            A.CallTo(() => fakeFileSystemHelper.CreateFileContent(FakeBatchValue.SerialAioFilePath, A<string>.That.Matches(x => UpdateRegex().Match(x).Success))).MustHaveHappenedOnceExactly();
             A.CallTo(() => fakeFileSystemHelper.CheckFileExists(typeCheckPath1)).MustHaveHappenedOnceExactly();
             A.CallTo(() => fakeFileSystemHelper.CheckFileExists(typeCheckPath2)).MustHaveHappenedOnceExactly();
-            A.CallTo(() => fakeFileSystemHelper.CheckFileExists(FakeSerialAioFilePath)).MustHaveHappenedOnceExactly();
+            A.CallTo(() => fakeFileSystemHelper.CheckFileExists(FakeBatchValue.SerialAioFilePath)).MustHaveHappenedOnceExactly();
         }
 
         [Test]
         public async Task WhenEmptyExchangeSetPathCreateSerialAioFileRequest_ThenReturnFalseResponse()
         {
-            var response = await fulfilmentAncillaryFiles.CreateSerialAioFile(FakeBatchId, string.Empty, FakeCorrelationId, null);
+            var response = await fulfilmentAncillaryFiles.CreateSerialAioFile(FakeBatchValue.BatchId, string.Empty, FakeBatchValue.CorrelationId, null);
 
             Assert.That(response, Is.False);
             A.CallTo(() => fakeFileSystemHelper.CheckAndCreateFolder(A<string>.Ignored)).MustNotHaveHappened();

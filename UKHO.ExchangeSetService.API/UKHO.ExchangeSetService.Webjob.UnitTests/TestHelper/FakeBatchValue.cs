@@ -77,6 +77,10 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.TestHelper
         /// MEDIA.TXT
         /// </summary>
         public const string MediaFileName = "MEDIA.TXT";
+        /// <summary>
+        /// ENC Update List.csv
+        /// </summary>
+        public const string UpdateListFileName = "ENC Update List.csv";
 
         /// <summary>
         /// C:\HOME\25SEP2025\7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272
@@ -102,6 +106,10 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.TestHelper
         /// C:\HOME\25SEP2025\7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272\M05X02\INFO
         /// </summary>
         public const string ExchangeSetMediaInfoPath = $@"{BatchPath}\M0{ExchangeSetMediaBaseNumber}X02\{Info}";
+        /// <summary>
+        /// C:\HOME\25SEP2025\7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272\M05X02\INFO\ENC Update List.csv
+        /// </summary>
+        public const string UpdateListFilePath = $@"{ExchangeSetMediaInfoPath}\{UpdateListFileName}";
         /// <summary>
         /// C:\HOME\25SEP2025\7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272\M05X02\MEDIA.TXT
         /// </summary>
