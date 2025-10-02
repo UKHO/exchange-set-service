@@ -139,6 +139,10 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.TestHelper
         /// </summary>
         public const string AioExchangeSetEncRootPath = $@"{AioExchangeSetPath}\{EncRoot}";
         /// <summary>
+        /// C:\HOME\25SEP2025\7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272\AIO\INFO
+        /// </summary>
+        public const string AioExchangeSetInfoPath = $@"{AioExchangeSetPath}\{Info}";
+        /// <summary>
         /// C:\HOME\25SEP2025\7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272\AIO\SERIAL.AIO
         /// </summary>
         public const string SerialAioFilePath = $@"{AioExchangeSetPath}\{SerialAioFileName}";
