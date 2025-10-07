@@ -312,17 +312,17 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
         [Test]
         public void WhenInvalidCreateMediaFileRequest_ThenReturnFulfilmentException()
         {
-            A.CallTo(() => fakeFileSystemHelper.CreateFileContent(FakeBatchValue.ExchangeSetMediaFilePath, A<string>.Ignored)).Returns(true);
-            A.CallTo(() => fakeFileSystemHelper.CheckFileExists(FakeBatchValue.ExchangeSetMediaFilePath)).Returns(false);
+            A.CallTo(() => fakeFileSystemHelper.CreateFileContent(FakeBatchValue.LargeExchangeSetMediaFilePath5, A<string>.Ignored)).Returns(true);
+            A.CallTo(() => fakeFileSystemHelper.CheckFileExists(FakeBatchValue.LargeExchangeSetMediaFilePath5)).Returns(false);
 
             Assert.ThrowsAsync(Is.TypeOf<FulfilmentException>().And.Message.EqualTo(FulfilmentExceptionMessage),
-                async delegate { await fulfilmentAncillaryFiles.CreateMediaFile(FakeBatchValue.BatchId, FakeBatchValue.ExchangeSetMediaPath, FakeBatchValue.CorrelationId, FakeBatchValue.ExchangeSetMediaBaseNumber); });
+                async delegate { await fulfilmentAncillaryFiles.CreateMediaFile(FakeBatchValue.BatchId, FakeBatchValue.LargeExchangeSetMediaPath5, FakeBatchValue.CorrelationId, FakeBatchValue.MediaBaseNumber5); });
         }
 
         [Test]
         public async Task WhenInvalidCreateMediaFileRequest_WithEmptyPath_ThenReturnFalseResponse()
         {
-            var response = await fulfilmentAncillaryFiles.CreateMediaFile(FakeBatchValue.BatchId, string.Empty, FakeBatchValue.CorrelationId, FakeBatchValue.ExchangeSetMediaBaseNumber);
+            var response = await fulfilmentAncillaryFiles.CreateMediaFile(FakeBatchValue.BatchId, string.Empty, FakeBatchValue.CorrelationId, FakeBatchValue.MediaBaseNumber5);
 
             Assert.That(response, Is.False);
         }
@@ -330,8 +330,8 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
         [Test]
         public async Task WhenValidCreateMediaFileRequest_ThenReturnTrueResponse()
         {
-            var baseFolderPath1 = Path.Combine(FakeBatchValue.ExchangeSetMediaPath, "B1");
-            var baseFolderPath2 = Path.Combine(FakeBatchValue.ExchangeSetMediaPath, "B2");
+            var baseFolderPath1 = Path.Combine(FakeBatchValue.LargeExchangeSetMediaPath5, "B1");
+            var baseFolderPath2 = Path.Combine(FakeBatchValue.LargeExchangeSetMediaPath5, "B2");
             var baseEncFolderPath1 = Path.Combine(baseFolderPath1, FakeBatchValue.EncRoot);
             var baseEncFolderPath2 = Path.Combine(baseFolderPath2, FakeBatchValue.EncRoot);
             var baseFolder1 = A.Fake<IDirectoryInfo>();
@@ -343,21 +343,21 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             IDirectoryInfo[] baseFolders = [baseFolder1, baseFolder2];
             string[] subdirectoryPaths1 = [Path.Combine(baseEncFolderPath1, "GB"), Path.Combine(baseEncFolderPath1, "FR")];
             string[] subdirectoryPaths2 = [Path.Combine(baseEncFolderPath2, "DE")];
-            A.CallTo(() => fakeFileSystemHelper.GetDirectoryInfo(FakeBatchValue.ExchangeSetMediaPath)).Returns(baseFolders);
+            A.CallTo(() => fakeFileSystemHelper.GetDirectoryInfo(FakeBatchValue.LargeExchangeSetMediaPath5)).Returns(baseFolders);
             A.CallTo(() => fakeFileSystemHelper.GetDirectories(baseEncFolderPath1)).Returns(subdirectoryPaths1);
             A.CallTo(() => fakeFileSystemHelper.GetDirectories(baseEncFolderPath2)).Returns(subdirectoryPaths2);
-            A.CallTo(() => fakeFileSystemHelper.CreateFileContent(FakeBatchValue.ExchangeSetMediaFilePath, A<string>.Ignored)).Returns(true);
-            A.CallTo(() => fakeFileSystemHelper.CheckFileExists(FakeBatchValue.ExchangeSetMediaFilePath)).Returns(true);
+            A.CallTo(() => fakeFileSystemHelper.CreateFileContent(FakeBatchValue.LargeExchangeSetMediaFilePath5, A<string>.Ignored)).Returns(true);
+            A.CallTo(() => fakeFileSystemHelper.CheckFileExists(FakeBatchValue.LargeExchangeSetMediaFilePath5)).Returns(true);
 
-            var response = await fulfilmentAncillaryFiles.CreateMediaFile(FakeBatchValue.BatchId, FakeBatchValue.ExchangeSetMediaPath, FakeBatchValue.CorrelationId, FakeBatchValue.ExchangeSetMediaBaseNumber);
+            var response = await fulfilmentAncillaryFiles.CreateMediaFile(FakeBatchValue.BatchId, FakeBatchValue.LargeExchangeSetMediaPath5, FakeBatchValue.CorrelationId, FakeBatchValue.MediaBaseNumber5);
 
             Assert.That(response, Is.True);
-            A.CallTo(() => fakeFileSystemHelper.CheckAndCreateFolder(FakeBatchValue.ExchangeSetMediaPath)).MustHaveHappenedOnceExactly();
-            A.CallTo(() => fakeFileSystemHelper.GetDirectoryInfo(FakeBatchValue.ExchangeSetMediaPath)).MustHaveHappenedOnceExactly();
+            A.CallTo(() => fakeFileSystemHelper.CheckAndCreateFolder(FakeBatchValue.LargeExchangeSetMediaPath5)).MustHaveHappenedOnceExactly();
+            A.CallTo(() => fakeFileSystemHelper.GetDirectoryInfo(FakeBatchValue.LargeExchangeSetMediaPath5)).MustHaveHappenedOnceExactly();
             A.CallTo(() => fakeFileSystemHelper.GetDirectories(baseEncFolderPath1)).MustHaveHappenedOnceExactly();
             A.CallTo(() => fakeFileSystemHelper.GetDirectories(baseEncFolderPath2)).MustHaveHappenedOnceExactly();
-            A.CallTo(() => fakeFileSystemHelper.CreateFileContent(FakeBatchValue.ExchangeSetMediaFilePath, A<string>.Ignored)).MustHaveHappenedOnceExactly();
-            A.CallTo(() => fakeFileSystemHelper.CheckFileExists(FakeBatchValue.ExchangeSetMediaFilePath)).MustHaveHappenedOnceExactly();
+            A.CallTo(() => fakeFileSystemHelper.CreateFileContent(FakeBatchValue.LargeExchangeSetMediaFilePath5, A<string>.Ignored)).MustHaveHappenedOnceExactly();
+            A.CallTo(() => fakeFileSystemHelper.CheckFileExists(FakeBatchValue.LargeExchangeSetMediaFilePath5)).MustHaveHappenedOnceExactly();
         }
 
         #endregion
@@ -367,7 +367,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
         [Test]
         public void WhenInvalidCreateLargeMediaSerialEncFileRequest_ThenReturnFulfilmentException()
         {
-            var baseFolderPath = Path.Combine(FakeBatchValue.ExchangeSetMediaPath, "B1");
+            var baseFolderPath = Path.Combine(FakeBatchValue.LargeExchangeSetMediaPath5, "B1");
             A.CallTo(() => fakeFileSystemHelper.CheckAndCreateFolder(A<string>.Ignored));
             A.CallTo(() => fakeFileSystemHelper.CreateFileContent(A<string>.Ignored, A<string>.Ignored)).Returns(true);
             A.CallTo(() => fakeFileSystemHelper.CheckFileExists(A<string>.Ignored)).Returns(false);
@@ -387,7 +387,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
         [Test]
         public async Task WhenValidCreateLargeMediaSerialEncFileRequest_ThenReturnTrueResponse()
         {
-            var baseFolderPath = Path.Combine(FakeBatchValue.ExchangeSetMediaPath, "B1");
+            var baseFolderPath = Path.Combine(FakeBatchValue.LargeExchangeSetMediaPath5, "B1");
             var serialFilePath = Path.Combine(baseFolderPath, FakeBatchValue.SerialFileName);
             var baseNumber = "1";
             A.CallTo(() => fakeFileSystemHelper.CreateFileContent(serialFilePath, A<string>.Ignored)).Returns(true);
@@ -408,7 +408,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
         [Test]
         public async Task WhenValidCreateLargeExchangeSetCatalogFileRequest_ThenReturnTrueReponse()
         {
-            var b1Path = Path.Combine(FakeBatchValue.ExchangeSetMediaPath, "B1");
+            var b1Path = Path.Combine(FakeBatchValue.LargeExchangeSetMediaPath5, "B1");
             var exchangeSetRootPath = Path.Combine(b1Path, FakeBatchValue.EncRoot);
             var readMeFileName = Path.Combine(exchangeSetRootPath, FakeBatchValue.ReadMeFileName);
             var outputFileName = Path.Combine(exchangeSetRootPath, FakeBatchValue.CatalogFileName);
@@ -421,7 +421,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
                 new() { BatchId = "63d38bde-5191-4a59-82d5-aa22ca1cc6dc", EditionNumber = 10, ProductName = "10000003", UpdateNumber = 3, FileUri = new List<string> { "http://ffs-demo.azurewebsites.net" }, Files = GetFiles() }
             };
             var directoryInfo = A.Fake<IDirectoryInfo>();
-            A.CallTo(() => directoryInfo.Name).Returns($"M0{FakeBatchValue.ExchangeSetMediaBaseNumber}X02");
+            A.CallTo(() => directoryInfo.Name).Returns($"M0{FakeBatchValue.MediaBaseNumber5}X02");
             A.CallTo(() => fakeFileSystemHelper.CheckFileExists(readMeFileName)).Returns(true);
             A.CallTo(() => fakeFileSystemHelper.CheckFileExists(outputFileName)).Returns(true);
             A.CallTo(() => fakeFileSystemHelper.ReadAllBytes(A<string>.Ignored)).Returns(byteContent);
@@ -450,7 +450,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
         [Test]
         public void WhenInvalidCreateLargeExchangeSetCatalogFileRequest_ThenReturnFulfilmentException()
         {
-            var b1Path = Path.Combine(FakeBatchValue.ExchangeSetMediaPath, "B1");
+            var b1Path = Path.Combine(FakeBatchValue.LargeExchangeSetMediaPath5, "B1");
             var exchangeSetRootPath = Path.Combine(b1Path, FakeBatchValue.EncRoot);
             var readMeFileName = Path.Combine(exchangeSetRootPath, FakeBatchValue.ReadMeFileName);
             var outputFileName = Path.Combine(exchangeSetRootPath, FakeBatchValue.CatalogFileName);
@@ -463,7 +463,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
                 new() { BatchId = "63d38bde-5191-4a59-82d5-aa22ca1cc6dc", EditionNumber = 10, ProductName = "10000003", UpdateNumber = 3, FileUri = new List<string> { "http://ffs-demo.azurewebsites.net" }, Files = GetFiles() }
             };
             var directoryInfo = A.Fake<IDirectoryInfo>();
-            A.CallTo(() => directoryInfo.Name).Returns($"M0{FakeBatchValue.ExchangeSetMediaBaseNumber}X02");
+            A.CallTo(() => directoryInfo.Name).Returns($"M0{FakeBatchValue.MediaBaseNumber5}X02");
             A.CallTo(() => fakeFileSystemHelper.CheckFileExists(readMeFileName)).Returns(true);
             A.CallTo(() => fakeFileSystemHelper.CheckFileExists(outputFileName)).Returns(false);
             A.CallTo(() => fakeFileSystemHelper.ReadAllBytes(A<string>.Ignored)).Returns(byteContent);
@@ -478,7 +478,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
         [Test]
         public void WhenNullCreateLargeExchangeSetCatalogFileRequest_ThenReturnFulfilmentException()
         {
-            var b1Path = Path.Combine(FakeBatchValue.ExchangeSetMediaPath, "B1");
+            var b1Path = Path.Combine(FakeBatchValue.LargeExchangeSetMediaPath5, "B1");
             var exchangeSetRootPath = Path.Combine(b1Path, FakeBatchValue.EncRoot);
             var readMeFileName = Path.Combine(exchangeSetRootPath, FakeBatchValue.ReadMeFileName);
             var outputFileName = Path.Combine(exchangeSetRootPath, FakeBatchValue.CatalogFileName);
@@ -503,28 +503,28 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
         public void WhenInvalidCreateEncUpdateCsvFileRequest_ThenReturnFulfilmentException()
         {
             var textWriter = A.Fake<TextWriter>();
-            A.CallTo(() => fakeFileSystemHelper.WriteStream(FakeBatchValue.UpdateListFilePath)).Returns(textWriter);
-            A.CallTo(() => fakeFileSystemHelper.CheckFileExists(FakeBatchValue.UpdateListFilePath)).Returns(false);
+            A.CallTo(() => fakeFileSystemHelper.WriteStream(FakeBatchValue.UpdateListFilePath5)).Returns(textWriter);
+            A.CallTo(() => fakeFileSystemHelper.CheckFileExists(FakeBatchValue.UpdateListFilePath5)).Returns(false);
 
             Assert.ThrowsAsync(Is.TypeOf<FulfilmentException>().And.Message.EqualTo(FulfilmentExceptionMessage),
-                async delegate { await fulfilmentAncillaryFiles.CreateEncUpdateCsv(GetSalesCatalogueDataResponse(), FakeBatchValue.ExchangeSetMediaInfoPath, FakeBatchValue.BatchId, FakeBatchValue.CorrelationId); });
+                async delegate { await fulfilmentAncillaryFiles.CreateEncUpdateCsv(GetSalesCatalogueDataResponse(), FakeBatchValue.LargeExchangeSetMediaInfoPath5, FakeBatchValue.BatchId, FakeBatchValue.CorrelationId); });
 
-            A.CallTo(() => fakeFileSystemHelper.WriteStream(FakeBatchValue.UpdateListFilePath)).MustHaveHappenedOnceExactly();
-            A.CallTo(() => fakeFileSystemHelper.CheckFileExists(FakeBatchValue.UpdateListFilePath)).MustHaveHappenedOnceExactly();
+            A.CallTo(() => fakeFileSystemHelper.WriteStream(FakeBatchValue.UpdateListFilePath5)).MustHaveHappenedOnceExactly();
+            A.CallTo(() => fakeFileSystemHelper.CheckFileExists(FakeBatchValue.UpdateListFilePath5)).MustHaveHappenedOnceExactly();
         }
 
         [Test]
         public async Task WhenValidCreateEncUpdateCsvFileRequest_ThenReturnTrueResponse()
         {
             var textWriter = A.Fake<TextWriter>();
-            A.CallTo(() => fakeFileSystemHelper.WriteStream(FakeBatchValue.UpdateListFilePath)).Returns(textWriter);
-            A.CallTo(() => fakeFileSystemHelper.CheckFileExists(FakeBatchValue.UpdateListFilePath)).Returns(true);
+            A.CallTo(() => fakeFileSystemHelper.WriteStream(FakeBatchValue.UpdateListFilePath5)).Returns(textWriter);
+            A.CallTo(() => fakeFileSystemHelper.CheckFileExists(FakeBatchValue.UpdateListFilePath5)).Returns(true);
 
-            var response = await fulfilmentAncillaryFiles.CreateEncUpdateCsv(GetSalesCatalogueDataResponse(), FakeBatchValue.ExchangeSetMediaInfoPath, FakeBatchValue.BatchId, FakeBatchValue.CorrelationId);
+            var response = await fulfilmentAncillaryFiles.CreateEncUpdateCsv(GetSalesCatalogueDataResponse(), FakeBatchValue.LargeExchangeSetMediaInfoPath5, FakeBatchValue.BatchId, FakeBatchValue.CorrelationId);
 
             Assert.That(response, Is.True);
-            A.CallTo(() => fakeFileSystemHelper.WriteStream(FakeBatchValue.UpdateListFilePath)).MustHaveHappenedOnceExactly();
-            A.CallTo(() => fakeFileSystemHelper.CheckFileExists(FakeBatchValue.UpdateListFilePath)).MustHaveHappenedOnceExactly();
+            A.CallTo(() => fakeFileSystemHelper.WriteStream(FakeBatchValue.UpdateListFilePath5)).MustHaveHappenedOnceExactly();
+            A.CallTo(() => fakeFileSystemHelper.CheckFileExists(FakeBatchValue.UpdateListFilePath5)).MustHaveHappenedOnceExactly();
         }
 
         #endregion

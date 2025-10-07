@@ -116,44 +116,44 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.FileBuilders
         public async Task WhenCreateLargeMediaSerialEncFile_ReturnsBool(bool secondResponse)
         {
             var mediaDir1 = A.Fake<IDirectoryInfo>();
-            A.CallTo(() => mediaDir1.Name).Returns(FakeBatchValue.LargeExchangeSetFolderName);
-            A.CallTo(() => mediaDir1.ToString()).Returns(FakeBatchValue.ExchangeSetMediaPath);
+            A.CallTo(() => mediaDir1.Name).Returns(FakeBatchValue.LargeExchangeSetFolderName5);
+            A.CallTo(() => mediaDir1.ToString()).Returns(FakeBatchValue.LargeExchangeSetMediaPath5);
             var mediaDir2 = A.Fake<IDirectoryInfo>();
-            A.CallTo(() => mediaDir2.Name).Returns(FakeBatchValue.LastLargeExchangeSetFolderName);
-            A.CallTo(() => mediaDir2.ToString()).Returns(FakeBatchValue.LastExchangeSetMediaPath);
+            A.CallTo(() => mediaDir2.Name).Returns(FakeBatchValue.LargeExchangeSetFolderName6);
+            A.CallTo(() => mediaDir2.ToString()).Returns(FakeBatchValue.LargeExchangeSetMediaPath6);
             var mediaDir3 = A.Fake<IDirectoryInfo>();
             A.CallTo(() => mediaDir3.Name).Returns("Not an M directory");
             A.CallTo(() => mediaDir3.ToString()).Returns(Path.Combine(FakeBatchValue.BatchPath, "Not an M directory"));
 
             var baseDir1 = A.Fake<IDirectoryInfo>();
             A.CallTo(() => baseDir1.Name).Returns("B1");
-            A.CallTo(() => baseDir1.ToString()).Returns(Path.Combine(FakeBatchValue.ExchangeSetMediaPath, "B1"));
+            A.CallTo(() => baseDir1.ToString()).Returns(Path.Combine(FakeBatchValue.LargeExchangeSetMediaPath5, "B1"));
             var baseDir2 = A.Fake<IDirectoryInfo>();
             A.CallTo(() => baseDir2.Name).Returns("B2");
-            A.CallTo(() => baseDir2.ToString()).Returns(Path.Combine(FakeBatchValue.ExchangeSetMediaPath, "B2"));
+            A.CallTo(() => baseDir2.ToString()).Returns(Path.Combine(FakeBatchValue.LargeExchangeSetMediaPath5, "B2"));
 
             var lastBaseDir1 = A.Fake<IDirectoryInfo>();
             A.CallTo(() => lastBaseDir1.Name).Returns("B3");
-            A.CallTo(() => lastBaseDir1.ToString()).Returns(Path.Combine(FakeBatchValue.LastExchangeSetMediaPath, "B3"));
+            A.CallTo(() => lastBaseDir1.ToString()).Returns(Path.Combine(FakeBatchValue.LargeExchangeSetMediaPath6, "B3"));
 
             // Root directories (to find last M0*)
             A.CallTo(() => _fakeFileSystemHelper.GetDirectoryInfo(FakeBatchValue.BatchPath)).Returns([mediaDir1, mediaDir2, mediaDir3]);
 
             // Base directories under rootfolder
-            A.CallTo(() => _fakeFileSystemHelper.GetDirectoryInfo(FakeBatchValue.ExchangeSetMediaPath)).Returns([baseDir1, baseDir2]);
+            A.CallTo(() => _fakeFileSystemHelper.GetDirectoryInfo(FakeBatchValue.LargeExchangeSetMediaPath5)).Returns([baseDir1, baseDir2]);
 
             // For determining last base directory
-            A.CallTo(() => _fakeFileSystemHelper.GetDirectoryInfo(FakeBatchValue.LastExchangeSetMediaPath)).Returns([lastBaseDir1]);
+            A.CallTo(() => _fakeFileSystemHelper.GetDirectoryInfo(FakeBatchValue.LargeExchangeSetMediaPath6)).Returns([lastBaseDir1]);
 
             A.CallTo(() => _fulfilmentAncillaryFiles.CreateLargeMediaSerialEncFile(FakeBatchValue.BatchId, baseDir1.ToString(), FakeBatchValue.CorrelationId, "1", "3")).Returns(true);
             A.CallTo(() => _fulfilmentAncillaryFiles.CreateLargeMediaSerialEncFile(FakeBatchValue.BatchId, baseDir2.ToString(), FakeBatchValue.CorrelationId, "2", "3")).Returns(secondResponse);
 
-            var result = await _fileBuilder.CreateLargeMediaSerialEncFile(FakeBatchValue.BatchId, FakeBatchValue.BatchPath, FakeBatchValue.LargeExchangeSetFolderName, FakeBatchValue.CorrelationId);
+            var result = await _fileBuilder.CreateLargeMediaSerialEncFile(FakeBatchValue.BatchId, FakeBatchValue.BatchPath, FakeBatchValue.LargeExchangeSetFolderName5, FakeBatchValue.CorrelationId);
 
             Assert.That(result, Is.EqualTo(secondResponse));
             A.CallTo(() => _fakeFileSystemHelper.GetDirectoryInfo(FakeBatchValue.BatchPath)).MustHaveHappenedOnceExactly();
-            A.CallTo(() => _fakeFileSystemHelper.GetDirectoryInfo(FakeBatchValue.ExchangeSetMediaPath)).MustHaveHappenedOnceExactly();
-            A.CallTo(() => _fakeFileSystemHelper.GetDirectoryInfo(FakeBatchValue.LastExchangeSetMediaPath)).MustHaveHappenedOnceExactly();
+            A.CallTo(() => _fakeFileSystemHelper.GetDirectoryInfo(FakeBatchValue.LargeExchangeSetMediaPath5)).MustHaveHappenedOnceExactly();
+            A.CallTo(() => _fakeFileSystemHelper.GetDirectoryInfo(FakeBatchValue.LargeExchangeSetMediaPath6)).MustHaveHappenedOnceExactly();
             A.CallTo(() => _fulfilmentAncillaryFiles.CreateLargeMediaSerialEncFile(FakeBatchValue.BatchId, baseDir1.ToString(), FakeBatchValue.CorrelationId, "1", "3")).MustHaveHappenedOnceExactly();
             A.CallTo(() => _fulfilmentAncillaryFiles.CreateLargeMediaSerialEncFile(FakeBatchValue.BatchId, baseDir2.ToString(), FakeBatchValue.CorrelationId, "2", "3")).MustHaveHappenedOnceExactly();
         }
@@ -168,16 +168,16 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.FileBuilders
 
             var baseDir1 = A.Fake<IDirectoryInfo>();
             A.CallTo(() => baseDir1.Name).Returns("B1");
-            A.CallTo(() => baseDir1.ToString()).Returns(Path.Combine(FakeBatchValue.ExchangeSetMediaPath, "B1"));
+            A.CallTo(() => baseDir1.ToString()).Returns(Path.Combine(FakeBatchValue.LargeExchangeSetMediaPath5, "B1"));
             var baseDir2 = A.Fake<IDirectoryInfo>();
             A.CallTo(() => baseDir2.Name).Returns("B2");
-            A.CallTo(() => baseDir2.ToString()).Returns(Path.Combine(FakeBatchValue.ExchangeSetMediaPath, "B2"));
+            A.CallTo(() => baseDir2.ToString()).Returns(Path.Combine(FakeBatchValue.LargeExchangeSetMediaPath5, "B2"));
             var baseDir3 = A.Fake<IDirectoryInfo>();
             A.CallTo(() => baseDir3.Name).Returns("Not a base directory");
-            A.CallTo(() => baseDir3.ToString()).Returns(Path.Combine(FakeBatchValue.ExchangeSetMediaPath, "Not a base directory"));
+            A.CallTo(() => baseDir3.ToString()).Returns(Path.Combine(FakeBatchValue.LargeExchangeSetMediaPath5, "Not a base directory"));
 
             // Base directories at exchangeSetPath
-            A.CallTo(() => _fakeFileSystemHelper.GetDirectoryInfo(FakeBatchValue.ExchangeSetMediaPath)).Returns([baseDir1, baseDir2, baseDir3]);
+            A.CallTo(() => _fakeFileSystemHelper.GetDirectoryInfo(FakeBatchValue.LargeExchangeSetMediaPath5)).Returns([baseDir1, baseDir2, baseDir3]);
 
             // ENC_ROOT folders under each base
             var encRoot1 = Path.Combine(baseDir1.ToString(), FakeBatchValue.EncRoot);
@@ -209,10 +209,10 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.FileBuilders
                 A<List<FulfilmentDataResponse>>.That.Matches(l => l.Count == 1 && l.Single().ProductName.StartsWith("DE")),
                 salesCatalogueDataResponse, salesCatalogueProductResponse)).Returns(secondResponse);
 
-            var result = await _fileBuilder.CreateLargeMediaExchangesetCatalogFile(FakeBatchValue.BatchId, FakeBatchValue.ExchangeSetMediaPath, FakeBatchValue.CorrelationId, listFulfilmentData, salesCatalogueDataResponse, salesCatalogueProductResponse);
+            var result = await _fileBuilder.CreateLargeMediaExchangesetCatalogFile(FakeBatchValue.BatchId, FakeBatchValue.LargeExchangeSetMediaPath5, FakeBatchValue.CorrelationId, listFulfilmentData, salesCatalogueDataResponse, salesCatalogueProductResponse);
 
             Assert.That(result, Is.EqualTo(secondResponse));
-            A.CallTo(() => _fakeFileSystemHelper.GetDirectoryInfo(FakeBatchValue.ExchangeSetMediaPath)).MustHaveHappenedOnceExactly();
+            A.CallTo(() => _fakeFileSystemHelper.GetDirectoryInfo(FakeBatchValue.LargeExchangeSetMediaPath5)).MustHaveHappenedOnceExactly();
             A.CallTo(() => _fulfilmentAncillaryFiles.CreateLargeExchangeSetCatalogFile(
                 FakeBatchValue.BatchId, encRoot1, FakeBatchValue.CorrelationId,
                 A<List<FulfilmentDataResponse>>.That.Matches(l => l.Count == 2 && l.Any(p => p.ProductName.StartsWith("GB")) && l.Any(p => p.ProductName.StartsWith("FR"))),
