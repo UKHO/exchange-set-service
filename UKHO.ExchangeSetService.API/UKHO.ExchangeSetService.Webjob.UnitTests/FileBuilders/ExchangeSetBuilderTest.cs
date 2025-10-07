@@ -29,7 +29,6 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.FileBuilders
         private IMonitorHelper _fakeMonitorHelper;
         private IFileSystemHelper _fakeFileSystemHelper;
         private IProductDataValidator _fakeProductDataValidator;
-        private IOptions<FileShareServiceConfiguration> _fileShareServiceConfiguration;
         private IOptions<AioConfiguration> _aioConfiguration;
         private IFulfilmentFileShareService _fakeFulfilmentFileShareService;
         private IFulfilmentAncillaryFiles _fakeFulfilmentAncillaryFiles;
@@ -98,7 +97,6 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.FileBuilders
             _fakeMonitorHelper = A.Fake<IMonitorHelper>();
             _fakeFileSystemHelper = A.Fake<IFileSystemHelper>();
             _fakeProductDataValidator = A.Fake<IProductDataValidator>();
-            _fileShareServiceConfiguration = FakeBatchValue.FileShareServiceConfiguration;
             _aioConfiguration = Options.Create(new AioConfiguration { AioCells = FakeBatchValue.AioCells }); // one AIO cell
             _fakeFulfilmentFileShareService = A.Fake<IFulfilmentFileShareService>();
             _fakeFulfilmentAncillaryFiles = A.Fake<IFulfilmentAncillaryFiles>();
