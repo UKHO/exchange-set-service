@@ -234,12 +234,12 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
         public async Task WhenRequestDownloadFolderDetails_ThenReturnsBoolForFileIsDownloaded(bool isFileDownloaded)
         {
             var batchFiles = new List<BatchFile>();
-            A.CallTo(() => fakefileShareService.DownloadFolderDetails(FakeBatchValue.BatchId, FakeBatchValue.CorrelationId, batchFiles, FakeBatchValue.ExchangeSetMediaInfoPath)).Returns(isFileDownloaded);
+            A.CallTo(() => fakefileShareService.DownloadFolderDetails(FakeBatchValue.BatchId, FakeBatchValue.CorrelationId, batchFiles, FakeBatchValue.LargeExchangeSetMediaInfoPath5)).Returns(isFileDownloaded);
 
-            var result = await fulfilmentFileShareService.DownloadFolderDetails(FakeBatchValue.BatchId, FakeBatchValue.CorrelationId, batchFiles, FakeBatchValue.ExchangeSetMediaInfoPath);
+            var result = await fulfilmentFileShareService.DownloadFolderDetails(FakeBatchValue.BatchId, FakeBatchValue.CorrelationId, batchFiles, FakeBatchValue.LargeExchangeSetMediaInfoPath5);
 
             Assert.That(result, Is.EqualTo(isFileDownloaded));
-            A.CallTo(() => fakefileShareService.DownloadFolderDetails(FakeBatchValue.BatchId, FakeBatchValue.CorrelationId, batchFiles, FakeBatchValue.ExchangeSetMediaInfoPath)).MustHaveHappenedOnceExactly();
+            A.CallTo(() => fakefileShareService.DownloadFolderDetails(FakeBatchValue.BatchId, FakeBatchValue.CorrelationId, batchFiles, FakeBatchValue.LargeExchangeSetMediaInfoPath5)).MustHaveHappenedOnceExactly();
         }
 
         #endregion DownloadFolderDetails

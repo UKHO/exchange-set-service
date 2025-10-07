@@ -32,19 +32,23 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.TestHelper
         /// <summary>
         /// 5
         /// </summary>
-        public const string ExchangeSetMediaBaseNumber = "5";
+        public const string MediaBaseNumber5 = "5";
         /// <summary>
         /// 6
         /// </summary>
-        public const string LastExchangeSetMediaBaseNumber = "6";
+        public const string MediaBaseNumber6 = "6";
         /// <summary>
         /// M05X02
         /// </summary>
-        public const string LargeExchangeSetFolderName = $"M0{ExchangeSetMediaBaseNumber}X02";
+        public const string LargeExchangeSetFolderName5 = $"M0{MediaBaseNumber5}X02";
+        /// <summary>
+        /// M0{0}X02
+        /// </summary>
+        public const string LargeExchangeSetFolderNamePattern = "M0{0}X02";
         /// <summary>
         /// M06X02
         /// </summary>
-        public const string LastLargeExchangeSetFolderName = $"M0{LastExchangeSetMediaBaseNumber}X02";
+        public const string LargeExchangeSetFolderName6 = $"M0{MediaBaseNumber6}X02";
         /// <summary>
         /// ENC_ROOT
         /// </summary>
@@ -101,11 +105,31 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.TestHelper
         /// ENC Update List.csv
         /// </summary>
         public const string UpdateListFileName = "ENC Update List.csv";
+        /// <summary>
+        /// ADDS-S57
+        /// </summary>
+        public const string S57BusinessUnit = "ADDS-S57";
+        /// <summary>
+        /// ADDS-S63
+        /// </summary>
+        public const string S63BusinessUnit = "ADDS";
+        /// <summary>
+        /// ADDS-S63
+        /// </summary>
+        public const string CurrentUtcDate = "25SEP2025";
+        /// <summary>
+        /// GB800001
+        /// </summary>
+        public const string AioCells = "GB800001";
 
+        /// <summary>
+        /// C:\HOME
+        /// </summary>
+        public const string HomeDirectoryPath = @"C:\HOME";
         /// <summary>
         /// C:\HOME\25SEP2025\7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272
         /// </summary>
-        public const string BatchPath = $@"C:\HOME\25SEP2025\{BatchId}";
+        public const string BatchPath = $@"{HomeDirectoryPath}\{CurrentUtcDate}\{BatchId}";
         /// <summary>
         /// C:\HOME\25SEP2025\7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272\V01X01
         /// </summary>
@@ -121,23 +145,39 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.TestHelper
         /// <summary>
         /// C:\HOME\25SEP2025\7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272\M05X02
         /// </summary>
-        public const string ExchangeSetMediaPath = $@"{BatchPath}\{LargeExchangeSetFolderName}";
+        public const string LargeExchangeSetMediaPath5 = $@"{BatchPath}\{LargeExchangeSetFolderName5}";
         /// <summary>
         /// C:\HOME\25SEP2025\7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272\M06X02
         /// </summary>
-        public const string LastExchangeSetMediaPath = $@"{BatchPath}\{LastLargeExchangeSetFolderName}";
+        public const string LargeExchangeSetMediaPath6 = $@"{BatchPath}\{LargeExchangeSetFolderName6}";
         /// <summary>
         /// C:\HOME\25SEP2025\7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272\M05X02\INFO
         /// </summary>
-        public const string ExchangeSetMediaInfoPath = $@"{ExchangeSetMediaPath}\{Info}";
+        public const string LargeExchangeSetMediaInfoPath5 = $@"{LargeExchangeSetMediaPath5}\{Info}";
+        /// <summary>
+        /// C:\HOME\25SEP2025\7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272\M06X02\INFO
+        /// </summary>
+        public const string LargeExchangeSetMediaInfoPath6 = $@"{LargeExchangeSetMediaPath6}\{Info}";
+        /// <summary>
+        /// C:\HOME\25SEP2025\7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272\M05X02\INFO\ADC
+        /// </summary>
+        public const string LargeExchangeSetMediaInfoAdcPath5 = $@"{LargeExchangeSetMediaInfoPath5}\{Adc}";
+        /// <summary>
+        /// C:\HOME\25SEP2025\7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272\M06X02\INFO\ADC
+        /// </summary>
+        public const string LargeExchangeSetMediaInfoAdcPath6 = $@"{LargeExchangeSetMediaInfoPath6}\{Adc}";
         /// <summary>
         /// C:\HOME\25SEP2025\7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272\M05X02\INFO\ENC Update List.csv
         /// </summary>
-        public const string UpdateListFilePath = $@"{ExchangeSetMediaInfoPath}\{UpdateListFileName}";
+        public const string UpdateListFilePath5 = $@"{LargeExchangeSetMediaInfoPath5}\{UpdateListFileName}";
         /// <summary>
         /// C:\HOME\25SEP2025\7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272\M05X02\MEDIA.TXT
         /// </summary>
-        public const string ExchangeSetMediaFilePath = $@"{ExchangeSetMediaPath}\{MediaFileName}";
+        public const string LargeExchangeSetMediaFilePath5 = $@"{LargeExchangeSetMediaPath5}\{MediaFileName}";
+        /// <summary>
+        /// C:\HOME\25SEP2025\7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272\M0{0}X02\{1}\ENC_ROOT
+        /// </summary>
+        public const string LargeExchangeSetEncRootPattern = $@"{BatchPath}\{LargeExchangeSetFolderNamePattern}\{{1}}\{EncRoot}";
         /// <summary>
         /// C:\HOME\25SEP2025\7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272\V01X01\SERIAL.ENC
         /// </summary>
@@ -211,8 +251,8 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.TestHelper
                 PublicBaseUrl = "https://fss-api-public.azurewebsites.net",
                 ReadMeFileName = ReadMeFileName,
                 ResourceId = "9dd69e65-a953-4a94-a624-c26e6fb33379",
-                S57BusinessUnit = "ADDS-S57",
-                S63BusinessUnit = "ADDS",
+                S57BusinessUnit = S57BusinessUnit,
+                S63BusinessUnit = S63BusinessUnit,
                 SerialAioFileName = SerialAioFileName,
                 SerialFileName = SerialFileName,
                 Start = 0,
