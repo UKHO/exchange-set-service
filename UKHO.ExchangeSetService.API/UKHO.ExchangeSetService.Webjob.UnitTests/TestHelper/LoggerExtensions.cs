@@ -6,7 +6,7 @@ using UKHO.ExchangeSetService.Common.Logging;
 
 namespace UKHO.ExchangeSetService.Webjob.UnitTests.TestHelper
 {
-    internal static class HelperExtensions
+    internal static class LoggerExtensions
     {
         public static void VerifyLogEntry<T>(this ILogger<T> logger, EventIds eventIds, string messageTemplate, bool endEvent = false, LogLevel logLevel = LogLevel.Information, int times = 1)
         {
