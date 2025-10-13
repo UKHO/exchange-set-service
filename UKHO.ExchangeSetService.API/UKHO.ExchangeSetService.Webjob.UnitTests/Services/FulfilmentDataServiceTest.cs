@@ -565,8 +565,8 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
         }
 
         [Test, Description("Creating Empty Aio exchange set without ENC exchange set")]
-        [TestCase("s63", FakeBatchValue.S63BusinessUnit)]
-        public async Task WhenValidMessageQueueTrigger_ThenReturnsEmptyAioExchangeSetCreatedSuccessfully(string exchangeSetStandard, string businessUnit)
+        [TestCase("s63")]
+        public async Task WhenValidMessageQueueTrigger_ThenReturnsEmptyAioExchangeSetCreatedSuccessfully(string exchangeSetStandard)
         {
             var salesCatalogueDataResponse = GetSalesCatalogueDataResponseForAio();
             var message = GetScsResponseQueueMessage(exchangeSetStandard);
@@ -674,63 +674,169 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             fakeLogger.VerifyLogEntry(EventIds.ExchangeSetCreated, "Exchange set is created for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", times: 0);
         }
 
+        //public async Task<string> CreateLargeExchangeSet(SalesCatalogueServiceResponseQueueMessage message, string currentUtcDate, string largeExchangeSetFolderName)
+        //{
+        //    DateTime createExchangeSetTaskStartedAt = DateTime.UtcNow;
+        //    string homeDirectoryPath = configuration["HOME"];
+        //    var exchangeSetFilePath = Path.Combine(homeDirectoryPath, currentUtcDate, message.BatchId);
+        //    bool isExchangeSetFolderCreated = false;
+        //    bool isZipAndUploadSuccessful = false;
+
+        //    var response = new LargeExchangeSetDataResponse
+        //    {
+        //        //Get SCS catalogue essData response
+        //        SalesCatalogueDataResponse = await GetSalesCatalogueDataResponse(message.BatchId, message.CorrelationId),
+        //        SalesCatalogueProductResponse = await DownloadSalesCatalogueResponse(message)
+        //    };
+
+        //    List<string> aioCells = !string.IsNullOrEmpty(aioConfiguration.AioCells) ? new(aioConfiguration.AioCells.Split(',')) : new List<string>();
+        //    var essItems = response.SalesCatalogueProductResponse.Products
+        //        .Where(product => aioCells.All(aioCell => product.ProductName != aioCell))
+        //        .ToList();
+
+        //    var aioItems = response.SalesCatalogueProductResponse.Products
+        //            .Where(product => aioCells.Any(aioCell => product.ProductName == aioCell))
+        //            .ToList();
+
+        //    var largeExchangeSetDataResponseForAio = new LargeExchangeSetDataResponse()
+        //    {
+        //        SalesCatalogueDataResponse = (SalesCatalogueDataResponse)response.SalesCatalogueDataResponse.Clone(),
+        //        SalesCatalogueProductResponse = response.SalesCatalogueProductResponse
+        //    };
+
+        //    if (essItems.Count > 0)
+        //    {
+        //        response.SalesCatalogueDataResponse.ResponseBody = response.SalesCatalogueDataResponse.ResponseBody
+        //                                                           .Where(x => !aioCells.Any(productName => productName == x.ProductName)).ToList();
+        //        isExchangeSetFolderCreated = await exchangeSetBuilder.CreateStandardLargeMediaExchangeSet(message, homeDirectoryPath, currentUtcDate, response, largeExchangeSetFolderName, exchangeSetFilePath);
+
+        //        if (!isExchangeSetFolderCreated)
+        //        {
+        //            logger.LogError(EventIds.LargeExchangeSetCreatedWithError.ToEventId(), "Large media exchange creation failed for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", message.BatchId, message.CorrelationId);
+        //            throw new FulfilmentException(EventIds.LargeExchangeSetCreatedWithError.ToEventId());
+        //        }
+        //    }
+
+        //    if (aioItems.Count > 0)
+        //    {
+        //        largeExchangeSetDataResponseForAio.SalesCatalogueDataResponse.ResponseBody = largeExchangeSetDataResponseForAio.SalesCatalogueDataResponse.ResponseBody
+        //                                                                            .Where(x => aioCells.Any(productName => productName == x.ProductName)).ToList();
+        //        isExchangeSetFolderCreated = await exchangeSetBuilder.CreateAioExchangeSet(message, currentUtcDate, homeDirectoryPath, aioItems, largeExchangeSetDataResponseForAio.SalesCatalogueDataResponse, largeExchangeSetDataResponseForAio.SalesCatalogueProductResponse);
+
+        //        if (!isExchangeSetFolderCreated)
+        //        {
+        //            logger.LogError(EventIds.AIOExchangeSetCreatedWithError.ToEventId(), "AIO exchange creation failed for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", message.BatchId, message.CorrelationId);
+        //            throw new FulfilmentException(EventIds.AIOExchangeSetCreatedWithError.ToEventId());
+        //        }
+        //    }
+
+        //    if (isExchangeSetFolderCreated)
+        //    {
+        //        var rootDirectories = fileSystemHelper.GetDirectoryInfo(Path.Combine(homeDirectoryPath, currentUtcDate, message.BatchId));
+
+        //        var parallelZipUploadTasks = new List<Task<bool>> { };
+        //        Parallel.ForEach(rootDirectories, rootDirectoryFolder =>
+        //        {
+        //            if (rootDirectoryFolder.Name.StartsWith("M0"))  //Large Media Exchange Set
+        //            {
+        //                string dvdNumber = rootDirectoryFolder.ToString()[^4..].Remove(1, 3);
+        //                parallelZipUploadTasks.Add(PackageAndUploadLargeMediaExchangeSetZipFileToFileShareService(message.BatchId, rootDirectoryFolder.ToString(), exchangeSetFilePath, message.CorrelationId, string.Format(largeExchangeSetFolderName, dvdNumber.ToString())));
+        //            }
+        //            else // AIO
+        //            {
+        //                parallelZipUploadTasks.Add(PackageAndUploadLargeMediaExchangeSetZipFileToFileShareService(message.BatchId, rootDirectoryFolder.ToString(), exchangeSetFilePath, message.CorrelationId, fileShareServiceConfig.Value.AioExchangeSetFileFolder));
+        //            }
+        //        });
+
+        //        await Task.WhenAll(parallelZipUploadTasks);
+        //        isZipAndUploadSuccessful = await Task.FromResult(parallelZipUploadTasks.All(x => x.Result.Equals(true)));
+        //        parallelZipUploadTasks.Clear();
+        //    }
+
+        //    if (isZipAndUploadSuccessful)
+        //    {
+        //        var isBatchCommitted = await fulfilmentFileShareService.CommitLargeMediaExchangeSet(message.BatchId, exchangeSetFilePath, message.CorrelationId);
+        //        if (isBatchCommitted)
+        //        {
+        //            logger.LogInformation(EventIds.ExchangeSetCreated.ToEventId(), "Large media exchange set is created for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", message.BatchId, message.CorrelationId);
+        //            monitorHelper.MonitorRequest("Create Exchange Set Task", createExchangeSetTaskStartedAt, DateTime.UtcNow, message.CorrelationId, null, null, null, message.BatchId);
+        //            return "Large Media Exchange Set Created Successfully";
+        //        }
+        //    }
+
+        //    monitorHelper.MonitorRequest("Create Exchange Set Task", createExchangeSetTaskStartedAt, DateTime.UtcNow, message.CorrelationId, null, null, null, message.BatchId);
+        //    return "Large Media Exchange Set Is Not Created";
+        //}
+
         [Test]
         [TestCase("s63")]
         public async Task WhenValidMessageQueueTrigger_ThenReturnsLargeMediaAndAioExchangeSetCreatedSuccessfully(string exchangeSetStandard)
         {
-            const string filePath = @"D:\\Downloads";
-            var b1 = A.Fake<IDirectoryInfo>();
-            var b2 = A.Fake<IDirectoryInfo>();
-            var m1 = A.Fake<IDirectoryInfo>();
+            //const string filePath = @"D:\\Downloads";
+            //var b1 = A.Fake<IDirectoryInfo>();
+            //var b2 = A.Fake<IDirectoryInfo>();
+            //var m1 = A.Fake<IDirectoryInfo>();
 
-            A.CallTo(() => b1.Name).Returns("B1");
-            A.CallTo(() => b2.Name).Returns("B2");
-            A.CallTo(() => m1.Name).Returns("M01X02");
+            //A.CallTo(() => b1.Name).Returns("B1");
+            //A.CallTo(() => b2.Name).Returns("B2");
+            //A.CallTo(() => m1.Name).Returns("M01X02");
 
-            IDirectoryInfo[] directoryInfos = [b1, b2, m1];
+            //IDirectoryInfo[] directoryInfos = [b1, b2, m1];
 
-            var fulfilmentDataResponse = new List<FulfilmentDataResponse>
-            {
-                new() { BatchId = "63d38bde-5191-4a59-82d5-aa22ca1cc6dc", EditionNumber = 10, ProductName = "Demo", UpdateNumber = 3, FileUri = new List<string>{ "http://ffs-demo.azurewebsites.net" }, Files = GetFiles() },
-                new() { BatchId = "63d38bde-5191-4a59-82d5-aa22ca1cc6dc", EditionNumber = 1, ProductName = "GB800001", UpdateNumber = 1, FileUri = new List<string>{ "http://ffs-demo.azurewebsites.net" }, Files = GetFiles() }
-            };
+            //var fulfilmentDataResponse = new List<FulfilmentDataResponse>
+            //{
+            //    new() { BatchId = "63d38bde-5191-4a59-82d5-aa22ca1cc6dc", EditionNumber = 10, ProductName = "Demo", UpdateNumber = 3, FileUri = new List<string>{ "http://ffs-demo.azurewebsites.net" }, Files = GetFiles() },
+            //    new() { BatchId = "63d38bde-5191-4a59-82d5-aa22ca1cc6dc", EditionNumber = 1, ProductName = "GB800001", UpdateNumber = 1, FileUri = new List<string>{ "http://ffs-demo.azurewebsites.net" }, Files = GetFiles() }
+            //};
 
-            var scsResponseQueueMessage = GetScsResponseQueueMessage(exchangeSetStandard);
+            //var message = GetScsResponseQueueMessage(exchangeSetStandard);
+            //var salesCatalogueDataResponse = GetSalesCatalogueDataResponse();
+            //IEnumerable<BatchFile> batchFiles = GetFiles();
+
+            //_aioConfiguration.Value.AioCells = "GB800001";
+
+            //A.CallTo(() => fakeAzureBlobStorageService.DownloadSalesCatalogueResponse(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(GetSalesCatalogueProductResponse_Old());
+            //A.CallTo(() => fakeproductDataValidator.Validate(A<List<Products>>.Ignored)).Returns(new ValidationResult(new List<ValidationFailure>()));
+            //A.CallTo(() => fakeFileSystemHelper.GetDirectoryInfo(A<string>.Ignored)).Returns(directoryInfos);
+            //A.CallTo(() => fakeFulfilmentAncillaryFiles.CreateMediaFile(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored));
+            //A.CallTo(() => fakeFulfilmentFileShareService.SearchReadMeFilePath(A<string>.Ignored, A<string>.Ignored)).Returns(filePath);
+            //A.CallTo(() => fakeFulfilmentFileShareService.SearchIhoCrtFilePath(A<string>.Ignored, A<string>.Ignored)).Returns(filePath);
+            //A.CallTo(() => fakeFulfilmentFileShareService.SearchIhoPubFilePath(A<string>.Ignored, A<string>.Ignored)).Returns(filePath);
+            //A.CallTo(() => fakeFulfilmentFileShareService.DownloadReadMeFileFromFssAsync(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(true);
+            //A.CallTo(() => fakeFulfilmentFileShareService.DownloadIhoCrtFile(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(true);
+            //A.CallTo(() => fakeFulfilmentFileShareService.DownloadIhoPubFile(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(true);
+            //A.CallTo(() => fakeFulfilmentAncillaryFiles.CreateLargeMediaSerialEncFile(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(true);
+            //A.CallTo(() => fakeFulfilmentAncillaryFiles.CreateProductFile(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, salesCatalogueDataResponse, fakeScsRequestDateTime, A<bool>.Ignored)).Returns(true);
+            //A.CallTo(() => fakeFulfilmentFileShareService.SearchFolderDetails(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(batchFiles);
+            //A.CallTo(() => fakeFulfilmentFileShareService.DownloadFolderDetails(A<string>.Ignored, A<string>.Ignored, batchFiles, A<string>.Ignored)).Returns(true);
+            //A.CallTo(() => fakeFulfilmentAncillaryFiles.CreateEncUpdateCsv(salesCatalogueDataResponse, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(true);
+            //A.CallTo(() => fakeFulfilmentAncillaryFiles.CreateLargeExchangeSetCatalogFile(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<List<FulfilmentDataResponse>>.Ignored, A<SalesCatalogueDataResponse>.Ignored, A<SalesCatalogueProductResponse>.Ignored)).Returns(true);
+            //A.CallTo(() => fakeFulfilmentFileShareService.CreateZipFileForExchangeSet(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(true);
+            //A.CallTo(() => fakeFulfilmentFileShareService.UploadZipFileForLargeMediaExchangeSetToFileShareService(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(true);
+            //A.CallTo(() => fakeFulfilmentFileShareService.CommitLargeMediaExchangeSet(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(true);
+            //A.CallTo(() => fakeFulfilmentFileShareService.QueryFileShareServiceData(A<List<Products>>.Ignored,
+            //    A<SalesCatalogueServiceResponseQueueMessage>.Ignored, A<CancellationTokenSource>.Ignored, A<CancellationToken>.Ignored,
+            //    A<string>.Ignored, A<string>.Ignored)).Returns(fulfilmentDataResponse);
+            //A.CallTo(() => fakeFulfilmentAncillaryFiles.CreateSerialAioFile(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<SalesCatalogueDataResponse>.Ignored)).Returns(true);
+            //A.CallTo(() => fakeFulfilmentAncillaryFiles.CreateProductFile(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<SalesCatalogueDataResponse>.Ignored, A<DateTime>.Ignored, A<bool>.Ignored)).Returns(true);
+            //A.CallTo(() => fakeFulfilmentSalesCatalogueService.GetSalesCatalogueDataResponse(A<string>.Ignored, A<string>.Ignored)).Returns(salesCatalogueDataResponse);
+            //A.CallTo(() => fakeFulfilmentAncillaryFiles.CreateCatalogFile(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<List<FulfilmentDataResponse>>.Ignored, A<SalesCatalogueDataResponse>.Ignored, A<SalesCatalogueProductResponse>.Ignored)).Returns(true);
+
             var salesCatalogueDataResponse = GetSalesCatalogueDataResponse();
-            IEnumerable<BatchFile> batchFiles = GetFiles();
+            var message = GetScsResponseQueueMessage(exchangeSetStandard);
+            var salesCatalogueProductResponse = GetSalesCatalogueProductResponse(true);
+            A.CallTo(() => fakeFulfilmentSalesCatalogueService.GetSalesCatalogueDataResponse(FakeBatchValue.BatchId, FakeBatchValue.CorrelationId)).Returns(salesCatalogueDataResponse);
+            A.CallTo(() => fakeAzureBlobStorageService.DownloadSalesCatalogueResponse(message.ScsResponseUri, FakeBatchValue.BatchId, FakeBatchValue.CorrelationId)).Returns(salesCatalogueProductResponse);
+            A.CallTo(() => fakeExchangeSetBuilder.CreateStandardLargeMediaExchangeSet(message, FakeBatchValue.HomeDirectoryPath, FakeBatchValue.CurrentUtcDate, A< LargeExchangeSetDataResponse>.Ignored, FakeBatchValue.LargeExchangeSetFolderNamePattern, FakeBatchValue.BatchPath)).Returns(true);
+            A.CallTo(() => fakeExchangeSetBuilder.CreateAioExchangeSet(message, FakeBatchValue.CurrentUtcDate, FakeBatchValue.HomeDirectoryPath, A<List<Products>>.Ignored, A<SalesCatalogueDataResponse>.Ignored, salesCatalogueProductResponse)).Returns(true);
 
-            _aioConfiguration.Value.AioCells = "GB800001";
-
-            A.CallTo(() => fakeAzureBlobStorageService.DownloadSalesCatalogueResponse(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(GetSalesCatalogueProductResponse_Old());
-            A.CallTo(() => fakeproductDataValidator.Validate(A<List<Products>>.Ignored)).Returns(new ValidationResult(new List<ValidationFailure>()));
-            A.CallTo(() => fakeFileSystemHelper.GetDirectoryInfo(A<string>.Ignored)).Returns(directoryInfos);
-            A.CallTo(() => fakeFulfilmentAncillaryFiles.CreateMediaFile(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored));
-            A.CallTo(() => fakeFulfilmentFileShareService.SearchReadMeFilePath(A<string>.Ignored, A<string>.Ignored)).Returns(filePath);
-            A.CallTo(() => fakeFulfilmentFileShareService.SearchIhoCrtFilePath(A<string>.Ignored, A<string>.Ignored)).Returns(filePath);
-            A.CallTo(() => fakeFulfilmentFileShareService.SearchIhoPubFilePath(A<string>.Ignored, A<string>.Ignored)).Returns(filePath);
-            A.CallTo(() => fakeFulfilmentFileShareService.DownloadReadMeFileFromFssAsync(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(true);
-            A.CallTo(() => fakeFulfilmentFileShareService.DownloadIhoCrtFile(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(true);
-            A.CallTo(() => fakeFulfilmentFileShareService.DownloadIhoPubFile(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(true);
-            A.CallTo(() => fakeFulfilmentAncillaryFiles.CreateLargeMediaSerialEncFile(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(true);
-            A.CallTo(() => fakeFulfilmentAncillaryFiles.CreateProductFile(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, salesCatalogueDataResponse, fakeScsRequestDateTime, A<bool>.Ignored)).Returns(true);
-            A.CallTo(() => fakeFulfilmentFileShareService.SearchFolderDetails(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(batchFiles);
-            A.CallTo(() => fakeFulfilmentFileShareService.DownloadFolderDetails(A<string>.Ignored, A<string>.Ignored, batchFiles, A<string>.Ignored)).Returns(true);
-            A.CallTo(() => fakeFulfilmentAncillaryFiles.CreateEncUpdateCsv(salesCatalogueDataResponse, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(true);
-            A.CallTo(() => fakeFulfilmentAncillaryFiles.CreateLargeExchangeSetCatalogFile(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<List<FulfilmentDataResponse>>.Ignored, A<SalesCatalogueDataResponse>.Ignored, A<SalesCatalogueProductResponse>.Ignored)).Returns(true);
-            A.CallTo(() => fakeFulfilmentFileShareService.CreateZipFileForExchangeSet(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(true);
-            A.CallTo(() => fakeFulfilmentFileShareService.UploadZipFileForLargeMediaExchangeSetToFileShareService(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(true);
-            A.CallTo(() => fakeFulfilmentFileShareService.CommitLargeMediaExchangeSet(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).Returns(true);
-            A.CallTo(() => fakeFulfilmentFileShareService.QueryFileShareServiceData(A<List<Products>>.Ignored,
-                A<SalesCatalogueServiceResponseQueueMessage>.Ignored, A<CancellationTokenSource>.Ignored, A<CancellationToken>.Ignored,
-                A<string>.Ignored, A<string>.Ignored)).Returns(fulfilmentDataResponse);
-            A.CallTo(() => fakeFulfilmentAncillaryFiles.CreateSerialAioFile(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<SalesCatalogueDataResponse>.Ignored)).Returns(true);
-            A.CallTo(() => fakeFulfilmentAncillaryFiles.CreateProductFile(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<SalesCatalogueDataResponse>.Ignored, A<DateTime>.Ignored, A<bool>.Ignored)).Returns(true);
-            A.CallTo(() => fakeFulfilmentSalesCatalogueService.GetSalesCatalogueDataResponse(A<string>.Ignored, A<string>.Ignored)).Returns(salesCatalogueDataResponse);
-            A.CallTo(() => fakeFulfilmentAncillaryFiles.CreateCatalogFile(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<List<FulfilmentDataResponse>>.Ignored, A<SalesCatalogueDataResponse>.Ignored, A<SalesCatalogueProductResponse>.Ignored)).Returns(true);
-
-            var result = await fulfilmentDataService.CreateLargeExchangeSet(scsResponseQueueMessage, currentUtcDate, "M0{0}X02");
+            var result = await fulfilmentDataService.CreateLargeExchangeSet(message, FakeBatchValue.CurrentUtcDate, FakeBatchValue.LargeExchangeSetFolderNamePattern);
 
             Assert.That(result, Is.EqualTo("Large Media Exchange Set Created Successfully"));
+            A.CallTo(() => fakeFulfilmentSalesCatalogueService.GetSalesCatalogueDataResponse(FakeBatchValue.BatchId, FakeBatchValue.CorrelationId)).MustHaveHappenedOnceExactly();
+            A.CallTo(() => fakeAzureBlobStorageService.DownloadSalesCatalogueResponse(message.ScsResponseUri, FakeBatchValue.BatchId, FakeBatchValue.CorrelationId)).MustHaveHappenedOnceExactly();
+            A.CallTo(() => fakeExchangeSetBuilder.CreateStandardLargeMediaExchangeSet(message, FakeBatchValue.HomeDirectoryPath, FakeBatchValue.CurrentUtcDate, A<LargeExchangeSetDataResponse>.Ignored, FakeBatchValue.LargeExchangeSetFolderNamePattern, FakeBatchValue.BatchPath)).MustHaveHappenedOnceExactly();
+            A.CallTo(() => fakeExchangeSetBuilder.CreateAioExchangeSet(message, FakeBatchValue.CurrentUtcDate, FakeBatchValue.HomeDirectoryPath, A<List<Products>>.Ignored, A<SalesCatalogueDataResponse>.Ignored, salesCatalogueProductResponse)).MustHaveHappenedOnceExactly();
 
             A.CallTo(fakeLogger).Where(call => call.Method.Name == "Log"
             && call.GetArgument<LogLevel>(0) == LogLevel.Information
