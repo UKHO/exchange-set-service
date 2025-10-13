@@ -218,14 +218,16 @@ namespace UKHO.ExchangeSetService.FulfilmentService.FileBuilders
         }
         private static string ParseDvdNumber(string directoryName)
         {
-            // Expect pattern M00..Mxx. Fallback to "01" if unexpected.
-            if (!string.IsNullOrEmpty(directoryName) &&
-                directoryName.Length >= 3 &&
-                directoryName.StartsWith("M", StringComparison.OrdinalIgnoreCase))
-            {
-                return directoryName[1..]; // drop leading 'M'
-            }
-            return "01";
+            //// Expect pattern M00..Mxx. Fallback to "01" if unexpected.
+            //if (!string.IsNullOrEmpty(directoryName) &&
+            //    directoryName.Length >= 3 &&
+            //    directoryName.StartsWith("M", StringComparison.OrdinalIgnoreCase))
+            //{
+            //    return directoryName[1..]; // drop leading 'M'
+            //}
+            //return "01";
+
+            return directoryName[^4..].Remove(1, 3);
         }
 
         private async Task CreatePosFolderStructure(string largeMediaExchangeSetPath)
