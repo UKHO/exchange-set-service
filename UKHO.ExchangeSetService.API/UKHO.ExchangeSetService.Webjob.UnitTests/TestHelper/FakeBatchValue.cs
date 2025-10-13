@@ -42,6 +42,10 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.TestHelper
         /// </summary>
         public const string LargeExchangeSetFolderName5 = $"M0{MediaBaseNumber5}X02";
         /// <summary>
+        /// M05X02.zip
+        /// </summary>
+        public const string LargeExchangeSetZipFileName5 = $"{LargeExchangeSetFolderName5}.zip";
+        /// <summary>
         /// M0{0}X02
         /// </summary>
         public const string LargeExchangeSetFolderNamePattern = "M0{0}X02";
