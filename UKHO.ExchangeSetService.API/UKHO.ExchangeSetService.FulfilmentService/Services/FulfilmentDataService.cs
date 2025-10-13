@@ -122,7 +122,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             {
                 response.SalesCatalogueDataResponse.ResponseBody = response.SalesCatalogueDataResponse.ResponseBody
                                                                    .Where(x => !aioCells.Any(productName => productName == x.ProductName)).ToList();
-                isExchangeSetFolderCreated = await exchangeSetBuilder.CreateStandardLargeMediaExchangeSet(message, homeDirectoryPath, currentUtcDate, response, largeExchangeSetFolderName, exchangeSetFilePath, cancellationToken);
+                isExchangeSetFolderCreated = await exchangeSetBuilder.CreateStandardLargeMediaExchangeSet(message, homeDirectoryPath, currentUtcDate, response, largeExchangeSetFolderName, exchangeSetFilePath, cancellationTokenSource, cancellationToken);
 
                 if (!isExchangeSetFolderCreated)
                 {

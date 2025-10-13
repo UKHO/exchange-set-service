@@ -140,11 +140,11 @@ namespace UKHO.ExchangeSetService.FulfilmentService.FileBuilders
         }
 
         public async Task<bool> CreateStandardLargeMediaExchangeSet(SalesCatalogueServiceResponseQueueMessage message, string homeDirectoryPath, string currentUtcDate, LargeExchangeSetDataResponse largeExchangeSetDataResponse, string largeExchangeSetFolderName, string largeMediaExchangeSetFilePath,
-            CancellationToken cancellationToken)
+            CancellationTokenSource cancellationTokenSource, CancellationToken cancellationToken)
         {
             cancellationToken.ThrowIfCancellationRequested();
 
-            LargeExchangeSetDataResponse response = await SearchAndDownloadEncFilesFromFss(message, homeDirectoryPath, currentUtcDate, largeExchangeSetFolderName, largeExchangeSetDataResponse, cancellationToken);
+            LargeExchangeSetDataResponse response = await SearchAndDownloadEncFilesFromFss(message, homeDirectoryPath, currentUtcDate, largeExchangeSetFolderName, largeExchangeSetDataResponse, cancellationTokenSource, cancellationToken);
 
             cancellationToken.ThrowIfCancellationRequested();
 
@@ -239,7 +239,8 @@ namespace UKHO.ExchangeSetService.FulfilmentService.FileBuilders
         }
 
         //Search and download ENC files for large media exchange set
-        private async Task<LargeExchangeSetDataResponse> SearchAndDownloadEncFilesFromFss(SalesCatalogueServiceResponseQueueMessage message, string homeDirectoryPath, string currentUtcDate, string largeExchangeSetFolderName, LargeExchangeSetDataResponse largeExchangeSetDataResponse, CancellationToken cancellationToken)
+        private async Task<LargeExchangeSetDataResponse> SearchAndDownloadEncFilesFromFss(SalesCatalogueServiceResponseQueueMessage message, string homeDirectoryPath, string currentUtcDate, string largeExchangeSetFolderName, LargeExchangeSetDataResponse largeExchangeSetDataResponse,
+            CancellationTokenSource cancellationTokenSource, CancellationToken cancellationToken)
         {
             cancellationToken.ThrowIfCancellationRequested();
 
@@ -291,7 +292,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.FileBuilders
                         chunk,
                         exchangeSetRootPath,
                         fileShareServiceConfig.Value.S63BusinessUnit,
-                        cancellationToken);
+                        cancellationTokenSource, cancellationToken);
 
                     if (result.Any())
                     {
@@ -329,6 +330,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.FileBuilders
             List<Products> products,
             string exchangeSetRootPath,
             string businessUnit,
+            CancellationTokenSource cancellationTokenSource,
             CancellationToken cancellationToken)
         {
             return await logger.LogStartEndAndElapsedTimeAsync(
@@ -340,7 +342,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.FileBuilders
                     return await fulfilmentFileShareService.QueryFileShareServiceData(
                         products,
                         message,
-                        cancellationTokenSource: null,          // no longer passing internal CTS
+                        cancellationTokenSource: cancellationTokenSource,          // no longer passing internal CTS
                         cancellationToken: cancellationToken,
                         exchangeSetRootPath,
                         businessUnit);
@@ -350,7 +352,11 @@ namespace UKHO.ExchangeSetService.FulfilmentService.FileBuilders
                 message.CorrelationId);
         }
 
-        public async Task<List<FulfilmentDataResponse>> QueryFileShareServiceFiles(SalesCatalogueServiceResponseQueueMessage message, List<Products> products, string exchangeSetRootPath, CancellationTokenSource cancellationTokenSource, CancellationToken cancellationToken, string businessUnit)
+        public async Task<List<FulfilmentDataResponse>> QueryFileShareServiceFiles(SalesCatalogueServiceResponseQueueMessage message,
+            List<Products> products,
+            string exchangeSetRootPath,
+            CancellationTokenSource cancellationTokenSource,
+            CancellationToken cancellationToken, string businessUnit)
         {
             return await logger.LogStartEndAndElapsedTimeAsync(EventIds.QueryFileShareServiceENCFilesRequestStart,
                    EventIds.QueryFileShareServiceENCFilesRequestCompleted,
