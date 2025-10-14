@@ -97,8 +97,6 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Job
                 expiresOn: DateTimeOffset.UtcNow.AddMinutes(5));
         }
 
-        #region ProcessQueueMessage
-
         [Test]
         public async Task ProcessQueueMessage_FileSizeOnOrBelowThreshold_CallsCreateExchangeSet()
         {
@@ -164,10 +162,6 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Job
             _fakeLogger.VerifyLogEntry(EventIds.ErrorTxtIsUploaded, "Error while processing Exchange Set creation and error.txt file is created and uploaded in file share service with ErrorCode-EventId:{EventId} and EventName:{EventName} for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", logLevel: LogLevel.Error);
             _fakeLogger.VerifyLogEntry(EventIds.ExchangeSetCreatedWithError, "Exchange set is created with error for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", logLevel: LogLevel.Error);
         }
-
-        #endregion
-
-        #region CreateAndUploadErrorFileToFileShareService
 
         [Test]
         public async Task CreateAndUploadErrorFile_FileUploadedAndCommitted_LogsUploadAndCallsCallback()
@@ -265,10 +259,6 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Job
             _fakeLogger.VerifyLogEntry(EventIds.ErrorTxtNotUploaded, "Error while uploading error.txt file to file share service for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", logLevel: LogLevel.Error);
         }
 
-        #endregion
-
-        #region SendErrorCallBackResponse
-
         [Test]
         public async Task SendErrorCallBackResponse_DownloadsResponseAndSendsCallback()
         {
@@ -288,7 +278,5 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Job
             A.CallTo(() => _fakeAzureBlobStorageService.DownloadSalesCatalogueResponse(scsResponseUri, FakeBatchValue.BatchId, FakeBatchValue.CorrelationId)).MustHaveHappenedOnceExactly();
             A.CallTo(() => _fakeFulfilmentCallBackService.SendCallBackErrorResponse(salesCatalogueProductResponse, message)).MustHaveHappenedOnceExactly();
         }
-
-        #endregion
     }
 }

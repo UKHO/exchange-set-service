@@ -7,6 +7,7 @@ using FakeItEasy;
 using Microsoft.Extensions.Logging;
 using NUnit.Framework;
 using UKHO.ExchangeSetService.Common.Helpers;
+using UKHO.ExchangeSetService.Common.Logging;
 using UKHO.ExchangeSetService.Common.Models.FileShareService.Response;
 using UKHO.ExchangeSetService.FulfilmentService.Downloads;
 using UKHO.ExchangeSetService.FulfilmentService.Services;
@@ -44,6 +45,9 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Downloads
             Assert.That(result, Is.True);
             A.CallTo(() => _fakeFulfilmentFileShareService.DownloadReadMeFileFromCacheAsync(FakeBatchValue.BatchId, FakeBatchValue.AioExchangeSetEncRootPath, FakeBatchValue.CorrelationId)).MustHaveHappenedOnceExactly();
             A.CallTo(() => _fakeFulfilmentFileShareService.SearchReadMeFilePath(A<string>.Ignored, A<string>.Ignored)).MustNotHaveHappened();
+
+            _fakeLogger.VerifyLogEntry(EventIds.SearchDownloadReadmeCacheEventStart, "Cache Search and Download readme.txt file started for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}");
+            _fakeLogger.VerifyLogEntry(EventIds.SearchDownloadReadmeCacheEventCompleted, "Cache Search and Download readme.txt file completed for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}");
         }
 
         [Test]
@@ -60,6 +64,13 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Downloads
             A.CallTo(() => _fakeFulfilmentFileShareService.DownloadReadMeFileFromCacheAsync(FakeBatchValue.BatchId, FakeBatchValue.ExchangeSetEncRootPath, FakeBatchValue.CorrelationId)).MustHaveHappenedOnceExactly();
             A.CallTo(() => _fakeFulfilmentFileShareService.SearchReadMeFilePath(FakeBatchValue.BatchId, FakeBatchValue.CorrelationId)).MustHaveHappenedOnceExactly();
             A.CallTo(() => _fakeFulfilmentFileShareService.DownloadReadMeFileFromFssAsync(readMeUrl, FakeBatchValue.BatchId, FakeBatchValue.ExchangeSetEncRootPath, FakeBatchValue.CorrelationId)).MustHaveHappenedOnceExactly();
+
+            _fakeLogger.VerifyLogEntry(EventIds.SearchDownloadReadmeCacheEventStart, "Cache Search and Download readme.txt file started for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}");
+            _fakeLogger.VerifyLogEntry(EventIds.ReadMeTextFileNotFound, "Cache Search and Download readme.txt file not found in blob cache for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}");
+            _fakeLogger.VerifyLogEntry(EventIds.QueryFileShareServiceReadMeFileRequestStart, "File share service search query request for readme file for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}");
+            _fakeLogger.VerifyLogEntry(EventIds.QueryFileShareServiceReadMeFileRequestCompleted, "File share service search query request for readme file for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", true);
+            _fakeLogger.VerifyLogEntry(EventIds.DownloadReadMeFileRequestStart, "File share service download request for readme file for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}");
+            _fakeLogger.VerifyLogEntry(EventIds.DownloadReadMeFileRequestCompleted, "File share service download request for readme file for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", true);
         }
 
         [Test]
@@ -74,6 +85,13 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Downloads
             A.CallTo(() => _fakeFulfilmentFileShareService.DownloadReadMeFileFromCacheAsync(FakeBatchValue.BatchId, FakeBatchValue.ExchangeSetEncRootPath, FakeBatchValue.CorrelationId)).MustHaveHappenedOnceExactly();
             A.CallTo(() => _fakeFulfilmentFileShareService.SearchReadMeFilePath(FakeBatchValue.BatchId, FakeBatchValue.CorrelationId)).MustHaveHappenedOnceExactly();
             A.CallTo(() => _fakeFulfilmentFileShareService.DownloadReadMeFileFromFssAsync(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).MustNotHaveHappened();
+
+            _fakeLogger.VerifyLogEntry(EventIds.SearchDownloadReadmeCacheEventStart, "Cache Search and Download readme.txt file started for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}");
+            _fakeLogger.VerifyLogEntry(EventIds.ReadMeTextFileNotFound, "Cache Search and Download readme.txt file not found in blob cache for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}");
+            _fakeLogger.VerifyLogEntry(EventIds.QueryFileShareServiceReadMeFileRequestStart, "File share service search query request for readme file for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}");
+            _fakeLogger.VerifyLogEntry(EventIds.QueryFileShareServiceReadMeFileRequestCompleted, "File share service search query request for readme file for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", true);
+            _fakeLogger.VerifyLogEntry(EventIds.DownloadReadMeFileRequestStart, "File share service download request for readme file for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", times: 0);
+            _fakeLogger.VerifyLogEntry(EventIds.DownloadReadMeFileRequestCompleted, "File share service download request for readme file for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", true, times: 0);
         }
 
         [Test]
@@ -90,6 +108,13 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Downloads
             A.CallTo(() => _fakeFulfilmentFileShareService.DownloadReadMeFileFromCacheAsync(FakeBatchValue.BatchId, FakeBatchValue.ExchangeSetEncRootPath, FakeBatchValue.CorrelationId)).MustHaveHappenedOnceExactly();
             A.CallTo(() => _fakeFulfilmentFileShareService.SearchReadMeFilePath(FakeBatchValue.BatchId, FakeBatchValue.CorrelationId)).MustHaveHappenedOnceExactly();
             A.CallTo(() => _fakeFulfilmentFileShareService.DownloadReadMeFileFromFssAsync(readMeUrl, FakeBatchValue.BatchId, FakeBatchValue.ExchangeSetEncRootPath, FakeBatchValue.CorrelationId)).MustHaveHappenedOnceExactly();
+
+            _fakeLogger.VerifyLogEntry(EventIds.SearchDownloadReadmeCacheEventStart, "Cache Search and Download readme.txt file started for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}");
+            _fakeLogger.VerifyLogEntry(EventIds.ReadMeTextFileNotFound, "Cache Search and Download readme.txt file not found in blob cache for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}");
+            _fakeLogger.VerifyLogEntry(EventIds.QueryFileShareServiceReadMeFileRequestStart, "File share service search query request for readme file for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}");
+            _fakeLogger.VerifyLogEntry(EventIds.QueryFileShareServiceReadMeFileRequestCompleted, "File share service search query request for readme file for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", true);
+            _fakeLogger.VerifyLogEntry(EventIds.DownloadReadMeFileRequestStart, "File share service download request for readme file for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}");
+            _fakeLogger.VerifyLogEntry(EventIds.DownloadReadMeFileRequestCompleted, "File share service download request for readme file for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", true);
         }
 
         [Test]
@@ -102,6 +127,9 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Downloads
             Assert.That(result, Is.False);
             A.CallTo(() => _fakeFulfilmentFileShareService.DownloadReadMeFileFromCacheAsync(FakeBatchValue.BatchId, FakeBatchValue.ExchangeSetEncRootPath, FakeBatchValue.CorrelationId)).MustHaveHappenedOnceExactly();
             A.CallTo(() => _fakeFulfilmentFileShareService.SearchReadMeFilePath(A<string>.Ignored, A<string>.Ignored)).MustNotHaveHappened();
+
+            _fakeLogger.VerifyLogEntry(EventIds.SearchDownloadReadmeCacheEventStart, "Cache Search and Download readme.txt file started for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}");
+            _fakeLogger.VerifyLogEntry(EventIds.ErrorInDownloadReadMeFile, "Error while downloading readme.txt file for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId} and Exception:{Message}", logLevel: LogLevel.Error);
         }
 
         [Test]
@@ -116,6 +144,11 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Downloads
             Assert.That(result, Is.True);
             A.CallTo(() => _fakeFulfilmentFileShareService.SearchReadMeFilePath(FakeBatchValue.BatchId, FakeBatchValue.CorrelationId)).MustHaveHappenedOnceExactly();
             A.CallTo(() => _fakeFulfilmentFileShareService.DownloadReadMeFileFromFssAsync(readMeUrl, FakeBatchValue.BatchId, FakeBatchValue.ExchangeSetEncRootPath, FakeBatchValue.CorrelationId)).MustHaveHappenedOnceExactly();
+
+            _fakeLogger.VerifyLogEntry(EventIds.QueryFileShareServiceReadMeFileRequestStart, "File share service search query request for readme file for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}");
+            _fakeLogger.VerifyLogEntry(EventIds.QueryFileShareServiceReadMeFileRequestCompleted, "File share service search query request for readme file for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", true);
+            _fakeLogger.VerifyLogEntry(EventIds.DownloadReadMeFileRequestStart, "File share service download request for readme file for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}");
+            _fakeLogger.VerifyLogEntry(EventIds.DownloadReadMeFileRequestCompleted, "File share service download request for readme file for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", true);
         }
 
         [Test]
@@ -130,6 +163,11 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Downloads
             Assert.That(result, Is.False);
             A.CallTo(() => _fakeFulfilmentFileShareService.SearchReadMeFilePath(FakeBatchValue.BatchId, FakeBatchValue.CorrelationId)).MustHaveHappenedOnceExactly();
             A.CallTo(() => _fakeFulfilmentFileShareService.DownloadReadMeFileFromFssAsync(readMeUrl, FakeBatchValue.BatchId, FakeBatchValue.ExchangeSetEncRootPath, FakeBatchValue.CorrelationId)).MustHaveHappenedOnceExactly();
+
+            _fakeLogger.VerifyLogEntry(EventIds.QueryFileShareServiceReadMeFileRequestStart, "File share service search query request for readme file for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}");
+            _fakeLogger.VerifyLogEntry(EventIds.QueryFileShareServiceReadMeFileRequestCompleted, "File share service search query request for readme file for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", true);
+            _fakeLogger.VerifyLogEntry(EventIds.DownloadReadMeFileRequestStart, "File share service download request for readme file for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}");
+            _fakeLogger.VerifyLogEntry(EventIds.DownloadReadMeFileRequestCompleted, "File share service download request for readme file for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", true);
         }
 
         [Test]
@@ -142,6 +180,11 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Downloads
             Assert.That(result, Is.False);
             A.CallTo(() => _fakeFulfilmentFileShareService.SearchReadMeFilePath(FakeBatchValue.BatchId, FakeBatchValue.CorrelationId)).MustHaveHappenedOnceExactly();
             A.CallTo(() => _fakeFulfilmentFileShareService.DownloadReadMeFileFromFssAsync(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).MustNotHaveHappened();
+
+            _fakeLogger.VerifyLogEntry(EventIds.QueryFileShareServiceReadMeFileRequestStart, "File share service search query request for readme file for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}");
+            _fakeLogger.VerifyLogEntry(EventIds.QueryFileShareServiceReadMeFileRequestCompleted, "File share service search query request for readme file for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", true);
+            _fakeLogger.VerifyLogEntry(EventIds.DownloadReadMeFileRequestStart, "File share service download request for readme file for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", times: 0);
+            _fakeLogger.VerifyLogEntry(EventIds.DownloadReadMeFileRequestCompleted, "File share service download request for readme file for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", true, times: 0);
         }
 
         [Test]
@@ -156,6 +199,11 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Downloads
             Assert.That(result, Is.True);
             A.CallTo(() => _fakeFulfilmentFileShareService.SearchIhoCrtFilePath(FakeBatchValue.BatchId, FakeBatchValue.CorrelationId)).MustHaveHappenedOnceExactly();
             A.CallTo(() => _fakeFulfilmentFileShareService.DownloadIhoCrtFile(ihoCrtFilePath, FakeBatchValue.BatchId, FakeBatchValue.AioExchangeSetPath, FakeBatchValue.CorrelationId)).MustHaveHappenedOnceExactly();
+
+            _fakeLogger.VerifyLogEntry(EventIds.QueryFileShareServiceIhoCrtFileRequestStart, "File share service search query request for IHO.crt file for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}");
+            _fakeLogger.VerifyLogEntry(EventIds.QueryFileShareServiceIhoCrtFileRequestCompleted, "File share service search query request for IHO.crt file for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", true);
+            _fakeLogger.VerifyLogEntry(EventIds.DownloadIhoCrtFileRequestStart, "File share service download request for IHO.crt file for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}");
+            _fakeLogger.VerifyLogEntry(EventIds.DownloadIhoCrtFileRequestCompleted, "File share service download request for IHO.crt file for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", true);
         }
 
         [Test]
@@ -170,6 +218,11 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Downloads
             Assert.That(result, Is.False);
             A.CallTo(() => _fakeFulfilmentFileShareService.SearchIhoCrtFilePath(FakeBatchValue.BatchId, FakeBatchValue.CorrelationId)).MustHaveHappenedOnceExactly();
             A.CallTo(() => _fakeFulfilmentFileShareService.DownloadIhoCrtFile(ihoCrtFilePath, FakeBatchValue.BatchId, FakeBatchValue.AioExchangeSetPath, FakeBatchValue.CorrelationId)).MustHaveHappenedOnceExactly();
+
+            _fakeLogger.VerifyLogEntry(EventIds.QueryFileShareServiceIhoCrtFileRequestStart, "File share service search query request for IHO.crt file for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}");
+            _fakeLogger.VerifyLogEntry(EventIds.QueryFileShareServiceIhoCrtFileRequestCompleted, "File share service search query request for IHO.crt file for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", true);
+            _fakeLogger.VerifyLogEntry(EventIds.DownloadIhoCrtFileRequestStart, "File share service download request for IHO.crt file for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}");
+            _fakeLogger.VerifyLogEntry(EventIds.DownloadIhoCrtFileRequestCompleted, "File share service download request for IHO.crt file for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", true);
         }
 
         [Test]
@@ -182,6 +235,11 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Downloads
             Assert.That(result, Is.False);
             A.CallTo(() => _fakeFulfilmentFileShareService.SearchIhoCrtFilePath(FakeBatchValue.BatchId, FakeBatchValue.CorrelationId)).MustHaveHappenedOnceExactly();
             A.CallTo(() => _fakeFulfilmentFileShareService.DownloadIhoCrtFile(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).MustNotHaveHappened();
+
+            _fakeLogger.VerifyLogEntry(EventIds.QueryFileShareServiceIhoCrtFileRequestStart, "File share service search query request for IHO.crt file for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}");
+            _fakeLogger.VerifyLogEntry(EventIds.QueryFileShareServiceIhoCrtFileRequestCompleted, "File share service search query request for IHO.crt file for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", true);
+            _fakeLogger.VerifyLogEntry(EventIds.DownloadIhoCrtFileRequestStart, "File share service download request for IHO.crt file for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", times: 0);
+            _fakeLogger.VerifyLogEntry(EventIds.DownloadIhoCrtFileRequestCompleted, "File share service download request for IHO.crt file for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", true, times: 0);
         }
 
         [Test]
@@ -196,6 +254,11 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Downloads
             Assert.That(result, Is.True);
             A.CallTo(() => _fakeFulfilmentFileShareService.SearchIhoPubFilePath(FakeBatchValue.BatchId, FakeBatchValue.CorrelationId)).MustHaveHappenedOnceExactly();
             A.CallTo(() => _fakeFulfilmentFileShareService.DownloadIhoPubFile(ihoPubFilePath, FakeBatchValue.BatchId, FakeBatchValue.AioExchangeSetPath, FakeBatchValue.CorrelationId)).MustHaveHappenedOnceExactly();
+
+            _fakeLogger.VerifyLogEntry(EventIds.QueryFileShareServiceIhoPubFileRequestStart, "File share service search query request for IHO.pub file for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}");
+            _fakeLogger.VerifyLogEntry(EventIds.QueryFileShareServiceIhoPubFileRequestCompleted, "File share service search query request for IHO.pub file for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", true);
+            _fakeLogger.VerifyLogEntry(EventIds.DownloadIhoPubFileRequestStart, "File share service download request for IHO.pub file for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}");
+            _fakeLogger.VerifyLogEntry(EventIds.DownloadIhoPubFileRequestCompleted, "File share service download request for IHO.pub file for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", true);
         }
 
         [Test]
@@ -210,6 +273,11 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Downloads
             Assert.That(result, Is.False);
             A.CallTo(() => _fakeFulfilmentFileShareService.SearchIhoPubFilePath(FakeBatchValue.BatchId, FakeBatchValue.CorrelationId)).MustHaveHappenedOnceExactly();
             A.CallTo(() => _fakeFulfilmentFileShareService.DownloadIhoPubFile(ihoPubFilePath, FakeBatchValue.BatchId, FakeBatchValue.AioExchangeSetPath, FakeBatchValue.CorrelationId)).MustHaveHappenedOnceExactly();
+
+            _fakeLogger.VerifyLogEntry(EventIds.QueryFileShareServiceIhoPubFileRequestStart, "File share service search query request for IHO.pub file for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}");
+            _fakeLogger.VerifyLogEntry(EventIds.QueryFileShareServiceIhoPubFileRequestCompleted, "File share service search query request for IHO.pub file for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", true);
+            _fakeLogger.VerifyLogEntry(EventIds.DownloadIhoPubFileRequestStart, "File share service download request for IHO.pub file for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}");
+            _fakeLogger.VerifyLogEntry(EventIds.DownloadIhoPubFileRequestCompleted, "File share service download request for IHO.pub file for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", true);
         }
 
         [Test]
@@ -222,6 +290,11 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Downloads
             Assert.That(result, Is.False);
             A.CallTo(() => _fakeFulfilmentFileShareService.SearchIhoPubFilePath(FakeBatchValue.BatchId, FakeBatchValue.CorrelationId)).MustHaveHappenedOnceExactly();
             A.CallTo(() => _fakeFulfilmentFileShareService.DownloadIhoPubFile(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).MustNotHaveHappened();
+
+            _fakeLogger.VerifyLogEntry(EventIds.QueryFileShareServiceIhoPubFileRequestStart, "File share service search query request for IHO.pub file for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}");
+            _fakeLogger.VerifyLogEntry(EventIds.QueryFileShareServiceIhoPubFileRequestCompleted, "File share service search query request for IHO.pub file for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", true);
+            _fakeLogger.VerifyLogEntry(EventIds.DownloadIhoPubFileRequestStart, "File share service download request for IHO.pub file for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", times: 0);
+            _fakeLogger.VerifyLogEntry(EventIds.DownloadIhoPubFileRequestCompleted, "File share service download request for IHO.pub file for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", true, times: 0);
         }
 
         [Test]
@@ -235,6 +308,11 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Downloads
 
             A.CallTo(() => _fakeFulfilmentFileShareService.SearchFolderDetails(FakeBatchValue.BatchId, FakeBatchValue.CorrelationId, FakeBatchValue.Info)).MustHaveHappenedOnceExactly();
             A.CallTo(() => _fakeFulfilmentFileShareService.DownloadFolderDetails(FakeBatchValue.BatchId, FakeBatchValue.CorrelationId, batchFiles, FakeBatchValue.LargeExchangeSetMediaInfoPath5)).MustHaveHappenedOnceExactly();
+
+            _fakeLogger.VerifyLogEntry(EventIds.DownloadInfoFolderRequestStart, "File share service search query request for Info folder files for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}");
+            _fakeLogger.VerifyLogEntry(EventIds.DownloadInfoFolderRequestCompleted, "File share service search query request for Info folder files for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", true);
+            _fakeLogger.VerifyLogEntry(EventIds.DownloadInfoFolderRequestStart, "File share service download request for Info folder files for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}");
+            _fakeLogger.VerifyLogEntry(EventIds.DownloadInfoFolderRequestCompleted, "File share service download request for Info folder files for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", true);
         }
 
         [Test]
@@ -246,6 +324,11 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Downloads
 
             A.CallTo(() => _fakeFulfilmentFileShareService.SearchFolderDetails(FakeBatchValue.BatchId, FakeBatchValue.CorrelationId, FakeBatchValue.Info)).MustHaveHappenedOnceExactly();
             A.CallTo(() => _fakeFulfilmentFileShareService.DownloadFolderDetails(A<string>.Ignored, A<string>.Ignored, A<IEnumerable<BatchFile>>.Ignored, A<string>.Ignored)).MustNotHaveHappened();
+
+            _fakeLogger.VerifyLogEntry(EventIds.DownloadInfoFolderRequestStart, "File share service search query request for Info folder files for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}");
+            _fakeLogger.VerifyLogEntry(EventIds.DownloadInfoFolderRequestCompleted, "File share service search query request for Info folder files for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", true);
+            _fakeLogger.VerifyLogEntry(EventIds.DownloadInfoFolderRequestStart, "File share service download request for Info folder files for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", times: 0);
+            _fakeLogger.VerifyLogEntry(EventIds.DownloadInfoFolderRequestCompleted, "File share service download request for Info folder files for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", true, times: 0);
         }
 
         [Test]
@@ -257,6 +340,11 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Downloads
 
             A.CallTo(() => _fakeFulfilmentFileShareService.SearchFolderDetails(FakeBatchValue.BatchId, FakeBatchValue.CorrelationId, FakeBatchValue.Info)).MustHaveHappenedOnceExactly();
             A.CallTo(() => _fakeFulfilmentFileShareService.DownloadFolderDetails(A<string>.Ignored, A<string>.Ignored, A<IEnumerable<BatchFile>>.Ignored, A<string>.Ignored)).MustNotHaveHappened();
+
+            _fakeLogger.VerifyLogEntry(EventIds.DownloadInfoFolderRequestStart, "File share service search query request for Info folder files for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}");
+            _fakeLogger.VerifyLogEntry(EventIds.DownloadInfoFolderRequestCompleted, "File share service search query request for Info folder files for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", true);
+            _fakeLogger.VerifyLogEntry(EventIds.DownloadInfoFolderRequestStart, "File share service download request for Info folder files for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", times: 0);
+            _fakeLogger.VerifyLogEntry(EventIds.DownloadInfoFolderRequestCompleted, "File share service download request for Info folder files for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", true, times: 0);
         }
 
         [Test]
@@ -270,6 +358,11 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Downloads
 
             A.CallTo(() => _fakeFulfilmentFileShareService.SearchFolderDetails(FakeBatchValue.BatchId, FakeBatchValue.CorrelationId, FakeBatchValue.Adc)).MustHaveHappenedOnceExactly();
             A.CallTo(() => _fakeFulfilmentFileShareService.DownloadFolderDetails(FakeBatchValue.BatchId, FakeBatchValue.CorrelationId, batchFiles, FakeBatchValue.LargeExchangeSetMediaInfoAdcPath5)).MustHaveHappenedOnceExactly();
+
+            _fakeLogger.VerifyLogEntry(EventIds.QueryFileShareServiceAdcFolderFilesRequestStart, "File share service search query request for Adc folder files for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}");
+            _fakeLogger.VerifyLogEntry(EventIds.QueryFileShareServiceAdcFolderFilesRequestCompleted, "File share service search query request for Adc folder files for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", true);
+            _fakeLogger.VerifyLogEntry(EventIds.DownloadAdcFolderFilesStart, "File share service download request for Adc folder files for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}");
+            _fakeLogger.VerifyLogEntry(EventIds.DownloadAdcFolderFilesCompleted, "File share service download request for Adc folder files for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", true);
         }
 
         [Test]
@@ -281,6 +374,11 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Downloads
 
             A.CallTo(() => _fakeFulfilmentFileShareService.SearchFolderDetails(FakeBatchValue.BatchId, FakeBatchValue.CorrelationId, FakeBatchValue.Adc)).MustHaveHappenedOnceExactly();
             A.CallTo(() => _fakeFulfilmentFileShareService.DownloadFolderDetails(A<string>.Ignored, A<string>.Ignored, A<IEnumerable<BatchFile>>.Ignored, A<string>.Ignored)).MustNotHaveHappened();
+
+            _fakeLogger.VerifyLogEntry(EventIds.QueryFileShareServiceAdcFolderFilesRequestStart, "File share service search query request for Adc folder files for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}");
+            _fakeLogger.VerifyLogEntry(EventIds.QueryFileShareServiceAdcFolderFilesRequestCompleted, "File share service search query request for Adc folder files for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", true);
+            _fakeLogger.VerifyLogEntry(EventIds.DownloadAdcFolderFilesStart, "File share service download request for Adc folder files for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", times: 0);
+            _fakeLogger.VerifyLogEntry(EventIds.DownloadAdcFolderFilesCompleted, "File share service download request for Adc folder files for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", true, times: 0);
         }
 
         [Test]
@@ -292,6 +390,11 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Downloads
 
             A.CallTo(() => _fakeFulfilmentFileShareService.SearchFolderDetails(FakeBatchValue.BatchId, FakeBatchValue.CorrelationId, FakeBatchValue.Adc)).MustHaveHappenedOnceExactly();
             A.CallTo(() => _fakeFulfilmentFileShareService.DownloadFolderDetails(A<string>.Ignored, A<string>.Ignored, A<IEnumerable<BatchFile>>.Ignored, A<string>.Ignored)).MustNotHaveHappened();
+
+            _fakeLogger.VerifyLogEntry(EventIds.QueryFileShareServiceAdcFolderFilesRequestStart, "File share service search query request for Adc folder files for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}");
+            _fakeLogger.VerifyLogEntry(EventIds.QueryFileShareServiceAdcFolderFilesRequestCompleted, "File share service search query request for Adc folder files for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", true);
+            _fakeLogger.VerifyLogEntry(EventIds.DownloadAdcFolderFilesStart, "File share service download request for Adc folder files for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", times: 0);
+            _fakeLogger.VerifyLogEntry(EventIds.DownloadAdcFolderFilesCompleted, "File share service download request for Adc folder files for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", true, times: 0);
         }
 
         [Test]

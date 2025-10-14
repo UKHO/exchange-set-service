@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using FakeItEasy;
 using Microsoft.Extensions.Logging;
@@ -16,8 +17,16 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.TestHelper
                 => call.Method.Name == "Log"
                 && call.GetArgument<LogLevel>(0) == logLevel
                 && call.GetArgument<EventId>(1) == eventId
-                && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == messageFormat
+                && CheckParameters(call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2), messageFormat)
                 ).MustHaveHappened(times, Times.Exactly);
+        }
+
+        private static bool CheckParameters(IEnumerable<KeyValuePair<string, object>> keyValuePairs, string messageFormat)
+        {
+            var dictionary = keyValuePairs.ToDictionary(c => c.Key, c => c.Value, StringComparer.OrdinalIgnoreCase);
+            return dictionary["BatchId"].ToString() == FakeBatchValue.BatchId
+                && dictionary["CorrelationId"].ToString() == FakeBatchValue.CorrelationId
+                && dictionary["{OriginalFormat}"].ToString() == messageFormat;
         }
     }
 }
