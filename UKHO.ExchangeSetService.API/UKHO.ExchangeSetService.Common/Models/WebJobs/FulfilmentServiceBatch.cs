@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using Azure.Storage.Queues.Models;
 using Microsoft.Extensions.Configuration;
 using UKHO.ExchangeSetService.Common.Models.SalesCatalogue;
 
@@ -39,16 +40,16 @@ namespace UKHO.ExchangeSetService.Common.Models.WebJobs
 
         public FulfilmentServiceBatch(
             IConfiguration configuration,
-            SalesCatalogueServiceResponseQueueMessage fulfilmentServiceQueueMessage,
+            QueueMessage queueMessage,
             DateTime currentUtcDate
             )
         {
+            Message = queueMessage.Body.ToObjectFromJson<SalesCatalogueServiceResponseQueueMessage>();
             BaseDirectory = configuration["HOME"];
             CurrentUtcDate = currentUtcDate.ToString("ddMMMyyyy");
-            BatchDirectory = Path.Combine(BaseDirectory, CurrentUtcDate, fulfilmentServiceQueueMessage.BatchId);
-            Message = fulfilmentServiceQueueMessage;
-            BatchId = fulfilmentServiceQueueMessage.BatchId;
-            CorrelationId = fulfilmentServiceQueueMessage.CorrelationId;
+            BatchDirectory = Path.Combine(BaseDirectory, CurrentUtcDate, Message.BatchId);
+            BatchId = Message.BatchId;
+            CorrelationId = Message.CorrelationId;
         }
     }
 }
