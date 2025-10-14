@@ -7,7 +7,6 @@ using System.Threading.Tasks;
 using FakeItEasy;
 using FluentValidation.Results;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using NUnit.Framework;
 using UKHO.ExchangeSetService.Common.Configuration;
 using UKHO.ExchangeSetService.Common.Helpers;
@@ -29,7 +28,6 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.FileBuilders
         private IMonitorHelper _fakeMonitorHelper;
         private IFileSystemHelper _fakeFileSystemHelper;
         private IProductDataValidator _fakeProductDataValidator;
-        private IOptions<AioConfiguration> _aioConfiguration;
         private IFulfilmentFileShareService _fakeFulfilmentFileShareService;
         private IFulfilmentAncillaryFiles _fakeFulfilmentAncillaryFiles;
         private IFileBuilder _fakeFileBuilder;
@@ -69,7 +67,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.FileBuilders
             [
                 new()
                 {
-                    ProductName = FakeBatchValue.AioCells,
+                    ProductName = FakeBatchValue.AioCell1,
                     EditionNumber = 1,
                     UpdateNumbers = [0],
                     FileSize = 100
@@ -97,13 +95,12 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.FileBuilders
             _fakeMonitorHelper = A.Fake<IMonitorHelper>();
             _fakeFileSystemHelper = A.Fake<IFileSystemHelper>();
             _fakeProductDataValidator = A.Fake<IProductDataValidator>();
-            _aioConfiguration = Options.Create(new AioConfiguration { AioCells = FakeBatchValue.AioCells }); // one AIO cell
             _fakeFulfilmentFileShareService = A.Fake<IFulfilmentFileShareService>();
             _fakeFulfilmentAncillaryFiles = A.Fake<IFulfilmentAncillaryFiles>();
             _fakeFileBuilder = A.Fake<IFileBuilder>();
             _fakeDownloader = A.Fake<IDownloader>();
 
-            _exchangeSetBuilder = new ExchangeSetBuilder(_fakeLogger, _fakeMonitorHelper, _fakeFileSystemHelper, _fakeProductDataValidator, FakeBatchValue.FileShareServiceConfiguration, _aioConfiguration, _fakeFulfilmentFileShareService, _fakeFulfilmentAncillaryFiles, _fakeFileBuilder, _fakeDownloader);
+            _exchangeSetBuilder = new ExchangeSetBuilder(_fakeLogger, _fakeMonitorHelper, _fakeFileSystemHelper, _fakeProductDataValidator, FakeBatchValue.FileShareServiceConfiguration, FakeBatchValue.AioConfiguration, _fakeFulfilmentFileShareService, _fakeFulfilmentAncillaryFiles, _fakeFileBuilder, _fakeDownloader);
         }
 
         [Test]

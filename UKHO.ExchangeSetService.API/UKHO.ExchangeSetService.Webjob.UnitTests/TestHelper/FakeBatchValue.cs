@@ -42,6 +42,10 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.TestHelper
         /// </summary>
         public const string LargeExchangeSetFolderName5 = $"M0{MediaBaseNumber5}X02";
         /// <summary>
+        /// M05X02.zip
+        /// </summary>
+        public const string LargeExchangeSetZipFileName5 = $"{LargeExchangeSetFolderName5}.zip";
+        /// <summary>
         /// M0{0}X02
         /// </summary>
         public const string LargeExchangeSetFolderNamePattern = "M0{0}X02";
@@ -120,7 +124,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.TestHelper
         /// <summary>
         /// GB800001
         /// </summary>
-        public const string AioCells = "GB800001";
+        public const string AioCell1 = "GB800001";
 
         /// <summary>
         /// C:\HOME
@@ -210,8 +214,18 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.TestHelper
         /// C:\HOME\25SEP2025\7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272\AIO\SERIAL.AIO
         /// </summary>
         public const string SerialAioFilePath = $@"{AioExchangeSetPath}\{SerialAioFileName}";
+        /// <summary>
+        /// C:\HOME\25SEP2025\7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272\V01X01\V01X01.zip
+        /// </summary>
+        public const string ExchangeSetZipFilePath = $@"{BatchPath}\{ExchangeSetZipFileName}";
+        /// <summary>
+        /// C:\HOME\25SEP2025\7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272\AIO\AIO.zip
+        /// </summary>
+        public const string AioExchangeSetZipFilePath = $@"{BatchPath}\{AioExchangeSetZipFileName}";
 
         public static IOptions<FileShareServiceConfiguration> FileShareServiceConfiguration { get; }
+
+        public static IOptions<AioConfiguration> AioConfiguration { get; }
 
         static FakeBatchValue()
         {
@@ -258,6 +272,11 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.TestHelper
                 Start = 0,
                 UpdateNumber = "$batch(UpdateNumber) eq '{0}' ",
                 UpdateNumberLimit = 5
+            });
+
+            AioConfiguration = Options.Create(new AioConfiguration
+            {
+                AioCells = AioCell1
             });
         }
     }
