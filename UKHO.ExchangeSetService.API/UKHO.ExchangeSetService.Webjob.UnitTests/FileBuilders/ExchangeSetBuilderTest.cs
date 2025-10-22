@@ -14,6 +14,7 @@ using UKHO.ExchangeSetService.Common.Logging;
 using UKHO.ExchangeSetService.Common.Models.FileShareService.Response;
 using UKHO.ExchangeSetService.Common.Models.Response;
 using UKHO.ExchangeSetService.Common.Models.SalesCatalogue;
+using UKHO.ExchangeSetService.Common.Models.WebJobs;
 using UKHO.ExchangeSetService.FulfilmentService.Downloads;
 using UKHO.ExchangeSetService.FulfilmentService.FileBuilders;
 using UKHO.ExchangeSetService.FulfilmentService.Services;
@@ -108,6 +109,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.FileBuilders
         public async Task WhenCreateAioExchangeSet_WithProducts_ReturnsTrueAndQueriesFss()
         {
             var message = CreateMessage();
+            var batch = new FulfilmentServiceBatch(FakeBatchValue.Configuration, message, FakeBatchValue.CurrentUtcDateTime);
             var products = CreateProductsAio();
             var fulfilmentDataResponses = CreateFulfilmentDataResponses(products);
             var salesCatalogueDataResponse = new SalesCatalogueDataResponse();
@@ -116,7 +118,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.FileBuilders
             A.CallTo(() => _fakeFulfilmentFileShareService.QueryFileShareServiceData(A<List<Products>>.Ignored, message, A<CancellationTokenSource>.Ignored, A<CancellationToken>.Ignored, FakeBatchValue.AioExchangeSetEncRootPath, FakeBatchValue.S63BusinessUnit)).Returns(fulfilmentDataResponses);
             A.CallTo(() => _fakeFileBuilder.CreateAncillaryFilesForAio(FakeBatchValue.BatchId, FakeBatchValue.AioExchangeSetPath, FakeBatchValue.CorrelationId, salesCatalogueDataResponse, message.ScsRequestDateTime, salesCatalogueProductResponse, A<List<FulfilmentDataResponse>>.That.Matches(l => l.Count == fulfilmentDataResponses.Count))).Returns(true);
 
-            var result = await _exchangeSetBuilder.CreateAioExchangeSet(message, FakeBatchValue.CurrentUtcDate, FakeBatchValue.HomeDirectoryPath, products, salesCatalogueDataResponse, salesCatalogueProductResponse);
+            var result = await _exchangeSetBuilder.CreateAioExchangeSet(batch, products, salesCatalogueDataResponse, salesCatalogueProductResponse);
 
             Assert.That(result, Is.True);
             A.CallTo(() => _fakeFulfilmentFileShareService.QueryFileShareServiceData(A<List<Products>>.Ignored, message, A<CancellationTokenSource>.Ignored, A<CancellationToken>.Ignored, FakeBatchValue.AioExchangeSetEncRootPath, FakeBatchValue.S63BusinessUnit)).MustHaveHappenedOnceExactly();
@@ -130,13 +132,14 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.FileBuilders
         public async Task WhenCreateAioExchangeSet_WithEmptyProducts_DoesNotQueryFssButStillCreatesAncillary()
         {
             var message = CreateMessage();
+            var batch = new FulfilmentServiceBatch(FakeBatchValue.Configuration, message, FakeBatchValue.CurrentUtcDateTime);
             var empty = new List<Products>();
             var salesCatalogueDataResponse = new SalesCatalogueDataResponse();
             var salesCatalogueProductResponse = new SalesCatalogueProductResponse();
 
             A.CallTo(() => _fakeFileBuilder.CreateAncillaryFilesForAio(FakeBatchValue.BatchId, FakeBatchValue.AioExchangeSetPath, FakeBatchValue.CorrelationId, salesCatalogueDataResponse, message.ScsRequestDateTime, salesCatalogueProductResponse, A<List<FulfilmentDataResponse>>.That.Matches(l => l.Count == 0))).Returns(true);
 
-            var result = await _exchangeSetBuilder.CreateAioExchangeSet(message, FakeBatchValue.CurrentUtcDate, FakeBatchValue.HomeDirectoryPath, empty, salesCatalogueDataResponse, salesCatalogueProductResponse);
+            var result = await _exchangeSetBuilder.CreateAioExchangeSet(batch, empty, salesCatalogueDataResponse, salesCatalogueProductResponse);
 
             Assert.That(result, Is.True);
             A.CallTo(() => _fakeFulfilmentFileShareService.QueryFileShareServiceData(A<List<Products>>.Ignored, A<SalesCatalogueServiceResponseQueueMessage>.Ignored, A<CancellationTokenSource>.Ignored, A<CancellationToken>.Ignored, A<string>.Ignored, A<string>.Ignored)).MustNotHaveHappened();
@@ -207,6 +210,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.FileBuilders
         public async Task WhenCreateStandardLargeMediaExchangeSet_Valid_ReturnsTrue()
         {
             var message = CreateMessage();
+            var batch = new FulfilmentServiceBatch(FakeBatchValue.Configuration, message, FakeBatchValue.CurrentUtcDateTime);
             var products = CreateProducts(1); // one non-AIO cell
             var fulfilmentDataResponses = CreateFulfilmentDataResponses(products);
             var salesCatalogueDataResponse = new SalesCatalogueDataResponse();
@@ -251,7 +255,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.FileBuilders
             A.CallTo(() => _fakeFileBuilder.CreateLargeMediaExchangesetCatalogFile(FakeBatchValue.BatchId, FakeBatchValue.LargeExchangeSetMediaPath5, FakeBatchValue.CorrelationId, fulfilmentDataResponses, salesCatalogueDataResponse, salesCatalogueProductResponse)).Returns(Task.FromResult(true));
             A.CallTo(() => _fakeFileBuilder.CreateLargeMediaExchangesetCatalogFile(FakeBatchValue.BatchId, FakeBatchValue.LargeExchangeSetMediaPath6, FakeBatchValue.CorrelationId, fulfilmentDataResponses, salesCatalogueDataResponse, salesCatalogueProductResponse)).Returns(Task.FromResult(true));
 
-            var result = await _exchangeSetBuilder.CreateStandardLargeMediaExchangeSet(message, FakeBatchValue.HomeDirectoryPath, FakeBatchValue.CurrentUtcDate, largeExchangeSetDataResponse, FakeBatchValue.LargeExchangeSetFolderNamePattern, FakeBatchValue.BatchPath);
+            var result = await _exchangeSetBuilder.CreateStandardLargeMediaExchangeSet(batch, largeExchangeSetDataResponse, FakeBatchValue.LargeExchangeSetFolderNamePattern, FakeBatchValue.BatchPath);
 
             Assert.That(result, Is.True);
             A.CallTo(() => _fakeFulfilmentFileShareService.QueryFileShareServiceData(A<List<Products>>.Ignored, message, A<CancellationTokenSource>.Ignored, A<CancellationToken>.Ignored, FakeBatchValue.LargeExchangeSetEncRootPattern, FakeBatchValue.S63BusinessUnit)).MustHaveHappenedOnceExactly();
@@ -289,6 +293,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.FileBuilders
         public void WhenCreateStandardLargeMediaExchangeSet_ProductValidationFails_ThrowsFulfilmentException()
         {
             var message = CreateMessage();
+            var batch = new FulfilmentServiceBatch(FakeBatchValue.Configuration, message, FakeBatchValue.CurrentUtcDateTime);
             var salesCatalogueProductResponse = new SalesCatalogueProductResponse { Products = CreateProducts(1) };
             var largeResponse = new LargeExchangeSetDataResponse
             {
@@ -301,7 +306,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.FileBuilders
 
             A.CallTo(() => _fakeProductDataValidator.Validate(A<List<Products>>.Ignored)).Returns(Task.FromResult(validationResult));
 
-            Assert.ThrowsAsync<FulfilmentException>(async () => await _exchangeSetBuilder.CreateStandardLargeMediaExchangeSet(message, FakeBatchValue.HomeDirectoryPath, FakeBatchValue.CurrentUtcDate, largeResponse, FakeBatchValue.LargeExchangeSetFolderNamePattern, FakeBatchValue.BatchPath));
+            Assert.ThrowsAsync<FulfilmentException>(async () => await _exchangeSetBuilder.CreateStandardLargeMediaExchangeSet(batch, largeResponse, FakeBatchValue.LargeExchangeSetFolderNamePattern, FakeBatchValue.BatchPath));
 
             _fakeLogger.VerifyLogEntry(EventIds.LargeExchangeSetCreatedWithError, "Large media exchange set is not created for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", logLevel: LogLevel.Error);
             _fakeLogger.VerifyLogEntry(EventIds.LargeExchangeSetCreatedWithError, "Operation Cancelled as product validation failed for BatchId:{BatchId}, _X-Correlation-ID:{CorrelationId} and Validation message :{Message}", logLevel: LogLevel.Error);

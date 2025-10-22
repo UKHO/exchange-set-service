@@ -63,7 +63,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             {
                 salesCatalogueEssDataResponseForAio.ResponseBody = salesCatalogueEssDataResponseForAio.ResponseBody
                                                      .Where(x => aioCells.Any(productName => productName.Equals(x.ProductName))).ToList();
-                await exchangeSetBuilder.CreateAioExchangeSet(batch.Message, batch.CurrentUtcDate, batch.BaseDirectory, aioItems, salesCatalogueEssDataResponseForAio, response);
+                await exchangeSetBuilder.CreateAioExchangeSet(batch, aioItems, salesCatalogueEssDataResponseForAio, response);
             }
 
             bool isZipFileUploaded = await PackageAndUploadExchangeSetZipFileToFileShareService(batch.BatchId, batch.BatchDirectory, batch.CorrelationId);
@@ -112,7 +112,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             {
                 response.SalesCatalogueDataResponse.ResponseBody = response.SalesCatalogueDataResponse.ResponseBody
                                                                    .Where(x => !aioCells.Any(productName => productName == x.ProductName)).ToList();
-                isExchangeSetFolderCreated = await exchangeSetBuilder.CreateStandardLargeMediaExchangeSet(batch.Message, batch.BaseDirectory, batch.CurrentUtcDate, response, largeExchangeSetFolderName, batch.BatchDirectory);
+                isExchangeSetFolderCreated = await exchangeSetBuilder.CreateStandardLargeMediaExchangeSet(batch, response, largeExchangeSetFolderName, batch.BatchDirectory);
 
                 if (!isExchangeSetFolderCreated)
                 {
@@ -125,7 +125,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             {
                 largeExchangeSetDataResponseForAio.SalesCatalogueDataResponse.ResponseBody = largeExchangeSetDataResponseForAio.SalesCatalogueDataResponse.ResponseBody
                                                                                     .Where(x => aioCells.Any(productName => productName == x.ProductName)).ToList();
-                isExchangeSetFolderCreated = await exchangeSetBuilder.CreateAioExchangeSet(batch.Message, batch.CurrentUtcDate, batch.BaseDirectory, aioItems, largeExchangeSetDataResponseForAio.SalesCatalogueDataResponse, largeExchangeSetDataResponseForAio.SalesCatalogueProductResponse);
+                isExchangeSetFolderCreated = await exchangeSetBuilder.CreateAioExchangeSet(batch, aioItems, largeExchangeSetDataResponseForAio.SalesCatalogueDataResponse, largeExchangeSetDataResponseForAio.SalesCatalogueProductResponse);
 
                 if (!isExchangeSetFolderCreated)
                 {
