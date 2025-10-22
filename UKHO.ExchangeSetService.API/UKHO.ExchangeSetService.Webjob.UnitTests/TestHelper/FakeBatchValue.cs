@@ -125,6 +125,10 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.TestHelper
         /// GB800001
         /// </summary>
         public const string AioCell1 = "GB800001";
+        /// <summary>
+        /// error.txt
+        /// </summary>
+        public const string ErrorFileName = "error.txt";
 
         /// <summary>
         /// C:\HOME
@@ -222,6 +226,10 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.TestHelper
         /// C:\HOME\25SEP2025\7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272\AIO\AIO.zip
         /// </summary>
         public const string AioExchangeSetZipFilePath = $@"{BatchPath}\{AioExchangeSetZipFileName}";
+        /// <summary>
+        /// C:\HOME\25SEP2025\7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272\error.txt
+        /// </summary>
+        public const string ErrorFilePath = $@"{BatchPath}\{ErrorFileName}";
 
         public static IOptions<FileShareServiceConfiguration> FileShareServiceConfiguration { get; }
 
@@ -246,7 +254,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.TestHelper
                 ContentInfo = ContentInfo,
                 EditionNumber = "$batch(EditionNumber) eq '{0}' and ",
                 EncRoot = EncRoot,
-                ErrorFileName = "error.txt",
+                ErrorFileName = ErrorFileName,
                 EssBusinessUnit = "AVCSCustomExchangeSets",
                 ExchangeSetFileFolder = ExchangeSetFileFolder,
                 ExchangeSetFileName = ExchangeSetZipFileName,

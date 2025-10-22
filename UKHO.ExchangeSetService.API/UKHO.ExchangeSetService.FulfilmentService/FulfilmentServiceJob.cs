@@ -1,19 +1,20 @@
-﻿using Azure.Storage.Queues.Models;
+﻿using System;
+using System.Diagnostics.CodeAnalysis;
+using System.IO;
+using System.Threading.Tasks;
+using Azure.Storage.Queues.Models;
+using Elastic.Apm;
+using Elastic.Apm.Api;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using System;
-using System.Diagnostics.CodeAnalysis;
-using System.IO;
-using System.Threading.Tasks;
-using Elastic.Apm;
-using Elastic.Apm.Api;
 using UKHO.ExchangeSetService.Common.Configuration;
 using UKHO.ExchangeSetService.Common.Extensions;
 using UKHO.ExchangeSetService.Common.Helpers;
 using UKHO.ExchangeSetService.Common.Logging;
 using UKHO.ExchangeSetService.Common.Models.SalesCatalogue;
+using UKHO.ExchangeSetService.Common.Models.WebJobs;
 using UKHO.ExchangeSetService.FulfilmentService.Services;
 
 namespace UKHO.ExchangeSetService.FulfilmentService
@@ -29,18 +30,15 @@ namespace UKHO.ExchangeSetService.FulfilmentService
 
         public async Task ProcessQueueMessage([QueueTrigger("%ESSFulfilmentStorageConfiguration:QueueName%")] QueueMessage message)
         {
-            SalesCatalogueServiceResponseQueueMessage fulfilmentServiceQueueMessage = message.Body.ToObjectFromJson<SalesCatalogueServiceResponseQueueMessage>();
-            string homeDirectoryPath = configuration["HOME"];
-            string currentUtcDate = DateTime.UtcNow.ToString("ddMMMyyyy");
-            string batchFolderPath = Path.Combine(homeDirectoryPath, currentUtcDate, fulfilmentServiceQueueMessage.BatchId);
-            double fileSizeInMb = CommonHelper.ConvertBytesToMegabytes(fulfilmentServiceQueueMessage.FileSize);
-
+            var batch = new FulfilmentServiceBatch(configuration, message, DateTime.UtcNow);
+            var fileSizeInMb = CommonHelper.ConvertBytesToMegabytes(batch.Message.FileSize);
             CommonHelper.IsPeriodicOutputService = fileSizeInMb > periodicOutputServiceConfiguration.Value.LargeMediaExchangeSetSizeInMB;
+
             try
             {
-                logger.LogInformation(EventIds.AIOToggleIsOn.ToEventId(), "ESS Webjob : AIO toggle is ON for BatchId:{BatchId} | _X-Correlation-ID : {CorrelationId}", fulfilmentServiceQueueMessage.BatchId, fulfilmentServiceQueueMessage.CorrelationId);
+                logger.LogInformation(EventIds.AIOToggleIsOn.ToEventId(), "ESS Webjob : AIO toggle is ON for BatchId:{BatchId} | _X-Correlation-ID : {CorrelationId}", batch.BatchId, batch.CorrelationId);
 
-                string transactionName =
+                var transactionName =
                     $"{Environment.GetEnvironmentVariable("WEBSITE_SITE_NAME")}-fulfilment-transaction";
 
                 await Agent.Tracer.CaptureTransaction(transactionName, ApiConstants.TypeRequest, async () =>
@@ -52,11 +50,11 @@ namespace UKHO.ExchangeSetService.FulfilmentService
                             "Create Large Exchange Set web job request for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}",
                             async () =>
                             {
-                                return await fulFilmentDataService.CreateLargeExchangeSet(fulfilmentServiceQueueMessage,
-                                    currentUtcDate,
+                                return await fulFilmentDataService.CreateLargeExchangeSet(batch.Message,
+                                    batch.CurrentUtcDate,
                                     periodicOutputServiceConfiguration.Value.LargeExchangeSetFolderName);
                             },
-                            fulfilmentServiceQueueMessage.BatchId, fulfilmentServiceQueueMessage.CorrelationId);
+                            batch.BatchId, batch.CorrelationId);
                     }
                     else
                     {
@@ -65,27 +63,27 @@ namespace UKHO.ExchangeSetService.FulfilmentService
                             "Create Exchange Set web job request for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}",
                             async () =>
                             {
-                                return await fulFilmentDataService.CreateExchangeSet(fulfilmentServiceQueueMessage,
-                                    currentUtcDate);
+                                return await fulFilmentDataService.CreateExchangeSet(batch.Message,
+                                    batch.CurrentUtcDate);
                             },
-                            fulfilmentServiceQueueMessage.BatchId, fulfilmentServiceQueueMessage.CorrelationId);
+                            batch.BatchId, batch.CorrelationId);
                     }
                 });
             }
             catch (Exception ex)
             {
-                EventId exceptionEventId = EventIds.SystemException.ToEventId();
+                var exceptionEventId = EventIds.SystemException.ToEventId();
 
                 if (ex.GetType() == typeof(FulfilmentException))
                     exceptionEventId = ((FulfilmentException)ex).EventId;
 
                 var fulfilmentException = new FulfilmentException(exceptionEventId);
-                string errorMessage = string.Format(fulfilmentException.Message, exceptionEventId.Id, fulfilmentServiceQueueMessage.CorrelationId);
+                var errorMessage = string.Format(fulfilmentException.Message, exceptionEventId.Id, batch.CorrelationId);
 
-                await CreateAndUploadErrorFileToFileShareService(fulfilmentServiceQueueMessage, exceptionEventId, errorMessage, batchFolderPath);
+                await CreateAndUploadErrorFileToFileShareService(batch.Message, exceptionEventId, errorMessage, batch.BatchDirectory);
 
                 if (ex.GetType() != typeof(FulfilmentException))
-                    logger.LogError(exceptionEventId, ex, "Unhandled exception while processing Exchange Set web job for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId} and Exception:{Message}", fulfilmentServiceQueueMessage.BatchId, fulfilmentServiceQueueMessage.CorrelationId, ex.Message);
+                    logger.LogError(exceptionEventId, ex, "Unhandled exception while processing Exchange Set web job for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId} and Exception:{Message}", batch.BatchId, batch.CorrelationId, ex.Message);
 
                 Agent.Tracer.CurrentTransaction?.CaptureException(ex);
             }
@@ -130,7 +128,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService
 
         public async Task SendErrorCallBackResponse(SalesCatalogueServiceResponseQueueMessage fulfilmentServiceQueueMessage)
         {
-            SalesCatalogueProductResponse salesCatalogueProductResponse = await azureBlobStorageService.DownloadSalesCatalogueResponse(fulfilmentServiceQueueMessage.ScsResponseUri, fulfilmentServiceQueueMessage.BatchId, fulfilmentServiceQueueMessage.CorrelationId);
+            var salesCatalogueProductResponse = await azureBlobStorageService.DownloadSalesCatalogueResponse(fulfilmentServiceQueueMessage.ScsResponseUri, fulfilmentServiceQueueMessage.BatchId, fulfilmentServiceQueueMessage.CorrelationId);
 
             await fulfilmentCallBackService.SendCallBackErrorResponse(salesCatalogueProductResponse, fulfilmentServiceQueueMessage);
         }
