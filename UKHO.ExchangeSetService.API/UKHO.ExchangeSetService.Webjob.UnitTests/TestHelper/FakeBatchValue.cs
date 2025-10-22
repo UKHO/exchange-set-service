@@ -1,5 +1,5 @@
 ﻿using System;
-using FakeItEasy;
+using System.Collections.Generic;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
 using UKHO.ExchangeSetService.Common.Configuration;
@@ -296,8 +296,11 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.TestHelper
                 AioCells = AioCell1
             });
 
-            Configuration = A.Fake<IConfiguration>();
-            Configuration["HOME"] = HomeDirectoryPath;
+            var inMemSettings = new Dictionary<string, string>
+            {
+                { "HOME", HomeDirectoryPath }
+            };
+            Configuration = new ConfigurationBuilder().AddInMemoryCollection(inMemSettings).Build();
         }
     }
 }

@@ -258,7 +258,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
 
             Assert.That(result, Is.EqualTo("Exchange Set Created Successfully"));
             A.CallTo(() => _fakeExchangeSetBuilder.CreateStandardExchangeSet(message, salesCatalogueProductResponse, A<List<Products>>.Ignored, FakeBatchValue.ExchangeSetPath, salesCatalogueDataResponse, businessUnit)).MustHaveHappenedOnceExactly();
-            A.CallTo(() => _fakeExchangeSetBuilder.CreateAioExchangeSet(A<SalesCatalogueServiceResponseQueueMessage>.Ignored, A<string>.Ignored, A<string>.Ignored, A<List<Products>>.Ignored, A<SalesCatalogueDataResponse>.Ignored, A<SalesCatalogueProductResponse>.Ignored)).MustNotHaveHappened();
+            A.CallTo(() => _fakeExchangeSetBuilder.CreateAioExchangeSet(A<FulfilmentServiceBatch>.Ignored, A<List<Products>>.Ignored, A<SalesCatalogueDataResponse>.Ignored, A<SalesCatalogueProductResponse>.Ignored)).MustNotHaveHappened();
             A.CallTo(() => _fakeFileSystemHelper.GetSubDirectories(FakeBatchValue.BatchPath)).MustHaveHappenedOnceExactly();
             A.CallTo(() => _fakeFulfilmentFileShareService.CreateZipFileForExchangeSet(FakeBatchValue.BatchId, FakeBatchValue.ExchangeSetPath, FakeBatchValue.CorrelationId)).MustHaveHappenedOnceExactly();
             A.CallTo(() => _fakeFileSystemHelper.GetZipFiles(FakeBatchValue.BatchPath)).MustHaveHappenedOnceExactly();
@@ -290,7 +290,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
                 async delegate { await _fulfilmentDataService.CreateExchangeSet(batch); });
 
             A.CallTo(() => _fakeExchangeSetBuilder.CreateStandardExchangeSet(message, salesCatalogueProductResponse, A<List<Products>>.Ignored, FakeBatchValue.ExchangeSetPath, salesCatalogueDataResponse, businessUnit)).MustHaveHappenedOnceExactly();
-            A.CallTo(() => _fakeExchangeSetBuilder.CreateAioExchangeSet(A<SalesCatalogueServiceResponseQueueMessage>.Ignored, A<string>.Ignored, A<string>.Ignored, A<List<Products>>.Ignored, A<SalesCatalogueDataResponse>.Ignored, A<SalesCatalogueProductResponse>.Ignored)).MustNotHaveHappened();
+            A.CallTo(() => _fakeExchangeSetBuilder.CreateAioExchangeSet(A<FulfilmentServiceBatch>.Ignored, A<List<Products>>.Ignored, A<SalesCatalogueDataResponse>.Ignored, A<SalesCatalogueProductResponse>.Ignored)).MustNotHaveHappened();
             A.CallTo(() => _fakeFileSystemHelper.GetSubDirectories(FakeBatchValue.BatchPath)).MustHaveHappenedOnceExactly();
             A.CallTo(() => _fakeFulfilmentFileShareService.CreateZipFileForExchangeSet(FakeBatchValue.BatchId, FakeBatchValue.ExchangeSetPath, FakeBatchValue.CorrelationId)).MustHaveHappenedOnceExactly();
             A.CallTo(() => _fakeFileSystemHelper.GetZipFiles(A<string>.Ignored)).MustNotHaveHappened();
@@ -341,7 +341,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
 
             Assert.That(result, Is.EqualTo("Exchange Set Created Successfully"));
             A.CallTo(() => _fakeExchangeSetBuilder.CreateStandardExchangeSet(message, salesCatalogueProductResponse, A<List<Products>>.Ignored, FakeBatchValue.ExchangeSetPath, salesCatalogueDataResponse, businessUnit)).MustHaveHappenedOnceExactly();
-            A.CallTo(() => _fakeExchangeSetBuilder.CreateAioExchangeSet(message, FakeBatchValue.CurrentUtcDate, FakeBatchValue.HomeDirectoryPath, A<List<Products>>.Ignored, A<SalesCatalogueDataResponse>.Ignored, salesCatalogueProductResponse)).MustHaveHappenedOnceExactly();
+            A.CallTo(() => _fakeExchangeSetBuilder.CreateAioExchangeSet(batch, A<List<Products>>.Ignored, A<SalesCatalogueDataResponse>.Ignored, salesCatalogueProductResponse)).MustHaveHappenedOnceExactly();
             A.CallTo(() => _fakeFileSystemHelper.GetSubDirectories(FakeBatchValue.BatchPath)).MustHaveHappenedOnceExactly();
             A.CallTo(() => _fakeFulfilmentFileShareService.CreateZipFileForExchangeSet(FakeBatchValue.BatchId, FakeBatchValue.ExchangeSetPath, FakeBatchValue.CorrelationId)).MustHaveHappenedOnceExactly();
             A.CallTo(() => _fakeFulfilmentFileShareService.CreateZipFileForExchangeSet(FakeBatchValue.BatchId, FakeBatchValue.AioExchangeSetPath, FakeBatchValue.CorrelationId)).MustHaveHappenedOnceExactly();
@@ -378,7 +378,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
 
             Assert.That(result, Is.EqualTo("Exchange Set Created Successfully"));
             A.CallTo(() => _fakeExchangeSetBuilder.CreateStandardExchangeSet(message, salesCatalogueProductResponse, A<List<Products>>.Ignored, FakeBatchValue.ExchangeSetPath, salesCatalogueDataResponse, businessUnit)).MustHaveHappenedOnceExactly();
-            A.CallTo(() => _fakeExchangeSetBuilder.CreateAioExchangeSet(A<SalesCatalogueServiceResponseQueueMessage>.Ignored, A<string>.Ignored, A<string>.Ignored, A<List<Products>>.Ignored, A<SalesCatalogueDataResponse>.Ignored, A<SalesCatalogueProductResponse>.Ignored)).MustNotHaveHappened();
+            A.CallTo(() => _fakeExchangeSetBuilder.CreateAioExchangeSet(A<FulfilmentServiceBatch>.Ignored, A<List<Products>>.Ignored, A<SalesCatalogueDataResponse>.Ignored, A<SalesCatalogueProductResponse>.Ignored)).MustNotHaveHappened();
             A.CallTo(() => _fakeFileSystemHelper.GetSubDirectories(FakeBatchValue.BatchPath)).MustHaveHappenedOnceExactly();
             A.CallTo(() => _fakeFulfilmentFileShareService.CreateZipFileForExchangeSet(FakeBatchValue.BatchId, FakeBatchValue.ExchangeSetPath, FakeBatchValue.CorrelationId)).MustHaveHappenedOnceExactly();
             A.CallTo(() => _fakeFulfilmentFileShareService.CreateZipFileForExchangeSet(A<string>.Ignored, FakeBatchValue.AioExchangeSetPath, A<string>.Ignored)).MustNotHaveHappened();
@@ -415,7 +415,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
 
             Assert.That(result, Is.EqualTo("Exchange Set Created Successfully"));
             A.CallTo(() => _fakeExchangeSetBuilder.CreateStandardExchangeSet(A<SalesCatalogueServiceResponseQueueMessage>.Ignored, A<SalesCatalogueProductResponse>.Ignored, A<List<Products>>.Ignored, A<string>.Ignored, A<SalesCatalogueDataResponse>.Ignored, A<string>.Ignored)).MustNotHaveHappened();
-            A.CallTo(() => _fakeExchangeSetBuilder.CreateAioExchangeSet(message, FakeBatchValue.CurrentUtcDate, FakeBatchValue.HomeDirectoryPath, A<List<Products>>.Ignored, A<SalesCatalogueDataResponse>.Ignored, salesCatalogueProductResponse)).MustHaveHappenedOnceExactly();
+            A.CallTo(() => _fakeExchangeSetBuilder.CreateAioExchangeSet(batch, A<List<Products>>.Ignored, A<SalesCatalogueDataResponse>.Ignored, salesCatalogueProductResponse)).MustHaveHappenedOnceExactly();
             A.CallTo(() => _fakeFileSystemHelper.GetSubDirectories(FakeBatchValue.BatchPath)).MustHaveHappenedOnceExactly();
             A.CallTo(() => _fakeFulfilmentFileShareService.CreateZipFileForExchangeSet(A<string>.Ignored, FakeBatchValue.ExchangeSetPath, A<string>.Ignored)).MustNotHaveHappened();
             A.CallTo(() => _fakeFulfilmentFileShareService.CreateZipFileForExchangeSet(FakeBatchValue.BatchId, FakeBatchValue.AioExchangeSetPath, FakeBatchValue.CorrelationId)).MustHaveHappenedOnceExactly();
@@ -453,7 +453,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
 
             Assert.That(result, Is.EqualTo("Exchange Set Created Successfully"));
             A.CallTo(() => _fakeExchangeSetBuilder.CreateStandardExchangeSet(message, salesCatalogueProductResponse, A<List<Products>>.Ignored, FakeBatchValue.ExchangeSetPath, salesCatalogueDataResponse, businessUnit)).MustHaveHappenedOnceExactly();
-            A.CallTo(() => _fakeExchangeSetBuilder.CreateAioExchangeSet(A<SalesCatalogueServiceResponseQueueMessage>.Ignored, A<string>.Ignored, A<string>.Ignored, A<List<Products>>.Ignored, A<SalesCatalogueDataResponse>.Ignored, A<SalesCatalogueProductResponse>.Ignored)).MustNotHaveHappened();
+            A.CallTo(() => _fakeExchangeSetBuilder.CreateAioExchangeSet(A<FulfilmentServiceBatch>.Ignored, A<List<Products>>.Ignored, A<SalesCatalogueDataResponse>.Ignored, A<SalesCatalogueProductResponse>.Ignored)).MustNotHaveHappened();
             A.CallTo(() => _fakeFileSystemHelper.GetSubDirectories(FakeBatchValue.BatchPath)).MustHaveHappenedOnceExactly();
             A.CallTo(() => _fakeFulfilmentFileShareService.CreateZipFileForExchangeSet(FakeBatchValue.BatchId, FakeBatchValue.ExchangeSetPath, FakeBatchValue.CorrelationId)).MustHaveHappenedOnceExactly();
             A.CallTo(() => _fakeFulfilmentFileShareService.CreateZipFileForExchangeSet(A<string>.Ignored, FakeBatchValue.AioExchangeSetPath, A<string>.Ignored)).MustNotHaveHappened();
@@ -491,7 +491,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
 
             Assert.That(result, Is.EqualTo("Exchange Set Is Not Created"));
             A.CallTo(() => _fakeExchangeSetBuilder.CreateStandardExchangeSet(message, salesCatalogueProductResponse, A<List<Products>>.Ignored, FakeBatchValue.ExchangeSetPath, salesCatalogueDataResponse, businessUnit)).MustHaveHappenedOnceExactly();
-            A.CallTo(() => _fakeExchangeSetBuilder.CreateAioExchangeSet(message, FakeBatchValue.CurrentUtcDate, FakeBatchValue.HomeDirectoryPath, A<List<Products>>.Ignored, A<SalesCatalogueDataResponse>.Ignored, salesCatalogueProductResponse)).MustHaveHappenedOnceExactly();
+            A.CallTo(() => _fakeExchangeSetBuilder.CreateAioExchangeSet(batch, A<List<Products>>.Ignored, A<SalesCatalogueDataResponse>.Ignored, salesCatalogueProductResponse)).MustHaveHappenedOnceExactly();
             A.CallTo(() => _fakeFileSystemHelper.GetSubDirectories(FakeBatchValue.BatchPath)).MustHaveHappenedOnceExactly();
             A.CallTo(() => _fakeFulfilmentFileShareService.CreateZipFileForExchangeSet(FakeBatchValue.BatchId, FakeBatchValue.ExchangeSetPath, FakeBatchValue.CorrelationId)).MustHaveHappenedOnceExactly();
             A.CallTo(() => _fakeFulfilmentFileShareService.CreateZipFileForExchangeSet(FakeBatchValue.BatchId, FakeBatchValue.AioExchangeSetPath, FakeBatchValue.CorrelationId)).MustHaveHappenedOnceExactly();
@@ -517,8 +517,8 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             var salesCatalogueProductResponse = GetSalesCatalogueProductResponse(true);
             A.CallTo(() => _fakeFulfilmentSalesCatalogueService.GetSalesCatalogueDataResponse(FakeBatchValue.BatchId, FakeBatchValue.CorrelationId)).Returns(salesCatalogueDataResponse);
             A.CallTo(() => _fakeAzureBlobStorageService.DownloadSalesCatalogueResponse(message.ScsResponseUri, FakeBatchValue.BatchId, FakeBatchValue.CorrelationId)).Returns(salesCatalogueProductResponse);
-            A.CallTo(() => _fakeExchangeSetBuilder.CreateStandardLargeMediaExchangeSet(message, FakeBatchValue.HomeDirectoryPath, FakeBatchValue.CurrentUtcDate, A<LargeExchangeSetDataResponse>.Ignored, FakeBatchValue.LargeExchangeSetFolderNamePattern, FakeBatchValue.BatchPath)).Returns(true);
-            A.CallTo(() => _fakeExchangeSetBuilder.CreateAioExchangeSet(message, FakeBatchValue.CurrentUtcDate, FakeBatchValue.HomeDirectoryPath, A<List<Products>>.Ignored, A<SalesCatalogueDataResponse>.Ignored, salesCatalogueProductResponse)).Returns(true);
+            A.CallTo(() => _fakeExchangeSetBuilder.CreateStandardLargeMediaExchangeSet(batch, A<LargeExchangeSetDataResponse>.Ignored, FakeBatchValue.LargeExchangeSetFolderNamePattern, FakeBatchValue.BatchPath)).Returns(true);
+            A.CallTo(() => _fakeExchangeSetBuilder.CreateAioExchangeSet(batch, A<List<Products>>.Ignored, A<SalesCatalogueDataResponse>.Ignored, salesCatalogueProductResponse)).Returns(true);
             A.CallTo(() => _fakeFileSystemHelper.GetDirectoryInfo(FakeBatchValue.BatchPath)).Returns(GetSubDirectories(false, true, true));
             A.CallTo(() => _fakeFulfilmentFileShareService.CreateZipFileForExchangeSet(FakeBatchValue.BatchId, FakeBatchValue.LargeExchangeSetMediaPath5, FakeBatchValue.CorrelationId)).Returns(true);
             A.CallTo(() => _fakeFulfilmentFileShareService.UploadZipFileForLargeMediaExchangeSetToFileShareService(FakeBatchValue.BatchId, FakeBatchValue.BatchPath, FakeBatchValue.CorrelationId, FakeBatchValue.LargeExchangeSetZipFileName5)).Returns(true);
@@ -531,8 +531,8 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             Assert.That(result, Is.EqualTo("Large Media Exchange Set Created Successfully"));
             A.CallTo(() => _fakeFulfilmentSalesCatalogueService.GetSalesCatalogueDataResponse(FakeBatchValue.BatchId, FakeBatchValue.CorrelationId)).MustHaveHappenedOnceExactly();
             A.CallTo(() => _fakeAzureBlobStorageService.DownloadSalesCatalogueResponse(message.ScsResponseUri, FakeBatchValue.BatchId, FakeBatchValue.CorrelationId)).MustHaveHappenedOnceExactly();
-            A.CallTo(() => _fakeExchangeSetBuilder.CreateStandardLargeMediaExchangeSet(message, FakeBatchValue.HomeDirectoryPath, FakeBatchValue.CurrentUtcDate, A<LargeExchangeSetDataResponse>.Ignored, FakeBatchValue.LargeExchangeSetFolderNamePattern, FakeBatchValue.BatchPath)).MustHaveHappenedOnceExactly();
-            A.CallTo(() => _fakeExchangeSetBuilder.CreateAioExchangeSet(message, FakeBatchValue.CurrentUtcDate, FakeBatchValue.HomeDirectoryPath, A<List<Products>>.Ignored, A<SalesCatalogueDataResponse>.Ignored, salesCatalogueProductResponse)).MustHaveHappenedOnceExactly();
+            A.CallTo(() => _fakeExchangeSetBuilder.CreateStandardLargeMediaExchangeSet(batch, A<LargeExchangeSetDataResponse>.Ignored, FakeBatchValue.LargeExchangeSetFolderNamePattern, FakeBatchValue.BatchPath)).MustHaveHappenedOnceExactly();
+            A.CallTo(() => _fakeExchangeSetBuilder.CreateAioExchangeSet(batch, A<List<Products>>.Ignored, A<SalesCatalogueDataResponse>.Ignored, salesCatalogueProductResponse)).MustHaveHappenedOnceExactly();
             A.CallTo(() => _fakeFileSystemHelper.GetDirectoryInfo(FakeBatchValue.BatchPath)).MustHaveHappenedOnceExactly();
             A.CallTo(() => _fakeFulfilmentFileShareService.CreateZipFileForExchangeSet(FakeBatchValue.BatchId, FakeBatchValue.LargeExchangeSetMediaPath5, FakeBatchValue.CorrelationId)).MustHaveHappenedOnceExactly();
             A.CallTo(() => _fakeFulfilmentFileShareService.UploadZipFileForLargeMediaExchangeSetToFileShareService(FakeBatchValue.BatchId, FakeBatchValue.BatchPath, FakeBatchValue.CorrelationId, FakeBatchValue.LargeExchangeSetZipFileName5)).MustHaveHappenedOnceExactly();
@@ -557,16 +557,16 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             var salesCatalogueProductResponse = GetSalesCatalogueProductResponse(true);
             A.CallTo(() => _fakeFulfilmentSalesCatalogueService.GetSalesCatalogueDataResponse(FakeBatchValue.BatchId, FakeBatchValue.CorrelationId)).Returns(salesCatalogueDataResponse);
             A.CallTo(() => _fakeAzureBlobStorageService.DownloadSalesCatalogueResponse(message.ScsResponseUri, FakeBatchValue.BatchId, FakeBatchValue.CorrelationId)).Returns(salesCatalogueProductResponse);
-            A.CallTo(() => _fakeExchangeSetBuilder.CreateStandardLargeMediaExchangeSet(message, FakeBatchValue.HomeDirectoryPath, FakeBatchValue.CurrentUtcDate, A<LargeExchangeSetDataResponse>.Ignored, FakeBatchValue.LargeExchangeSetFolderNamePattern, FakeBatchValue.BatchPath)).Returns(true);
-            A.CallTo(() => _fakeExchangeSetBuilder.CreateAioExchangeSet(message, FakeBatchValue.CurrentUtcDate, FakeBatchValue.HomeDirectoryPath, A<List<Products>>.Ignored, A<SalesCatalogueDataResponse>.Ignored, salesCatalogueProductResponse)).Returns(false);
+            A.CallTo(() => _fakeExchangeSetBuilder.CreateStandardLargeMediaExchangeSet(batch, A<LargeExchangeSetDataResponse>.Ignored, FakeBatchValue.LargeExchangeSetFolderNamePattern, FakeBatchValue.BatchPath)).Returns(true);
+            A.CallTo(() => _fakeExchangeSetBuilder.CreateAioExchangeSet(batch, A<List<Products>>.Ignored, A<SalesCatalogueDataResponse>.Ignored, salesCatalogueProductResponse)).Returns(false);
 
             Assert.ThrowsAsync(Is.TypeOf<FulfilmentException>().And.Message.EqualTo(FulfilmentExceptionMessage),
                 async delegate { await _fulfilmentDataService.CreateLargeExchangeSet(batch, FakeBatchValue.LargeExchangeSetFolderNamePattern); });
 
             A.CallTo(() => _fakeFulfilmentSalesCatalogueService.GetSalesCatalogueDataResponse(FakeBatchValue.BatchId, FakeBatchValue.CorrelationId)).MustHaveHappenedOnceExactly();
             A.CallTo(() => _fakeAzureBlobStorageService.DownloadSalesCatalogueResponse(message.ScsResponseUri, FakeBatchValue.BatchId, FakeBatchValue.CorrelationId)).MustHaveHappenedOnceExactly();
-            A.CallTo(() => _fakeExchangeSetBuilder.CreateStandardLargeMediaExchangeSet(message, FakeBatchValue.HomeDirectoryPath, FakeBatchValue.CurrentUtcDate, A<LargeExchangeSetDataResponse>.Ignored, FakeBatchValue.LargeExchangeSetFolderNamePattern, FakeBatchValue.BatchPath)).MustHaveHappenedOnceExactly();
-            A.CallTo(() => _fakeExchangeSetBuilder.CreateAioExchangeSet(message, FakeBatchValue.CurrentUtcDate, FakeBatchValue.HomeDirectoryPath, A<List<Products>>.Ignored, A<SalesCatalogueDataResponse>.Ignored, salesCatalogueProductResponse)).MustHaveHappenedOnceExactly();
+            A.CallTo(() => _fakeExchangeSetBuilder.CreateStandardLargeMediaExchangeSet(batch, A<LargeExchangeSetDataResponse>.Ignored, FakeBatchValue.LargeExchangeSetFolderNamePattern, FakeBatchValue.BatchPath)).MustHaveHappenedOnceExactly();
+            A.CallTo(() => _fakeExchangeSetBuilder.CreateAioExchangeSet(batch, A<List<Products>>.Ignored, A<SalesCatalogueDataResponse>.Ignored, salesCatalogueProductResponse)).MustHaveHappenedOnceExactly();
             A.CallTo(() => _fakeFileSystemHelper.GetDirectoryInfo(A<string>.Ignored)).MustNotHaveHappened();
             A.CallTo(() => _fakeFulfilmentFileShareService.CreateZipFileForExchangeSet(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).MustNotHaveHappened();
             A.CallTo(() => _fakeFulfilmentFileShareService.UploadZipFileForLargeMediaExchangeSetToFileShareService(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored)).MustNotHaveHappened();
@@ -592,7 +592,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             var salesCatalogueProductResponse = GetSalesCatalogueProductResponse(false);
             A.CallTo(() => _fakeFulfilmentSalesCatalogueService.GetSalesCatalogueDataResponse(FakeBatchValue.BatchId, FakeBatchValue.CorrelationId)).Returns(salesCatalogueDataResponse);
             A.CallTo(() => _fakeAzureBlobStorageService.DownloadSalesCatalogueResponse(message.ScsResponseUri, FakeBatchValue.BatchId, FakeBatchValue.CorrelationId)).Returns(salesCatalogueProductResponse);
-            A.CallTo(() => _fakeExchangeSetBuilder.CreateStandardLargeMediaExchangeSet(message, FakeBatchValue.HomeDirectoryPath, FakeBatchValue.CurrentUtcDate, A<LargeExchangeSetDataResponse>.Ignored, FakeBatchValue.LargeExchangeSetFolderNamePattern, FakeBatchValue.BatchPath)).Returns(true);
+            A.CallTo(() => _fakeExchangeSetBuilder.CreateStandardLargeMediaExchangeSet(batch, A<LargeExchangeSetDataResponse>.Ignored, FakeBatchValue.LargeExchangeSetFolderNamePattern, FakeBatchValue.BatchPath)).Returns(true);
             A.CallTo(() => _fakeFileSystemHelper.GetDirectoryInfo(FakeBatchValue.BatchPath)).Returns(GetSubDirectories(false, false, true));
             A.CallTo(() => _fakeFulfilmentFileShareService.CreateZipFileForExchangeSet(FakeBatchValue.BatchId, FakeBatchValue.LargeExchangeSetMediaPath5, FakeBatchValue.CorrelationId)).Returns(true);
             A.CallTo(() => _fakeFulfilmentFileShareService.UploadZipFileForLargeMediaExchangeSetToFileShareService(FakeBatchValue.BatchId, FakeBatchValue.BatchPath, FakeBatchValue.CorrelationId, FakeBatchValue.LargeExchangeSetZipFileName5)).Returns(true);
@@ -603,8 +603,8 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             Assert.That(result, Is.EqualTo("Large Media Exchange Set Created Successfully"));
             A.CallTo(() => _fakeFulfilmentSalesCatalogueService.GetSalesCatalogueDataResponse(FakeBatchValue.BatchId, FakeBatchValue.CorrelationId)).MustHaveHappenedOnceExactly();
             A.CallTo(() => _fakeAzureBlobStorageService.DownloadSalesCatalogueResponse(message.ScsResponseUri, FakeBatchValue.BatchId, FakeBatchValue.CorrelationId)).MustHaveHappenedOnceExactly();
-            A.CallTo(() => _fakeExchangeSetBuilder.CreateStandardLargeMediaExchangeSet(message, FakeBatchValue.HomeDirectoryPath, FakeBatchValue.CurrentUtcDate, A<LargeExchangeSetDataResponse>.Ignored, FakeBatchValue.LargeExchangeSetFolderNamePattern, FakeBatchValue.BatchPath)).MustHaveHappenedOnceExactly();
-            A.CallTo(() => _fakeExchangeSetBuilder.CreateAioExchangeSet(A<SalesCatalogueServiceResponseQueueMessage>.Ignored, A<string>.Ignored, A<string>.Ignored, A<List<Products>>.Ignored, A<SalesCatalogueDataResponse>.Ignored, A<SalesCatalogueProductResponse>.Ignored)).MustNotHaveHappened();
+            A.CallTo(() => _fakeExchangeSetBuilder.CreateStandardLargeMediaExchangeSet(batch, A<LargeExchangeSetDataResponse>.Ignored, FakeBatchValue.LargeExchangeSetFolderNamePattern, FakeBatchValue.BatchPath)).MustHaveHappenedOnceExactly();
+            A.CallTo(() => _fakeExchangeSetBuilder.CreateAioExchangeSet(A<FulfilmentServiceBatch>.Ignored, A<List<Products>>.Ignored, A<SalesCatalogueDataResponse>.Ignored, A<SalesCatalogueProductResponse>.Ignored)).MustNotHaveHappened();
             A.CallTo(() => _fakeFileSystemHelper.GetDirectoryInfo(FakeBatchValue.BatchPath)).MustHaveHappenedOnceExactly();
             A.CallTo(() => _fakeFulfilmentFileShareService.CreateZipFileForExchangeSet(FakeBatchValue.BatchId, FakeBatchValue.LargeExchangeSetMediaPath5, FakeBatchValue.CorrelationId)).MustHaveHappenedOnceExactly();
             A.CallTo(() => _fakeFulfilmentFileShareService.UploadZipFileForLargeMediaExchangeSetToFileShareService(FakeBatchValue.BatchId, FakeBatchValue.BatchPath, FakeBatchValue.CorrelationId, FakeBatchValue.LargeExchangeSetZipFileName5)).MustHaveHappenedOnceExactly();
@@ -629,8 +629,8 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             var salesCatalogueProductResponse = GetSalesCatalogueProductResponseAioOnly();
             A.CallTo(() => _fakeFulfilmentSalesCatalogueService.GetSalesCatalogueDataResponse(FakeBatchValue.BatchId, FakeBatchValue.CorrelationId)).Returns(salesCatalogueDataResponse);
             A.CallTo(() => _fakeAzureBlobStorageService.DownloadSalesCatalogueResponse(message.ScsResponseUri, FakeBatchValue.BatchId, FakeBatchValue.CorrelationId)).Returns(salesCatalogueProductResponse);
-            A.CallTo(() => _fakeExchangeSetBuilder.CreateStandardLargeMediaExchangeSet(message, FakeBatchValue.HomeDirectoryPath, FakeBatchValue.CurrentUtcDate, A<LargeExchangeSetDataResponse>.Ignored, FakeBatchValue.LargeExchangeSetFolderNamePattern, FakeBatchValue.BatchPath)).Returns(true);
-            A.CallTo(() => _fakeExchangeSetBuilder.CreateAioExchangeSet(message, FakeBatchValue.CurrentUtcDate, FakeBatchValue.HomeDirectoryPath, A<List<Products>>.Ignored, A<SalesCatalogueDataResponse>.Ignored, salesCatalogueProductResponse)).Returns(true);
+            A.CallTo(() => _fakeExchangeSetBuilder.CreateStandardLargeMediaExchangeSet(batch, A<LargeExchangeSetDataResponse>.Ignored, FakeBatchValue.LargeExchangeSetFolderNamePattern, FakeBatchValue.BatchPath)).Returns(true);
+            A.CallTo(() => _fakeExchangeSetBuilder.CreateAioExchangeSet(batch, A<List<Products>>.Ignored, A<SalesCatalogueDataResponse>.Ignored, salesCatalogueProductResponse)).Returns(true);
             A.CallTo(() => _fakeFileSystemHelper.GetDirectoryInfo(FakeBatchValue.BatchPath)).Returns(GetSubDirectories(false, true, false));
             A.CallTo(() => _fakeFulfilmentFileShareService.CreateZipFileForExchangeSet(FakeBatchValue.BatchId, FakeBatchValue.AioExchangeSetPath, FakeBatchValue.CorrelationId)).Returns(true);
             A.CallTo(() => _fakeFulfilmentFileShareService.UploadZipFileForLargeMediaExchangeSetToFileShareService(FakeBatchValue.BatchId, FakeBatchValue.BatchPath, FakeBatchValue.CorrelationId, FakeBatchValue.AioExchangeSetZipFileName)).Returns(true);
@@ -641,8 +641,8 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             Assert.That(result, Is.EqualTo("Large Media Exchange Set Created Successfully"));
             A.CallTo(() => _fakeFulfilmentSalesCatalogueService.GetSalesCatalogueDataResponse(FakeBatchValue.BatchId, FakeBatchValue.CorrelationId)).MustHaveHappenedOnceExactly();
             A.CallTo(() => _fakeAzureBlobStorageService.DownloadSalesCatalogueResponse(message.ScsResponseUri, FakeBatchValue.BatchId, FakeBatchValue.CorrelationId)).MustHaveHappenedOnceExactly();
-            A.CallTo(() => _fakeExchangeSetBuilder.CreateStandardLargeMediaExchangeSet(A<SalesCatalogueServiceResponseQueueMessage>.Ignored, A<string>.Ignored, A<string>.Ignored, A<LargeExchangeSetDataResponse>.Ignored, A<string>.Ignored, A<string>.Ignored)).MustNotHaveHappened();
-            A.CallTo(() => _fakeExchangeSetBuilder.CreateAioExchangeSet(message, FakeBatchValue.CurrentUtcDate, FakeBatchValue.HomeDirectoryPath, A<List<Products>>.Ignored, A<SalesCatalogueDataResponse>.Ignored, salesCatalogueProductResponse)).MustHaveHappenedOnceExactly();
+            A.CallTo(() => _fakeExchangeSetBuilder.CreateStandardLargeMediaExchangeSet(A<FulfilmentServiceBatch>.Ignored, A<LargeExchangeSetDataResponse>.Ignored, A<string>.Ignored, A<string>.Ignored)).MustNotHaveHappened();
+            A.CallTo(() => _fakeExchangeSetBuilder.CreateAioExchangeSet(batch, A<List<Products>>.Ignored, A<SalesCatalogueDataResponse>.Ignored, salesCatalogueProductResponse)).MustHaveHappenedOnceExactly();
             A.CallTo(() => _fakeFileSystemHelper.GetDirectoryInfo(FakeBatchValue.BatchPath)).MustHaveHappenedOnceExactly();
             A.CallTo(() => _fakeFulfilmentFileShareService.CreateZipFileForExchangeSet(A<string>.Ignored, FakeBatchValue.LargeExchangeSetMediaPath5, A<string>.Ignored)).MustNotHaveHappened();
             A.CallTo(() => _fakeFulfilmentFileShareService.UploadZipFileForLargeMediaExchangeSetToFileShareService(A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, FakeBatchValue.LargeExchangeSetZipFileName5)).MustNotHaveHappened();

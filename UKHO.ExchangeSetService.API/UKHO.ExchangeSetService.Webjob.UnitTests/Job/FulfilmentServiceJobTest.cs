@@ -1,10 +1,8 @@
 using System;
-using System.Collections.Generic;
 using System.Text.Json;
 using System.Threading.Tasks;
 using Azure.Storage.Queues.Models;
 using FakeItEasy;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using NUnit.Framework;
@@ -22,7 +20,6 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Job
     [TestFixture]
     public class FulfilmentServiceJobTest
     {
-        private IConfiguration _configuration;
         private IFulfilmentDataService _fakeFulfilmentDataService;
         private ILogger<FulfilmentServiceJob> _fakeLogger;
         private IFileSystemHelper _fakeFileSystemHelper;
@@ -37,14 +34,6 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Job
         [SetUp]
         public void SetUp()
         {
-            var inMemSettings = new Dictionary<string, string>
-            {
-                { "HOME", @"C:\HOME" }
-            };
-            _configuration = new ConfigurationBuilder()
-                .AddInMemoryCollection(inMemSettings)
-                .Build();
-
             _fakeFulfilmentDataService = A.Fake<IFulfilmentDataService>();
             _fakeLogger = A.Fake<ILogger<FulfilmentServiceJob>>();
             _fakeFileSystemHelper = A.Fake<IFileSystemHelper>();
@@ -60,7 +49,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Job
             });
 
             _fulfilmentServiceJob = new FulfilmentServiceJob(
-                _configuration,
+                FakeBatchValue.Configuration,
                 _fakeFulfilmentDataService,
                 _fakeLogger,
                 _fakeFileSystemHelper,
