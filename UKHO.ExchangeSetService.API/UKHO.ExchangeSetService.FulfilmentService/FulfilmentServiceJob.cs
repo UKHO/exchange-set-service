@@ -30,7 +30,8 @@ namespace UKHO.ExchangeSetService.FulfilmentService
 
         public async Task ProcessQueueMessage([QueueTrigger("%ESSFulfilmentStorageConfiguration:QueueName%")] QueueMessage message)
         {
-            var batch = new FulfilmentServiceBatch(configuration, message, DateTime.UtcNow);
+            var salesCatalogueServiceResponseQueueMessage = message.Body.ToObjectFromJson<SalesCatalogueServiceResponseQueueMessage>();
+            var batch = new FulfilmentServiceBatch(configuration, salesCatalogueServiceResponseQueueMessage, DateTime.UtcNow);
             var fileSizeInMb = CommonHelper.ConvertBytesToMegabytes(batch.Message.FileSize);
             CommonHelper.IsPeriodicOutputService = fileSizeInMb > periodicOutputServiceConfiguration.Value.LargeMediaExchangeSetSizeInMB;
 
@@ -50,9 +51,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService
                             "Create Large Exchange Set web job request for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}",
                             async () =>
                             {
-                                return await fulFilmentDataService.CreateLargeExchangeSet(batch.Message,
-                                    batch.CurrentUtcDate,
-                                    periodicOutputServiceConfiguration.Value.LargeExchangeSetFolderName);
+                                return await fulFilmentDataService.CreateLargeExchangeSet(batch, periodicOutputServiceConfiguration.Value.LargeExchangeSetFolderName);
                             },
                             batch.BatchId, batch.CorrelationId);
                     }
@@ -63,8 +62,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService
                             "Create Exchange Set web job request for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}",
                             async () =>
                             {
-                                return await fulFilmentDataService.CreateExchangeSet(batch.Message,
-                                    batch.CurrentUtcDate);
+                                return await fulFilmentDataService.CreateExchangeSet(batch);
                             },
                             batch.BatchId, batch.CorrelationId);
                     }

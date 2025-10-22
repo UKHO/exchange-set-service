@@ -10,6 +10,7 @@ using Microsoft.Extensions.Logging;
 using NUnit.Framework;
 using UKHO.ExchangeSetService.Common.Configuration;
 using UKHO.ExchangeSetService.Common.Helpers;
+using UKHO.ExchangeSetService.Common.Logging;
 using UKHO.ExchangeSetService.Common.Models.FileShareService.Response;
 using UKHO.ExchangeSetService.Common.Models.Response;
 using UKHO.ExchangeSetService.Common.Models.SalesCatalogue;
@@ -120,6 +121,9 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.FileBuilders
             Assert.That(result, Is.True);
             A.CallTo(() => _fakeFulfilmentFileShareService.QueryFileShareServiceData(A<List<Products>>.Ignored, message, A<CancellationTokenSource>.Ignored, A<CancellationToken>.Ignored, FakeBatchValue.AioExchangeSetEncRootPath, FakeBatchValue.S63BusinessUnit)).MustHaveHappenedOnceExactly();
             A.CallTo(() => _fakeFileBuilder.CreateAncillaryFilesForAio(FakeBatchValue.BatchId, FakeBatchValue.AioExchangeSetPath, FakeBatchValue.CorrelationId, salesCatalogueDataResponse, message.ScsRequestDateTime, salesCatalogueProductResponse, A<List<FulfilmentDataResponse>>.That.Matches(l => l.Count == fulfilmentDataResponses.Count))).MustHaveHappenedOnceExactly();
+
+            _fakeLogger.VerifyLogEntry(EventIds.QueryFileShareServiceENCFilesRequestStart, "File share service search query and download request for ENC files from BusinessUnit:{businessUnit} for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}");
+            _fakeLogger.VerifyLogEntry(EventIds.QueryFileShareServiceENCFilesRequestCompleted, "File share service search query and download request for ENC files from BusinessUnit:{businessUnit} for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", true);
         }
 
         [Test]
@@ -137,6 +141,9 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.FileBuilders
             Assert.That(result, Is.True);
             A.CallTo(() => _fakeFulfilmentFileShareService.QueryFileShareServiceData(A<List<Products>>.Ignored, A<SalesCatalogueServiceResponseQueueMessage>.Ignored, A<CancellationTokenSource>.Ignored, A<CancellationToken>.Ignored, A<string>.Ignored, A<string>.Ignored)).MustNotHaveHappened();
             A.CallTo(() => _fakeFileBuilder.CreateAncillaryFilesForAio(FakeBatchValue.BatchId, FakeBatchValue.AioExchangeSetPath, FakeBatchValue.CorrelationId, salesCatalogueDataResponse, message.ScsRequestDateTime, salesCatalogueProductResponse, A<List<FulfilmentDataResponse>>.That.Matches(l => l.Count == 0))).MustHaveHappenedOnceExactly();
+
+            _fakeLogger.VerifyLogEntry(EventIds.QueryFileShareServiceENCFilesRequestStart, "File share service search query and download request for ENC files from BusinessUnit:{businessUnit} for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", times: 0);
+            _fakeLogger.VerifyLogEntry(EventIds.QueryFileShareServiceENCFilesRequestCompleted, "File share service search query and download request for ENC files from BusinessUnit:{businessUnit} for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", true, times: 0);
         }
 
         [Test]
@@ -154,6 +161,9 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.FileBuilders
 
             A.CallTo(() => _fakeFulfilmentFileShareService.QueryFileShareServiceData(A<List<Products>>.Ignored, message, A<CancellationTokenSource>.Ignored, A<CancellationToken>.Ignored, FakeBatchValue.ExchangeSetEncRootPath, FakeBatchValue.S63BusinessUnit)).MustHaveHappened(products.Count, Times.Exactly);
             A.CallTo(() => _fakeFileBuilder.CreateAncillaryFiles(FakeBatchValue.BatchId, FakeBatchValue.ExchangeSetPath, FakeBatchValue.CorrelationId, A<List<FulfilmentDataResponse>>.Ignored, salesCatalogueProductResponse, message.ScsRequestDateTime, salesCatalogueDataResponse, true)).MustHaveHappenedOnceExactly();
+
+            _fakeLogger.VerifyLogEntry(EventIds.QueryFileShareServiceENCFilesRequestStart, "File share service search query and download request for ENC files from BusinessUnit:{businessUnit} for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", times: 2);
+            _fakeLogger.VerifyLogEntry(EventIds.QueryFileShareServiceENCFilesRequestCompleted, "File share service search query and download request for ENC files from BusinessUnit:{businessUnit} for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", true, times: 2);
         }
 
         [Test]
@@ -171,6 +181,9 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.FileBuilders
 
             A.CallTo(() => _fakeFulfilmentFileShareService.QueryFileShareServiceData(A<List<Products>>.Ignored, message, A<CancellationTokenSource>.Ignored, A<CancellationToken>.Ignored, FakeBatchValue.ExchangeSetEncRootPath, FakeBatchValue.S57BusinessUnit)).MustHaveHappened(products.Count, Times.Exactly);
             A.CallTo(() => _fakeFileBuilder.CreateAncillaryFiles(FakeBatchValue.BatchId, FakeBatchValue.ExchangeSetPath, FakeBatchValue.CorrelationId, A<List<FulfilmentDataResponse>>.Ignored, salesCatalogueProductResponse, message.ScsRequestDateTime, salesCatalogueDataResponse, false)).MustHaveHappenedOnceExactly();
+
+            _fakeLogger.VerifyLogEntry(EventIds.QueryFileShareServiceENCFilesRequestStart, "File share service search query and download request for ENC files from BusinessUnit:{businessUnit} for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", times: 2);
+            _fakeLogger.VerifyLogEntry(EventIds.QueryFileShareServiceENCFilesRequestCompleted, "File share service search query and download request for ENC files from BusinessUnit:{businessUnit} for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", true, times: 2);
         }
 
         [Test]
@@ -185,6 +198,9 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.FileBuilders
 
             A.CallTo(() => _fakeFulfilmentFileShareService.QueryFileShareServiceData(A<List<Products>>.Ignored, A<SalesCatalogueServiceResponseQueueMessage>.Ignored, A<CancellationTokenSource>.Ignored, A<CancellationToken>.Ignored, A<string>.Ignored, A<string>.Ignored)).MustNotHaveHappened();
             A.CallTo(() => _fakeFileBuilder.CreateAncillaryFiles(FakeBatchValue.BatchId, FakeBatchValue.ExchangeSetPath, FakeBatchValue.CorrelationId, A<List<FulfilmentDataResponse>>.Ignored, salesCatalogueProductResponse, message.ScsRequestDateTime, salesCatalogueDataResponse, false)).MustHaveHappenedOnceExactly();
+
+            _fakeLogger.VerifyLogEntry(EventIds.QueryFileShareServiceENCFilesRequestStart, "File share service search query and download request for ENC files from BusinessUnit:{businessUnit} for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", times: 0);
+            _fakeLogger.VerifyLogEntry(EventIds.QueryFileShareServiceENCFilesRequestCompleted, "File share service search query and download request for ENC files from BusinessUnit:{businessUnit} for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", true, times: 0);
         }
 
         [Test]
@@ -264,6 +280,9 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.FileBuilders
             A.CallTo(() => _fakeFulfilmentAncillaryFiles.CreateEncUpdateCsv(salesCatalogueDataResponse, FakeBatchValue.LargeExchangeSetMediaInfoPath6, FakeBatchValue.BatchId, FakeBatchValue.CorrelationId)).MustHaveHappenedOnceExactly();
             A.CallTo(() => _fakeFileBuilder.CreateLargeMediaExchangesetCatalogFile(FakeBatchValue.BatchId, FakeBatchValue.LargeExchangeSetMediaPath5, FakeBatchValue.CorrelationId, fulfilmentDataResponses, salesCatalogueDataResponse, salesCatalogueProductResponse)).MustHaveHappenedOnceExactly();
             A.CallTo(() => _fakeFileBuilder.CreateLargeMediaExchangesetCatalogFile(FakeBatchValue.BatchId, FakeBatchValue.LargeExchangeSetMediaPath6, FakeBatchValue.CorrelationId, fulfilmentDataResponses, salesCatalogueDataResponse, salesCatalogueProductResponse)).MustHaveHappenedOnceExactly();
+
+            _fakeLogger.VerifyLogEntry(EventIds.LargeExchangeSetCreatedWithError, "Large media exchange set is not created for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", logLevel: LogLevel.Error, times: 0);
+            _fakeLogger.VerifyLogEntry(EventIds.LargeExchangeSetCreatedWithError, "Operation Cancelled as product validation failed for BatchId:{BatchId}, _X-Correlation-ID:{CorrelationId} and Validation message :{Message}", logLevel: LogLevel.Error, times: 0);
         }
 
         [Test]
@@ -283,6 +302,9 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.FileBuilders
             A.CallTo(() => _fakeProductDataValidator.Validate(A<List<Products>>.Ignored)).Returns(Task.FromResult(validationResult));
 
             Assert.ThrowsAsync<FulfilmentException>(async () => await _exchangeSetBuilder.CreateStandardLargeMediaExchangeSet(message, FakeBatchValue.HomeDirectoryPath, FakeBatchValue.CurrentUtcDate, largeResponse, FakeBatchValue.LargeExchangeSetFolderNamePattern, FakeBatchValue.BatchPath));
+
+            _fakeLogger.VerifyLogEntry(EventIds.LargeExchangeSetCreatedWithError, "Large media exchange set is not created for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", logLevel: LogLevel.Error);
+            _fakeLogger.VerifyLogEntry(EventIds.LargeExchangeSetCreatedWithError, "Operation Cancelled as product validation failed for BatchId:{BatchId}, _X-Correlation-ID:{CorrelationId} and Validation message :{Message}", logLevel: LogLevel.Error);
         }
 
         [Test]

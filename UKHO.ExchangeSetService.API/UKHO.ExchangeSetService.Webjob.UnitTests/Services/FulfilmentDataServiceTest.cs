@@ -4,7 +4,6 @@ using System.IO.Abstractions;
 using System.Net;
 using System.Threading.Tasks;
 using FakeItEasy;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using NUnit.Framework;
@@ -13,6 +12,7 @@ using UKHO.ExchangeSetService.Common.Helpers;
 using UKHO.ExchangeSetService.Common.Logging;
 using UKHO.ExchangeSetService.Common.Models.Response;
 using UKHO.ExchangeSetService.Common.Models.SalesCatalogue;
+using UKHO.ExchangeSetService.Common.Models.WebJobs;
 using UKHO.ExchangeSetService.FulfilmentService.FileBuilders;
 using UKHO.ExchangeSetService.FulfilmentService.Services;
 using UKHO.ExchangeSetService.Webjob.UnitTests.TestHelper;
@@ -24,7 +24,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
     {
         private IAzureBlobStorageService _fakeAzureBlobStorageService;
         private IFulfilmentFileShareService _fakeFulfilmentFileShareService;
-        private FulfilmentDataService _fulfilmentDataService;        
+        private FulfilmentDataService _fulfilmentDataService;
         private ILogger<FulfilmentDataService> _fakeLogger;
         private IFulfilmentSalesCatalogueService _fakeFulfilmentSalesCatalogueService;
         private IOptions<AioConfiguration> _aioConfiguration;
@@ -38,15 +38,13 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             _fakeAzureBlobStorageService = A.Fake<IAzureBlobStorageService>();
             _fakeFulfilmentFileShareService = A.Fake<IFulfilmentFileShareService>();
             _fakeLogger = A.Fake<ILogger<FulfilmentDataService>>();
-            var fakeConfiguration = A.Fake<IConfiguration>();
-            fakeConfiguration["HOME"] = FakeBatchValue.HomeDirectoryPath;
             _fakeFulfilmentSalesCatalogueService = A.Fake<IFulfilmentSalesCatalogueService>();
             var fakeFulfilmentCallBackService = A.Fake<IFulfilmentCallBackService>();
             var fakeMonitorHelper = A.Fake<IMonitorHelper>();
             _aioConfiguration = FakeBatchValue.AioConfiguration;
             _fakeFileSystemHelper = A.Fake<IFileSystemHelper>();
             _fakeExchangeSetBuilder = A.Fake<IExchangeSetBuilder>();
-            _fulfilmentDataService = new FulfilmentDataService(_fakeAzureBlobStorageService, _fakeFulfilmentFileShareService, _fakeLogger, FakeBatchValue.FileShareServiceConfiguration, fakeConfiguration, _fakeFulfilmentSalesCatalogueService, fakeFulfilmentCallBackService, fakeMonitorHelper, _aioConfiguration, _fakeFileSystemHelper, _fakeExchangeSetBuilder);
+            _fulfilmentDataService = new FulfilmentDataService(_fakeAzureBlobStorageService, _fakeFulfilmentFileShareService, _fakeLogger, FakeBatchValue.FileShareServiceConfiguration, _fakeFulfilmentSalesCatalogueService, fakeFulfilmentCallBackService, fakeMonitorHelper, _aioConfiguration, _fakeFileSystemHelper, _fakeExchangeSetBuilder);
         }
 
         #region GetScsResponseQueueMessage
@@ -246,6 +244,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
         {
             var salesCatalogueDataResponse = GetSalesCatalogueDataResponse();
             var message = GetScsResponseQueueMessage(exchangeSetStandard);
+            var batch = new FulfilmentServiceBatch(FakeBatchValue.Configuration, message, FakeBatchValue.CurrentUtcDateTime);
             var salesCatalogueProductResponse = GetSalesCatalogueProductResponse();
             A.CallTo(() => _fakeFulfilmentSalesCatalogueService.GetSalesCatalogueDataResponse(FakeBatchValue.BatchId, FakeBatchValue.CorrelationId)).Returns(salesCatalogueDataResponse);
             A.CallTo(() => _fakeAzureBlobStorageService.DownloadSalesCatalogueResponse(message.ScsResponseUri, FakeBatchValue.BatchId, FakeBatchValue.CorrelationId)).Returns(salesCatalogueProductResponse);
@@ -255,7 +254,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             A.CallTo(() => _fakeFulfilmentFileShareService.UploadZipFileForExchangeSetToFileShareService(FakeBatchValue.BatchId, FakeBatchValue.BatchPath, FakeBatchValue.CorrelationId, FakeBatchValue.ExchangeSetZipFileName)).Returns(true);
             A.CallTo(() => _fakeFulfilmentFileShareService.CommitExchangeSet(FakeBatchValue.BatchId, FakeBatchValue.CorrelationId, FakeBatchValue.BatchPath)).Returns(true);
 
-            var result = await _fulfilmentDataService.CreateExchangeSet(message, FakeBatchValue.CurrentUtcDate);
+            var result = await _fulfilmentDataService.CreateExchangeSet(batch);
 
             Assert.That(result, Is.EqualTo("Exchange Set Created Successfully"));
             A.CallTo(() => _fakeExchangeSetBuilder.CreateStandardExchangeSet(message, salesCatalogueProductResponse, A<List<Products>>.Ignored, FakeBatchValue.ExchangeSetPath, salesCatalogueDataResponse, businessUnit)).MustHaveHappenedOnceExactly();
@@ -280,6 +279,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
         {
             var salesCatalogueDataResponse = GetSalesCatalogueDataResponse();
             var message = GetScsResponseQueueMessage(exchangeSetStandard);
+            var batch = new FulfilmentServiceBatch(FakeBatchValue.Configuration, message, FakeBatchValue.CurrentUtcDateTime);
             var salesCatalogueProductResponse = GetSalesCatalogueProductResponse();
             A.CallTo(() => _fakeFulfilmentSalesCatalogueService.GetSalesCatalogueDataResponse(FakeBatchValue.BatchId, FakeBatchValue.CorrelationId)).Returns(salesCatalogueDataResponse);
             A.CallTo(() => _fakeAzureBlobStorageService.DownloadSalesCatalogueResponse(message.ScsResponseUri, FakeBatchValue.BatchId, FakeBatchValue.CorrelationId)).Returns(salesCatalogueProductResponse);
@@ -287,7 +287,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             A.CallTo(() => _fakeFulfilmentFileShareService.CreateZipFileForExchangeSet(FakeBatchValue.BatchId, FakeBatchValue.ExchangeSetPath, FakeBatchValue.CorrelationId)).Returns(false);
 
             Assert.ThrowsAsync(Is.TypeOf<FulfilmentException>().And.Message.EqualTo(FulfilmentExceptionMessage),
-                async delegate { await _fulfilmentDataService.CreateExchangeSet(message, FakeBatchValue.CurrentUtcDate); });
+                async delegate { await _fulfilmentDataService.CreateExchangeSet(batch); });
 
             A.CallTo(() => _fakeExchangeSetBuilder.CreateStandardExchangeSet(message, salesCatalogueProductResponse, A<List<Products>>.Ignored, FakeBatchValue.ExchangeSetPath, salesCatalogueDataResponse, businessUnit)).MustHaveHappenedOnceExactly();
             A.CallTo(() => _fakeExchangeSetBuilder.CreateAioExchangeSet(A<SalesCatalogueServiceResponseQueueMessage>.Ignored, A<string>.Ignored, A<string>.Ignored, A<List<Products>>.Ignored, A<SalesCatalogueDataResponse>.Ignored, A<SalesCatalogueProductResponse>.Ignored)).MustNotHaveHappened();
@@ -308,12 +308,13 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
         {
             var salesCatalogueDataResponse = GetSalesCatalogueDataResponse();
             var message = GetScsResponseQueueMessage(exchangeSetStandard);
+            var batch = new FulfilmentServiceBatch(FakeBatchValue.Configuration, message, FakeBatchValue.CurrentUtcDateTime);
             var salesCatalogueProductResponse = GetSalesCatalogueProductResponse();
             A.CallTo(() => _fakeFulfilmentSalesCatalogueService.GetSalesCatalogueDataResponse(FakeBatchValue.BatchId, FakeBatchValue.CorrelationId)).Returns(salesCatalogueDataResponse);
             A.CallTo(() => _fakeAzureBlobStorageService.DownloadSalesCatalogueResponse(message.ScsResponseUri, FakeBatchValue.BatchId, FakeBatchValue.CorrelationId)).Returns(salesCatalogueProductResponse);
 
             Assert.ThrowsAsync(Is.TypeOf<FulfilmentException>().And.Message.EqualTo(FulfilmentExceptionMessage),
-                async delegate { await _fulfilmentDataService.CreateExchangeSet(message, FakeBatchValue.CurrentUtcDate); });
+                async delegate { await _fulfilmentDataService.CreateExchangeSet(batch); });
         }
 
         #region AIO
@@ -324,6 +325,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
         {
             var salesCatalogueDataResponse = GetSalesCatalogueDataResponse();
             var message = GetScsResponseQueueMessage(exchangeSetStandard);
+            var batch = new FulfilmentServiceBatch(FakeBatchValue.Configuration, message, FakeBatchValue.CurrentUtcDateTime);
             var salesCatalogueProductResponse = GetSalesCatalogueProductResponse(true);
             A.CallTo(() => _fakeFulfilmentSalesCatalogueService.GetSalesCatalogueDataResponse(FakeBatchValue.BatchId, FakeBatchValue.CorrelationId)).Returns(salesCatalogueDataResponse);
             A.CallTo(() => _fakeAzureBlobStorageService.DownloadSalesCatalogueResponse(message.ScsResponseUri, FakeBatchValue.BatchId, FakeBatchValue.CorrelationId)).Returns(salesCatalogueProductResponse);
@@ -335,7 +337,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             A.CallTo(() => _fakeFulfilmentFileShareService.UploadZipFileForExchangeSetToFileShareService(FakeBatchValue.BatchId, FakeBatchValue.BatchPath, FakeBatchValue.CorrelationId, FakeBatchValue.AioExchangeSetZipFileName)).Returns(true);
             A.CallTo(() => _fakeFulfilmentFileShareService.CommitExchangeSet(FakeBatchValue.BatchId, FakeBatchValue.CorrelationId, FakeBatchValue.BatchPath)).Returns(true);
 
-            var result = await _fulfilmentDataService.CreateExchangeSet(message, FakeBatchValue.CurrentUtcDate);
+            var result = await _fulfilmentDataService.CreateExchangeSet(batch);
 
             Assert.That(result, Is.EqualTo("Exchange Set Created Successfully"));
             A.CallTo(() => _fakeExchangeSetBuilder.CreateStandardExchangeSet(message, salesCatalogueProductResponse, A<List<Products>>.Ignored, FakeBatchValue.ExchangeSetPath, salesCatalogueDataResponse, businessUnit)).MustHaveHappenedOnceExactly();
@@ -362,6 +364,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             _aioConfiguration = Options.Create(new AioConfiguration { AioCells = string.Empty }); // no AIO cells configured
             var salesCatalogueDataResponse = GetSalesCatalogueDataResponse();
             var message = GetScsResponseQueueMessage(exchangeSetStandard);
+            var batch = new FulfilmentServiceBatch(FakeBatchValue.Configuration, message, FakeBatchValue.CurrentUtcDateTime);
             var salesCatalogueProductResponse = GetSalesCatalogueProductResponse();
             A.CallTo(() => _fakeFulfilmentSalesCatalogueService.GetSalesCatalogueDataResponse(FakeBatchValue.BatchId, FakeBatchValue.CorrelationId)).Returns(salesCatalogueDataResponse);
             A.CallTo(() => _fakeAzureBlobStorageService.DownloadSalesCatalogueResponse(message.ScsResponseUri, FakeBatchValue.BatchId, FakeBatchValue.CorrelationId)).Returns(salesCatalogueProductResponse);
@@ -371,7 +374,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             A.CallTo(() => _fakeFulfilmentFileShareService.UploadZipFileForExchangeSetToFileShareService(FakeBatchValue.BatchId, FakeBatchValue.BatchPath, FakeBatchValue.CorrelationId, FakeBatchValue.ExchangeSetZipFileName)).Returns(true);
             A.CallTo(() => _fakeFulfilmentFileShareService.CommitExchangeSet(FakeBatchValue.BatchId, FakeBatchValue.CorrelationId, FakeBatchValue.BatchPath)).Returns(true);
 
-            var result = await _fulfilmentDataService.CreateExchangeSet(message, FakeBatchValue.CurrentUtcDate);
+            var result = await _fulfilmentDataService.CreateExchangeSet(batch);
 
             Assert.That(result, Is.EqualTo("Exchange Set Created Successfully"));
             A.CallTo(() => _fakeExchangeSetBuilder.CreateStandardExchangeSet(message, salesCatalogueProductResponse, A<List<Products>>.Ignored, FakeBatchValue.ExchangeSetPath, salesCatalogueDataResponse, businessUnit)).MustHaveHappenedOnceExactly();
@@ -397,6 +400,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
         {
             var salesCatalogueDataResponse = GetSalesCatalogueDataResponseForAio();
             var message = GetScsResponseQueueMessage(exchangeSetStandard);
+            var batch = new FulfilmentServiceBatch(FakeBatchValue.Configuration, message, FakeBatchValue.CurrentUtcDateTime);
             message.IsEmptyAioExchangeSet = true;
             var salesCatalogueProductResponse = new SalesCatalogueProductResponse { Products = [] };
             A.CallTo(() => _fakeFulfilmentSalesCatalogueService.GetSalesCatalogueDataResponse(FakeBatchValue.BatchId, FakeBatchValue.CorrelationId)).Returns(salesCatalogueDataResponse);
@@ -407,7 +411,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             A.CallTo(() => _fakeFulfilmentFileShareService.UploadZipFileForExchangeSetToFileShareService(FakeBatchValue.BatchId, FakeBatchValue.BatchPath, FakeBatchValue.CorrelationId, FakeBatchValue.AioExchangeSetZipFileName)).Returns(true);
             A.CallTo(() => _fakeFulfilmentFileShareService.CommitExchangeSet(FakeBatchValue.BatchId, FakeBatchValue.CorrelationId, FakeBatchValue.BatchPath)).Returns(true);
 
-            var result = await _fulfilmentDataService.CreateExchangeSet(message, FakeBatchValue.CurrentUtcDate);
+            var result = await _fulfilmentDataService.CreateExchangeSet(batch);
 
             Assert.That(result, Is.EqualTo("Exchange Set Created Successfully"));
             A.CallTo(() => _fakeExchangeSetBuilder.CreateStandardExchangeSet(A<SalesCatalogueServiceResponseQueueMessage>.Ignored, A<SalesCatalogueProductResponse>.Ignored, A<List<Products>>.Ignored, A<string>.Ignored, A<SalesCatalogueDataResponse>.Ignored, A<string>.Ignored)).MustNotHaveHappened();
@@ -434,6 +438,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             _aioConfiguration = Options.Create(new AioConfiguration { AioCells = null }); // no AIO cells configured
             var salesCatalogueDataResponse = GetSalesCatalogueDataResponse();
             var message = GetScsResponseQueueMessage(exchangeSetStandard);
+            var batch = new FulfilmentServiceBatch(FakeBatchValue.Configuration, message, FakeBatchValue.CurrentUtcDateTime);
             message.IsEmptyEncExchangeSet = true;
             var salesCatalogueProductResponse = new SalesCatalogueProductResponse { Products = [] };
             A.CallTo(() => _fakeFulfilmentSalesCatalogueService.GetSalesCatalogueDataResponse(FakeBatchValue.BatchId, FakeBatchValue.CorrelationId)).Returns(salesCatalogueDataResponse);
@@ -444,7 +449,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             A.CallTo(() => _fakeFulfilmentFileShareService.UploadZipFileForExchangeSetToFileShareService(FakeBatchValue.BatchId, FakeBatchValue.BatchPath, FakeBatchValue.CorrelationId, FakeBatchValue.ExchangeSetZipFileName)).Returns(true);
             A.CallTo(() => _fakeFulfilmentFileShareService.CommitExchangeSet(FakeBatchValue.BatchId, FakeBatchValue.CorrelationId, FakeBatchValue.BatchPath)).Returns(true);
 
-            var result = await _fulfilmentDataService.CreateExchangeSet(message, FakeBatchValue.CurrentUtcDate);
+            var result = await _fulfilmentDataService.CreateExchangeSet(batch);
 
             Assert.That(result, Is.EqualTo("Exchange Set Created Successfully"));
             A.CallTo(() => _fakeExchangeSetBuilder.CreateStandardExchangeSet(message, salesCatalogueProductResponse, A<List<Products>>.Ignored, FakeBatchValue.ExchangeSetPath, salesCatalogueDataResponse, businessUnit)).MustHaveHappenedOnceExactly();
@@ -470,6 +475,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
         {
             var salesCatalogueDataResponse = GetSalesCatalogueDataResponse();
             var message = GetScsResponseQueueMessage(exchangeSetStandard);
+            var batch = new FulfilmentServiceBatch(FakeBatchValue.Configuration, message, FakeBatchValue.CurrentUtcDateTime);
             var salesCatalogueProductResponse = GetSalesCatalogueProductResponse(true);
             A.CallTo(() => _fakeFulfilmentSalesCatalogueService.GetSalesCatalogueDataResponse(FakeBatchValue.BatchId, FakeBatchValue.CorrelationId)).Returns(salesCatalogueDataResponse);
             A.CallTo(() => _fakeAzureBlobStorageService.DownloadSalesCatalogueResponse(message.ScsResponseUri, FakeBatchValue.BatchId, FakeBatchValue.CorrelationId)).Returns(salesCatalogueProductResponse);
@@ -481,7 +487,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             A.CallTo(() => _fakeFulfilmentFileShareService.UploadZipFileForExchangeSetToFileShareService(FakeBatchValue.BatchId, FakeBatchValue.BatchPath, FakeBatchValue.CorrelationId, FakeBatchValue.AioExchangeSetZipFileName)).Returns(false);
             A.CallTo(() => _fakeFulfilmentFileShareService.CommitExchangeSet(FakeBatchValue.BatchId, FakeBatchValue.CorrelationId, FakeBatchValue.BatchPath)).Returns(true);
 
-            var result = await _fulfilmentDataService.CreateExchangeSet(message, FakeBatchValue.CurrentUtcDate);
+            var result = await _fulfilmentDataService.CreateExchangeSet(batch);
 
             Assert.That(result, Is.EqualTo("Exchange Set Is Not Created"));
             A.CallTo(() => _fakeExchangeSetBuilder.CreateStandardExchangeSet(message, salesCatalogueProductResponse, A<List<Products>>.Ignored, FakeBatchValue.ExchangeSetPath, salesCatalogueDataResponse, businessUnit)).MustHaveHappenedOnceExactly();
@@ -507,6 +513,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
         {
             var salesCatalogueDataResponse = GetSalesCatalogueDataResponse();
             var message = GetScsResponseQueueMessage(exchangeSetStandard);
+            var batch = new FulfilmentServiceBatch(FakeBatchValue.Configuration, message, FakeBatchValue.CurrentUtcDateTime);
             var salesCatalogueProductResponse = GetSalesCatalogueProductResponse(true);
             A.CallTo(() => _fakeFulfilmentSalesCatalogueService.GetSalesCatalogueDataResponse(FakeBatchValue.BatchId, FakeBatchValue.CorrelationId)).Returns(salesCatalogueDataResponse);
             A.CallTo(() => _fakeAzureBlobStorageService.DownloadSalesCatalogueResponse(message.ScsResponseUri, FakeBatchValue.BatchId, FakeBatchValue.CorrelationId)).Returns(salesCatalogueProductResponse);
@@ -519,7 +526,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             A.CallTo(() => _fakeFulfilmentFileShareService.UploadZipFileForLargeMediaExchangeSetToFileShareService(FakeBatchValue.BatchId, FakeBatchValue.BatchPath, FakeBatchValue.CorrelationId, FakeBatchValue.AioExchangeSetZipFileName)).Returns(true);
             A.CallTo(() => _fakeFulfilmentFileShareService.CommitLargeMediaExchangeSet(FakeBatchValue.BatchId, FakeBatchValue.BatchPath, FakeBatchValue.CorrelationId)).Returns(true);
 
-            var result = await _fulfilmentDataService.CreateLargeExchangeSet(message, FakeBatchValue.CurrentUtcDate, FakeBatchValue.LargeExchangeSetFolderNamePattern);
+            var result = await _fulfilmentDataService.CreateLargeExchangeSet(batch, FakeBatchValue.LargeExchangeSetFolderNamePattern);
 
             Assert.That(result, Is.EqualTo("Large Media Exchange Set Created Successfully"));
             A.CallTo(() => _fakeFulfilmentSalesCatalogueService.GetSalesCatalogueDataResponse(FakeBatchValue.BatchId, FakeBatchValue.CorrelationId)).MustHaveHappenedOnceExactly();
@@ -546,6 +553,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
         {
             var salesCatalogueDataResponse = GetSalesCatalogueDataResponse();
             var message = GetScsResponseQueueMessage(exchangeSetStandard);
+            var batch = new FulfilmentServiceBatch(FakeBatchValue.Configuration, message, FakeBatchValue.CurrentUtcDateTime);
             var salesCatalogueProductResponse = GetSalesCatalogueProductResponse(true);
             A.CallTo(() => _fakeFulfilmentSalesCatalogueService.GetSalesCatalogueDataResponse(FakeBatchValue.BatchId, FakeBatchValue.CorrelationId)).Returns(salesCatalogueDataResponse);
             A.CallTo(() => _fakeAzureBlobStorageService.DownloadSalesCatalogueResponse(message.ScsResponseUri, FakeBatchValue.BatchId, FakeBatchValue.CorrelationId)).Returns(salesCatalogueProductResponse);
@@ -553,7 +561,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             A.CallTo(() => _fakeExchangeSetBuilder.CreateAioExchangeSet(message, FakeBatchValue.CurrentUtcDate, FakeBatchValue.HomeDirectoryPath, A<List<Products>>.Ignored, A<SalesCatalogueDataResponse>.Ignored, salesCatalogueProductResponse)).Returns(false);
 
             Assert.ThrowsAsync(Is.TypeOf<FulfilmentException>().And.Message.EqualTo(FulfilmentExceptionMessage),
-                async delegate { await _fulfilmentDataService.CreateLargeExchangeSet(message, FakeBatchValue.CurrentUtcDate, FakeBatchValue.LargeExchangeSetFolderNamePattern); });
+                async delegate { await _fulfilmentDataService.CreateLargeExchangeSet(batch, FakeBatchValue.LargeExchangeSetFolderNamePattern); });
 
             A.CallTo(() => _fakeFulfilmentSalesCatalogueService.GetSalesCatalogueDataResponse(FakeBatchValue.BatchId, FakeBatchValue.CorrelationId)).MustHaveHappenedOnceExactly();
             A.CallTo(() => _fakeAzureBlobStorageService.DownloadSalesCatalogueResponse(message.ScsResponseUri, FakeBatchValue.BatchId, FakeBatchValue.CorrelationId)).MustHaveHappenedOnceExactly();
@@ -580,6 +588,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
         {
             var salesCatalogueDataResponse = GetSalesCatalogueDataResponse();
             var message = GetScsResponseQueueMessage(exchangeSetStandard);
+            var batch = new FulfilmentServiceBatch(FakeBatchValue.Configuration, message, FakeBatchValue.CurrentUtcDateTime);
             var salesCatalogueProductResponse = GetSalesCatalogueProductResponse(false);
             A.CallTo(() => _fakeFulfilmentSalesCatalogueService.GetSalesCatalogueDataResponse(FakeBatchValue.BatchId, FakeBatchValue.CorrelationId)).Returns(salesCatalogueDataResponse);
             A.CallTo(() => _fakeAzureBlobStorageService.DownloadSalesCatalogueResponse(message.ScsResponseUri, FakeBatchValue.BatchId, FakeBatchValue.CorrelationId)).Returns(salesCatalogueProductResponse);
@@ -589,7 +598,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             A.CallTo(() => _fakeFulfilmentFileShareService.UploadZipFileForLargeMediaExchangeSetToFileShareService(FakeBatchValue.BatchId, FakeBatchValue.BatchPath, FakeBatchValue.CorrelationId, FakeBatchValue.LargeExchangeSetZipFileName5)).Returns(true);
             A.CallTo(() => _fakeFulfilmentFileShareService.CommitLargeMediaExchangeSet(FakeBatchValue.BatchId, FakeBatchValue.BatchPath, FakeBatchValue.CorrelationId)).Returns(true);
 
-            var result = await _fulfilmentDataService.CreateLargeExchangeSet(message, FakeBatchValue.CurrentUtcDate, FakeBatchValue.LargeExchangeSetFolderNamePattern);
+            var result = await _fulfilmentDataService.CreateLargeExchangeSet(batch, FakeBatchValue.LargeExchangeSetFolderNamePattern);
 
             Assert.That(result, Is.EqualTo("Large Media Exchange Set Created Successfully"));
             A.CallTo(() => _fakeFulfilmentSalesCatalogueService.GetSalesCatalogueDataResponse(FakeBatchValue.BatchId, FakeBatchValue.CorrelationId)).MustHaveHappenedOnceExactly();
@@ -616,6 +625,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
         {
             var salesCatalogueDataResponse = GetSalesCatalogueDataResponse();
             var message = GetScsResponseQueueMessage(exchangeSetStandard);
+            var batch = new FulfilmentServiceBatch(FakeBatchValue.Configuration, message, FakeBatchValue.CurrentUtcDateTime);
             var salesCatalogueProductResponse = GetSalesCatalogueProductResponseAioOnly();
             A.CallTo(() => _fakeFulfilmentSalesCatalogueService.GetSalesCatalogueDataResponse(FakeBatchValue.BatchId, FakeBatchValue.CorrelationId)).Returns(salesCatalogueDataResponse);
             A.CallTo(() => _fakeAzureBlobStorageService.DownloadSalesCatalogueResponse(message.ScsResponseUri, FakeBatchValue.BatchId, FakeBatchValue.CorrelationId)).Returns(salesCatalogueProductResponse);
@@ -626,7 +636,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             A.CallTo(() => _fakeFulfilmentFileShareService.UploadZipFileForLargeMediaExchangeSetToFileShareService(FakeBatchValue.BatchId, FakeBatchValue.BatchPath, FakeBatchValue.CorrelationId, FakeBatchValue.AioExchangeSetZipFileName)).Returns(true);
             A.CallTo(() => _fakeFulfilmentFileShareService.CommitLargeMediaExchangeSet(FakeBatchValue.BatchId, FakeBatchValue.BatchPath, FakeBatchValue.CorrelationId)).Returns(true);
 
-            var result = await _fulfilmentDataService.CreateLargeExchangeSet(message, FakeBatchValue.CurrentUtcDate, FakeBatchValue.LargeExchangeSetFolderNamePattern);
+            var result = await _fulfilmentDataService.CreateLargeExchangeSet(batch, FakeBatchValue.LargeExchangeSetFolderNamePattern);
 
             Assert.That(result, Is.EqualTo("Large Media Exchange Set Created Successfully"));
             A.CallTo(() => _fakeFulfilmentSalesCatalogueService.GetSalesCatalogueDataResponse(FakeBatchValue.BatchId, FakeBatchValue.CorrelationId)).MustHaveHappenedOnceExactly();

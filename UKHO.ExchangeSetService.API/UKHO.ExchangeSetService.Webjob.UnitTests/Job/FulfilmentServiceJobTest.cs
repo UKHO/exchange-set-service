@@ -12,6 +12,7 @@ using UKHO.ExchangeSetService.Common.Configuration;
 using UKHO.ExchangeSetService.Common.Helpers;
 using UKHO.ExchangeSetService.Common.Logging;
 using UKHO.ExchangeSetService.Common.Models.SalesCatalogue;
+using UKHO.ExchangeSetService.Common.Models.WebJobs;
 using UKHO.ExchangeSetService.FulfilmentService;
 using UKHO.ExchangeSetService.FulfilmentService.Services;
 using UKHO.ExchangeSetService.Webjob.UnitTests.TestHelper;
@@ -102,13 +103,13 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Job
         {
             var qm = BuildQueueMessage(fileSizeBytes: LargeMediaExchangeSetSizeInMB * 1024 * 1024); // <= LargeMediaExchangeSetSizeInMB
 
-            A.CallTo(() => _fakeFulfilmentDataService.CreateExchangeSet(A<SalesCatalogueServiceResponseQueueMessage>.That.Matches(m => m.BatchId == FakeBatchValue.BatchId), A<string>.Ignored)).Returns("ok");
+            A.CallTo(() => _fakeFulfilmentDataService.CreateExchangeSet(A<FulfilmentServiceBatch>.That.Matches(m => m.BatchId == FakeBatchValue.BatchId))).Returns("ok");
 
             await _fulfilmentServiceJob.ProcessQueueMessage(qm);
 
             Assert.That(CommonHelper.IsPeriodicOutputService, Is.False);
-            A.CallTo(() => _fakeFulfilmentDataService.CreateExchangeSet(A<SalesCatalogueServiceResponseQueueMessage>.Ignored, A<string>.Ignored)).MustHaveHappenedOnceExactly();
-            A.CallTo(() => _fakeFulfilmentDataService.CreateLargeExchangeSet(A<SalesCatalogueServiceResponseQueueMessage>.Ignored, A<string>.Ignored, A<string>.Ignored)).MustNotHaveHappened();
+            A.CallTo(() => _fakeFulfilmentDataService.CreateExchangeSet(A<FulfilmentServiceBatch>.Ignored)).MustHaveHappenedOnceExactly();
+            A.CallTo(() => _fakeFulfilmentDataService.CreateLargeExchangeSet(A<FulfilmentServiceBatch>.Ignored, A<string>.Ignored)).MustNotHaveHappened();
 
             _fakeLogger.VerifyLogEntry(EventIds.AIOToggleIsOn, "ESS Webjob : AIO toggle is ON for BatchId:{BatchId} | _X-Correlation-ID : {CorrelationId}");
             _fakeLogger.VerifyLogEntry(EventIds.CreateExchangeSetRequestStart, "Create Exchange Set web job request for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}");
@@ -120,13 +121,13 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Job
         {
             var qm = BuildQueueMessage(fileSizeBytes: (LargeMediaExchangeSetSizeInMB * 1024 * 1024) + 1); // > LargeMediaExchangeSetSizeInMB
 
-            A.CallTo(() => _fakeFulfilmentDataService.CreateLargeExchangeSet(A<SalesCatalogueServiceResponseQueueMessage>.That.Matches(m => m.BatchId == FakeBatchValue.BatchId), A<string>.Ignored, FakeBatchValue.LargeExchangeSetFolderNamePattern)).Returns("large");
+            A.CallTo(() => _fakeFulfilmentDataService.CreateLargeExchangeSet(A<FulfilmentServiceBatch>.That.Matches(m => m.BatchId == FakeBatchValue.BatchId), FakeBatchValue.LargeExchangeSetFolderNamePattern)).Returns("large");
 
             await _fulfilmentServiceJob.ProcessQueueMessage(qm);
 
             Assert.That(CommonHelper.IsPeriodicOutputService, Is.True);
-            A.CallTo(() => _fakeFulfilmentDataService.CreateLargeExchangeSet(A<SalesCatalogueServiceResponseQueueMessage>.Ignored, A<string>.Ignored, FakeBatchValue.LargeExchangeSetFolderNamePattern)).MustHaveHappenedOnceExactly();
-            A.CallTo(() => _fakeFulfilmentDataService.CreateExchangeSet(A<SalesCatalogueServiceResponseQueueMessage>.Ignored, A<string>.Ignored)).MustNotHaveHappened();
+            A.CallTo(() => _fakeFulfilmentDataService.CreateLargeExchangeSet(A<FulfilmentServiceBatch>.Ignored, FakeBatchValue.LargeExchangeSetFolderNamePattern)).MustHaveHappenedOnceExactly();
+            A.CallTo(() => _fakeFulfilmentDataService.CreateExchangeSet(A<FulfilmentServiceBatch>.Ignored)).MustNotHaveHappened();
 
             _fakeLogger.VerifyLogEntry(EventIds.AIOToggleIsOn, "ESS Webjob : AIO toggle is ON for BatchId:{BatchId} | _X-Correlation-ID : {CorrelationId}");
             _fakeLogger.VerifyLogEntry(EventIds.CreateLargeExchangeSetRequestStart, "Create Large Exchange Set web job request for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}");
@@ -139,7 +140,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Job
             var qm = BuildQueueMessage(10 * 1024 * 1024, includeScsUri: true);
             var salesCatalogueProductResponse = new SalesCatalogueProductResponse();
 
-            A.CallTo(() => _fakeFulfilmentDataService.CreateExchangeSet(A<SalesCatalogueServiceResponseQueueMessage>.Ignored, A<string>.Ignored)).Throws(new FulfilmentException(EventIds.SystemException.ToEventId()));
+            A.CallTo(() => _fakeFulfilmentDataService.CreateExchangeSet(A<FulfilmentServiceBatch>.Ignored)).Throws(new FulfilmentException(EventIds.SystemException.ToEventId()));
             A.CallTo(() => _fakeFileSystemHelper.CheckFileExists(A<string>.That.EndsWith(FakeBatchValue.ErrorFileName))).Returns(true);
             A.CallTo(() => _fakeFileShareUploadService.UploadFileToFileShareService(FakeBatchValue.BatchId, A<string>.That.EndsWith(FakeBatchValue.BatchId), FakeBatchValue.CorrelationId, FakeBatchValue.ErrorFileName)).Returns(true);
             A.CallTo(() => _fakeFileShareBatchService.CommitBatchToFss(FakeBatchValue.BatchId, FakeBatchValue.CorrelationId, A<string>.That.EndsWith(FakeBatchValue.BatchId), FakeBatchValue.ErrorFileName)).Returns(true);
@@ -147,7 +148,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Job
 
             await _fulfilmentServiceJob.ProcessQueueMessage(qm);
 
-            A.CallTo(() => _fakeFulfilmentDataService.CreateExchangeSet(A<SalesCatalogueServiceResponseQueueMessage>.Ignored, A<string>.Ignored)).MustHaveHappenedOnceExactly();
+            A.CallTo(() => _fakeFulfilmentDataService.CreateExchangeSet(A<FulfilmentServiceBatch>.Ignored)).MustHaveHappenedOnceExactly();
             A.CallTo(() => _fakeFileSystemHelper.CheckAndCreateFolder(A<string>.That.EndsWith(FakeBatchValue.BatchId))).MustHaveHappenedOnceExactly();
             A.CallTo(() => _fakeFileSystemHelper.CreateFileContent(A<string>.That.EndsWith(FakeBatchValue.ErrorFileName), A<string>.Ignored)).MustHaveHappenedOnceExactly();
             A.CallTo(() => _fakeFileSystemHelper.CheckFileExists(A<string>.That.EndsWith(FakeBatchValue.ErrorFileName))).MustHaveHappenedOnceExactly();
