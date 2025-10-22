@@ -66,7 +66,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.FileBuilders
                     if (cancellationToken.IsCancellationRequested)
                     {
                         cancellationTokenSource.Cancel();
-                        logger.LogError(EventIds.CancellationTokenEvent.ToEventId(), "Operation is cancelled as IsCancellationRequested flag is true in QueryFileShareServiceFiles with {cancellationTokenSource.Token} and batchId:{message.BatchId} and CorrelationId:{message.CorrelationId}", JsonConvert.SerializeObject(cancellationTokenSource.Token), batch.BatchId, batch.CorrelationId);
+                        logger.LogError(EventIds.CancellationTokenEvent.ToEventId(), "Operation is cancelled as IsCancellationRequested flag is true in QueryFileShareServiceFiles with {Token} and batchId:{BatchId} and CorrelationId:{CorrelationId}", JsonConvert.SerializeObject(cancellationTokenSource.Token), batch.BatchId, batch.CorrelationId);
                         throw new OperationCanceledException();
                     }
                     listFulfilmentAioData.AddRange(fulfilmentDataResponse);
@@ -117,7 +117,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.FileBuilders
                     if (cancellationToken.IsCancellationRequested)
                     {
                         cancellationTokenSource.Cancel();
-                        logger.LogError(EventIds.CancellationTokenEvent.ToEventId(), "Operation is cancelled as IsCancellationRequested flag is true in QueryFileShareServiceFiles with {cancellationTokenSource.Token} and batchId:{message.BatchId} and CorrelationId:{message.CorrelationId}", JsonConvert.SerializeObject(cancellationTokenSource.Token), message.BatchId, message.CorrelationId);
+                        logger.LogError(EventIds.CancellationTokenEvent.ToEventId(), "Operation is cancelled as IsCancellationRequested flag is true in QueryFileShareServiceFiles with {Token} and batchId:{BatchId} and CorrelationId:{CorrelationId}", JsonConvert.SerializeObject(cancellationTokenSource.Token), message.BatchId, message.CorrelationId);
                         throw new OperationCanceledException();
                     }
                     listFulfilmentData.AddRange(fulfilmentDataResponse);
@@ -237,7 +237,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.FileBuilders
                     if (cancellationToken.IsCancellationRequested)
                     {
                         cancellationTokenSource.Cancel();
-                        logger.LogError(EventIds.CancellationTokenEvent.ToEventId(), "Operation is cancelled as IsCancellationRequested flag is true in QueryFileShareServiceFiles with {cancellationTokenSource.Token} and batchId:{message.BatchId} and CorrelationId:{message.CorrelationId}", JsonConvert.SerializeObject(cancellationTokenSource.Token), batch.BatchId, batch.CorrelationId);
+                        logger.LogError(EventIds.CancellationTokenEvent.ToEventId(), "Operation is cancelled as IsCancellationRequested flag is true in QueryFileShareServiceFiles with {Token} and batchId:{BatchId} and CorrelationId:{CorrelationId}", JsonConvert.SerializeObject(cancellationTokenSource.Token), batch.BatchId, batch.CorrelationId);
                         throw new OperationCanceledException();
                     }
                     listFulfilmentData.AddRange(fulfilmentDataResponse);
