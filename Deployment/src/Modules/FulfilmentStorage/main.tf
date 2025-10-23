@@ -32,7 +32,7 @@ resource "azurerm_storage_management_policy" "small_exchange_set_storage_policy"
   storage_account_id = azurerm_storage_account.small_exchange_set_storage.id
 
   rule {
-    name    = azurerm_storage_container.small_exchange_set_storage_container.name + "-rule"
+    name    = "${azurerm_storage_container.small_exchange_set_storage_container.name}-retention"
     enabled = true
 
     filters {
@@ -84,7 +84,7 @@ resource "azurerm_storage_management_policy" "medium_exchange_set_storage_policy
   storage_account_id = azurerm_storage_account.medium_exchange_set_storage.id
 
   rule {
-    name    = azurerm_storage_container.medium_exchange_set_storage_container.name + "-rule"
+    name    = "${azurerm_storage_container.medium_exchange_set_storage_container.name}-retention"
     enabled = true
 
     filters {
@@ -136,7 +136,7 @@ resource "azurerm_storage_management_policy" "large_exchange_set_storage_policy"
   storage_account_id = azurerm_storage_account.large_exchange_set_storage.id
 
   rule {
-    name    = azurerm_storage_container.large_exchange_set_storage_container.name + "-rule"
+    name    = "${azurerm_storage_container.large_exchange_set_storage_container.name}-retention"
     enabled = true
 
     filters {
