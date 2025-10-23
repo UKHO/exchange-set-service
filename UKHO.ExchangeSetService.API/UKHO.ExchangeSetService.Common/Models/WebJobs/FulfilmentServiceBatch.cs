@@ -23,7 +23,7 @@ namespace UKHO.ExchangeSetService.Common.Models.WebJobs
         public string CorrelationId { get; }
 
         /// <summary>
-        /// eg. 14OCT2025
+        /// eg. 14Oct2025
         /// </summary>
         public string CurrentUtcDate { get; }
 
@@ -33,7 +33,7 @@ namespace UKHO.ExchangeSetService.Common.Models.WebJobs
         public string BaseDirectory { get; }
 
         /// <summary>
-        /// eg. C:\Home\14OCT2025\635219b9-43b6-4e96-9b33-72759ac6d5c2
+        /// eg. C:\Home\14Oct2025\635219b9-43b6-4e96-9b33-72759ac6d5c2
         /// </summary>
         public string BatchDirectory { get; }
 

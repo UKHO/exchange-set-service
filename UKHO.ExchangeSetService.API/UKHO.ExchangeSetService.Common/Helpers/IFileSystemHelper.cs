@@ -29,9 +29,9 @@ namespace UKHO.ExchangeSetService.Common.Helpers
         List<FileDetail> UploadLargeMediaCommitBatch(List<BatchCommitMetaData> batchCommitMetaDataList);
         string GetFileName(string fileFullPath);
         TextWriter WriteStream(string filePath);
-        void CreateFile(string filePath);
         IDirectoryInfo[] GetSubDirectories(string folderPath);
         IFileInfo[] GetZipFiles(string folderPath);
         bool DownloadFile(string filePath, Stream stream);
+        bool DeleteFolderIfExists(string folderPath);
     }
 }

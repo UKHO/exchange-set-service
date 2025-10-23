@@ -24,7 +24,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService
                                 IFulfilmentDataService fulFilmentDataService, ILogger<FulfilmentServiceJob> logger, IFileSystemHelper fileSystemHelper,
                                 IFileShareBatchService fileBatchShareService, IFileShareUploadService fileShareUploadService, IOptions<FileShareServiceConfiguration> fileShareServiceConfig,
                                 IAzureBlobStorageService azureBlobStorageService, IFulfilmentCallBackService fulfilmentCallBackService,
-                                IOptions<PeriodicOutputServiceConfiguration> periodicOutputServiceConfiguration)
+                                IOptions<PeriodicOutputServiceConfiguration> periodicOutputServiceConfiguration, IFulfilmentCleanUpService fulfilmentCleanUpService)
     {
         protected IConfiguration configuration = configuration;
 
@@ -87,7 +87,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService
             }
             finally
             {
-                Agent.Tracer.CurrentTransaction?.End();
+                await CleanUpTemporaryBatchData(batch);
             }
         }
 
@@ -129,6 +129,32 @@ namespace UKHO.ExchangeSetService.FulfilmentService
             var salesCatalogueProductResponse = await azureBlobStorageService.DownloadSalesCatalogueResponse(fulfilmentServiceQueueMessage.ScsResponseUri, fulfilmentServiceQueueMessage.BatchId, fulfilmentServiceQueueMessage.CorrelationId);
 
             await fulfilmentCallBackService.SendCallBackErrorResponse(salesCatalogueProductResponse, fulfilmentServiceQueueMessage);
+        }
+
+        private async Task CleanUpTemporaryBatchData(FulfilmentServiceBatch batch)
+        {
+            try
+            {
+                await logger.LogStartEndAndElapsedTimeAsync(EventIds.FulfilmentBatchCleanUpStarted,
+                    EventIds.FulfilmentBatchCleanUpCompleted,
+                    "Deletion of temporary data for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}.",
+                    async () =>
+                    {
+                        await fulfilmentCleanUpService.DeleteScsResponseAsync(batch);
+                        fulfilmentCleanUpService.DeleteBatchFolder(batch);
+                        return string.Empty;
+                    },
+                    batch.BatchId, batch.CorrelationId);
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(EventIds.FulfilmentBatchCleanUpFailed.ToEventId(), ex, "Exception occurred while cleaning up temporary data for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}. Exception:{Message}", batch.BatchId, batch.CorrelationId, ex.Message);
+                Agent.Tracer.CurrentTransaction?.CaptureException(ex);
+            }
+            finally
+            {
+                Agent.Tracer.CurrentTransaction?.End();
+            }
         }
     }
 }

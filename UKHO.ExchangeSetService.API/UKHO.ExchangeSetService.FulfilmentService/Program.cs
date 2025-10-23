@@ -149,6 +149,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService
                  services.AddScoped<IEssFulfilmentStorageConfiguration, EssFulfilmentStorageConfiguration>();
                  services.AddScoped<ISalesCatalogueStorageService, SalesCatalogueStorageService>();
                  services.AddScoped<IFulfilmentDataService, FulfilmentDataService>();
+                 services.AddScoped<IFulfilmentCleanUpService, FulfilmentCleanUpService>();
                  services.AddScoped<IMonitorHelper, MonitorHelper>();
                  services.AddScoped<IAzureBlobStorageService, AzureBlobStorageService>();
                  services.AddScoped<IAzureBlobStorageClient, AzureBlobStorageClient>();
@@ -156,7 +157,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService
                  services.AddScoped<IAzureTableStorageClient, AzureTableStorageClient>();
                  services.AddScoped<IFileShareServiceCache, FileShareServiceCache>();
                  services.AddScoped<IProductDataValidator, ProductDataValidator>();
-                 services.AddScoped<IFileBuilder,  FileBuilder>();
+                 services.AddScoped<IFileBuilder, FileBuilder>();
                  services.AddScoped<IDownloader, Downloader>();
                  services.AddScoped<IExchangeSetBuilder, ExchangeSetBuilder>();
 
