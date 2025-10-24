@@ -20,5 +20,10 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
                 logger.LogError(EventIds.FulfilmentBatchTemporaryFolderNotFound.ToEventId(), "Temporary data folder not found for deletion for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}.", batch.BatchId, batch.CorrelationId);
             }
         }
+
+        public void DeleteHistoricBatchFolders(FulfilmentServiceBatch batch)
+        {
+            // Implementation for deleting historic batch folders can be added here
+        }
     }
 }
