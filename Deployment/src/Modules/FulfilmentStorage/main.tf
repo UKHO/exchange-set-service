@@ -42,7 +42,7 @@ resource "azurerm_storage_management_policy" "small_exchange_set_storage_policy"
 
     actions {
       base_blob {
-        delete_after_days_since_creation_greater_than = scs_response_retention
+        delete_after_days_since_creation_greater_than = var.scs_response_retention
       }
     }
   }
@@ -94,7 +94,7 @@ resource "azurerm_storage_management_policy" "medium_exchange_set_storage_policy
 
     actions {
       base_blob {
-        delete_after_days_since_creation_greater_than = scs_response_retention
+        delete_after_days_since_creation_greater_than = var.scs_response_retention
       }
     }
   }
@@ -146,7 +146,7 @@ resource "azurerm_storage_management_policy" "large_exchange_set_storage_policy"
 
     actions {
       base_blob {
-        delete_after_days_since_creation_greater_than = scs_response_retention
+        delete_after_days_since_creation_greater_than = var.scs_response_retention
       }
     }
   }
