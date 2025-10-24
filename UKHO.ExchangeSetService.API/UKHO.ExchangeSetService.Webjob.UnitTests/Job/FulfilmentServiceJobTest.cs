@@ -103,7 +103,6 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Job
             Assert.That(CommonHelper.IsPeriodicOutputService, Is.False);
             A.CallTo(() => _fakeFulfilmentDataService.CreateExchangeSet(A<FulfilmentServiceBatch>.Ignored)).MustHaveHappenedOnceExactly();
             A.CallTo(() => _fakeFulfilmentDataService.CreateLargeExchangeSet(A<FulfilmentServiceBatch>.Ignored, A<string>.Ignored)).MustNotHaveHappened();
-            A.CallTo(() => _fakeFulfilmentCleanUpService.DeleteScsResponseAsync(A<FulfilmentServiceBatch>.That.Matches(m => m.BatchId == FakeBatchValue.BatchId))).MustHaveHappenedOnceExactly();
             A.CallTo(() => _fakeFulfilmentCleanUpService.DeleteBatchFolder(A<FulfilmentServiceBatch>.That.Matches(m => m.BatchId == FakeBatchValue.BatchId))).MustHaveHappenedOnceExactly();
 
             _fakeLogger.VerifyLogEntry(EventIds.AIOToggleIsOn, "ESS Webjob : AIO toggle is ON for BatchId:{BatchId} | _X-Correlation-ID : {CorrelationId}");
@@ -119,21 +118,20 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Job
             var qm = BuildQueueMessage(fileSizeBytes: LargeMediaExchangeSetSizeInMB * 1024 * 1024); // <= LargeMediaExchangeSetSizeInMB
 
             A.CallTo(() => _fakeFulfilmentDataService.CreateExchangeSet(A<FulfilmentServiceBatch>.That.Matches(m => m.BatchId == FakeBatchValue.BatchId))).Returns("ok");
-            A.CallTo(() => _fakeFulfilmentCleanUpService.DeleteScsResponseAsync(A<FulfilmentServiceBatch>.That.Matches(m => m.BatchId == FakeBatchValue.BatchId))).Throws(new Exception("Clean up failed"));
+            A.CallTo(() => _fakeFulfilmentCleanUpService.DeleteBatchFolder(A<FulfilmentServiceBatch>.That.Matches(m => m.BatchId == FakeBatchValue.BatchId))).Throws(new Exception("Clean up failed"));
 
             await _fulfilmentServiceJob.ProcessQueueMessage(qm);
 
             Assert.That(CommonHelper.IsPeriodicOutputService, Is.False);
             A.CallTo(() => _fakeFulfilmentDataService.CreateExchangeSet(A<FulfilmentServiceBatch>.Ignored)).MustHaveHappenedOnceExactly();
             A.CallTo(() => _fakeFulfilmentDataService.CreateLargeExchangeSet(A<FulfilmentServiceBatch>.Ignored, A<string>.Ignored)).MustNotHaveHappened();
-            A.CallTo(() => _fakeFulfilmentCleanUpService.DeleteScsResponseAsync(A<FulfilmentServiceBatch>.That.Matches(m => m.BatchId == FakeBatchValue.BatchId))).MustHaveHappenedOnceExactly();
-            A.CallTo(() => _fakeFulfilmentCleanUpService.DeleteBatchFolder(A<FulfilmentServiceBatch>.Ignored)).MustNotHaveHappened();
+            A.CallTo(() => _fakeFulfilmentCleanUpService.DeleteBatchFolder(A<FulfilmentServiceBatch>.That.Matches(m => m.BatchId == FakeBatchValue.BatchId))).MustHaveHappenedOnceExactly();
 
             _fakeLogger.VerifyLogEntry(EventIds.AIOToggleIsOn, "ESS Webjob : AIO toggle is ON for BatchId:{BatchId} | _X-Correlation-ID : {CorrelationId}");
             _fakeLogger.VerifyLogEntry(EventIds.CreateExchangeSetRequestStart, "Create Exchange Set web job request for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}");
             _fakeLogger.VerifyLogEntry(EventIds.CreateExchangeSetRequestCompleted, "Create Exchange Set web job request for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", true);
             _fakeLogger.VerifyLogEntry(EventIds.FulfilmentBatchCleanUpStarted, "Deletion of temporary data for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}.");
-            _fakeLogger.VerifyLogEntry(EventIds.FulfilmentBatchCleanUpCompleted, "Deletion of temporary data for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}.", true, times: 0);
+            _fakeLogger.VerifyLogEntry(EventIds.FulfilmentBatchCleanUpCompleted, "Deletion of temporary data for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}.", true);
             _fakeLogger.VerifyLogEntry(EventIds.FulfilmentBatchCleanUpFailed, "Exception occurred while cleaning up temporary data for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}. Exception:{Message}", logLevel: LogLevel.Error);
         }
 
@@ -149,7 +147,6 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Job
             Assert.That(CommonHelper.IsPeriodicOutputService, Is.True);
             A.CallTo(() => _fakeFulfilmentDataService.CreateLargeExchangeSet(A<FulfilmentServiceBatch>.Ignored, FakeBatchValue.LargeExchangeSetFolderNamePattern)).MustHaveHappenedOnceExactly();
             A.CallTo(() => _fakeFulfilmentDataService.CreateExchangeSet(A<FulfilmentServiceBatch>.Ignored)).MustNotHaveHappened();
-            A.CallTo(() => _fakeFulfilmentCleanUpService.DeleteScsResponseAsync(A<FulfilmentServiceBatch>.That.Matches(m => m.BatchId == FakeBatchValue.BatchId))).MustHaveHappenedOnceExactly();
             A.CallTo(() => _fakeFulfilmentCleanUpService.DeleteBatchFolder(A<FulfilmentServiceBatch>.That.Matches(m => m.BatchId == FakeBatchValue.BatchId))).MustHaveHappenedOnceExactly();
 
             _fakeLogger.VerifyLogEntry(EventIds.AIOToggleIsOn, "ESS Webjob : AIO toggle is ON for BatchId:{BatchId} | _X-Correlation-ID : {CorrelationId}");
@@ -181,7 +178,6 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Job
             A.CallTo(() => _fakeFileShareBatchService.CommitBatchToFss(FakeBatchValue.BatchId, FakeBatchValue.CorrelationId, A<string>.That.EndsWith(FakeBatchValue.BatchId), FakeBatchValue.ErrorFileName)).MustHaveHappenedOnceExactly();
             A.CallTo(() => _fakeAzureBlobStorageService.DownloadSalesCatalogueResponse(A<string>.Ignored, FakeBatchValue.BatchId, FakeBatchValue.CorrelationId)).MustHaveHappenedOnceExactly();
             A.CallTo(() => _fakeFulfilmentCallBackService.SendCallBackErrorResponse(salesCatalogueProductResponse, A<SalesCatalogueServiceResponseQueueMessage>.That.Matches(m => m.BatchId == FakeBatchValue.BatchId))).MustHaveHappenedOnceExactly();
-            A.CallTo(() => _fakeFulfilmentCleanUpService.DeleteScsResponseAsync(A<FulfilmentServiceBatch>.That.Matches(m => m.BatchId == FakeBatchValue.BatchId))).MustHaveHappenedOnceExactly();
             A.CallTo(() => _fakeFulfilmentCleanUpService.DeleteBatchFolder(A<FulfilmentServiceBatch>.That.Matches(m => m.BatchId == FakeBatchValue.BatchId))).MustHaveHappenedOnceExactly();
 
             _fakeLogger.VerifyLogEntry(EventIds.AIOToggleIsOn, "ESS Webjob : AIO toggle is ON for BatchId:{BatchId} | _X-Correlation-ID : {CorrelationId}");

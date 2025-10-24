@@ -87,7 +87,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService
             }
             finally
             {
-                await CleanUpTemporaryBatchData(batch);
+                CleanUpTemporaryBatchData(batch);
             }
         }
 
@@ -131,21 +131,20 @@ namespace UKHO.ExchangeSetService.FulfilmentService
             await fulfilmentCallBackService.SendCallBackErrorResponse(salesCatalogueProductResponse, fulfilmentServiceQueueMessage);
         }
 
-        private async Task CleanUpTemporaryBatchData(FulfilmentServiceBatch batch)
+        private void CleanUpTemporaryBatchData(FulfilmentServiceBatch batch)
         {
             try
             {
-                await logger.LogStartEndAndElapsedTimeAsync(EventIds.FulfilmentBatchCleanUpStarted,
+                logger.LogStartEndAndElapsedTime(EventIds.FulfilmentBatchCleanUpStarted,
                     EventIds.FulfilmentBatchCleanUpCompleted,
                     "Deletion of temporary data for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}.",
-                    async () =>
+                    () =>
                     {
-                        await fulfilmentCleanUpService.DeleteScsResponseAsync(batch);
                         fulfilmentCleanUpService.DeleteBatchFolder(batch);
                         return string.Empty;
                     },
                     batch.BatchId, batch.CorrelationId);
-            }
+             }
             catch (Exception ex)
             {
                 logger.LogError(EventIds.FulfilmentBatchCleanUpFailed.ToEventId(), ex, "Exception occurred while cleaning up temporary data for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}. Exception:{Message}", batch.BatchId, batch.CorrelationId, ex.Message);

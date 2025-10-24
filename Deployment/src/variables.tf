@@ -100,3 +100,8 @@ variable "agent_2204_subnet" {
 variable "agent_prd_subnet" {
   type = string
 }
+
+variable "scs_response_retention" {
+  type    = number
+  default = 7
+}

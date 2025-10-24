@@ -129,6 +129,7 @@ module "fulfilment_storage" {
   service_name                          = local.service_name
   agent_2204_subnet                     = var.agent_2204_subnet
   agent_prd_subnet                      = var.agent_prd_subnet
+  scs_response_retention                = var.scs_response_retention
 }
 
 module "fulfilment_scaling" {

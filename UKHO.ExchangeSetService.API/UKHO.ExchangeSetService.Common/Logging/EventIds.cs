@@ -880,15 +880,7 @@ namespace UKHO.ExchangeSetService.Common.Logging
         /// <summary>
         /// 805217 - Fulfilment batch temporary folder is not found.
         /// </summary>
-        FulfilmentBatchTemporaryFolderNotFound = 805217,
-        /// <summary>
-        /// 805218 - Fulfilment batch SCS response json file is deleted successfully.
-        /// </summary>
-        FulfilmentBatchScsResponseDeleted = 805218,
-        /// <summary>
-        /// 805219 - Fulfilment batch SCS response json file is not found.
-        /// </summary>
-        FulfilmentBatchScsResponseNotFound = 805219
+        FulfilmentBatchTemporaryFolderNotFound = 805217
     }
 
     public static class EventIdExtensions

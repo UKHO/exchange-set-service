@@ -26,7 +26,7 @@ jobs:
       inputs:
         command: "test"
         projects: "**/*UnitTests.csproj"
-        arguments: '--configuration $(BuildConfiguration) --settings "$(Build.SourcesDirectory)\test.runsettings" /p:CollectCoverage=true /p:CoverletOutputFormat=cobertura'
+        arguments: '--configuration $(BuildConfiguration) --settings "$(Build.SourcesDirectory)\test.runsettings" /p:CollectCoverage=true /p:CoverletOutputFormat=cobertura --no-restore'
         publishTestResults: true
         testRunTitle: "UnitTests"
 
