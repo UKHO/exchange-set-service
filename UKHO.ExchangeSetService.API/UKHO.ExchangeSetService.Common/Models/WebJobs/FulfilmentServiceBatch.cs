@@ -37,6 +37,8 @@ namespace UKHO.ExchangeSetService.Common.Models.WebJobs
         /// </summary>
         public string BatchDirectory { get; }
 
+        public const string CurrentUtcDateFormat = "ddMMMyyyy";
+
         public FulfilmentServiceBatch(
             IConfiguration configuration,
             SalesCatalogueServiceResponseQueueMessage message,
@@ -45,7 +47,7 @@ namespace UKHO.ExchangeSetService.Common.Models.WebJobs
         {
             Message = message;
             BaseDirectory = configuration["HOME"];
-            CurrentUtcDate = currentUtcDate.ToString("ddMMMyyyy");
+            CurrentUtcDate = currentUtcDate.ToString(CurrentUtcDateFormat);
             BatchDirectory = Path.Combine(BaseDirectory, CurrentUtcDate, Message.BatchId);
             BatchId = Message.BatchId;
             CorrelationId = Message.CorrelationId;

@@ -205,6 +205,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService
                  services.Configure<EssManagedIdentityConfiguration>(ConfigurationBuilder.GetSection("ESSManagedIdentity"));
                  services.Configure<EssCallBackConfiguration>(ConfigurationBuilder.GetSection("ESSCallBackConfiguration"));
                  services.Configure<PeriodicOutputServiceConfiguration>(ConfigurationBuilder.GetSection("PeriodicOutputServiceConfiguration"));
+                 services.Configure<CleanUpConfiguration>(ConfigurationBuilder.GetSection("CleanUpConfiguration"));
 
                  services.AddDistributedMemoryCache();
 

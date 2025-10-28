@@ -141,7 +141,8 @@ namespace UKHO.ExchangeSetService.FulfilmentService
                     () =>
                     {
                         fulfilmentCleanUpService.DeleteBatchFolder(batch);
-                        return string.Empty;
+                        fulfilmentCleanUpService.DeleteHistoricBatchFolders(batch);
+                        return true;
                     },
                     batch.BatchId, batch.CorrelationId);
              }
