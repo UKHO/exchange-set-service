@@ -13,7 +13,6 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
     public class FulfilmentCleanUpService(ILogger<FulfilmentCleanUpService> logger, IFileSystemHelper fileSystemHelper, IOptions<CleanUpConfiguration> cleanUpConfiguration) : IFulfilmentCleanUpService
     {
         private readonly CleanUpConfiguration _cleanUpConfiguration = cleanUpConfiguration?.Value ?? throw new ArgumentNullException(nameof(cleanUpConfiguration));
-        private readonly object _historicDeleteLock = new();
 
         public void DeleteBatchFolder(FulfilmentServiceBatch batch)
         {
@@ -32,29 +31,29 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             }
         }
 
-        public void DeleteHistoricBatchFolders(FulfilmentServiceBatch batch)
+        public void DeleteHistoricBatchFolders(FulfilmentServiceBase fulfilmentServiceBase)
         {
             if (_cleanUpConfiguration.Enabled)
             {
                 try
                 {
-                    var cutoffDate = DateTime.UtcNow.AddDays(-_cleanUpConfiguration.NumberOfDays).Date;
+                    var cutoffDate = fulfilmentServiceBase.CurrentUtcDateTime.AddDays(-_cleanUpConfiguration.NumberOfDays).Date;
 
-                    lock (_historicDeleteLock)
+                    foreach (var subFolder in fileSystemHelper.GetDirectories(fulfilmentServiceBase.BaseDirectory))
                     {
-                        foreach (var subFolder in fileSystemHelper.GetDirectories(batch.BaseDirectory))
+                        var subFolderName = new DirectoryInfo(subFolder).Name;
+                        var folderIsValidDate = DateTimeExtensions.IsValidDate(subFolderName, FulfilmentServiceBase.CurrentUtcDateFormat, out var subFolderDateTime);
+
+                        if (folderIsValidDate && subFolderDateTime.Date <= cutoffDate)
                         {
-                            var subFolderName = new DirectoryInfo(subFolder).Name;
-                            var folderIsValidDate = DateTimeExtensions.IsValidDate(subFolderName, FulfilmentServiceBatch.CurrentUtcDateFormat, out var subFolderDateTime);
-
-                            if (folderIsValidDate && subFolderDateTime.Date <= cutoffDate)
+                            if (fileSystemHelper.DeleteFolderIfExists(subFolder))
                             {
-                                var deleted = fileSystemHelper.DeleteFolderIfExists(subFolder);
-
-                                if (!deleted)
-                                {
-                                    logger.LogError(EventIds.HistoricDateFolderNotFound.ToEventId(), "Historic folder not found for Date:{Date}.", subFolderName);
-                                }
+                                // Even if folder is deleted successfully, log it as error. The FulfilmentServiceJob should have cleaned up after itself.
+                                logger.LogError(EventIds.HistoricDateFolderDeleted.ToEventId(), "Historic folder deleted successfully for Date:{Date}.", subFolderName);
+                            }
+                            else
+                            {
+                                logger.LogError(EventIds.HistoricDateFolderNotFound.ToEventId(), "Historic folder not found for Date:{Date}.", subFolderName);
                             }
                         }
                     }

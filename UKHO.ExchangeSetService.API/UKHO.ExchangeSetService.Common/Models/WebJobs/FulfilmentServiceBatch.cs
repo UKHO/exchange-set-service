@@ -5,7 +5,7 @@ using UKHO.ExchangeSetService.Common.Models.SalesCatalogue;
 
 namespace UKHO.ExchangeSetService.Common.Models.WebJobs
 {
-    public class FulfilmentServiceBatch
+    public class FulfilmentServiceBatch : FulfilmentServiceBase
     {
         /// <summary>
         /// Queue message
@@ -23,34 +23,40 @@ namespace UKHO.ExchangeSetService.Common.Models.WebJobs
         public string CorrelationId { get; }
 
         /// <summary>
-        /// eg. 14Oct2025
-        /// </summary>
-        public string CurrentUtcDate { get; }
-
-        /// <summary>
-        /// eg. C:\Home
-        /// </summary>
-        public string BaseDirectory { get; }
-
-        /// <summary>
         /// eg. C:\Home\14Oct2025\635219b9-43b6-4e96-9b33-72759ac6d5c2
         /// </summary>
         public string BatchDirectory { get; }
-
-        public const string CurrentUtcDateFormat = "ddMMMyyyy";
 
         public FulfilmentServiceBatch(
             IConfiguration configuration,
             SalesCatalogueServiceResponseQueueMessage message,
             DateTime currentUtcDate
-            )
+            ) : base(configuration, currentUtcDate)
         {
             Message = message;
-            BaseDirectory = configuration["HOME"];
-            CurrentUtcDate = currentUtcDate.ToString(CurrentUtcDateFormat);
-            BatchDirectory = Path.Combine(BaseDirectory, CurrentUtcDate, Message.BatchId);
-            BatchId = Message.BatchId;
-            CorrelationId = Message.CorrelationId;
+            BatchDirectory = Path.Combine(BaseDirectory, CurrentUtcDate, message.BatchId);
+            BatchId = message.BatchId;
+            CorrelationId = message.CorrelationId;
         }
+    }
+
+    public class FulfilmentServiceBase(IConfiguration configuration, DateTime currentUtcDate)
+    {
+        public const string CurrentUtcDateFormat = "ddMMMyyyy";
+
+        /// <summary>
+        /// eg. 14Oct2025
+        /// </summary>
+        public string CurrentUtcDate { get; } = currentUtcDate.ToString(CurrentUtcDateFormat);
+
+        /// <summary>
+        /// The DateTime value related to <see cref="CurrentUtcDate"/>
+        /// </summary>
+        public DateTime CurrentUtcDateTime { get; } = currentUtcDate;
+
+        /// <summary>
+        /// eg. C:\Home
+        /// </summary>
+        public string BaseDirectory { get; } = configuration["HOME"];
     }
 }

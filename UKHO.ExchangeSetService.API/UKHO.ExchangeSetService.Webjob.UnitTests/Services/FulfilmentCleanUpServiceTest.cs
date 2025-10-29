@@ -1,3 +1,4 @@
+using System.IO;
 using FakeItEasy;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -84,6 +85,84 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
 
             _fakeLogger.VerifyLogEntry(EventIds.FulfilmentBatchTemporaryFolderDeleted, "Temporary data folder deleted successfully for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}.", times: 0);
             _fakeLogger.VerifyLogEntry(EventIds.FulfilmentBatchTemporaryFolderNotFound, "Temporary data folder not found for deletion for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}.", logLevel: LogLevel.Error);
+        }
+
+        [Test]
+        public void DeleteHistoricBatchFolders_WhenCleanUpDisabled_DoesNothing()
+        {
+            _cleanUpConfiguration.Enabled = false;
+
+            _service.DeleteHistoricBatchFolders(_batch);
+
+            A.CallTo(() => _fakeFileSystemHelper.GetDirectories(A<string>.Ignored)).MustNotHaveHappened();
+            A.CallTo(() => _fakeFileSystemHelper.DeleteFolderIfExists(A<string>.Ignored)).MustNotHaveHappened();
+
+            _fakeLogger.VerifyLogEntry(EventIds.HistoricDateFolderDeleted, "Historic folder deleted successfully for Date:{Date}.", logLevel: LogLevel.Error, checkIds: false, times: 0);
+            _fakeLogger.VerifyLogEntry(EventIds.HistoricDateFolderNotFound, "Historic folder not found for Date:{Date}.", logLevel: LogLevel.Error, checkIds: false, times: 0);
+            _fakeLogger.VerifyLogEntry(EventIds.DeleteHistoricFoldersAndFilesException, "Exception while deleting historic folders and files with error {Message}", logLevel: LogLevel.Error, checkIds: false, times: 0);
+        }
+
+        [Test]
+        public void DeleteHistoricBatchFolders_WhenNoHistoricFoldersFound_DoesNothing()
+        {
+            var directories = new string[]
+            {
+                Path.Combine(FakeBatchValue.BaseDirectoryPath, FakeBatchValue.CurrentUtcDateTime.AddDays(-1).ToString(FulfilmentServiceBase.CurrentUtcDateFormat)), // Within retention period
+                Path.Combine(FakeBatchValue.BaseDirectoryPath, FakeBatchValue.CurrentUtcDateTime.ToString(FulfilmentServiceBase.CurrentUtcDateFormat)),             // Within retention period
+                Path.Combine(FakeBatchValue.BaseDirectoryPath, "SomeOtherFolder")                                                                                   // Non-date folder
+            };
+            A.CallTo(() => _fakeFileSystemHelper.GetDirectories(FakeBatchValue.BaseDirectoryPath)).Returns(directories);
+
+            _service.DeleteHistoricBatchFolders(_batch);
+
+            A.CallTo(() => _fakeFileSystemHelper.GetDirectories(FakeBatchValue.BaseDirectoryPath)).MustHaveHappenedOnceExactly();
+            A.CallTo(() => _fakeFileSystemHelper.DeleteFolderIfExists(A<string>.Ignored)).MustNotHaveHappened();
+
+            _fakeLogger.VerifyLogEntry(EventIds.HistoricDateFolderDeleted, "Historic folder deleted successfully for Date:{Date}.", logLevel: LogLevel.Error, checkIds: false, times: 0);
+            _fakeLogger.VerifyLogEntry(EventIds.HistoricDateFolderNotFound, "Historic folder not found for Date:{Date}.", logLevel: LogLevel.Error, checkIds: false, times: 0);
+            _fakeLogger.VerifyLogEntry(EventIds.DeleteHistoricFoldersAndFilesException, "Exception while deleting historic folders and files with error {Message}", logLevel: LogLevel.Error, checkIds: false, times: 0);
+        }
+
+        [Test]
+        public void DeleteHistoricBatchFolders_WhenHistoricFoldersDeleted_CallsDelete()
+        {
+            var directories = new string[]
+            {
+                Path.Combine(FakeBatchValue.BaseDirectoryPath, FakeBatchValue.CurrentUtcDateTime.AddDays(-3).ToString(FulfilmentServiceBase.CurrentUtcDateFormat)), // Outside retention period
+                Path.Combine(FakeBatchValue.BaseDirectoryPath, FakeBatchValue.CurrentUtcDateTime.AddDays(-2).ToString(FulfilmentServiceBase.CurrentUtcDateFormat)), // Outside retention period
+                Path.Combine(FakeBatchValue.BaseDirectoryPath, FakeBatchValue.CurrentUtcDateTime.AddDays(-1).ToString(FulfilmentServiceBase.CurrentUtcDateFormat)), // Within retention period
+                Path.Combine(FakeBatchValue.BaseDirectoryPath, FakeBatchValue.CurrentUtcDateTime.ToString(FulfilmentServiceBase.CurrentUtcDateFormat))              // Within retention period
+            };
+            A.CallTo(() => _fakeFileSystemHelper.GetDirectories(FakeBatchValue.BaseDirectoryPath)).Returns(directories);
+            A.CallTo(() => _fakeFileSystemHelper.DeleteFolderIfExists(directories[0])).Returns(true);
+            A.CallTo(() => _fakeFileSystemHelper.DeleteFolderIfExists(directories[1])).Returns(false);
+
+            _service.DeleteHistoricBatchFolders(_batch);
+
+            A.CallTo(() => _fakeFileSystemHelper.GetDirectories(FakeBatchValue.BaseDirectoryPath)).MustHaveHappenedOnceExactly();
+            A.CallTo(() => _fakeFileSystemHelper.DeleteFolderIfExists(directories[0])).MustHaveHappenedOnceExactly();
+            A.CallTo(() => _fakeFileSystemHelper.DeleteFolderIfExists(directories[1])).MustHaveHappenedOnceExactly();
+            A.CallTo(() => _fakeFileSystemHelper.DeleteFolderIfExists(directories[2])).MustNotHaveHappened();
+            A.CallTo(() => _fakeFileSystemHelper.DeleteFolderIfExists(directories[3])).MustNotHaveHappened();
+
+            _fakeLogger.VerifyLogEntry(EventIds.HistoricDateFolderDeleted, "Historic folder deleted successfully for Date:{Date}.", logLevel: LogLevel.Error, checkIds: false, times: 1);
+            _fakeLogger.VerifyLogEntry(EventIds.HistoricDateFolderNotFound, "Historic folder not found for Date:{Date}.", logLevel: LogLevel.Error, checkIds: false, times: 1);
+            _fakeLogger.VerifyLogEntry(EventIds.DeleteHistoricFoldersAndFilesException, "Exception while deleting historic folders and files with error {Message}", logLevel: LogLevel.Error, checkIds: false, times: 0);
+        }
+
+        [Test]
+        public void DeleteHistoricBatchFolders_WhenExceptionIsThrown_LogIt()
+        {
+            A.CallTo(() => _fakeFileSystemHelper.GetDirectories(FakeBatchValue.BaseDirectoryPath)).Throws(new IOException("Disk not accessible"));
+
+            _service.DeleteHistoricBatchFolders(_batch);
+
+            A.CallTo(() => _fakeFileSystemHelper.GetDirectories(FakeBatchValue.BaseDirectoryPath)).MustHaveHappenedOnceExactly();
+            A.CallTo(() => _fakeFileSystemHelper.DeleteFolderIfExists(A<string>.Ignored)).MustNotHaveHappened();
+
+            _fakeLogger.VerifyLogEntry(EventIds.HistoricDateFolderDeleted, "Historic folder deleted successfully for Date:{Date}.", logLevel: LogLevel.Error, checkIds: false, times: 0);
+            _fakeLogger.VerifyLogEntry(EventIds.HistoricDateFolderNotFound, "Historic folder not found for Date:{Date}.", logLevel: LogLevel.Error, checkIds: false, times: 0);
+            _fakeLogger.VerifyLogEntry(EventIds.DeleteHistoricFoldersAndFilesException, "Exception while deleting historic folders and files with error {Message}", logLevel: LogLevel.Error, checkIds: false, times: 1);
         }
     }
 }

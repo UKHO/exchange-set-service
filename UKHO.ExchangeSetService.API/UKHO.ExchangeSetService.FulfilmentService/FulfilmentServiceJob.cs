@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Threading.Tasks;
 using Azure.Storage.Queues.Models;
@@ -19,7 +18,6 @@ using UKHO.ExchangeSetService.FulfilmentService.Services;
 
 namespace UKHO.ExchangeSetService.FulfilmentService
 {
-    [ExcludeFromCodeCoverage]
     public class FulfilmentServiceJob(IConfiguration configuration,
                                 IFulfilmentDataService fulFilmentDataService, ILogger<FulfilmentServiceJob> logger, IFileSystemHelper fileSystemHelper,
                                 IFileShareBatchService fileBatchShareService, IFileShareUploadService fileShareUploadService, IOptions<FileShareServiceConfiguration> fileShareServiceConfig,
@@ -141,7 +139,6 @@ namespace UKHO.ExchangeSetService.FulfilmentService
                     () =>
                     {
                         fulfilmentCleanUpService.DeleteBatchFolder(batch);
-                        fulfilmentCleanUpService.DeleteHistoricBatchFolders(batch);
                         return true;
                     },
                     batch.BatchId, batch.CorrelationId);
