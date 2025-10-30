@@ -38,6 +38,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
                 try
                 {
                     var cutoffDate = fulfilmentServiceBase.CurrentUtcDateTime.AddDays(-_cleanUpConfiguration.NumberOfDays).Date;
+                    var historicFoldersFound = false;
 
                     foreach (var subFolder in fileSystemHelper.GetDirectories(fulfilmentServiceBase.BaseDirectory))
                     {
@@ -46,16 +47,19 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
 
                         if (folderIsValidDate && subFolderDateTime.Date <= cutoffDate)
                         {
+                            historicFoldersFound = true;
+
                             if (fileSystemHelper.DeleteFolderIfExists(subFolder))
                             {
-                                // Even if folder is deleted successfully, log it as error. The FulfilmentServiceJob should have cleaned up after itself.
+                                // Even if folder is deleted, log it as error. The FulfilmentServiceJob should have cleaned up after itself.
                                 logger.LogError(EventIds.HistoricDateFolderDeleted.ToEventId(), "Historic folder deleted successfully for Date:{Date}.", subFolderName);
                             }
-                            else
-                            {
-                                logger.LogError(EventIds.HistoricDateFolderNotFound.ToEventId(), "Historic folder not found for Date:{Date}.", subFolderName);
-                            }
                         }
+                    }
+
+                    if (!historicFoldersFound)
+                    {
+                        logger.LogInformation(EventIds.HistoricDateFolderNotFound.ToEventId(), "Historic folder not found for Date:{Date}.", cutoffDate.ToString(FulfilmentServiceBase.CurrentUtcDateFormat));
                     }
                 }
                 catch (Exception ex)
