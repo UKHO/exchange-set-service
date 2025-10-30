@@ -5,6 +5,6 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
     public interface IFulfilmentCleanUpService
     {
         void DeleteBatchFolder(FulfilmentServiceBatch batch);
-        void DeleteHistoricBatchFolders(FulfilmentServiceBase fulfilmentServiceBase);
+        void DeleteHistoricBatchFolders(FulfilmentServiceBatchBase batchBase);
     }
 }

@@ -35,7 +35,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Job
 
             _service.DailyMaintenance(timerInfo);
 
-            A.CallTo(() => _fakeFulfilmentCleanUpService.DeleteHistoricBatchFolders(A<FulfilmentServiceBase>.Ignored)).MustHaveHappenedOnceExactly();
+            A.CallTo(() => _fakeFulfilmentCleanUpService.DeleteHistoricBatchFolders(A<FulfilmentServiceBatchBase>.Ignored)).MustHaveHappenedOnceExactly();
 
             _fakeLogger.VerifyLogEntry(EventIds.DeleteHistoricFoldersAndFilesStarted, "Clean up process of historic folders and files", checkIds: false);
             _fakeLogger.VerifyLogEntry(EventIds.DeleteHistoricFoldersAndFilesCompleted, "Clean up process of historic folders and files", endEvent: true, checkIds: false);
@@ -47,7 +47,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Job
         {
             var timerInfo = new TimerInfo(null, new ScheduleStatus(), false);
 
-            A.CallTo(() => _fakeFulfilmentCleanUpService.DeleteHistoricBatchFolders(A<FulfilmentServiceBase>.Ignored)).Throws(new InvalidOperationException("boom"));
+            A.CallTo(() => _fakeFulfilmentCleanUpService.DeleteHistoricBatchFolders(A<FulfilmentServiceBatchBase>.Ignored)).Throws(new InvalidOperationException("boom"));
 
             _service.DailyMaintenance(timerInfo);
 
@@ -62,7 +62,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Job
             var next = new DateTime(2030, 12, 25, 07, 30, 00, DateTimeKind.Utc);
             var timerInfo = new TimerInfo(new TestSchedule(next), new ScheduleStatus(), false);
 
-            A.CallTo(() => _fakeFulfilmentCleanUpService.DeleteHistoricBatchFolders(A<FulfilmentServiceBase>.Ignored)).Throws(new Exception("failure"));
+            A.CallTo(() => _fakeFulfilmentCleanUpService.DeleteHistoricBatchFolders(A<FulfilmentServiceBatchBase>.Ignored)).Throws(new Exception("failure"));
 
             _service.DailyMaintenance(timerInfo);
 

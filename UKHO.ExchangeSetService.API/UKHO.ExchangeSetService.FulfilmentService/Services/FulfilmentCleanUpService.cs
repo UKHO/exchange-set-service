@@ -31,19 +31,19 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             }
         }
 
-        public void DeleteHistoricBatchFolders(FulfilmentServiceBase fulfilmentServiceBase)
+        public void DeleteHistoricBatchFolders(FulfilmentServiceBatchBase batchBase)
         {
             if (_cleanUpConfiguration.Enabled)
             {
                 try
                 {
-                    var cutoffDate = fulfilmentServiceBase.CurrentUtcDateTime.AddDays(-_cleanUpConfiguration.NumberOfDays).Date;
+                    var cutoffDate = batchBase.CurrentUtcDateTime.AddDays(-_cleanUpConfiguration.NumberOfDays).Date;
                     var historicFoldersFound = false;
 
-                    foreach (var subFolder in fileSystemHelper.GetDirectories(fulfilmentServiceBase.BaseDirectory))
+                    foreach (var subFolder in fileSystemHelper.GetDirectories(batchBase.BaseDirectory))
                     {
                         var subFolderName = new DirectoryInfo(subFolder).Name;
-                        var folderIsValidDate = DateTimeExtensions.IsValidDate(subFolderName, FulfilmentServiceBase.CurrentUtcDateFormat, out var subFolderDateTime);
+                        var folderIsValidDate = DateTimeExtensions.IsValidDate(subFolderName, FulfilmentServiceBatchBase.CurrentUtcDateFormat, out var subFolderDateTime);
 
                         if (folderIsValidDate && subFolderDateTime.Date <= cutoffDate)
                         {
@@ -59,7 +59,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
 
                     if (!historicFoldersFound)
                     {
-                        logger.LogInformation(EventIds.HistoricDateFolderNotFound.ToEventId(), "Historic folder not found for Date:{Date}.", cutoffDate.ToString(FulfilmentServiceBase.CurrentUtcDateFormat));
+                        logger.LogInformation(EventIds.HistoricDateFolderNotFound.ToEventId(), "Historic folder not found for Date:{Date}.", cutoffDate.ToString(FulfilmentServiceBatchBase.CurrentUtcDateFormat));
                     }
                 }
                 catch (Exception ex)

@@ -5,7 +5,7 @@ using UKHO.ExchangeSetService.Common.Models.SalesCatalogue;
 
 namespace UKHO.ExchangeSetService.Common.Models.WebJobs
 {
-    public class FulfilmentServiceBatch : FulfilmentServiceBase
+    public class FulfilmentServiceBatch : FulfilmentServiceBatchBase
     {
         /// <summary>
         /// Queue message
@@ -40,7 +40,7 @@ namespace UKHO.ExchangeSetService.Common.Models.WebJobs
         }
     }
 
-    public class FulfilmentServiceBase(IConfiguration configuration, DateTime currentUtcDate)
+    public class FulfilmentServiceBatchBase(IConfiguration configuration, DateTime currentUtcDate)
     {
         public const string CurrentUtcDateFormat = "ddMMMyyyy";
 

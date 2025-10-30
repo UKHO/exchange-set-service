@@ -26,8 +26,8 @@ namespace UKHO.ExchangeSetService.FulfilmentService
                 {
                     logger.LogStartEndAndElapsedTime(EventIds.DeleteHistoricFoldersAndFilesStarted, EventIds.DeleteHistoricFoldersAndFilesCompleted, "Clean up process of historic folders and files", () =>
                     {
-                        var fulfilmentServiceBase = new FulfilmentServiceBase(configuration, DateTime.UtcNow);
-                        fulfilmentCleanUpService.DeleteHistoricBatchFolders(fulfilmentServiceBase);
+                        var batchBase = new FulfilmentServiceBatchBase(configuration, DateTime.UtcNow);
+                        fulfilmentCleanUpService.DeleteHistoricBatchFolders(batchBase);
                         return true;
                     });
                 });

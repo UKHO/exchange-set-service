@@ -107,8 +107,8 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
         {
             var directories = new string[]
             {
-                Path.Combine(FakeBatchValue.BaseDirectoryPath, FakeBatchValue.CurrentUtcDateTime.AddDays(-1).ToString(FulfilmentServiceBase.CurrentUtcDateFormat)), // Within retention period
-                Path.Combine(FakeBatchValue.BaseDirectoryPath, FakeBatchValue.CurrentUtcDateTime.ToString(FulfilmentServiceBase.CurrentUtcDateFormat)),             // Within retention period
+                Path.Combine(FakeBatchValue.BaseDirectoryPath, FakeBatchValue.CurrentUtcDateTime.AddDays(-1).ToString(FulfilmentServiceBatchBase.CurrentUtcDateFormat)), // Within retention period
+                Path.Combine(FakeBatchValue.BaseDirectoryPath, FakeBatchValue.CurrentUtcDateTime.ToString(FulfilmentServiceBatchBase.CurrentUtcDateFormat)),             // Within retention period
                 Path.Combine(FakeBatchValue.BaseDirectoryPath, "SomeOtherFolder")                                                                                   // Non-date folder
             };
             A.CallTo(() => _fakeFileSystemHelper.GetDirectories(FakeBatchValue.BaseDirectoryPath)).Returns(directories);
@@ -128,10 +128,10 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
         {
             var directories = new string[]
             {
-                Path.Combine(FakeBatchValue.BaseDirectoryPath, FakeBatchValue.CurrentUtcDateTime.AddDays(-3).ToString(FulfilmentServiceBase.CurrentUtcDateFormat)), // Outside retention period
-                Path.Combine(FakeBatchValue.BaseDirectoryPath, FakeBatchValue.CurrentUtcDateTime.AddDays(-2).ToString(FulfilmentServiceBase.CurrentUtcDateFormat)), // Outside retention period
-                Path.Combine(FakeBatchValue.BaseDirectoryPath, FakeBatchValue.CurrentUtcDateTime.AddDays(-1).ToString(FulfilmentServiceBase.CurrentUtcDateFormat)), // Within retention period
-                Path.Combine(FakeBatchValue.BaseDirectoryPath, FakeBatchValue.CurrentUtcDateTime.ToString(FulfilmentServiceBase.CurrentUtcDateFormat))              // Within retention period
+                Path.Combine(FakeBatchValue.BaseDirectoryPath, FakeBatchValue.CurrentUtcDateTime.AddDays(-3).ToString(FulfilmentServiceBatchBase.CurrentUtcDateFormat)), // Outside retention period
+                Path.Combine(FakeBatchValue.BaseDirectoryPath, FakeBatchValue.CurrentUtcDateTime.AddDays(-2).ToString(FulfilmentServiceBatchBase.CurrentUtcDateFormat)), // Outside retention period
+                Path.Combine(FakeBatchValue.BaseDirectoryPath, FakeBatchValue.CurrentUtcDateTime.AddDays(-1).ToString(FulfilmentServiceBatchBase.CurrentUtcDateFormat)), // Within retention period
+                Path.Combine(FakeBatchValue.BaseDirectoryPath, FakeBatchValue.CurrentUtcDateTime.ToString(FulfilmentServiceBatchBase.CurrentUtcDateFormat))              // Within retention period
             };
             A.CallTo(() => _fakeFileSystemHelper.GetDirectories(FakeBatchValue.BaseDirectoryPath)).Returns(directories);
             A.CallTo(() => _fakeFileSystemHelper.DeleteFolderIfExists(directories[0])).Returns(true);
