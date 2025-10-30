@@ -60,7 +60,7 @@ resource "azurerm_monitor_autoscale_setting" "autoscale_setting_sxs" {
 }
 
 resource "azurerm_monitor_autoscale_setting" "autoscale_setting_mxs" {
-  count               = var.asp_control_mxs.enableAutoScale ? var.exchange_set_config.SmallExchangeSetInstance : 0
+  count               = var.asp_control_mxs.enableAutoScale ? var.exchange_set_config.MediumExchangeSetInstance : 0
   name                = "${var.asp["mxs"][count.index].name}-autoscale"
   resource_group_name = var.resource_group_name
   location            = var.location
@@ -121,7 +121,7 @@ resource "azurerm_monitor_autoscale_setting" "autoscale_setting_mxs" {
 }
 
 resource "azurerm_monitor_autoscale_setting" "autoscale_setting_lxs" {
-  count               = var.asp_control_lxs.enableAutoScale ? var.exchange_set_config.SmallExchangeSetInstance : 0
+  count               = var.asp_control_lxs.enableAutoScale ? var.exchange_set_config.LargeExchangeSetInstance : 0
   name                = "${var.asp["lxs"][count.index].name}-autoscale"
   resource_group_name = var.resource_group_name
   location            = var.location

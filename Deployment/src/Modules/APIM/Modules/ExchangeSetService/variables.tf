@@ -111,3 +111,27 @@ variable "ess_ui_product_call_renewal_period" {
 variable "ess_ui_product_daily_quota_limit" {
     type = number
 }
+
+variable "apim_ess_monitor_product_name" {
+  type  = string
+}
+
+variable "apim_ess_monitor_product_description" {
+  type  = string
+}
+
+variable "apim_monitor_api_name" {
+  type  = string
+}
+
+variable "apim_monitor_api_description" {
+  type  = string
+}
+
+variable "apim_monitor_api_openapi" {
+  type  = string
+}
+
+variable "apim_monitor_api_path" {
+  type  = string
+}
