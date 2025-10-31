@@ -5,6 +5,9 @@ using UKHO.ExchangeSetService.Common.Models.SalesCatalogue;
 
 namespace UKHO.ExchangeSetService.Common.Models.WebJobs
 {
+    /// <summary>
+    /// Contains data related to the current batch.
+    /// </summary>
     public class FulfilmentServiceBatch : FulfilmentServiceBatchBase
     {
         /// <summary>
@@ -40,6 +43,11 @@ namespace UKHO.ExchangeSetService.Common.Models.WebJobs
         }
     }
 
+    /// <summary>
+    /// Contains data that's identical across all batches processed on a given day.
+    /// </summary>
+    /// <param name="configuration"></param>
+    /// <param name="currentUtcDate"></param>
     public class FulfilmentServiceBatchBase(IConfiguration configuration, DateTime currentUtcDate)
     {
         public const string CurrentUtcDateFormat = "ddMMMyyyy";
