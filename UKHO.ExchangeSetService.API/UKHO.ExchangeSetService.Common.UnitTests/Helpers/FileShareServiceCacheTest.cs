@@ -406,7 +406,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
         }
 
         [Test]
-        public async Task WhenGetNonCachedProductDataForFssIsCalled_ThenReturnProductNotFoundForLargeMediaExchangeSetWhenAioToggleIsOn()
+        public async Task WhenGetNonCachedProductDataForFssIsCalledWithAio_ThenReturnProductNotFoundForLargeMediaExchangeSet()
         {
             string exchangeSetRootPath = @"C:\\HOME";
             fakeAioConfiguration.Value.AioCells = "GB800001";

@@ -700,7 +700,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
         }
 
         [Test]
-        public async Task WhenValidProductIdentifierRequest_And_AIOToggleIsOn_ThenCreateProductDataByProductIdentifierReturnsOkrequest()
+        public async Task WhenValidProductIdentifierRequest_ThenCreateProductDataByProductIdentifierReturnsOkrequest()
         {
             A.CallTo(() => fakeProductIdentifierValidator.Validate(A<ProductIdentifierRequest>.Ignored))
                 .Returns(new ValidationResult(new List<ValidationFailure>()));
@@ -769,11 +769,6 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
                 Assert.That(exchangeSetResponseAioToggleOn.RequestedProductsNotInExchangeSet, Has.Count.EqualTo(result.ExchangeSetResponse.RequestedProductsNotInExchangeSet.Count));
                 Assert.That(exchangeSetResponseAioToggleOn.Links.AioExchangeSetFileUri.Href, Is.EqualTo(result.ExchangeSetResponse.Links.AioExchangeSetFileUri.Href));
             });
-
-            A.CallTo(logger).Where(call => call.Method.Name == "Log"
-            && call.GetArgument<LogLevel>(0) == LogLevel.Information
-            && call.GetArgument<EventId>(1) == EventIds.AIOToggleIsOn.ToEventId()
-            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2).ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "Aio cell details for AioCells:{AioCells} | BatchId:{BatchId} | _X-Correlation-ID : {CorrelationId}").MustHaveHappenedOnceExactly();
 
             A.CallTo(logger).Where(call => call.Method.Name == "Log"
             && call.GetArgument<LogLevel>(0) == LogLevel.Information
@@ -1339,7 +1334,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
         }
 
         [Test]
-        public async Task WhenValidProductVersionRequest_And_AIOToggleIsON_ThenCreateProductDataByProductVersionsReturnsOkrequest()
+        public async Task WhenValidProductVersionRequest_ThenCreateProductDataByProductVersionsReturnsOkrequest()
         {
             A.CallTo(() => fakeProductVersionValidator.Validate(A<ProductDataProductVersionsRequest>.Ignored))
                 .Returns(new ValidationResult(new List<ValidationFailure>()));
@@ -1424,11 +1419,6 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
             && call.GetArgument<LogLevel>(0) == LogLevel.Information
             && call.GetArgument<EventId>(1) == EventIds.FSSCreateBatchRequestStart.ToEventId()
             && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2).ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "FSS create batch endpoint request for _X-Correlation-ID:{CorrelationId}").MustHaveHappenedOnceExactly();
-
-            A.CallTo(logger).Where(call => call.Method.Name == "Log"
-            && call.GetArgument<LogLevel>(0) == LogLevel.Information
-            && call.GetArgument<EventId>(1) == EventIds.AIOToggleIsOn.ToEventId()
-            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2).ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "Aio cell details for AioCells:{AioCells} | BatchId:{BatchId} | _X-Correlation-ID : {CorrelationId}").MustHaveHappenedOnceExactly();
         }
 
         #endregion ProductVersions
@@ -1776,7 +1766,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
         }
 
         [Test]
-        public async Task WhenValidateProductDataSinceDateTimeInRequest_And_AIOToggleIsON_ThenCreateProductDataSinceDateTimeReturnOk()
+        public async Task WhenValidateProductDataSinceDateTimeInRequestWithAioCell_ThenCreateProductDataSinceDateTimeReturnOk()
         {
             A.CallTo(() => fakeProductDataSinceDateTimeValidator.Validate(A<ProductDataSinceDateTimeRequest>.Ignored))
                 .Returns(new ValidationResult(new List<ValidationFailure>()));
@@ -1847,11 +1837,6 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
             && call.GetArgument<LogLevel>(0) == LogLevel.Information
             && call.GetArgument<EventId>(1) == EventIds.FSSCreateBatchRequestStart.ToEventId()
             && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2).ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "FSS create batch endpoint request for _X-Correlation-ID:{CorrelationId}").MustHaveHappenedOnceExactly();
-
-            A.CallTo(logger).Where(call => call.Method.Name == "Log"
-            && call.GetArgument<LogLevel>(0) == LogLevel.Information
-            && call.GetArgument<EventId>(1) == EventIds.AIOToggleIsOn.ToEventId()
-            && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2).ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "Aio cell details for AioCells:{AioCells} | BatchId:{BatchId} | _X-Correlation-ID : {CorrelationId}").MustHaveHappenedOnceExactly();
         }
 
         [Test]
