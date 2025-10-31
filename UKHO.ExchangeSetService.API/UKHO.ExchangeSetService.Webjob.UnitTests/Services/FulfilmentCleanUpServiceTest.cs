@@ -97,7 +97,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             A.CallTo(() => _fakeFileSystemHelper.GetDirectories(A<string>.Ignored)).MustNotHaveHappened();
             A.CallTo(() => _fakeFileSystemHelper.DeleteFolderIfExists(A<string>.Ignored)).MustNotHaveHappened();
 
-            _fakeLogger.VerifyLogEntry(EventIds.HistoricDateFolderDeleted, "Historic folder deleted successfully for Date:{Date}.", logLevel: LogLevel.Error, checkIds: false, times: 0);
+            _fakeLogger.VerifyLogEntry(EventIds.HistoricDateFolderDeleted, "Historic folder deleted successfully for Date:{Date}.", checkIds: false, times: 0);
             _fakeLogger.VerifyLogEntry(EventIds.HistoricDateFolderNotFound, "Historic folder not found for Date:{Date}.", checkIds: false, times: 0);
             _fakeLogger.VerifyLogEntry(EventIds.DeleteHistoricFoldersAndFilesException, "Exception while deleting historic folders and files with error {Message}", logLevel: LogLevel.Error, checkIds: false, times: 0);
         }
@@ -118,7 +118,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             A.CallTo(() => _fakeFileSystemHelper.GetDirectories(FakeBatchValue.BaseDirectoryPath)).MustHaveHappenedOnceExactly();
             A.CallTo(() => _fakeFileSystemHelper.DeleteFolderIfExists(A<string>.Ignored)).MustNotHaveHappened();
 
-            _fakeLogger.VerifyLogEntry(EventIds.HistoricDateFolderDeleted, "Historic folder deleted successfully for Date:{Date}.", logLevel: LogLevel.Error, checkIds: false, times: 0);
+            _fakeLogger.VerifyLogEntry(EventIds.HistoricDateFolderDeleted, "Historic folder deleted successfully for Date:{Date}.", checkIds: false, times: 0);
             _fakeLogger.VerifyLogEntry(EventIds.HistoricDateFolderNotFound, "Historic folder not found for Date:{Date}.", checkIds: false, times: 1);
             _fakeLogger.VerifyLogEntry(EventIds.DeleteHistoricFoldersAndFilesException, "Exception while deleting historic folders and files with error {Message}", logLevel: LogLevel.Error, checkIds: false, times: 0);
         }
@@ -145,7 +145,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             A.CallTo(() => _fakeFileSystemHelper.DeleteFolderIfExists(directories[2])).MustNotHaveHappened();
             A.CallTo(() => _fakeFileSystemHelper.DeleteFolderIfExists(directories[3])).MustNotHaveHappened();
 
-            _fakeLogger.VerifyLogEntry(EventIds.HistoricDateFolderDeleted, "Historic folder deleted successfully for Date:{Date}.", logLevel: LogLevel.Error, checkIds: false, times: 1);
+            _fakeLogger.VerifyLogEntry(EventIds.HistoricDateFolderDeleted, "Historic folder deleted successfully for Date:{Date}.", checkIds: false, times: 1);
             _fakeLogger.VerifyLogEntry(EventIds.HistoricDateFolderNotFound, "Historic folder not found for Date:{Date}.", checkIds: false, times: 0);
             _fakeLogger.VerifyLogEntry(EventIds.DeleteHistoricFoldersAndFilesException, "Exception while deleting historic folders and files with error {Message}", logLevel: LogLevel.Error, checkIds: false, times: 0);
         }
@@ -160,7 +160,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             A.CallTo(() => _fakeFileSystemHelper.GetDirectories(FakeBatchValue.BaseDirectoryPath)).MustHaveHappenedOnceExactly();
             A.CallTo(() => _fakeFileSystemHelper.DeleteFolderIfExists(A<string>.Ignored)).MustNotHaveHappened();
 
-            _fakeLogger.VerifyLogEntry(EventIds.HistoricDateFolderDeleted, "Historic folder deleted successfully for Date:{Date}.", logLevel: LogLevel.Error, checkIds: false, times: 0);
+            _fakeLogger.VerifyLogEntry(EventIds.HistoricDateFolderDeleted, "Historic folder deleted successfully for Date:{Date}.", checkIds: false, times: 0);
             _fakeLogger.VerifyLogEntry(EventIds.HistoricDateFolderNotFound, "Historic folder not found for Date:{Date}.", checkIds: false, times: 0);
             _fakeLogger.VerifyLogEntry(EventIds.DeleteHistoricFoldersAndFilesException, "Exception while deleting historic folders and files with error {Message}", logLevel: LogLevel.Error, checkIds: false, times: 1);
         }

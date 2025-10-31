@@ -14,7 +14,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService
     public class FulfilmentCleanUpJob(IConfiguration configuration, ILogger<FulfilmentCleanUpJob> logger, IFulfilmentCleanUpService fulfilmentCleanUpService)
     {
         /// <summary>
-        /// This should run once a day as per the cron expression in app settings. It shouldn't find anything to delete if everything is working fine as the FulfilmentServiceJob should clean up after itself.
+        /// This should run once a day as per the cron expression in app settings.
         /// </summary>
         /// <param name="timerInfo"></param>
         public void DailyMaintenance([TimerTrigger("%CleanUpConfiguration:DailyMaintenanceCronSchedule%")] TimerInfo timerInfo)

@@ -51,8 +51,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
 
                             if (fileSystemHelper.DeleteFolderIfExists(subFolder))
                             {
-                                // Even if folder is deleted, log it as error. The FulfilmentServiceJob should have cleaned up after itself.
-                                logger.LogError(EventIds.HistoricDateFolderDeleted.ToEventId(), "Historic folder deleted successfully for Date:{Date}.", subFolderName);
+                                logger.LogInformation(EventIds.HistoricDateFolderDeleted.ToEventId(), "Historic folder deleted successfully for Date:{Date}.", subFolderName);
                             }
                         }
                     }
