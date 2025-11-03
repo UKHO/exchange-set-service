@@ -100,7 +100,6 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Job
             A.CallTo(() => _fakeFulfilmentDataService.CreateExchangeSet(A<FulfilmentServiceBatch>.Ignored)).MustHaveHappenedOnceExactly();
             A.CallTo(() => _fakeFulfilmentDataService.CreateLargeExchangeSet(A<FulfilmentServiceBatch>.Ignored, A<string>.Ignored)).MustNotHaveHappened();
 
-            _fakeLogger.VerifyLogEntry(EventIds.AIOToggleIsOn, "ESS Webjob : AIO toggle is ON for BatchId:{BatchId} | _X-Correlation-ID : {CorrelationId}");
             _fakeLogger.VerifyLogEntry(EventIds.CreateExchangeSetRequestStart, "Create Exchange Set web job request for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}");
             _fakeLogger.VerifyLogEntry(EventIds.CreateExchangeSetRequestCompleted, "Create Exchange Set web job request for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", true);
         }
@@ -118,7 +117,6 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Job
             A.CallTo(() => _fakeFulfilmentDataService.CreateLargeExchangeSet(A<FulfilmentServiceBatch>.Ignored, FakeBatchValue.LargeExchangeSetFolderNamePattern)).MustHaveHappenedOnceExactly();
             A.CallTo(() => _fakeFulfilmentDataService.CreateExchangeSet(A<FulfilmentServiceBatch>.Ignored)).MustNotHaveHappened();
 
-            _fakeLogger.VerifyLogEntry(EventIds.AIOToggleIsOn, "ESS Webjob : AIO toggle is ON for BatchId:{BatchId} | _X-Correlation-ID : {CorrelationId}");
             _fakeLogger.VerifyLogEntry(EventIds.CreateLargeExchangeSetRequestStart, "Create Large Exchange Set web job request for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}");
             _fakeLogger.VerifyLogEntry(EventIds.CreateLargeExchangeSetRequestCompleted, "Create Large Exchange Set web job request for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", true);
         }
@@ -146,7 +144,6 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Job
             A.CallTo(() => _fakeAzureBlobStorageService.DownloadSalesCatalogueResponse(A<string>.Ignored, FakeBatchValue.BatchId, FakeBatchValue.CorrelationId)).MustHaveHappenedOnceExactly();
             A.CallTo(() => _fakeFulfilmentCallBackService.SendCallBackErrorResponse(salesCatalogueProductResponse, A<SalesCatalogueServiceResponseQueueMessage>.That.Matches(m => m.BatchId == FakeBatchValue.BatchId))).MustHaveHappenedOnceExactly();
 
-            _fakeLogger.VerifyLogEntry(EventIds.AIOToggleIsOn, "ESS Webjob : AIO toggle is ON for BatchId:{BatchId} | _X-Correlation-ID : {CorrelationId}");
             _fakeLogger.VerifyLogEntry(EventIds.CreateExchangeSetRequestStart, "Create Exchange Set web job request for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}");
             _fakeLogger.VerifyLogEntry(EventIds.CreateExchangeSetRequestCompleted, "Create Exchange Set web job request for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", true, times: 0);
             _fakeLogger.VerifyLogEntry(EventIds.ErrorTxtIsUploaded, "Error while processing Exchange Set creation and error.txt file is created and uploaded in file share service with ErrorCode-EventId:{EventId} and EventName:{EventName} for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", logLevel: LogLevel.Error);

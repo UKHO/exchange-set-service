@@ -702,14 +702,6 @@ namespace UKHO.ExchangeSetService.Common.Logging
         /// </summary>
         AzureWebJobIsDegraded = 805172,
         /// <summary>
-        /// 805173 - AIO toggle is ON.
-        /// </summary>
-        AIOToggleIsOn = 805173,
-        /// <summary>
-        /// 805174 - AIO toggle is OFF.
-        /// </summary>
-        AIOToggleIsOff = 805174,
-        /// <summary>
         /// 805175 - Request for creating serial.aio file in exchange set is started.
         /// </summary>
         CreateSerialAioFileRequestStart = 805175,

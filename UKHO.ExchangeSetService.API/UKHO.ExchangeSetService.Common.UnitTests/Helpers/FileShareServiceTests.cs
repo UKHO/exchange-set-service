@@ -1607,7 +1607,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
 
 
         [Test]
-        public async Task WhenGetBatchInfoBasedOnProducts_ThenReturnsSearchBatchResponseForLargeMediaExchangeSetWithAioProductAndAioToggleEnabled()
+        public async Task WhenGetBatchInfoBasedOnProducts_ThenReturnsSearchBatchResponseForLargeMediaExchangeSetWithAioProduct()
         {
             string postBodyParam = "This should be replace by actual value when param passed to api call";
             string businessUnit = "ADDS";
