@@ -37,8 +37,6 @@ namespace UKHO.ExchangeSetService.FulfilmentService
 
             try
             {
-                logger.LogInformation(EventIds.AIOToggleIsOn.ToEventId(), "ESS Webjob : AIO toggle is ON for BatchId:{BatchId} | _X-Correlation-ID : {CorrelationId}", batch.BatchId, batch.CorrelationId);
-
                 var transactionName =
                     $"{Environment.GetEnvironmentVariable("WEBSITE_SITE_NAME")}-fulfilment-transaction";
 
