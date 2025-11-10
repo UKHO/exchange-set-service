@@ -40,6 +40,7 @@ steps:
       TF_VAR_asp_control_mxs: $(appServicePlanControlMxs)
       TF_VAR_asp_control_lxs: $(appServicePlanControlLxs)
       TF_VAR_asp_control_webapp: $(appServicePlanControlWebApp)
+      TF_VAR_scs_response_retention: $(SalesCatalogueResponseRetentionInDays)
 
   - task: FileTransform@2
     displayName: "File Transform: WebJob"
@@ -57,7 +58,6 @@ steps:
       scriptLocation: 'scriptPath'
       scriptPath: '$(Pipeline.Workspace)/terraformartifact/fulfilment_webjob_deployment.ps1'
       arguments: '-terraformJsonOutputFile $(Pipeline.Workspace)/terraformartifact/terraform_output.json -packagePath "$(Pipeline.Workspace)/ExchangeSetService" -packageName "ExchangeSetFulFilmentService.zip"'
-
 
   - task: FileTransform@2
     displayName: "File Transform: WebAppSettings"

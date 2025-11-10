@@ -28,6 +28,26 @@ resource "azurerm_storage_queue" "small_exchange_set_storage_queue" {
   storage_account_name = azurerm_storage_account.small_exchange_set_storage.name
 }
 
+resource "azurerm_storage_management_policy" "small_exchange_set_storage_policy" {
+  storage_account_id = azurerm_storage_account.small_exchange_set_storage.id
+
+  rule {
+    name    = "${azurerm_storage_container.small_exchange_set_storage_container.name}-retention"
+    enabled = true
+
+    filters {
+      prefix_match = [azurerm_storage_container.small_exchange_set_storage_container.name]
+      blob_types   = ["blockBlob", "appendBlob"]
+    }
+
+    actions {
+      base_blob {
+        delete_after_days_since_creation_greater_than = var.scs_response_retention
+      }
+    }
+  }
+}
+
 #Medium exchange set storage
 
 resource "azurerm_storage_account" "medium_exchange_set_storage" {
@@ -60,6 +80,26 @@ resource "azurerm_storage_queue" "medium_exchange_set_storage_queue" {
   storage_account_name = azurerm_storage_account.medium_exchange_set_storage.name
 }
 
+resource "azurerm_storage_management_policy" "medium_exchange_set_storage_policy" {
+  storage_account_id = azurerm_storage_account.medium_exchange_set_storage.id
+
+  rule {
+    name    = "${azurerm_storage_container.medium_exchange_set_storage_container.name}-retention"
+    enabled = true
+
+    filters {
+      prefix_match = [azurerm_storage_container.medium_exchange_set_storage_container.name]
+      blob_types   = ["blockBlob", "appendBlob"]
+    }
+
+    actions {
+      base_blob {
+        delete_after_days_since_creation_greater_than = var.scs_response_retention
+      }
+    }
+  }
+}
+
 #Large exchange set storage
 
 resource "azurerm_storage_account" "large_exchange_set_storage" {
@@ -90,4 +130,24 @@ resource "azurerm_storage_queue" "large_exchange_set_storage_queue" {
   count                = var.exchange_set_config.LargeExchangeSetInstance
   name                 = "ess-${sum([1,count.index])}-fulfilment"
   storage_account_name = azurerm_storage_account.large_exchange_set_storage.name
+}
+
+resource "azurerm_storage_management_policy" "large_exchange_set_storage_policy" {
+  storage_account_id = azurerm_storage_account.large_exchange_set_storage.id
+
+  rule {
+    name    = "${azurerm_storage_container.large_exchange_set_storage_container.name}-retention"
+    enabled = true
+
+    filters {
+      prefix_match = [azurerm_storage_container.large_exchange_set_storage_container.name]
+      blob_types   = ["blockBlob", "appendBlob"]
+    }
+
+    actions {
+      base_blob {
+        delete_after_days_since_creation_greater_than = var.scs_response_retention
+      }
+    }
+  }
 }
