@@ -15,6 +15,7 @@ using UKHO.ExchangeSetService.Common.Helpers;
 using UKHO.ExchangeSetService.Common.Logging;
 using UKHO.ExchangeSetService.Common.Models.SalesCatalogue;
 using UKHO.ExchangeSetService.Common.Models.WebJobs;
+using UKHO.ExchangeSetService.FulfilmentService.Configuration;
 using UKHO.ExchangeSetService.FulfilmentService.Services;
 
 namespace UKHO.ExchangeSetService.FulfilmentService
@@ -24,9 +25,9 @@ namespace UKHO.ExchangeSetService.FulfilmentService
                                 IFulfilmentDataService fulFilmentDataService, ILogger<FulfilmentServiceJob> logger, IFileSystemHelper fileSystemHelper,
                                 IFileShareBatchService fileBatchShareService, IFileShareUploadService fileShareUploadService, IOptions<FileShareServiceConfiguration> fileShareServiceConfig,
                                 IAzureBlobStorageService azureBlobStorageService, IFulfilmentCallBackService fulfilmentCallBackService,
-                                IOptions<PeriodicOutputServiceConfiguration> periodicOutputServiceConfiguration)
+                                IOptions<PeriodicOutputServiceConfiguration> periodicOutputServiceConfiguration, IFulfilmentCleanUpService fulfilmentCleanUpService, IOptions<CleanUpConfiguration> cleanUpConfiguration)
     {
-        protected IConfiguration configuration = configuration;
+        private readonly CleanUpConfiguration _cleanUpConfiguration = cleanUpConfiguration?.Value ?? throw new ArgumentNullException(nameof(cleanUpConfiguration));
 
         public async Task ProcessQueueMessage([QueueTrigger("%ESSFulfilmentStorageConfiguration:QueueName%")] QueueMessage message)
         {
@@ -85,7 +86,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService
             }
             finally
             {
-                Agent.Tracer.CurrentTransaction?.End();
+                CleanUpTemporaryBatchData(batch);
             }
         }
 
@@ -127,6 +128,31 @@ namespace UKHO.ExchangeSetService.FulfilmentService
             var salesCatalogueProductResponse = await azureBlobStorageService.DownloadSalesCatalogueResponse(fulfilmentServiceQueueMessage.ScsResponseUri, fulfilmentServiceQueueMessage.BatchId, fulfilmentServiceQueueMessage.CorrelationId);
 
             await fulfilmentCallBackService.SendCallBackErrorResponse(salesCatalogueProductResponse, fulfilmentServiceQueueMessage);
+        }
+
+        private void CleanUpTemporaryBatchData(FulfilmentServiceBatch batch)
+        {
+            try
+            {
+                if (_cleanUpConfiguration.ContinuousCleanupEnabled)
+                {
+                    logger.LogStartEndAndElapsedTime(EventIds.FulfilmentBatchCleanUpStarted, EventIds.FulfilmentBatchCleanUpCompleted, "Deletion of temporary data for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}.", () =>
+                    {
+                        fulfilmentCleanUpService.DeleteBatchFolder(batch);
+                        return true;
+                    },
+                    batch.BatchId, batch.CorrelationId);
+                }
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(EventIds.FulfilmentBatchCleanUpFailed.ToEventId(), ex, "Exception occurred while cleaning up temporary data for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}. Exception:{Message}", batch.BatchId, batch.CorrelationId, ex.Message);
+                Agent.Tracer.CurrentTransaction?.CaptureException(ex);
+            }
+            finally
+            {
+                Agent.Tracer.CurrentTransaction?.End();
+            }
         }
     }
 }
