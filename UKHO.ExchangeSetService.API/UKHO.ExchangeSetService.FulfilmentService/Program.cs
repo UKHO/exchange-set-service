@@ -150,13 +150,14 @@ namespace UKHO.ExchangeSetService.FulfilmentService
                  services.AddScoped<ISalesCatalogueStorageService, SalesCatalogueStorageService>();
                  services.AddScoped<IFulfilmentDataService, FulfilmentDataService>();
                  services.AddScoped<IMonitorHelper, MonitorHelper>();
+                 services.AddScoped<IFulfilmentCleanUpService, FulfilmentCleanUpService>();
                  services.AddScoped<IAzureBlobStorageService, AzureBlobStorageService>();
                  services.AddScoped<IAzureBlobStorageClient, AzureBlobStorageClient>();
                  services.AddScoped<IAzureMessageQueueHelper, AzureMessageQueueHelper>();
                  services.AddScoped<IAzureTableStorageClient, AzureTableStorageClient>();
                  services.AddScoped<IFileShareServiceCache, FileShareServiceCache>();
                  services.AddScoped<IProductDataValidator, ProductDataValidator>();
-                 services.AddScoped<IFileBuilder,  FileBuilder>();
+                 services.AddScoped<IFileBuilder, FileBuilder>();
                  services.AddScoped<IDownloader, Downloader>();
                  services.AddScoped<IExchangeSetBuilder, ExchangeSetBuilder>();
 
@@ -204,6 +205,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService
                  services.Configure<EssManagedIdentityConfiguration>(ConfigurationBuilder.GetSection("ESSManagedIdentity"));
                  services.Configure<EssCallBackConfiguration>(ConfigurationBuilder.GetSection("ESSCallBackConfiguration"));
                  services.Configure<PeriodicOutputServiceConfiguration>(ConfigurationBuilder.GetSection("PeriodicOutputServiceConfiguration"));
+                 services.Configure<CleanUpConfiguration>(ConfigurationBuilder.GetSection("CleanUpConfiguration"));
 
                  services.AddDistributedMemoryCache();
 
