@@ -1,8 +1,6 @@
 ﻿using System;
-using System.IO;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using UKHO.ExchangeSetService.Common.Extensions;
 using UKHO.ExchangeSetService.Common.Helpers;
 using UKHO.ExchangeSetService.Common.Logging;
 using UKHO.ExchangeSetService.Common.Models.WebJobs;
@@ -28,38 +26,28 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             }
         }
 
-        public void DeleteHistoricBatchFolders(FulfilmentServiceBatchBase batchBase)
+        public void DeleteHistoricBatchFolders(FulfilmentServiceBatchBase batchBase, DateTime currentUtcDateTime)
         {
-            //try
-            //{
-            //    var cutoffDate = batchBase.CurrentUtcDateTime.AddDays(-_cleanUpConfiguration.NumberOfDays).Date;
-            //    var historicFoldersFound = false;
+            try
+            {
+                var cutoffDate = currentUtcDateTime.AddDays(-_cleanUpConfiguration.NumberOfDays);
+                var directories = fileSystemHelper.GetDirectoryInfo(batchBase.BaseDirectory);
 
-            //    foreach (var subFolder in fileSystemHelper.GetDirectories(batchBase.BaseDirectory))
-            //    {
-            //        var subFolderName = new DirectoryInfo(subFolder).Name;
-            //        var folderIsValidDate = DateTimeExtensions.IsValidDate(subFolderName, FulfilmentServiceBatchBase.CurrentUtcDateFormat, out var subFolderDateTime);
-
-            //        if (folderIsValidDate && subFolderDateTime.Date <= cutoffDate)
-            //        {
-            //            historicFoldersFound = true;
-
-            //            if (fileSystemHelper.DeleteFolderIfExists(subFolder))
-            //            {
-            //                logger.LogInformation(EventIds.HistoricDateFolderDeleted.ToEventId(), "Historic folder deleted successfully for Date:{Date}.", subFolderName);
-            //            }
-            //        }
-            //    }
-
-            //    if (!historicFoldersFound)
-            //    {
-            //        logger.LogInformation(EventIds.HistoricDateFolderNotFound.ToEventId(), "Historic folder not found for Date:{Date}.", cutoffDate.ToString(FulfilmentServiceBatchBase.CurrentUtcDateFormat));
-            //    }
-            //}
-            //catch (Exception ex)
-            //{
-            //    logger.LogError(EventIds.DeleteHistoricFoldersAndFilesException.ToEventId(), ex, "Exception while deleting historic folders and files with error {Message}", ex.Message);
-            //}
+                foreach (var subFolder in directories)
+                {
+                    if (subFolder.CreationTime < cutoffDate)
+                    {
+                        if (fileSystemHelper.DeleteFolderIfExists(subFolder.FullName))
+                        {
+                            logger.LogError(EventIds.HistoricDateFolderDeleted.ToEventId(), "Historic folder deleted successfully for folder:{Folder}.", subFolder.Name);
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(EventIds.DeleteHistoricFoldersAndFilesException.ToEventId(), ex, "Exception while deleting historic folders and files with error {Message}", ex.Message);
+            }
         }
     }
 }
