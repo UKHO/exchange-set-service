@@ -122,14 +122,6 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.TestHelper
         /// </summary>
         public const string S63BusinessUnit = "ADDS";
         /// <summary>
-        /// 25Sep2025
-        /// </summary>
-        public const string CurrentUtcDate = "25Sep2025";
-        /// <summary>
-        /// The DateTime value related to <see cref="CurrentUtcDate"/>
-        /// </summary>
-        public static DateTime CurrentUtcDateTime { get; }
-        /// <summary>
         /// GB800001
         /// </summary>
         public const string AioCell1 = "GB800001";
@@ -139,103 +131,107 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.TestHelper
         public const string ErrorFileName = "error.txt";
 
         /// <summary>
-        /// C:\HOME
+        /// C:\Temp
         /// </summary>
-        public const string BaseDirectoryPath = @"C:\HOME";
+        public const string TempDirectoryPath = @"C:\Temp";
         /// <summary>
-        /// C:\HOME\25Sep2025\7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272
+        /// C:\Temp\ess-fulfilment
         /// </summary>
-        public const string BatchPath = $@"{BaseDirectoryPath}\{CurrentUtcDate}\{BatchId}";
+        public const string BaseDirectoryPath = $@"{TempDirectoryPath}\ess-fulfilment";
         /// <summary>
-        /// C:\HOME\25Sep2025\7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272\V01X01
+        /// C:\Temp\ess-fulfilment\7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272
+        /// </summary>
+        public const string BatchPath = $@"{BaseDirectoryPath}\{BatchId}";
+        /// <summary>
+        /// C:\Temp\ess-fulfilment\7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272\V01X01
         /// </summary>
         public const string ExchangeSetPath = $@"{BatchPath}\{ExchangeSetFileFolder}";
         /// <summary>
-        /// C:\HOME\25Sep2025\7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272\V01X01\ENC_ROOT
+        /// C:\Temp\ess-fulfilment\7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272\V01X01\ENC_ROOT
         /// </summary>
         public const string ExchangeSetEncRootPath = $@"{ExchangeSetPath}\{EncRoot}";
         /// <summary>
-        /// C:\HOME\25Sep2025\7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272\V01X01\INFO
+        /// C:\Temp\ess-fulfilment\7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272\V01X01\INFO
         /// </summary>
         public const string ExchangeSetInfoPath = $@"{ExchangeSetPath}\{Info}";
         /// <summary>
-        /// C:\HOME\25Sep2025\7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272\M05X02
+        /// C:\Temp\ess-fulfilment\7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272\M05X02
         /// </summary>
         public const string LargeExchangeSetMediaPath5 = $@"{BatchPath}\{LargeExchangeSetFolderName5}";
         /// <summary>
-        /// C:\HOME\25Sep2025\7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272\M06X02
+        /// C:\Temp\ess-fulfilment\7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272\M06X02
         /// </summary>
         public const string LargeExchangeSetMediaPath6 = $@"{BatchPath}\{LargeExchangeSetFolderName6}";
         /// <summary>
-        /// C:\HOME\25Sep2025\7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272\M05X02\INFO
+        /// C:\Temp\ess-fulfilment\7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272\M05X02\INFO
         /// </summary>
         public const string LargeExchangeSetMediaInfoPath5 = $@"{LargeExchangeSetMediaPath5}\{Info}";
         /// <summary>
-        /// C:\HOME\25Sep2025\7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272\M06X02\INFO
+        /// C:\Temp\ess-fulfilment\7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272\M06X02\INFO
         /// </summary>
         public const string LargeExchangeSetMediaInfoPath6 = $@"{LargeExchangeSetMediaPath6}\{Info}";
         /// <summary>
-        /// C:\HOME\25Sep2025\7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272\M05X02\INFO\ADC
+        /// C:\Temp\ess-fulfilment\7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272\M05X02\INFO\ADC
         /// </summary>
         public const string LargeExchangeSetMediaInfoAdcPath5 = $@"{LargeExchangeSetMediaInfoPath5}\{Adc}";
         /// <summary>
-        /// C:\HOME\25Sep2025\7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272\M06X02\INFO\ADC
+        /// C:\Temp\ess-fulfilment\7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272\M06X02\INFO\ADC
         /// </summary>
         public const string LargeExchangeSetMediaInfoAdcPath6 = $@"{LargeExchangeSetMediaInfoPath6}\{Adc}";
         /// <summary>
-        /// C:\HOME\25Sep2025\7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272\M05X02\INFO\ENC Update List.csv
+        /// C:\Temp\ess-fulfilment\7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272\M05X02\INFO\ENC Update List.csv
         /// </summary>
         public const string UpdateListFilePath5 = $@"{LargeExchangeSetMediaInfoPath5}\{UpdateListFileName}";
         /// <summary>
-        /// C:\HOME\25Sep2025\7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272\M05X02\MEDIA.TXT
+        /// C:\Temp\ess-fulfilment\7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272\M05X02\MEDIA.TXT
         /// </summary>
         public const string LargeExchangeSetMediaFilePath5 = $@"{LargeExchangeSetMediaPath5}\{MediaFileName}";
         /// <summary>
-        /// C:\HOME\25Sep2025\7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272\M0{0}X02\{1}\ENC_ROOT
+        /// C:\Temp\ess-fulfilment\7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272\M0{0}X02\{1}\ENC_ROOT
         /// </summary>
         public const string LargeExchangeSetEncRootPattern = $@"{BatchPath}\{LargeExchangeSetFolderNamePattern}\{{1}}\{EncRoot}";
         /// <summary>
-        /// C:\HOME\25Sep2025\7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272\V01X01\SERIAL.ENC
+        /// C:\Temp\ess-fulfilment\7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272\V01X01\SERIAL.ENC
         /// </summary>
         public const string SerialFilePath = $@"{ExchangeSetPath}\{SerialFileName}";
         /// <summary>
-        /// C:\HOME\25Sep2025\7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272\V01X01\INFO\PRODUCTS.TXT
+        /// C:\Temp\ess-fulfilment\7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272\V01X01\INFO\PRODUCTS.TXT
         /// </summary>
         public const string ProductFilePath = $@"{ExchangeSetInfoPath}\{ProductFileName}";
         /// <summary>
-        /// C:\HOME\25Sep2025\7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272\V01X01\ENC_ROOT\README.TXT
+        /// C:\Temp\ess-fulfilment\7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272\V01X01\ENC_ROOT\README.TXT
         /// </summary>
         public const string ReadMeFilePath = $@"{ExchangeSetEncRootPath}\{ReadMeFileName}";
         /// <summary>
-        /// C:\HOME\25Sep2025\7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272\V01X01\ENC_ROOT\CATALOG.031
+        /// C:\Temp\ess-fulfilment\7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272\V01X01\ENC_ROOT\CATALOG.031
         /// </summary>
         public const string CatalogFilePath = $@"{ExchangeSetEncRootPath}\{CatalogFileName}";
         /// <summary>
-        /// C:\HOME\25Sep2025\7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272\AIO
+        /// C:\Temp\ess-fulfilment\7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272\AIO
         /// </summary>
         public const string AioExchangeSetPath = $@"{BatchPath}\{AioExchangeSetFileFolder}";
         /// <summary>
-        /// C:\HOME\25Sep2025\7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272\AIO\ENC_ROOT
+        /// C:\Temp\ess-fulfilment\7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272\AIO\ENC_ROOT
         /// </summary>
         public const string AioExchangeSetEncRootPath = $@"{AioExchangeSetPath}\{EncRoot}";
         /// <summary>
-        /// C:\HOME\25Sep2025\7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272\AIO\INFO
+        /// C:\Temp\ess-fulfilment\7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272\AIO\INFO
         /// </summary>
         public const string AioExchangeSetInfoPath = $@"{AioExchangeSetPath}\{Info}";
         /// <summary>
-        /// C:\HOME\25Sep2025\7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272\AIO\SERIAL.AIO
+        /// C:\Temp\ess-fulfilment\7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272\AIO\SERIAL.AIO
         /// </summary>
         public const string SerialAioFilePath = $@"{AioExchangeSetPath}\{SerialAioFileName}";
         /// <summary>
-        /// C:\HOME\25Sep2025\7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272\V01X01\V01X01.zip
+        /// C:\Temp\ess-fulfilment\7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272\V01X01\V01X01.zip
         /// </summary>
         public const string ExchangeSetZipFilePath = $@"{BatchPath}\{ExchangeSetZipFileName}";
         /// <summary>
-        /// C:\HOME\25Sep2025\7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272\AIO\AIO.zip
+        /// C:\Temp\ess-fulfilment\7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272\AIO\AIO.zip
         /// </summary>
         public const string AioExchangeSetZipFilePath = $@"{BatchPath}\{AioExchangeSetZipFileName}";
         /// <summary>
-        /// C:\HOME\25Sep2025\7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272\error.txt
+        /// C:\Temp\ess-fulfilment\7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272\error.txt
         /// </summary>
         public const string ErrorFilePath = $@"{BatchPath}\{ErrorFileName}";
 
@@ -247,9 +243,6 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.TestHelper
 
         static FakeBatchValue()
         {
-            var currentUtcDateTime = DateTime.ParseExact(CurrentUtcDate, "ddMMMyyyy", CultureInfo.InvariantCulture);
-            CurrentUtcDateTime = new DateTime(currentUtcDateTime.Year, currentUtcDateTime.Month, currentUtcDateTime.Day, 13, 14, 15, DateTimeKind.Utc);
-
             FileShareServiceConfiguration = Options.Create(new FileShareServiceConfiguration
             {
                 Adc = Adc,
@@ -302,7 +295,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.TestHelper
 
             var inMemSettings = new Dictionary<string, string>
             {
-                { "HOME", BaseDirectoryPath }
+                { "TMP", TempDirectoryPath }
             };
             Configuration = new ConfigurationBuilder().AddInMemoryCollection(inMemSettings).Build();
         }

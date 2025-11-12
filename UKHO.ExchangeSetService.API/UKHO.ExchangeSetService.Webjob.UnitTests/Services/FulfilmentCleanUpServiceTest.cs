@@ -45,7 +45,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
                 CorrelationId = FakeBatchValue.CorrelationId
             };
 
-            _batch = new FulfilmentServiceBatch(FakeBatchValue.Configuration, message, FakeBatchValue.CurrentUtcDateTime);
+            _batch = new FulfilmentServiceBatch(FakeBatchValue.Configuration, message);
         }
 
         [Test]

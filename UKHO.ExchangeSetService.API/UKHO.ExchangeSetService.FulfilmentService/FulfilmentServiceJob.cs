@@ -32,7 +32,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService
         public async Task ProcessQueueMessage([QueueTrigger("%ESSFulfilmentStorageConfiguration:QueueName%")] QueueMessage message)
         {
             var salesCatalogueServiceResponseQueueMessage = message.Body.ToObjectFromJson<SalesCatalogueServiceResponseQueueMessage>();
-            var batch = new FulfilmentServiceBatch(configuration, salesCatalogueServiceResponseQueueMessage, DateTime.UtcNow);
+            var batch = new FulfilmentServiceBatch(configuration, salesCatalogueServiceResponseQueueMessage);
             var fileSizeInMb = CommonHelper.ConvertBytesToMegabytes(batch.Message.FileSize);
             CommonHelper.IsPeriodicOutputService = fileSizeInMb > periodicOutputServiceConfiguration.Value.LargeMediaExchangeSetSizeInMB;
 
