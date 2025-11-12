@@ -28,7 +28,6 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             _fakeFileSystemHelper = A.Fake<IFileSystemHelper>();
             _cleanUpConfiguration = new CleanUpConfiguration
             {
-                ContinuousCleanupEnabled = true,
                 NumberOfDays = 2
             };
             var fakeCleanUpConfiguration = A.Fake<IOptions<CleanUpConfiguration>>();
