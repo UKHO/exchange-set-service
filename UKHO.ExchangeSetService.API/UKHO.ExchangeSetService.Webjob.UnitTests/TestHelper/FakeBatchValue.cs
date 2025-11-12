@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
 using UKHO.ExchangeSetService.Common.Configuration;
@@ -127,7 +128,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.TestHelper
         /// <summary>
         /// The DateTime value related to <see cref="CurrentUtcDate"/>
         /// </summary>
-        public static DateTime CurrentUtcDateTime = new(2025, 9, 25);
+        public static DateTime CurrentUtcDateTime { get; }
         /// <summary>
         /// GB800001
         /// </summary>
@@ -140,11 +141,11 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.TestHelper
         /// <summary>
         /// C:\HOME
         /// </summary>
-        public const string HomeDirectoryPath = @"C:\HOME";
+        public const string BaseDirectoryPath = @"C:\HOME";
         /// <summary>
         /// C:\HOME\25Sep2025\7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272
         /// </summary>
-        public const string BatchPath = $@"{HomeDirectoryPath}\{CurrentUtcDate}\{BatchId}";
+        public const string BatchPath = $@"{BaseDirectoryPath}\{CurrentUtcDate}\{BatchId}";
         /// <summary>
         /// C:\HOME\25Sep2025\7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272\V01X01
         /// </summary>
@@ -246,6 +247,9 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.TestHelper
 
         static FakeBatchValue()
         {
+            var currentUtcDateTime = DateTime.ParseExact(CurrentUtcDate, "ddMMMyyyy", CultureInfo.InvariantCulture);
+            CurrentUtcDateTime = new DateTime(currentUtcDateTime.Year, currentUtcDateTime.Month, currentUtcDateTime.Day, 13, 14, 15, DateTimeKind.Utc);
+
             FileShareServiceConfiguration = Options.Create(new FileShareServiceConfiguration
             {
                 Adc = Adc,
@@ -298,7 +302,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.TestHelper
 
             var inMemSettings = new Dictionary<string, string>
             {
-                { "HOME", HomeDirectoryPath }
+                { "HOME", BaseDirectoryPath }
             };
             Configuration = new ConfigurationBuilder().AddInMemoryCollection(inMemSettings).Build();
         }
