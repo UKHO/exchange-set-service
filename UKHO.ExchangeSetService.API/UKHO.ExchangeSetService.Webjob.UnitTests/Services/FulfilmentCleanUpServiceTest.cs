@@ -1,10 +1,12 @@
 ﻿using FakeItEasy;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using NUnit.Framework;
 using UKHO.ExchangeSetService.Common.Helpers;
 using UKHO.ExchangeSetService.Common.Logging;
 using UKHO.ExchangeSetService.Common.Models.SalesCatalogue;
 using UKHO.ExchangeSetService.Common.Models.WebJobs;
+using UKHO.ExchangeSetService.FulfilmentService.Configuration;
 using UKHO.ExchangeSetService.FulfilmentService.Services;
 using UKHO.ExchangeSetService.Webjob.UnitTests.TestHelper;
 
@@ -15,6 +17,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
     {
         private ILogger<FulfilmentCleanUpService> _fakeLogger;
         private IFileSystemHelper _fakeFileSystemHelper;
+        private CleanUpConfiguration _cleanUpConfiguration;
         private FulfilmentCleanUpService _service;
         private FulfilmentServiceBatch _batch;
 
@@ -23,10 +26,18 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
         {
             _fakeLogger = A.Fake<ILogger<FulfilmentCleanUpService>>();
             _fakeFileSystemHelper = A.Fake<IFileSystemHelper>();
+            _cleanUpConfiguration = new CleanUpConfiguration
+            {
+                ContinuousCleanupEnabled = true,
+                NumberOfDays = 2
+            };
+            var fakeCleanUpConfiguration = A.Fake<IOptions<CleanUpConfiguration>>();
+            A.CallTo(() => fakeCleanUpConfiguration.Value).Returns(_cleanUpConfiguration);
 
             _service = new FulfilmentCleanUpService(
                 _fakeLogger,
-                _fakeFileSystemHelper);
+                _fakeFileSystemHelper,
+                fakeCleanUpConfiguration);
 
             var message = new SalesCatalogueServiceResponseQueueMessage
             {
