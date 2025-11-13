@@ -63,6 +63,8 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Job
                 _fakeFulfilmentCallBackService,
                 _periodicOutputServiceConfiguration,
                 _fakeFulfilmentCleanUpService);
+
+            Environment.SetEnvironmentVariable("WEBSITE_SITE_NAME", "unittestsite");
         }
 
         [TearDown]

@@ -209,6 +209,8 @@ namespace UKHO.ExchangeSetService.FulfilmentService
 
                  services.AddDistributedMemoryCache();
 
+                 services.AddMaintenancePerInstance();
+
                  // Add App Insights Telemetry Filter
                  var telemetryConfiguration = buildServiceProvider.GetRequiredService<TelemetryConfiguration>();
                  var telemetryProcessorChainBuilder = telemetryConfiguration.TelemetryProcessorChainBuilder;
