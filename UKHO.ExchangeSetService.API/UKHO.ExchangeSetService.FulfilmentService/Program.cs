@@ -151,6 +151,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService
                  services.AddScoped<IFulfilmentDataService, FulfilmentDataService>();
                  services.AddScoped<IMonitorHelper, MonitorHelper>();
                  services.AddScoped<IFulfilmentCleanUpService, FulfilmentCleanUpService>();
+                 services.AddScoped<IMaintenanceBackgroundService, MaintenanceBackgroundService>();
                  services.AddScoped<IAzureBlobStorageService, AzureBlobStorageService>();
                  services.AddScoped<IAzureBlobStorageClient, AzureBlobStorageClient>();
                  services.AddScoped<IAzureMessageQueueHelper, AzureMessageQueueHelper>();
@@ -209,7 +210,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService
 
                  services.AddDistributedMemoryCache();
 
-                 services.AddMaintenancePerInstance();
+                 services.AddHostedService<MaintenanceBackgroundJob>();
 
                  // Add App Insights Telemetry Filter
                  var telemetryConfiguration = buildServiceProvider.GetRequiredService<TelemetryConfiguration>();
