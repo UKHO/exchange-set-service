@@ -16,6 +16,19 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
     {
         private readonly CleanUpConfiguration _cleanUpConfiguration = cleanUpConfiguration?.Value ?? throw new ArgumentNullException(nameof(cleanUpConfiguration));
 
+        public TimeSpan CalculateNextRunDelay(DateTime utcNow, DateTime nextRunUtc)
+        {
+            var delay = nextRunUtc - utcNow;
+
+            if (delay < TimeSpan.Zero)
+            {
+                // If we're behind (e.g. cold start), run immediately.
+                delay = TimeSpan.Zero;
+            }
+
+            return delay;
+        }
+
         public (bool Error, string Message, CrontabSchedule Schedule) GetSchedule()
         {
             CrontabSchedule schedule;

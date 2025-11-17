@@ -38,6 +38,27 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
         }
 
         [Test]
+        [TestCase(-1, TestName = "CalculateNextRunDelay_WhenNextRunIsInThePast")]
+        [TestCase(0, TestName = "CalculateNextRunDelay_WhenNextRunIsNow")]
+        [TestCase(1, TestName = "CalculateNextRunDelay_WhenNextRunIsInTheFuture")]
+        public void CalculateNextRunDelay(long ticks)
+        {
+            var utcNow = DateTime.UtcNow;
+            var nextRunUtc = utcNow.AddTicks(ticks);
+
+            var delay = _service.CalculateNextRunDelay(utcNow, nextRunUtc);
+
+            if (ticks < 0)
+            {
+                Assert.That(delay, Is.EqualTo(TimeSpan.Zero));
+            }
+            else
+            {
+                Assert.That(delay, Is.EqualTo(TimeSpan.FromTicks(ticks)));
+            }
+        }
+
+        [Test]
         public void GetSchedule_WhenCronMissing_ReportErrorAndReturnFalse()
         {
             _cleanUpConfiguration.MaintenanceCronSchedule = " ";

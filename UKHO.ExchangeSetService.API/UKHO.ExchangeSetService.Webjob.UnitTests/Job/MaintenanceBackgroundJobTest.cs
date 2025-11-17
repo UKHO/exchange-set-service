@@ -48,58 +48,11 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Job
         public async Task StartAsync_WhenCancelled_DoesNotThrowException()
         {
             _cancellationTokenSource.Cancel();
+            var schedule = CrontabSchedule.Parse("0 0 1 * * *", new CrontabSchedule.ParseOptions { IncludingSeconds = true });
+            A.CallTo(() => _fakeMaintenanceBackgroundService.GetSchedule()).Returns((false, string.Empty, schedule));
 
             Assert.DoesNotThrowAsync(async () => await _job.StartAsync(_cancellationTokenSource.Token));
         }
-
-        //protected override async Task ExecuteAsync(CancellationToken stoppingToken)
-        //{
-        //    var (error, message, schedule) = maintenanceBackgroundService.GetSchedule();
-
-        //    if (error)
-        //    {
-        //        logger.LogError(EventIds.MaintenanceCronScheduleInvalid.ToEventId(), "Maintenance background service disabled. Invalid cron expression. Error:{Error}", message);
-        //        return;
-        //    }
-
-        //    var nextRunUtc = ScheduleNextOccurrence(schedule);
-
-        //    while (!stoppingToken.IsCancellationRequested)
-        //    {
-        //        var delay = nextRunUtc - DateTime.UtcNow;
-
-        //        if (delay < TimeSpan.Zero)
-        //        {
-        //            // If we're behind (e.g. cold start), run immediately.
-        //            delay = TimeSpan.Zero;
-        //        }
-
-        //        try
-        //        {
-        //            await Task.Delay(delay, stoppingToken);
-        //        }
-        //        catch (TaskCanceledException)
-        //        {
-        //            break;
-        //        }
-
-        //        if (stoppingToken.IsCancellationRequested)
-        //        {
-        //            break;
-        //        }
-
-        //        maintenanceBackgroundService.RunMaintenance(DateTime.UtcNow, schedule);
-
-        //        nextRunUtc = ScheduleNextOccurrence(schedule);
-        //    }
-        //}
-
-        //private DateTime ScheduleNextOccurrence(CrontabSchedule schedule)
-        //{
-        //    var nextRunUtc = schedule.GetNextOccurrence(DateTime.UtcNow);
-        //    logger.LogInformation(EventIds.MaintenanceNextScheduledRun.ToEventId(), "Maintenance background service - next run at {NextRunUtc:dd/MM/yyyy HH:mm:ss} (UTC).", nextRunUtc);
-        //    return nextRunUtc;
-        //}
 
         [Test]
         public async Task ExecuteAsync_WhenGetScheduleReturnsError_LogErrorAndExit()
@@ -111,40 +64,51 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Job
             await result;
 
             A.CallTo(() => _fakeMaintenanceBackgroundService.GetSchedule()).MustHaveHappenedOnceExactly();
+            A.CallTo(() => _fakeMaintenanceBackgroundService.CalculateNextRunDelay(A<DateTime>.Ignored, A<DateTime>.Ignored)).MustNotHaveHappened();
             A.CallTo(() => _fakeMaintenanceBackgroundService.RunMaintenance(A<DateTime>.Ignored, A<CrontabSchedule>.Ignored)).MustNotHaveHappened();
 
+            _fakeLogger.VerifyLogEntry(EventIds.MaintenanceNextScheduledRun, "Maintenance background service - next run at {NextRunUtc:dd/MM/yyyy HH:mm:ss} (UTC).", checkIds: false, times: 0);
             _fakeLogger.VerifyLogEntry(EventIds.MaintenanceCronScheduleInvalid, "Maintenance background service disabled. Invalid cron expression. Error:{Error}", checkIds: false, logLevel: LogLevel.Error);
         }
 
-        //[Test]
-        //public async Task ExecuteAsync_WhenCancelled_DoNothing()
-        //{
-        //    _cancellationTokenSource.Cancel();
-        //    var parameters = new object[] { _cancellationTokenSource.Token };
+        [Test]
+        public async Task ExecuteAsync_WhenCancelled_DoNothing()
+        {
+            _cancellationTokenSource.Cancel();
+            var parameters = new object[] { _cancellationTokenSource.Token };
+            var schedule = CrontabSchedule.Parse("0 0 1 * * *", new CrontabSchedule.ParseOptions { IncludingSeconds = true });
+            A.CallTo(() => _fakeMaintenanceBackgroundService.GetSchedule()).Returns((false, string.Empty, schedule));
 
-        //    var result = (Task)InvokePrivate(_job, "ExecuteAsync", parameters);
-        //    await result;
+            var result = (Task)InvokePrivate(_job, "ExecuteAsync", parameters);
+            await result;
 
-        //    _fakeLogger.VerifyLogEntry(EventIds.MaintenanceNextScheduledRun, "Maintenance background service - next run at {NextRunUtc:dd/MM/yyyy HH:mm:ss} (UTC).", checkIds: false);
-        //    _fakeLogger.VerifyLogEntry(EventIds.MaintenanceCronScheduleInvalid, "Maintenance background service disabled. Invalid cron expression. Error:{Error}", checkIds: false, logLevel: LogLevel.Error, times: 0);
-        //    _fakeLogger.VerifyLogEntry(EventIds.DeleteHistoricFoldersAndFilesStarted, "Per-instance clean up process of historic folders and files", checkIds: false, times: 0);
-        //    _fakeLogger.VerifyLogEntry(EventIds.DeleteHistoricFoldersAndFilesCompleted, "Per-instance clean up process of historic folders and files", endEvent: true, checkIds: false, times: 0);
-        //}
+            A.CallTo(() => _fakeMaintenanceBackgroundService.GetSchedule()).MustHaveHappenedOnceExactly();
+            A.CallTo(() => _fakeMaintenanceBackgroundService.CalculateNextRunDelay(A<DateTime>.Ignored, A<DateTime>.Ignored)).MustNotHaveHappened();
+            A.CallTo(() => _fakeMaintenanceBackgroundService.RunMaintenance(A<DateTime>.Ignored, A<CrontabSchedule>.Ignored)).MustNotHaveHappened();
 
-        //[Test]
-        //public async Task ExecuteAsync_ProcessAfterDelay()
-        //{
-        //    var target = DateTime.UtcNow.AddSeconds(20);
-        //    _cleanUpConfiguration.MaintenanceCronSchedule = $"{target.Second} {target.Minute} {target.Hour} * * *";
-        //    var parameters = new object[] { _cancellationTokenSource.Token };
+            _fakeLogger.VerifyLogEntry(EventIds.MaintenanceNextScheduledRun, "Maintenance background service - next run at {NextRunUtc:dd/MM/yyyy HH:mm:ss} (UTC).", checkIds: false);
+            _fakeLogger.VerifyLogEntry(EventIds.MaintenanceCronScheduleInvalid, "Maintenance background service disabled. Invalid cron expression. Error:{Error}", checkIds: false, logLevel: LogLevel.Error, times: 0);
+        }
 
-        //    var result = (Task)InvokePrivate(_job, "ExecuteAsync", parameters);
-        //    await result;
+        [Test]
+        public async Task ExecuteAsync_ProcessAfterDelay_ThenCancel()
+        {
+            var delay = new TimeSpan(0, 0, 1); // 1 second delay
+            var cancellationTokenSource = new CancellationTokenSource(TimeSpan.FromMilliseconds(1750)); // Use a separate CTS to allow the task to complete
+            var parameters = new object[] { cancellationTokenSource.Token };
+            var schedule = CrontabSchedule.Parse("0 0 1 * * *", new CrontabSchedule.ParseOptions { IncludingSeconds = true });
+            A.CallTo(() => _fakeMaintenanceBackgroundService.GetSchedule()).Returns((false, string.Empty, schedule));
+            A.CallTo(() => _fakeMaintenanceBackgroundService.CalculateNextRunDelay(A<DateTime>.Ignored, A<DateTime>.Ignored)).Returns(delay);
 
-        //    _fakeLogger.VerifyLogEntry(EventIds.MaintenanceNextScheduledRun, "Maintenance background service - next run at {NextRunUtc:dd/MM/yyyy HH:mm:ss} (UTC).", checkIds: false);
-        //    _fakeLogger.VerifyLogEntry(EventIds.MaintenanceCronScheduleInvalid, "Maintenance background service disabled. Invalid cron expression. Error:{Error}", checkIds: false, logLevel: LogLevel.Error, times: 0);
-        //    _fakeLogger.VerifyLogEntry(EventIds.DeleteHistoricFoldersAndFilesStarted, "Per-instance clean up process of historic folders and files", checkIds: false);
-        //    _fakeLogger.VerifyLogEntry(EventIds.DeleteHistoricFoldersAndFilesCompleted, "Per-instance clean up process of historic folders and files", endEvent: true, checkIds: false);
-        //}
+            var result = (Task)InvokePrivate(_job, "ExecuteAsync", parameters);
+            await result;
+
+            A.CallTo(() => _fakeMaintenanceBackgroundService.GetSchedule()).MustHaveHappenedOnceExactly();
+            A.CallTo(() => _fakeMaintenanceBackgroundService.CalculateNextRunDelay(A<DateTime>.Ignored, A<DateTime>.Ignored)).MustHaveHappenedTwiceExactly();
+            A.CallTo(() => _fakeMaintenanceBackgroundService.RunMaintenance(A<DateTime>.Ignored, A<CrontabSchedule>.Ignored)).MustHaveHappenedOnceExactly();
+
+            _fakeLogger.VerifyLogEntry(EventIds.MaintenanceNextScheduledRun, "Maintenance background service - next run at {NextRunUtc:dd/MM/yyyy HH:mm:ss} (UTC).", checkIds: false, times: 2);
+            _fakeLogger.VerifyLogEntry(EventIds.MaintenanceCronScheduleInvalid, "Maintenance background service disabled. Invalid cron expression. Error:{Error}", checkIds: false, logLevel: LogLevel.Error, times: 0);
+        }
     }
 }

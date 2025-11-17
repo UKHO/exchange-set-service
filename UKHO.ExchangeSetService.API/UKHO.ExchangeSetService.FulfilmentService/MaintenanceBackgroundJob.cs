@@ -35,13 +35,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService
 
             while (!stoppingToken.IsCancellationRequested)
             {
-                var delay = nextRunUtc - DateTime.UtcNow;
-
-                if (delay < TimeSpan.Zero)
-                {
-                    // If we're behind (e.g. cold start), run immediately.
-                    delay = TimeSpan.Zero;
-                }
+                var delay = maintenanceBackgroundService.CalculateNextRunDelay(DateTime.UtcNow, nextRunUtc);
 
                 try
                 {
