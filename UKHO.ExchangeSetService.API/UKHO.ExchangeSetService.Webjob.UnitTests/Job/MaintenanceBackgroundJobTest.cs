@@ -45,7 +45,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Job
         }
 
         [Test]
-        public async Task StartAsync_WhenCancelled_DoesNotThrowException()
+        public void StartAsync_WhenCancelled_DoesNotThrowException()
         {
             _cancellationTokenSource.Cancel();
             var schedule = CrontabSchedule.Parse("0 0 1 * * *", new CrontabSchedule.ParseOptions { IncludingSeconds = true });
