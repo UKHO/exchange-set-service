@@ -131,107 +131,107 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.TestHelper
         public const string ErrorFileName = "error.txt";
 
         /// <summary>
-        /// C:\Temp
+        /// C:\local\Temp
         /// </summary>
-        public const string TempDirectoryPath = @"C:\Temp";
+        public const string TempDirectoryPath = @"C:\local\Temp";
         /// <summary>
-        /// C:\Temp\ess-fulfilment
+        /// C:\local\Temp\ess-fulfilment
         /// </summary>
         public const string BaseDirectoryPath = $@"{TempDirectoryPath}\ess-fulfilment";
         /// <summary>
-        /// C:\Temp\ess-fulfilment\7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272
+        /// C:\local\Temp\ess-fulfilment\7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272
         /// </summary>
         public const string BatchPath = $@"{BaseDirectoryPath}\{BatchId}";
         /// <summary>
-        /// C:\Temp\ess-fulfilment\7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272\V01X01
+        /// C:\local\Temp\ess-fulfilment\7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272\V01X01
         /// </summary>
         public const string ExchangeSetPath = $@"{BatchPath}\{ExchangeSetFileFolder}";
         /// <summary>
-        /// C:\Temp\ess-fulfilment\7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272\V01X01\ENC_ROOT
+        /// C:\local\Temp\ess-fulfilment\7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272\V01X01\ENC_ROOT
         /// </summary>
         public const string ExchangeSetEncRootPath = $@"{ExchangeSetPath}\{EncRoot}";
         /// <summary>
-        /// C:\Temp\ess-fulfilment\7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272\V01X01\INFO
+        /// C:\local\Temp\ess-fulfilment\7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272\V01X01\INFO
         /// </summary>
         public const string ExchangeSetInfoPath = $@"{ExchangeSetPath}\{Info}";
         /// <summary>
-        /// C:\Temp\ess-fulfilment\7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272\M05X02
+        /// C:\local\Temp\ess-fulfilment\7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272\M05X02
         /// </summary>
         public const string LargeExchangeSetMediaPath5 = $@"{BatchPath}\{LargeExchangeSetFolderName5}";
         /// <summary>
-        /// C:\Temp\ess-fulfilment\7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272\M06X02
+        /// C:\local\Temp\ess-fulfilment\7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272\M06X02
         /// </summary>
         public const string LargeExchangeSetMediaPath6 = $@"{BatchPath}\{LargeExchangeSetFolderName6}";
         /// <summary>
-        /// C:\Temp\ess-fulfilment\7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272\M05X02\INFO
+        /// C:\local\Temp\ess-fulfilment\7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272\M05X02\INFO
         /// </summary>
         public const string LargeExchangeSetMediaInfoPath5 = $@"{LargeExchangeSetMediaPath5}\{Info}";
         /// <summary>
-        /// C:\Temp\ess-fulfilment\7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272\M06X02\INFO
+        /// C:\local\Temp\ess-fulfilment\7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272\M06X02\INFO
         /// </summary>
         public const string LargeExchangeSetMediaInfoPath6 = $@"{LargeExchangeSetMediaPath6}\{Info}";
         /// <summary>
-        /// C:\Temp\ess-fulfilment\7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272\M05X02\INFO\ADC
+        /// C:\local\Temp\ess-fulfilment\7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272\M05X02\INFO\ADC
         /// </summary>
         public const string LargeExchangeSetMediaInfoAdcPath5 = $@"{LargeExchangeSetMediaInfoPath5}\{Adc}";
         /// <summary>
-        /// C:\Temp\ess-fulfilment\7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272\M06X02\INFO\ADC
+        /// C:\local\Temp\ess-fulfilment\7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272\M06X02\INFO\ADC
         /// </summary>
         public const string LargeExchangeSetMediaInfoAdcPath6 = $@"{LargeExchangeSetMediaInfoPath6}\{Adc}";
         /// <summary>
-        /// C:\Temp\ess-fulfilment\7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272\M05X02\INFO\ENC Update List.csv
+        /// C:\local\Temp\ess-fulfilment\7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272\M05X02\INFO\ENC Update List.csv
         /// </summary>
         public const string UpdateListFilePath5 = $@"{LargeExchangeSetMediaInfoPath5}\{UpdateListFileName}";
         /// <summary>
-        /// C:\Temp\ess-fulfilment\7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272\M05X02\MEDIA.TXT
+        /// C:\local\Temp\ess-fulfilment\7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272\M05X02\MEDIA.TXT
         /// </summary>
         public const string LargeExchangeSetMediaFilePath5 = $@"{LargeExchangeSetMediaPath5}\{MediaFileName}";
         /// <summary>
-        /// C:\Temp\ess-fulfilment\7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272\M0{0}X02\{1}\ENC_ROOT
+        /// C:\local\Temp\ess-fulfilment\7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272\M0{0}X02\{1}\ENC_ROOT
         /// </summary>
         public const string LargeExchangeSetEncRootPattern = $@"{BatchPath}\{LargeExchangeSetFolderNamePattern}\{{1}}\{EncRoot}";
         /// <summary>
-        /// C:\Temp\ess-fulfilment\7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272\V01X01\SERIAL.ENC
+        /// C:\local\Temp\ess-fulfilment\7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272\V01X01\SERIAL.ENC
         /// </summary>
         public const string SerialFilePath = $@"{ExchangeSetPath}\{SerialFileName}";
         /// <summary>
-        /// C:\Temp\ess-fulfilment\7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272\V01X01\INFO\PRODUCTS.TXT
+        /// C:\local\Temp\ess-fulfilment\7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272\V01X01\INFO\PRODUCTS.TXT
         /// </summary>
         public const string ProductFilePath = $@"{ExchangeSetInfoPath}\{ProductFileName}";
         /// <summary>
-        /// C:\Temp\ess-fulfilment\7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272\V01X01\ENC_ROOT\README.TXT
+        /// C:\local\Temp\ess-fulfilment\7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272\V01X01\ENC_ROOT\README.TXT
         /// </summary>
         public const string ReadMeFilePath = $@"{ExchangeSetEncRootPath}\{ReadMeFileName}";
         /// <summary>
-        /// C:\Temp\ess-fulfilment\7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272\V01X01\ENC_ROOT\CATALOG.031
+        /// C:\local\Temp\ess-fulfilment\7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272\V01X01\ENC_ROOT\CATALOG.031
         /// </summary>
         public const string CatalogFilePath = $@"{ExchangeSetEncRootPath}\{CatalogFileName}";
         /// <summary>
-        /// C:\Temp\ess-fulfilment\7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272\AIO
+        /// C:\local\Temp\ess-fulfilment\7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272\AIO
         /// </summary>
         public const string AioExchangeSetPath = $@"{BatchPath}\{AioExchangeSetFileFolder}";
         /// <summary>
-        /// C:\Temp\ess-fulfilment\7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272\AIO\ENC_ROOT
+        /// C:\local\Temp\ess-fulfilment\7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272\AIO\ENC_ROOT
         /// </summary>
         public const string AioExchangeSetEncRootPath = $@"{AioExchangeSetPath}\{EncRoot}";
         /// <summary>
-        /// C:\Temp\ess-fulfilment\7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272\AIO\INFO
+        /// C:\local\Temp\ess-fulfilment\7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272\AIO\INFO
         /// </summary>
         public const string AioExchangeSetInfoPath = $@"{AioExchangeSetPath}\{Info}";
         /// <summary>
-        /// C:\Temp\ess-fulfilment\7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272\AIO\SERIAL.AIO
+        /// C:\local\Temp\ess-fulfilment\7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272\AIO\SERIAL.AIO
         /// </summary>
         public const string SerialAioFilePath = $@"{AioExchangeSetPath}\{SerialAioFileName}";
         /// <summary>
-        /// C:\Temp\ess-fulfilment\7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272\V01X01\V01X01.zip
+        /// C:\local\Temp\ess-fulfilment\7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272\V01X01\V01X01.zip
         /// </summary>
         public const string ExchangeSetZipFilePath = $@"{BatchPath}\{ExchangeSetZipFileName}";
         /// <summary>
-        /// C:\Temp\ess-fulfilment\7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272\AIO\AIO.zip
+        /// C:\local\Temp\ess-fulfilment\7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272\AIO\AIO.zip
         /// </summary>
         public const string AioExchangeSetZipFilePath = $@"{BatchPath}\{AioExchangeSetZipFileName}";
         /// <summary>
-        /// C:\Temp\ess-fulfilment\7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272\error.txt
+        /// C:\local\Temp\ess-fulfilment\7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272\error.txt
         /// </summary>
         public const string ErrorFilePath = $@"{BatchPath}\{ErrorFileName}";
 

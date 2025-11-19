@@ -30,16 +30,19 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
         {
             try
             {
-                var cutoffDate = currentUtcDateTime.AddDays(-_cleanUpConfiguration.NumberOfDays);
-                var directories = fileSystemHelper.GetDirectoryInfo(batchBase.BaseDirectory);
-
-                foreach (var subFolder in directories)
+                if (fileSystemHelper.CheckDirectoryExists(batchBase.BaseDirectory))
                 {
-                    if (subFolder.CreationTime < cutoffDate)
+                    var cutoffDate = currentUtcDateTime.AddDays(-_cleanUpConfiguration.NumberOfDays);
+                    var directories = fileSystemHelper.GetDirectoryInfo(batchBase.BaseDirectory);
+
+                    foreach (var subFolder in directories)
                     {
-                        if (fileSystemHelper.DeleteFolderIfExists(subFolder.FullName))
+                        if (subFolder.CreationTime < cutoffDate)
                         {
-                            logger.LogError(EventIds.HistoricDateFolderDeleted.ToEventId(), "Historic folder deleted successfully for folder:{Folder}.", subFolder.Name);
+                            if (fileSystemHelper.DeleteFolderIfExists(subFolder.FullName))
+                            {
+                                logger.LogError(EventIds.HistoricDateFolderDeleted.ToEventId(), "Historic folder deleted successfully for folder:{Folder}.", subFolder.Name);
+                            }
                         }
                     }
                 }

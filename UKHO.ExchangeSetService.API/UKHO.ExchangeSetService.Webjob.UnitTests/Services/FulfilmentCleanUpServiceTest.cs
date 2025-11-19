@@ -77,6 +77,22 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
         }
 
         [Test]
+        public void DeleteHistoricBatchFolders_WhenBaseDirectoryDoesNotExist()
+        {
+            var currentUtcDateTime = DateTime.UtcNow;
+
+            A.CallTo(() => _fakeFileSystemHelper.CheckDirectoryExists(FakeBatchValue.BaseDirectoryPath)).Returns(false);
+
+            _service.DeleteHistoricBatchFolders(_batch, currentUtcDateTime);
+
+            A.CallTo(() => _fakeFileSystemHelper.CheckDirectoryExists(FakeBatchValue.BaseDirectoryPath)).MustHaveHappenedOnceExactly();
+            A.CallTo(() => _fakeFileSystemHelper.GetDirectoryInfo(A<string>.Ignored)).MustNotHaveHappened();
+            A.CallTo(() => _fakeFileSystemHelper.DeleteFolderIfExists(A<string>.Ignored)).MustNotHaveHappened();
+
+            _fakeLogger.VerifyLogEntry(EventIds.HistoricDateFolderDeleted, "Historic folder deleted successfully for folder:{Folder}.", logLevel: LogLevel.Error, checkIds: false, times: 0);
+        }
+
+        [Test]
         public void DeleteHistoricBatchFolders_WhenHistoricFolderDeleted_LogsSuccess()
         {
             var currentUtcDateTime = DateTime.UtcNow;
@@ -92,11 +108,13 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             A.CallTo(() => recentDir.FullName).Returns($@"{FakeBatchValue.BaseDirectoryPath}\recent-folder");
             A.CallTo(() => recentDir.Name).Returns("recent-folder");
 
+            A.CallTo(() => _fakeFileSystemHelper.CheckDirectoryExists(FakeBatchValue.BaseDirectoryPath)).Returns(true);
             A.CallTo(() => _fakeFileSystemHelper.GetDirectoryInfo(FakeBatchValue.BaseDirectoryPath)).Returns([oldDir, recentDir]);
             A.CallTo(() => _fakeFileSystemHelper.DeleteFolderIfExists(oldDir.FullName)).Returns(true);
 
             _service.DeleteHistoricBatchFolders(_batch, currentUtcDateTime);
 
+            A.CallTo(() => _fakeFileSystemHelper.CheckDirectoryExists(FakeBatchValue.BaseDirectoryPath)).MustHaveHappenedOnceExactly();
             A.CallTo(() => _fakeFileSystemHelper.GetDirectoryInfo(FakeBatchValue.BaseDirectoryPath)).MustHaveHappenedOnceExactly();
             A.CallTo(() => _fakeFileSystemHelper.DeleteFolderIfExists(oldDir.FullName)).MustHaveHappenedOnceExactly();
             A.CallTo(() => _fakeFileSystemHelper.DeleteFolderIfExists(recentDir.FullName)).MustNotHaveHappened();
@@ -115,11 +133,13 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             A.CallTo(() => oldDir.FullName).Returns($@"{FakeBatchValue.BaseDirectoryPath}\old-folder");
             A.CallTo(() => oldDir.Name).Returns("old-folder");
 
+            A.CallTo(() => _fakeFileSystemHelper.CheckDirectoryExists(FakeBatchValue.BaseDirectoryPath)).Returns(true);
             A.CallTo(() => _fakeFileSystemHelper.GetDirectoryInfo(FakeBatchValue.BaseDirectoryPath)).Returns([oldDir]);
             A.CallTo(() => _fakeFileSystemHelper.DeleteFolderIfExists(oldDir.FullName)).Returns(false);
 
             _service.DeleteHistoricBatchFolders(_batch, currentUtcDateTime);
 
+            A.CallTo(() => _fakeFileSystemHelper.CheckDirectoryExists(FakeBatchValue.BaseDirectoryPath)).MustHaveHappenedOnceExactly();
             A.CallTo(() => _fakeFileSystemHelper.GetDirectoryInfo(FakeBatchValue.BaseDirectoryPath)).MustHaveHappenedOnceExactly();
             A.CallTo(() => _fakeFileSystemHelper.DeleteFolderIfExists(oldDir.FullName)).MustHaveHappenedOnceExactly();
 
@@ -131,6 +151,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
         {
             var currentUtcDateTime = DateTime.UtcNow;
 
+            A.CallTo(() => _fakeFileSystemHelper.CheckDirectoryExists(FakeBatchValue.BaseDirectoryPath)).Returns(true);
             A.CallTo(() => _fakeFileSystemHelper.GetDirectoryInfo(FakeBatchValue.BaseDirectoryPath)).Throws(new Exception("boom"));
 
             _service.DeleteHistoricBatchFolders(_batch, currentUtcDateTime);

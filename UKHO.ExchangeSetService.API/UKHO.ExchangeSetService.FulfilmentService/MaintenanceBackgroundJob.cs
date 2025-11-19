@@ -60,7 +60,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService
         private DateTime ScheduleNextOccurrence(CrontabSchedule schedule)
         {
             var nextRunUtc = schedule.GetNextOccurrence(DateTime.UtcNow);
-            logger.LogInformation(EventIds.MaintenanceNextScheduledRun.ToEventId(), "Maintenance background service - next run at {NextRunUtc:dd/MM/yyyy HH:mm:ss} (UTC).", nextRunUtc);
+            logger.LogInformation(EventIds.MaintenanceNextScheduledRun.ToEventId(), "Maintenance background service - next run at {NextRunUtc} (UTC).", nextRunUtc);
             return nextRunUtc;
         }
     }

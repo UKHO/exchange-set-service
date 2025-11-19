@@ -25,7 +25,7 @@ namespace UKHO.ExchangeSetService.Common.Models.WebJobs
         public string CorrelationId { get; }
 
         /// <summary>
-        /// eg. C:\Temp\ess-fulfilment\635219b9-43b6-4e96-9b33-72759ac6d5c2
+        /// eg. C:\local\Temp\ess-fulfilment\635219b9-43b6-4e96-9b33-72759ac6d5c2
         /// </summary>
         public string BatchDirectory { get; }
 
@@ -48,7 +48,7 @@ namespace UKHO.ExchangeSetService.Common.Models.WebJobs
     public class FulfilmentServiceBatchBase(IConfiguration configuration)
     {
         /// <summary>
-        /// eg. C:\Temp\ess-fulfilment
+        /// eg. C:\local\Temp\ess-fulfilment
         /// </summary>
         public string BaseDirectory { get; } = Path.Combine(configuration["TMP"], "ess-fulfilment");
     }
