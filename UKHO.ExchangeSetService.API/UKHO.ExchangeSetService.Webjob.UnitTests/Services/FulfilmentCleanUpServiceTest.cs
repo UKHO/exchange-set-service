@@ -77,7 +77,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
         }
 
         [Test]
-        public void DeleteHistoricBatchFolders_WhenBaseDirectoryDoesNotExist()
+        public void DeleteHistoricBatchFolders_WhenBaseDirectoryDoesNotExist_DoNothing()
         {
             var currentUtcDateTime = DateTime.UtcNow;
 
