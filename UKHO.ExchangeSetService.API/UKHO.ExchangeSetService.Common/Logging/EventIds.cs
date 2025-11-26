@@ -4,7 +4,7 @@ namespace UKHO.ExchangeSetService.Common.Logging
 {
     public enum EventIds
     {
-        /*Event id range for ESS - 805000 to 805217 */
+        /*Event id range for ESS - 805000 to 805219 */
         /// <summary>
         /// 805000 - Request for sales catalogue service products sincedatetime endpoint is started.
         /// </summary>
@@ -872,7 +872,15 @@ namespace UKHO.ExchangeSetService.Common.Logging
         /// <summary>
         /// 805217 - Fulfilment batch temporary folder is not found.
         /// </summary>
-        FulfilmentBatchTemporaryFolderNotFound = 805217
+        FulfilmentBatchTemporaryFolderNotFound = 805217,
+        /// <summary>
+        /// 805218 - Maintenance cron schedule is invalid.
+        /// </summary>
+        MaintenanceCronScheduleInvalid = 805218,
+        /// <summary>
+        /// 805219 - Maintenance next scheduled run.
+        /// </summary>
+        MaintenanceNextScheduledRun = 805219
     }
 
     public static class EventIdExtensions

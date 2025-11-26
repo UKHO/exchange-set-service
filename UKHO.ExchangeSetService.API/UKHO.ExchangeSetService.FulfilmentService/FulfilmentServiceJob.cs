@@ -15,7 +15,6 @@ using UKHO.ExchangeSetService.Common.Helpers;
 using UKHO.ExchangeSetService.Common.Logging;
 using UKHO.ExchangeSetService.Common.Models.SalesCatalogue;
 using UKHO.ExchangeSetService.Common.Models.WebJobs;
-using UKHO.ExchangeSetService.FulfilmentService.Configuration;
 using UKHO.ExchangeSetService.FulfilmentService.Services;
 
 namespace UKHO.ExchangeSetService.FulfilmentService
@@ -25,14 +24,12 @@ namespace UKHO.ExchangeSetService.FulfilmentService
                                 IFulfilmentDataService fulFilmentDataService, ILogger<FulfilmentServiceJob> logger, IFileSystemHelper fileSystemHelper,
                                 IFileShareBatchService fileBatchShareService, IFileShareUploadService fileShareUploadService, IOptions<FileShareServiceConfiguration> fileShareServiceConfig,
                                 IAzureBlobStorageService azureBlobStorageService, IFulfilmentCallBackService fulfilmentCallBackService,
-                                IOptions<PeriodicOutputServiceConfiguration> periodicOutputServiceConfiguration, IFulfilmentCleanUpService fulfilmentCleanUpService, IOptions<CleanUpConfiguration> cleanUpConfiguration)
+                                IOptions<PeriodicOutputServiceConfiguration> periodicOutputServiceConfiguration, IFulfilmentCleanUpService fulfilmentCleanUpService)
     {
-        private readonly CleanUpConfiguration _cleanUpConfiguration = cleanUpConfiguration?.Value ?? throw new ArgumentNullException(nameof(cleanUpConfiguration));
-
         public async Task ProcessQueueMessage([QueueTrigger("%ESSFulfilmentStorageConfiguration:QueueName%")] QueueMessage message)
         {
             var salesCatalogueServiceResponseQueueMessage = message.Body.ToObjectFromJson<SalesCatalogueServiceResponseQueueMessage>();
-            var batch = new FulfilmentServiceBatch(configuration, salesCatalogueServiceResponseQueueMessage, DateTime.UtcNow);
+            var batch = new FulfilmentServiceBatch(configuration, salesCatalogueServiceResponseQueueMessage);
             var fileSizeInMb = CommonHelper.ConvertBytesToMegabytes(batch.Message.FileSize);
             CommonHelper.IsPeriodicOutputService = fileSizeInMb > periodicOutputServiceConfiguration.Value.LargeMediaExchangeSetSizeInMB;
 
@@ -134,15 +131,12 @@ namespace UKHO.ExchangeSetService.FulfilmentService
         {
             try
             {
-                if (_cleanUpConfiguration.ContinuousCleanupEnabled)
+                logger.LogStartEndAndElapsedTime(EventIds.FulfilmentBatchCleanUpStarted, EventIds.FulfilmentBatchCleanUpCompleted, "Deletion of temporary data for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}.", () =>
                 {
-                    logger.LogStartEndAndElapsedTime(EventIds.FulfilmentBatchCleanUpStarted, EventIds.FulfilmentBatchCleanUpCompleted, "Deletion of temporary data for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}.", () =>
-                    {
-                        fulfilmentCleanUpService.DeleteBatchFolder(batch);
-                        return true;
-                    },
-                    batch.BatchId, batch.CorrelationId);
-                }
+                    fulfilmentCleanUpService.DeleteBatchFolder(batch);
+                    return true;
+                },
+                batch.BatchId, batch.CorrelationId);
             }
             catch (Exception ex)
             {

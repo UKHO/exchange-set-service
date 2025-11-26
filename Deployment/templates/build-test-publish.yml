@@ -105,16 +105,6 @@ jobs:
         zipAfterPublish: false
         modifyOutputPath: false
 
-    - task: DotNetCoreCLI@2
-      displayName: "Publish ESS clean up webjob"
-      inputs:
-        command: "publish"
-        publishWebProjects: false
-        projects: "**/*UKHO.ExchangeSetService.CleanUpJob.csproj"
-        arguments: '--configuration $(BuildConfiguration) --output $(Build.ArtifactStagingDirectory)\ExchangeSetFulFilmentService\App_Data\jobs\triggered\ESSCleanUpWebJob'
-        zipAfterPublish: false
-        modifyOutputPath: false
-
     - task: ArchiveFiles@2
       displayName: "Zip ESS fulfilment service"
       inputs:

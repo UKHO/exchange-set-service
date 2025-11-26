@@ -12,7 +12,6 @@ using UKHO.ExchangeSetService.Common.Logging;
 using UKHO.ExchangeSetService.Common.Models.SalesCatalogue;
 using UKHO.ExchangeSetService.Common.Models.WebJobs;
 using UKHO.ExchangeSetService.FulfilmentService;
-using UKHO.ExchangeSetService.FulfilmentService.Configuration;
 using UKHO.ExchangeSetService.FulfilmentService.Services;
 using UKHO.ExchangeSetService.Webjob.UnitTests.TestHelper;
 
@@ -30,7 +29,6 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Job
         private IFulfilmentCallBackService _fakeFulfilmentCallBackService;
         private IOptions<PeriodicOutputServiceConfiguration> _periodicOutputServiceConfiguration;
         private IFulfilmentCleanUpService _fakeFulfilmentCleanUpService;
-        private CleanUpConfiguration _cleanUpConfiguration;
         private FulfilmentServiceJob _fulfilmentServiceJob;
         private const int LargeMediaExchangeSetSizeInMB = 300;
 
@@ -52,12 +50,6 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Job
             });
 
             _fakeFulfilmentCleanUpService = A.Fake<IFulfilmentCleanUpService>();
-            _cleanUpConfiguration = new CleanUpConfiguration
-            {
-                ContinuousCleanupEnabled = true
-            };
-            var fakeCleanUpConfiguration = A.Fake<IOptions<CleanUpConfiguration>>();
-            A.CallTo(() => fakeCleanUpConfiguration.Value).Returns(_cleanUpConfiguration);
 
             _fulfilmentServiceJob = new FulfilmentServiceJob(
                 FakeBatchValue.Configuration,
@@ -70,8 +62,9 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Job
                 _fakeAzureBlobStorageService,
                 _fakeFulfilmentCallBackService,
                 _periodicOutputServiceConfiguration,
-                _fakeFulfilmentCleanUpService,
-                fakeCleanUpConfiguration);
+                _fakeFulfilmentCleanUpService);
+
+            Environment.SetEnvironmentVariable("WEBSITE_SITE_NAME", "unittestsite");
         }
 
         [TearDown]
@@ -118,27 +111,6 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Job
             _fakeLogger.VerifyLogEntry(EventIds.CreateExchangeSetRequestCompleted, "Create Exchange Set web job request for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", true);
             _fakeLogger.VerifyLogEntry(EventIds.FulfilmentBatchCleanUpStarted, "Deletion of temporary data for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}.");
             _fakeLogger.VerifyLogEntry(EventIds.FulfilmentBatchCleanUpCompleted, "Deletion of temporary data for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}.", true);
-        }
-
-        [Test]
-        public async Task ProcessQueueMessage_FileSizeOnOrBelowThreshold_CleanUpDisabled_CallsCreateExchangeSet()
-        {
-            _cleanUpConfiguration.ContinuousCleanupEnabled = false;
-            var qm = BuildQueueMessage(fileSizeBytes: LargeMediaExchangeSetSizeInMB * 1024 * 1024); // <= LargeMediaExchangeSetSizeInMB
-
-            A.CallTo(() => _fakeFulfilmentDataService.CreateExchangeSet(A<FulfilmentServiceBatch>.That.Matches(m => m.BatchId == FakeBatchValue.BatchId))).Returns("ok");
-
-            await _fulfilmentServiceJob.ProcessQueueMessage(qm);
-
-            Assert.That(CommonHelper.IsPeriodicOutputService, Is.False);
-            A.CallTo(() => _fakeFulfilmentDataService.CreateExchangeSet(A<FulfilmentServiceBatch>.Ignored)).MustHaveHappenedOnceExactly();
-            A.CallTo(() => _fakeFulfilmentDataService.CreateLargeExchangeSet(A<FulfilmentServiceBatch>.Ignored, A<string>.Ignored)).MustNotHaveHappened();
-            A.CallTo(() => _fakeFulfilmentCleanUpService.DeleteBatchFolder(A<FulfilmentServiceBatch>.Ignored)).MustNotHaveHappened();
-
-            _fakeLogger.VerifyLogEntry(EventIds.CreateExchangeSetRequestStart, "Create Exchange Set web job request for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}");
-            _fakeLogger.VerifyLogEntry(EventIds.CreateExchangeSetRequestCompleted, "Create Exchange Set web job request for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", true);
-            _fakeLogger.VerifyLogEntry(EventIds.FulfilmentBatchCleanUpStarted, "Deletion of temporary data for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}.", times: 0);
-            _fakeLogger.VerifyLogEntry(EventIds.FulfilmentBatchCleanUpCompleted, "Deletion of temporary data for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}.", true, times: 0);
         }
 
         [Test]

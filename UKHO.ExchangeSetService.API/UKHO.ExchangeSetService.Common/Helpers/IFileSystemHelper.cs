@@ -33,5 +33,6 @@ namespace UKHO.ExchangeSetService.Common.Helpers
         IFileInfo[] GetZipFiles(string folderPath);
         bool DownloadFile(string filePath, Stream stream);
         bool DeleteFolderIfExists(string folderPath);
+        bool CheckDirectoryExists(string path);
     }
 }
