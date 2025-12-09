@@ -51,7 +51,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService
                     break;
                 }
 
-                maintenanceBackgroundService.RunMaintenance(DateTime.UtcNow, schedule);
+                maintenanceBackgroundService.RunMaintenance(DateTime.UtcNow, schedule, stoppingToken);
 
                 nextRunUtc = ScheduleNextOccurrence(schedule);
             }

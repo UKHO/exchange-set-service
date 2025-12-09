@@ -65,7 +65,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Job
 
             A.CallTo(() => _fakeMaintenanceBackgroundService.GetSchedule()).MustHaveHappenedOnceExactly();
             A.CallTo(() => _fakeMaintenanceBackgroundService.CalculateNextRunDelay(A<DateTime>.Ignored, A<DateTime>.Ignored)).MustNotHaveHappened();
-            A.CallTo(() => _fakeMaintenanceBackgroundService.RunMaintenance(A<DateTime>.Ignored, A<CrontabSchedule>.Ignored)).MustNotHaveHappened();
+            A.CallTo(() => _fakeMaintenanceBackgroundService.RunMaintenance(A<DateTime>.Ignored, A<CrontabSchedule>.Ignored, A<CancellationToken>.Ignored)).MustNotHaveHappened();
 
             _fakeLogger.VerifyLogEntry(EventIds.MaintenanceNextScheduledRun, "Maintenance background service - next run at {NextRunUtc} (UTC).", checkIds: false, times: 0);
             _fakeLogger.VerifyLogEntry(EventIds.MaintenanceCronScheduleInvalid, "Maintenance background service disabled. Invalid cron expression. Error:{Error}", checkIds: false, logLevel: LogLevel.Error);
@@ -84,7 +84,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Job
 
             A.CallTo(() => _fakeMaintenanceBackgroundService.GetSchedule()).MustHaveHappenedOnceExactly();
             A.CallTo(() => _fakeMaintenanceBackgroundService.CalculateNextRunDelay(A<DateTime>.Ignored, A<DateTime>.Ignored)).MustNotHaveHappened();
-            A.CallTo(() => _fakeMaintenanceBackgroundService.RunMaintenance(A<DateTime>.Ignored, A<CrontabSchedule>.Ignored)).MustNotHaveHappened();
+            A.CallTo(() => _fakeMaintenanceBackgroundService.RunMaintenance(A<DateTime>.Ignored, A<CrontabSchedule>.Ignored, A<CancellationToken>.Ignored)).MustNotHaveHappened();
 
             _fakeLogger.VerifyLogEntry(EventIds.MaintenanceNextScheduledRun, "Maintenance background service - next run at {NextRunUtc} (UTC).", checkIds: false);
             _fakeLogger.VerifyLogEntry(EventIds.MaintenanceCronScheduleInvalid, "Maintenance background service disabled. Invalid cron expression. Error:{Error}", checkIds: false, logLevel: LogLevel.Error, times: 0);
@@ -105,7 +105,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Job
 
             A.CallTo(() => _fakeMaintenanceBackgroundService.GetSchedule()).MustHaveHappenedOnceExactly();
             A.CallTo(() => _fakeMaintenanceBackgroundService.CalculateNextRunDelay(A<DateTime>.Ignored, A<DateTime>.Ignored)).MustHaveHappenedTwiceExactly();
-            A.CallTo(() => _fakeMaintenanceBackgroundService.RunMaintenance(A<DateTime>.Ignored, A<CrontabSchedule>.Ignored)).MustHaveHappenedOnceExactly();
+            A.CallTo(() => _fakeMaintenanceBackgroundService.RunMaintenance(A<DateTime>.Ignored, A<CrontabSchedule>.Ignored, cancellationTokenSource.Token)).MustHaveHappenedOnceExactly();
 
             _fakeLogger.VerifyLogEntry(EventIds.MaintenanceNextScheduledRun, "Maintenance background service - next run at {NextRunUtc} (UTC).", checkIds: false, times: 2);
             _fakeLogger.VerifyLogEntry(EventIds.MaintenanceCronScheduleInvalid, "Maintenance background service disabled. Invalid cron expression. Error:{Error}", checkIds: false, logLevel: LogLevel.Error, times: 0);

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using UKHO.ExchangeSetService.Common.Helpers;
@@ -26,7 +27,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             }
         }
 
-        public void DeleteHistoricBatchFolders(FulfilmentServiceBatchBase batchBase, DateTime currentUtcDateTime)
+        public void DeleteHistoricBatchFolders(FulfilmentServiceBatchBase batchBase, DateTime currentUtcDateTime, CancellationToken cancellationToken)
         {
             try
             {
@@ -37,6 +38,11 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
 
                     foreach (var subFolder in directories)
                     {
+                        if (cancellationToken.IsCancellationRequested)
+                        {
+                            break;
+                        }
+
                         if (subFolder.CreationTime < cutoffDate)
                         {
                             if (fileSystemHelper.DeleteFolderIfExists(subFolder.FullName))

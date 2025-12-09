@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO.Abstractions;
+using System.Threading;
 using FakeItEasy;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -22,6 +23,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
         private CleanUpConfiguration _cleanUpConfiguration;
         private FulfilmentCleanUpService _service;
         private FulfilmentServiceBatch _batch;
+        private CancellationTokenSource _cancellationTokenSource;
 
         [SetUp]
         public void SetUp()
@@ -48,6 +50,13 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             };
 
             _batch = new FulfilmentServiceBatch(FakeBatchValue.Configuration, message);
+            _cancellationTokenSource = new CancellationTokenSource();
+        }
+
+        [TearDown]
+        public void TearDown()
+        {
+            _cancellationTokenSource.Dispose();
         }
 
         [Test]
@@ -83,7 +92,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
 
             A.CallTo(() => _fakeFileSystemHelper.CheckDirectoryExists(FakeBatchValue.BaseDirectoryPath)).Returns(false);
 
-            _service.DeleteHistoricBatchFolders(_batch, currentUtcDateTime);
+            _service.DeleteHistoricBatchFolders(_batch, currentUtcDateTime, _cancellationTokenSource.Token);
 
             A.CallTo(() => _fakeFileSystemHelper.CheckDirectoryExists(FakeBatchValue.BaseDirectoryPath)).MustHaveHappenedOnceExactly();
             A.CallTo(() => _fakeFileSystemHelper.GetDirectoryInfo(A<string>.Ignored)).MustNotHaveHappened();
@@ -112,7 +121,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             A.CallTo(() => _fakeFileSystemHelper.GetDirectoryInfo(FakeBatchValue.BaseDirectoryPath)).Returns([oldDir, recentDir]);
             A.CallTo(() => _fakeFileSystemHelper.DeleteFolderIfExists(oldDir.FullName)).Returns(true);
 
-            _service.DeleteHistoricBatchFolders(_batch, currentUtcDateTime);
+            _service.DeleteHistoricBatchFolders(_batch, currentUtcDateTime, _cancellationTokenSource.Token);
 
             A.CallTo(() => _fakeFileSystemHelper.CheckDirectoryExists(FakeBatchValue.BaseDirectoryPath)).MustHaveHappenedOnceExactly();
             A.CallTo(() => _fakeFileSystemHelper.GetDirectoryInfo(FakeBatchValue.BaseDirectoryPath)).MustHaveHappenedOnceExactly();
@@ -120,6 +129,35 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             A.CallTo(() => _fakeFileSystemHelper.DeleteFolderIfExists(recentDir.FullName)).MustNotHaveHappened();
 
             _fakeLogger.VerifyLogEntry(EventIds.HistoricDateFolderDeleted, "Historic folder deleted successfully for folder:{Folder}.", logLevel: LogLevel.Error, checkIds: false);
+        }
+
+        [Test]
+        public void DeleteHistoricBatchFolders_WhenCancelled_StopProcessing()
+        {
+            _cancellationTokenSource.Cancel();
+            var currentUtcDateTime = DateTime.UtcNow;
+            var cutoffDate = currentUtcDateTime.AddDays(-_cleanUpConfiguration.NumberOfDays);
+
+            var oldDir = A.Fake<IDirectoryInfo>();
+            A.CallTo(() => oldDir.CreationTime).Returns(cutoffDate.AddTicks(-1)); // older than cutoff
+            A.CallTo(() => oldDir.FullName).Returns($@"{FakeBatchValue.BaseDirectoryPath}\old-folder");
+            A.CallTo(() => oldDir.Name).Returns("old-folder");
+
+            var recentDir = A.Fake<IDirectoryInfo>();
+            A.CallTo(() => recentDir.CreationTime).Returns(cutoffDate); // same as cutoff
+            A.CallTo(() => recentDir.FullName).Returns($@"{FakeBatchValue.BaseDirectoryPath}\recent-folder");
+            A.CallTo(() => recentDir.Name).Returns("recent-folder");
+
+            A.CallTo(() => _fakeFileSystemHelper.CheckDirectoryExists(FakeBatchValue.BaseDirectoryPath)).Returns(true);
+            A.CallTo(() => _fakeFileSystemHelper.GetDirectoryInfo(FakeBatchValue.BaseDirectoryPath)).Returns([oldDir, recentDir]);
+
+            _service.DeleteHistoricBatchFolders(_batch, currentUtcDateTime, _cancellationTokenSource.Token);
+
+            A.CallTo(() => _fakeFileSystemHelper.CheckDirectoryExists(FakeBatchValue.BaseDirectoryPath)).MustHaveHappenedOnceExactly();
+            A.CallTo(() => _fakeFileSystemHelper.GetDirectoryInfo(FakeBatchValue.BaseDirectoryPath)).MustHaveHappenedOnceExactly();
+            A.CallTo(() => _fakeFileSystemHelper.DeleteFolderIfExists(A<string>.Ignored)).MustNotHaveHappened();
+
+            _fakeLogger.VerifyLogEntry(EventIds.HistoricDateFolderDeleted, "Historic folder deleted successfully for folder:{Folder}.", logLevel: LogLevel.Error, checkIds: false, times: 0);
         }
 
         [Test]
@@ -137,7 +175,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             A.CallTo(() => _fakeFileSystemHelper.GetDirectoryInfo(FakeBatchValue.BaseDirectoryPath)).Returns([oldDir]);
             A.CallTo(() => _fakeFileSystemHelper.DeleteFolderIfExists(oldDir.FullName)).Returns(false);
 
-            _service.DeleteHistoricBatchFolders(_batch, currentUtcDateTime);
+            _service.DeleteHistoricBatchFolders(_batch, currentUtcDateTime, _cancellationTokenSource.Token);
 
             A.CallTo(() => _fakeFileSystemHelper.CheckDirectoryExists(FakeBatchValue.BaseDirectoryPath)).MustHaveHappenedOnceExactly();
             A.CallTo(() => _fakeFileSystemHelper.GetDirectoryInfo(FakeBatchValue.BaseDirectoryPath)).MustHaveHappenedOnceExactly();
@@ -154,7 +192,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             A.CallTo(() => _fakeFileSystemHelper.CheckDirectoryExists(FakeBatchValue.BaseDirectoryPath)).Returns(true);
             A.CallTo(() => _fakeFileSystemHelper.GetDirectoryInfo(FakeBatchValue.BaseDirectoryPath)).Throws(new Exception("boom"));
 
-            _service.DeleteHistoricBatchFolders(_batch, currentUtcDateTime);
+            _service.DeleteHistoricBatchFolders(_batch, currentUtcDateTime, _cancellationTokenSource.Token);
 
             _fakeLogger.VerifyLogEntry(EventIds.DeleteHistoricFoldersAndFilesException, "Exception while deleting historic folders and files with error {Message}", logLevel: LogLevel.Error, checkIds: false);
         }

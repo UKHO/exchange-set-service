@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 using FakeItEasy;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -19,6 +20,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
         private CleanUpConfiguration _cleanUpConfiguration;
         private IFulfilmentCleanUpService _fakeFulfilmentCleanUpService;
         private MaintenanceBackgroundService _service;
+        private CancellationTokenSource _cancellationTokenSource;
 
         [SetUp]
         public void SetUp()
@@ -35,6 +37,13 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             _service = new MaintenanceBackgroundService(FakeBatchValue.Configuration, _fakeLogger, fakeCleanUpConfiguration, _fakeFulfilmentCleanUpService);
 
             Environment.SetEnvironmentVariable("WEBSITE_SITE_NAME", "unittestsite");
+            _cancellationTokenSource = new CancellationTokenSource();
+        }
+
+        [TearDown]
+        public void TearDown()
+        {
+            _cancellationTokenSource.Dispose();
         }
 
         [Test]
@@ -107,11 +116,11 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             var utcNow = DateTime.UtcNow;
             var schedule = CrontabSchedule.Parse(_cleanUpConfiguration.MaintenanceCronSchedule, new CrontabSchedule.ParseOptions { IncludingSeconds = true });
 
-            A.CallTo(() => _fakeFulfilmentCleanUpService.DeleteHistoricBatchFolders(A<FulfilmentServiceBatchBase>.Ignored, utcNow)).DoesNothing();
+            A.CallTo(() => _fakeFulfilmentCleanUpService.DeleteHistoricBatchFolders(A<FulfilmentServiceBatchBase>.Ignored, utcNow, _cancellationTokenSource.Token)).DoesNothing();
 
-            _service.RunMaintenance(utcNow, schedule);
+            _service.RunMaintenance(utcNow, schedule, _cancellationTokenSource.Token);
 
-            A.CallTo(() => _fakeFulfilmentCleanUpService.DeleteHistoricBatchFolders(A<FulfilmentServiceBatchBase>.Ignored, utcNow)).MustHaveHappenedOnceExactly();
+            A.CallTo(() => _fakeFulfilmentCleanUpService.DeleteHistoricBatchFolders(A<FulfilmentServiceBatchBase>.Ignored, utcNow, _cancellationTokenSource.Token)).MustHaveHappenedOnceExactly();
 
             _fakeLogger.VerifyLogEntry(EventIds.DeleteHistoricFoldersAndFilesStarted, "Per-instance clean up process of historic folders and files", checkIds: false);
             _fakeLogger.VerifyLogEntry(EventIds.DeleteHistoricFoldersAndFilesCompleted, "Per-instance clean up process of historic folders and files", endEvent: true, checkIds: false);
@@ -123,11 +132,11 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             var utcNow = DateTime.UtcNow;
             var schedule = CrontabSchedule.Parse(_cleanUpConfiguration.MaintenanceCronSchedule, new CrontabSchedule.ParseOptions { IncludingSeconds = true });
 
-            A.CallTo(() => _fakeFulfilmentCleanUpService.DeleteHistoricBatchFolders(A<FulfilmentServiceBatchBase>.Ignored, utcNow)).Throws(new Exception("boom"));
+            A.CallTo(() => _fakeFulfilmentCleanUpService.DeleteHistoricBatchFolders(A<FulfilmentServiceBatchBase>.Ignored, utcNow, _cancellationTokenSource.Token)).Throws(new Exception("boom"));
 
-            _service.RunMaintenance(utcNow, schedule);
+            _service.RunMaintenance(utcNow, schedule, _cancellationTokenSource.Token);
 
-            A.CallTo(() => _fakeFulfilmentCleanUpService.DeleteHistoricBatchFolders(A<FulfilmentServiceBatchBase>.Ignored, utcNow)).MustHaveHappenedOnceExactly();
+            A.CallTo(() => _fakeFulfilmentCleanUpService.DeleteHistoricBatchFolders(A<FulfilmentServiceBatchBase>.Ignored, utcNow, _cancellationTokenSource.Token)).MustHaveHappenedOnceExactly();
 
             _fakeLogger.VerifyLogEntry(EventIds.DeleteHistoricFoldersAndFilesStarted, "Per-instance clean up process of historic folders and files", checkIds: false);
             _fakeLogger.VerifyLogEntry(EventIds.DeleteHistoricFoldersAndFilesCompleted, "Per-instance clean up process of historic folders and files", endEvent: true, checkIds: false);

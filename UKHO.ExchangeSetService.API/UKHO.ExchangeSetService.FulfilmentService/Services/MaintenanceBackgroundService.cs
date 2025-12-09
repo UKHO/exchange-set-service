@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 using Elastic.Apm;
 using Elastic.Apm.Api;
 using Microsoft.Extensions.Configuration;
@@ -50,7 +51,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             return (false, string.Empty, schedule);
         }
 
-        public void RunMaintenance(DateTime utcNow, CrontabSchedule schedule)
+        public void RunMaintenance(DateTime utcNow, CrontabSchedule schedule, CancellationToken cancellationToken)
         {
             var transactionName = $"{Environment.GetEnvironmentVariable("WEBSITE_SITE_NAME")}-fulfilment-maintenance";
             var transaction = Agent.Tracer.StartTransaction(transactionName, ApiConstants.TypeRequest);
@@ -64,7 +65,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
                     () =>
                     {
                         var batchBase = new FulfilmentServiceBatchBase(configuration);
-                        fulfilmentCleanUpService.DeleteHistoricBatchFolders(batchBase, utcNow);
+                        fulfilmentCleanUpService.DeleteHistoricBatchFolders(batchBase, utcNow, cancellationToken);
                         return true;
                     });
             }
