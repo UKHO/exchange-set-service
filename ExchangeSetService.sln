@@ -1,0 +1,95 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.13.35919.96
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Stub", "Stub", "{02EA681E-C7D8-13C7-8484-4AC65E1B71E8}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UKHO.SalesCatalogueFileShareServicesMock.API", "UKHO.SalesCatalogueFileShareServicesMock.API\UKHO.SalesCatalogueFileShareServicesMock.API\UKHO.SalesCatalogueFileShareServicesMock.API.csproj", "{B1684574-201F-1BFF-FE44-DAF73219C30F}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{49EBF898-0482-4F67-8634-2F72000DE39F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UKHO.ExchangeSetService.API.FunctionalTests", "UKHO.ExchangeSetService.API\UKHO.ExchangeSetService.API.FunctionalTests\UKHO.ExchangeSetService.API.FunctionalTests.csproj", "{7E99F74E-CDB0-EB3E-C09B-B64113090C17}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UKHO.ExchangeSetService.API.UnitTests", "UKHO.ExchangeSetService.API\UKHO.ExchangeSetService.API.UnitTests\UKHO.ExchangeSetService.API.UnitTests.csproj", "{826477EC-88DB-AD86-BBBA-F90111526811}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UKHO.ExchangeSetService.Common.UnitTests", "UKHO.ExchangeSetService.API\UKHO.ExchangeSetService.Common.UnitTests\UKHO.ExchangeSetService.Common.UnitTests.csproj", "{730AAF37-847B-B5A6-154B-690441042F72}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UKHO.ExchangeSetService.Webjob.CleanUpJob.UnitTests", "UKHO.ExchangeSetService.API\UKHO.ExchangeSetService.Webjob.CleanUpJob.UnitTests\UKHO.ExchangeSetService.Webjob.CleanUpJob.UnitTests.csproj", "{2C1C3EB9-E419-E697-3404-987C25FD6797}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UKHO.ExchangeSetService.Webjob.UnitTests", "UKHO.ExchangeSetService.API\UKHO.ExchangeSetService.Webjob.UnitTests\UKHO.ExchangeSetService.Webjob.UnitTests.csproj", "{26BF3684-F03C-56E9-31F0-8A950E98EE0D}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "WebJobs", "WebJobs", "{92883773-C020-46BA-9557-4D491B39D0B0}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UKHO.ExchangeSetService.CleanUpJob", "UKHO.ExchangeSetService.API\UKHO.ExchangeSetService.CleanUpJob\UKHO.ExchangeSetService.CleanUpJob.csproj", "{1E99635D-6C75-D21E-FE82-A595D556479A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UKHO.ExchangeSetService.FulfilmentService", "UKHO.ExchangeSetService.API\UKHO.ExchangeSetService.FulfilmentService\UKHO.ExchangeSetService.FulfilmentService.csproj", "{1D4872A4-81B2-77E9-1ACA-B5A3184FCEF7}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UKHO.ExchangeSetService.API", "UKHO.ExchangeSetService.API\UKHO.ExchangeSetService.API\UKHO.ExchangeSetService.API.csproj", "{D1D4FFA3-1951-8548-6825-FA3BB7C9DC41}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UKHO.ExchangeSetService.Common", "UKHO.ExchangeSetService.API\UKHO.ExchangeSetService.Common\UKHO.ExchangeSetService.Common.csproj", "{2F591B9E-177A-A6D2-704B-6E64A4D485D6}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{B1684574-201F-1BFF-FE44-DAF73219C30F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B1684574-201F-1BFF-FE44-DAF73219C30F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B1684574-201F-1BFF-FE44-DAF73219C30F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B1684574-201F-1BFF-FE44-DAF73219C30F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7E99F74E-CDB0-EB3E-C09B-B64113090C17}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7E99F74E-CDB0-EB3E-C09B-B64113090C17}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7E99F74E-CDB0-EB3E-C09B-B64113090C17}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7E99F74E-CDB0-EB3E-C09B-B64113090C17}.Release|Any CPU.Build.0 = Release|Any CPU
+		{826477EC-88DB-AD86-BBBA-F90111526811}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{826477EC-88DB-AD86-BBBA-F90111526811}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{826477EC-88DB-AD86-BBBA-F90111526811}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{826477EC-88DB-AD86-BBBA-F90111526811}.Release|Any CPU.Build.0 = Release|Any CPU
+		{730AAF37-847B-B5A6-154B-690441042F72}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{730AAF37-847B-B5A6-154B-690441042F72}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{730AAF37-847B-B5A6-154B-690441042F72}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{730AAF37-847B-B5A6-154B-690441042F72}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2C1C3EB9-E419-E697-3404-987C25FD6797}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2C1C3EB9-E419-E697-3404-987C25FD6797}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2C1C3EB9-E419-E697-3404-987C25FD6797}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2C1C3EB9-E419-E697-3404-987C25FD6797}.Release|Any CPU.Build.0 = Release|Any CPU
+		{26BF3684-F03C-56E9-31F0-8A950E98EE0D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{26BF3684-F03C-56E9-31F0-8A950E98EE0D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{26BF3684-F03C-56E9-31F0-8A950E98EE0D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{26BF3684-F03C-56E9-31F0-8A950E98EE0D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1E99635D-6C75-D21E-FE82-A595D556479A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1E99635D-6C75-D21E-FE82-A595D556479A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1E99635D-6C75-D21E-FE82-A595D556479A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1E99635D-6C75-D21E-FE82-A595D556479A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1D4872A4-81B2-77E9-1ACA-B5A3184FCEF7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1D4872A4-81B2-77E9-1ACA-B5A3184FCEF7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1D4872A4-81B2-77E9-1ACA-B5A3184FCEF7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1D4872A4-81B2-77E9-1ACA-B5A3184FCEF7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D1D4FFA3-1951-8548-6825-FA3BB7C9DC41}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D1D4FFA3-1951-8548-6825-FA3BB7C9DC41}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D1D4FFA3-1951-8548-6825-FA3BB7C9DC41}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D1D4FFA3-1951-8548-6825-FA3BB7C9DC41}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2F591B9E-177A-A6D2-704B-6E64A4D485D6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2F591B9E-177A-A6D2-704B-6E64A4D485D6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2F591B9E-177A-A6D2-704B-6E64A4D485D6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2F591B9E-177A-A6D2-704B-6E64A4D485D6}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{B1684574-201F-1BFF-FE44-DAF73219C30F} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
+		{7E99F74E-CDB0-EB3E-C09B-B64113090C17} = {49EBF898-0482-4F67-8634-2F72000DE39F}
+		{826477EC-88DB-AD86-BBBA-F90111526811} = {49EBF898-0482-4F67-8634-2F72000DE39F}
+		{730AAF37-847B-B5A6-154B-690441042F72} = {49EBF898-0482-4F67-8634-2F72000DE39F}
+		{2C1C3EB9-E419-E697-3404-987C25FD6797} = {49EBF898-0482-4F67-8634-2F72000DE39F}
+		{26BF3684-F03C-56E9-31F0-8A950E98EE0D} = {49EBF898-0482-4F67-8634-2F72000DE39F}
+		{1E99635D-6C75-D21E-FE82-A595D556479A} = {92883773-C020-46BA-9557-4D491B39D0B0}
+		{1D4872A4-81B2-77E9-1ACA-B5A3184FCEF7} = {92883773-C020-46BA-9557-4D491B39D0B0}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {7DF32072-E9E7-4FEC-9202-9CDE579848E9}
+	EndGlobalSection
+EndGlobal
