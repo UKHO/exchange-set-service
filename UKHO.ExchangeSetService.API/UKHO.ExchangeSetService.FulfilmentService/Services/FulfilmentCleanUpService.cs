@@ -43,12 +43,9 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
                             break;
                         }
 
-                        if (subFolder.CreationTime < cutoffDate)
+                        if (subFolder.CreationTime < cutoffDate && fileSystemHelper.DeleteFolderIfExists(subFolder.FullName))
                         {
-                            if (fileSystemHelper.DeleteFolderIfExists(subFolder.FullName))
-                            {
-                                logger.LogError(EventIds.HistoricDateFolderDeleted.ToEventId(), "Historic folder deleted successfully for folder:{Folder}.", subFolder.Name);
-                            }
+                            logger.LogError(EventIds.HistoricDateFolderDeleted.ToEventId(), "Historic folder deleted successfully for folder:{Folder}.", subFolder.Name);
                         }
                     }
                 }
