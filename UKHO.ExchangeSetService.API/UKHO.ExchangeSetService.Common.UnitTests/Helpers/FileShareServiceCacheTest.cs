@@ -48,6 +48,8 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
             fakeFileSystemHelper = A.Fake<IFileSystemHelper>();
             fakeCacheConfiguration.Value.CacheStorageAccountKey = "testaccountkey";
             fakeCacheConfiguration.Value.CacheStorageAccountName = "testessstorage";
+            fakeCacheConfiguration.Value.CacheStorageAccountKey2 = "testaccountkey2";
+            fakeCacheConfiguration.Value.CacheStorageAccountName2 = "testessstorage2";
             fakeCacheConfiguration.Value.FssSearchCacheTableName = "testfsscache";
             fakeCacheConfiguration.Value.IsFssCacheEnabled = true;
             fakeAioConfiguration = A.Fake<IOptions<AioConfiguration>>();

@@ -76,7 +76,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
 
                     if (!productList.Contains(compareProducts))
                     {
-                        var storageConnectionString = azureStorageService.GetStorageAccountConnectionString(fssCacheConfiguration.Value.CacheStorageAccountName, fssCacheConfiguration.Value.CacheStorageAccountKey);
+                        var storageConnectionString = azureStorageService.GetStorageAccountConnectionString(fssCacheConfiguration.Value.CacheStorageAccountName2, fssCacheConfiguration.Value.CacheStorageAccountKey2);
                         var cacheInfo = await azureTableStorageClient.RetrieveFromTableStorageAsync<FssSearchResponseCache>(item.ProductName, item.EditionNumber + "|" + itemUpdateNumber.Value + "|" + businessUnit, fssCacheConfiguration.Value.FssSearchCacheTableName, storageConnectionString);
 
                         if (cacheInfo != null && string.IsNullOrEmpty(cacheInfo.Response))
@@ -203,7 +203,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
 
         public async Task CopyFileToBlob(Stream stream, string fileName, string batchId)
         {
-            var storageConnectionString = azureStorageService.GetStorageAccountConnectionString(fssCacheConfiguration.Value.CacheStorageAccountName, fssCacheConfiguration.Value.CacheStorageAccountKey);
+            var storageConnectionString = azureStorageService.GetStorageAccountConnectionString(fssCacheConfiguration.Value.CacheStorageAccountName2, fssCacheConfiguration.Value.CacheStorageAccountKey2);
             var blobClient = await azureBlobStorageClient.GetBlobClient(fileName, storageConnectionString, batchId);
 
             if (!await blobClient.ExistsAsync())
@@ -234,7 +234,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
 
         public async Task<Stream> DownloadFileFromCacheAsync(string fileName, string containerName)
         {
-            var storageConnectionString = azureStorageService.GetStorageAccountConnectionString(fssCacheConfiguration.Value.CacheStorageAccountName, fssCacheConfiguration.Value.CacheStorageAccountKey);
+            var storageConnectionString = azureStorageService.GetStorageAccountConnectionString(fssCacheConfiguration.Value.CacheStorageAccountName2, fssCacheConfiguration.Value.CacheStorageAccountKey2);
             var blobClient = await azureBlobStorageClient.GetBlobClient(fileName, storageConnectionString, containerName);
 
             var memoryStream = new MemoryStream();

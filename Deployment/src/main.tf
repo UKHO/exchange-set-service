@@ -175,6 +175,8 @@ module "key_vault" {
         "ESSFulfilmentConfiguration--LargeExchangeSetAccountKey"     = module.fulfilment_storage.large_exchange_set_primary_access_key
         "CacheConfiguration--CacheStorageAccountName"                = module.cache_storage.cache_storage_name
         "CacheConfiguration--CacheStorageAccountKey"                 = module.cache_storage.cache_storage_primary_access_key
+        "CacheConfiguration--CacheStorageAccountName2"               = module.cache_storage.cache_storage_name2
+        "CacheConfiguration--CacheStorageAccountKey2"                = module.cache_storage.cache_storage_primary_access_key2
       },
       module.fulfilment_webapp.small_exchange_set_scm_credentials,
       module.fulfilment_webapp.medium_exchange_set_scm_credentials,
@@ -208,6 +210,8 @@ module "fulfilment_keyvaults" {
     "AzureWebJobsStorage"                                       = module.fulfilment_storage.small_exchange_set_connection_string
     "CacheConfiguration--CacheStorageAccountName"               = module.cache_storage.cache_storage_name
     "CacheConfiguration--CacheStorageAccountKey"                = module.cache_storage.cache_storage_primary_access_key
+    "CacheConfiguration--CacheStorageAccountName2"              = module.cache_storage.cache_storage_name2
+    "CacheConfiguration--CacheStorageAccountKey2"               = module.cache_storage.cache_storage_primary_access_key2
 
   }
   medium_exchange_set_secrets = {
@@ -218,6 +222,8 @@ module "fulfilment_keyvaults" {
     "AzureWebJobsStorage"                                       = module.fulfilment_storage.medium_exchange_set_connection_string
     "CacheConfiguration--CacheStorageAccountName"               = module.cache_storage.cache_storage_name
     "CacheConfiguration--CacheStorageAccountKey"                = module.cache_storage.cache_storage_primary_access_key
+    "CacheConfiguration--CacheStorageAccountName2"              = module.cache_storage.cache_storage_name2
+    "CacheConfiguration--CacheStorageAccountKey2"               = module.cache_storage.cache_storage_primary_access_key2
   }
   large_exchange_set_secrets = {
     "EventHubLoggingConfiguration--ConnectionString"            = module.eventhub.log_primary_connection_string
@@ -227,6 +233,8 @@ module "fulfilment_keyvaults" {
     "AzureWebJobsStorage"                                       = module.fulfilment_storage.large_exchange_set_connection_string
     "CacheConfiguration--CacheStorageAccountName"               = module.cache_storage.cache_storage_name
     "CacheConfiguration--CacheStorageAccountKey"                = module.cache_storage.cache_storage_primary_access_key
+    "CacheConfiguration--CacheStorageAccountName2"              = module.cache_storage.cache_storage_name2
+    "CacheConfiguration--CacheStorageAccountKey2"               = module.cache_storage.cache_storage_primary_access_key2
   }
   tags                                      = local.tags
 }
@@ -243,6 +251,7 @@ module "azure-dashboard" {
 module "cache_storage" {
   source                                = "./Modules/CacheStorage"
   name                                  = (local.env_name == "prod" || local.env_name == "pre") && var.storage_suffix == "v2" ? "${local.service_name}${local.env_name}cachestorageukho2" : "${local.service_name}${local.env_name}cachestorageukho${var.storage_suffix}"
+  name2                                 = (local.env_name == "prod" || local.env_name == "pre") && var.storage_suffix == "v2" ? "${local.service_name}${local.env_name}cachesaukho2" : "${local.service_name}${local.env_name}cachesaukho${var.storage_suffix}"
   resource_group_name                   = azurerm_resource_group.rg.name
   allowed_ips                           = var.allowed_ips  
   location                              = var.location

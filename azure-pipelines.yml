@@ -4,15 +4,15 @@ parameters:
   - name: ContinueEvenIfResourcesAreGettingDestroyed
     displayName: "Continue even if resources are getting destroyed"
     type: boolean
-    default: false
+    default: true
   - name: disableStryker
     displayName: "Disable Stryker"
     type: boolean
-    default: false
+    default: true
   - name: skipDeploymentOfUIInstance
     displayName: "Skip deployment of UI instance"
     type: boolean
-    default: false
+    default: true
 
 trigger:
   - main

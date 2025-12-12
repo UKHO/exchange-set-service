@@ -73,11 +73,12 @@ namespace UKHO.ExchangeSetService.API.Services
         public async Task InvalidateAndInsertCacheDataAsync(EnterpriseEventCacheDataRequest enterpriseEventCacheDataRequest, string correlationId)
         {
             var storageConnectionString = azureStorageService.GetStorageAccountConnectionString(cacheConfiguration.Value.CacheStorageAccountName, cacheConfiguration.Value.CacheStorageAccountKey);
+            var storageConnectionString2 = azureStorageService.GetStorageAccountConnectionString(cacheConfiguration.Value.CacheStorageAccountName2, cacheConfiguration.Value.CacheStorageAccountKey2);
             var readMeFileExist = enterpriseEventCacheDataRequest.Files?.Exists(x => x.Filename?.ToUpper() == fileShareServiceConfig.Value.ReadMeFileName);
             if (readMeFileExist == true)
             {
                 var productType = enterpriseEventCacheDataRequest.Attributes.Where(a => a.Key == "Product Type").Select(a => a.Value).FirstOrDefault();
-                await InvalidateReadMeFileCacheDataAsync(storageConnectionString, enterpriseEventCacheDataRequest.BusinessUnit, enterpriseEventCacheDataRequest.BatchId, productType, correlationId);
+                await InvalidateReadMeFileCacheDataAsync(storageConnectionString, storageConnectionString2, enterpriseEventCacheDataRequest.BusinessUnit, enterpriseEventCacheDataRequest.BatchId, productType, correlationId);
             }
             else
             {
@@ -100,7 +101,7 @@ namespace UKHO.ExchangeSetService.API.Services
                         Response = JsonConvert.SerializeObject(enterpriseEventCacheDataRequest)
                     };
 
-                    await DeleteCacheDataAsync(fssSearchResponse, storageConnectionString, correlationId);
+                    await DeleteCacheDataAsync(fssSearchResponse, storageConnectionString, storageConnectionString2, correlationId);
                     if (enterpriseEventCacheDataRequest.Files != null && enterpriseEventCacheDataRequest.Files.Count > 0)
                     {
                         await UploadDataToCacheAsync(fssSearchResponse, correlationId);
@@ -113,7 +114,7 @@ namespace UKHO.ExchangeSetService.API.Services
             }
         }
 
-        private async Task DeleteCacheDataAsync(FssSearchResponseCache fssSearchResponse, string storageConnectionString, string correlationId)
+        private async Task DeleteCacheDataAsync(FssSearchResponseCache fssSearchResponse, string storageConnectionString, string storageConnectionString2, string correlationId)
         {
             var cacheInfo = (FssSearchResponseCache)await azureTableStorageClient.RetrieveFromTableStorageAsync<FssSearchResponseCache>(fssSearchResponse.PartitionKey, fssSearchResponse.RowKey, cacheConfiguration.Value.FssSearchCacheTableName, storageConnectionString);
             string[] cacheTableRowKeys = fssSearchResponse.RowKey.Split('|', StringSplitOptions.TrimEntries);
@@ -134,7 +135,7 @@ namespace UKHO.ExchangeSetService.API.Services
                 logger.LogInformation(EventIds.DeleteSearchDownloadCacheDataFromTableCompleted.ToEventId(), "Deletion completed for Search and Download cache data from table:{cacheConfiguration.Value.FssSearchCacheTableName} for ProductName:{cellName} of BusinessUnit:{businessUnit} and BatchId:{cacheTableData.BatchId} and _X-Correlation-ID:{CorrelationId}", cacheConfiguration.Value.FssSearchCacheTableName, fssSearchResponse.PartitionKey, cacheTableRowKeys[2], cacheTableData.BatchId, correlationId);
 
                 logger.LogInformation(EventIds.DeleteSearchDownloadCacheDataFromContainerStarted.ToEventId(), "Deletion started for Search and Download cache data from Blob Container for ProductName:{cellName} of BusinessUnit:{businessUnit} and BatchId:{cacheTableData.BatchId} and _X-Correlation-ID:{CorrelationId}", fssSearchResponse.PartitionKey, cacheTableRowKeys[2], cacheTableData.BatchId, correlationId);
-                await azureBlobStorageClient.DeleteCacheContainer(storageConnectionString, cacheTableData.BatchId);
+                await azureBlobStorageClient.DeleteCacheContainer(storageConnectionString2, cacheTableData.BatchId);
                 logger.LogInformation(EventIds.DeleteSearchDownloadCacheDataFromContainerCompleted.ToEventId(), "Deletion completed for Search and Download cache data from Blob Container for ProductName:{cellName} of BusinessUnit:{businessUnit} and BatchId:{cacheTableData.BatchId} and _X-Correlation-ID:{CorrelationId}", fssSearchResponse.PartitionKey, cacheTableRowKeys[2], cacheTableData.BatchId, correlationId);
             }
             else
@@ -216,7 +217,7 @@ namespace UKHO.ExchangeSetService.API.Services
                 && !string.IsNullOrWhiteSpace(editionNumber)
                 && !string.IsNullOrWhiteSpace(updateNumber));
         }
-        private async Task InvalidateReadMeFileCacheDataAsync(string storageConnectionString, string businessUnit, string batchId, string productType, string correlationId)
+        private async Task InvalidateReadMeFileCacheDataAsync(string storageConnectionString, string storageConnectionString2, string businessUnit, string batchId, string productType, string correlationId)
         {
             if (!ValidateCacheAttributeDataForReadMeFile(businessUnit, productType))
             {
@@ -225,7 +226,7 @@ namespace UKHO.ExchangeSetService.API.Services
             else
             {
                 logger.LogInformation(EventIds.DeleteSearchDownloadCacheDataFromContainerStarted.ToEventId(), "Deletion started for readme.txt file cache data from Blob Container for BusinessUnit:{businessUnit} and BatchId:{cacheTableData.BatchId} and _X-Correlation-ID:{CorrelationId}", businessUnit, batchId, correlationId);
-                await azureBlobStorageClient.DeleteCacheContainer(storageConnectionString, ReadMeContainerName);
+                await azureBlobStorageClient.DeleteCacheContainer(storageConnectionString2, ReadMeContainerName);
                 logger.LogInformation(EventIds.DeleteSearchDownloadCacheDataFromContainerCompleted.ToEventId(), "Deletion completed for readme.txt file cache data from Blob Container for BusinessUnit:{businessUnit} and BatchId:{cacheTableData.BatchId} and _X-Correlation-ID:{CorrelationId}", businessUnit, batchId, correlationId);
             }
         }
