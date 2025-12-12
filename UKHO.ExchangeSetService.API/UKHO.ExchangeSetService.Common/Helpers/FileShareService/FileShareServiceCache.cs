@@ -76,12 +76,13 @@ namespace UKHO.ExchangeSetService.Common.Helpers
 
                     if (!productList.Contains(compareProducts))
                     {
-                        var storageConnectionString = azureStorageService.GetStorageAccountConnectionString(fssCacheConfiguration.Value.CacheStorageAccountName2, fssCacheConfiguration.Value.CacheStorageAccountKey2);
+                        var storageConnectionString = azureStorageService.GetStorageAccountConnectionString(fssCacheConfiguration.Value.CacheStorageAccountName, fssCacheConfiguration.Value.CacheStorageAccountKey);
+                        var storageConnectionString2 = azureStorageService.GetStorageAccountConnectionString(fssCacheConfiguration.Value.CacheStorageAccountName2, fssCacheConfiguration.Value.CacheStorageAccountKey2);
                         var cacheInfo = await azureTableStorageClient.RetrieveFromTableStorageAsync<FssSearchResponseCache>(item.ProductName, item.EditionNumber + "|" + itemUpdateNumber.Value + "|" + businessUnit, fssCacheConfiguration.Value.FssSearchCacheTableName, storageConnectionString);
 
                         if (cacheInfo != null && string.IsNullOrEmpty(cacheInfo.Response))
                         {
-                            var blobClient = await azureBlobStorageClient.GetBlobClient($"{cacheInfo.BatchId}.json", storageConnectionString, cacheInfo.BatchId);
+                            var blobClient = await azureBlobStorageClient.GetBlobClient($"{cacheInfo.BatchId}.json", storageConnectionString2, cacheInfo.BatchId);
 
                             if (blobClient != null)
                             {
@@ -91,7 +92,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
 
                         if (cacheInfo != null && !string.IsNullOrEmpty(cacheInfo.Response))
                         {
-                            var internalBatchDetail = await CheckIfCacheProductsExistsInBlob(exchangeSetRootPath, queueMessage, item, updateNumbers, itemUpdateNumber, storageConnectionString, cacheInfo, businessUnit);
+                            var internalBatchDetail = await CheckIfCacheProductsExistsInBlob(exchangeSetRootPath, queueMessage, item, updateNumbers, itemUpdateNumber, storageConnectionString2, cacheInfo, businessUnit);
 
                             var fileCount = internalBatchDetail.Files.Count();
 
