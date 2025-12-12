@@ -43,3 +43,6 @@ variable name {
 
 variable name2 {
 }
+
+variable name3 {
+}

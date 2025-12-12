@@ -6,6 +6,8 @@
         public string CacheStorageAccountKey { get; set; }
         public string CacheStorageAccountName2 { get; set; }
         public string CacheStorageAccountKey2 { get; set; }
+        public string CacheStorageAccountName3 { get; set; }
+        public string CacheStorageAccountKey3 { get; set; }
         public string FssSearchCacheTableName { get; set; }
         public bool IsFssCacheEnabled { get; set; }
         public string S63CacheBusinessUnit { get; set; }

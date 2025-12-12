@@ -177,6 +177,8 @@ module "key_vault" {
         "CacheConfiguration--CacheStorageAccountKey"                 = module.cache_storage.cache_storage_primary_access_key
         "CacheConfiguration--CacheStorageAccountName2"               = module.cache_storage.cache_storage_name2
         "CacheConfiguration--CacheStorageAccountKey2"                = module.cache_storage.cache_storage_primary_access_key2
+        "CacheConfiguration--CacheStorageAccountName3"               = module.cache_storage.cache_storage_name3
+        "CacheConfiguration--CacheStorageAccountKey3"                = module.cache_storage.cache_storage_primary_access_key3
       },
       module.fulfilment_webapp.small_exchange_set_scm_credentials,
       module.fulfilment_webapp.medium_exchange_set_scm_credentials,
@@ -212,6 +214,8 @@ module "fulfilment_keyvaults" {
     "CacheConfiguration--CacheStorageAccountKey"                = module.cache_storage.cache_storage_primary_access_key
     "CacheConfiguration--CacheStorageAccountName2"              = module.cache_storage.cache_storage_name2
     "CacheConfiguration--CacheStorageAccountKey2"               = module.cache_storage.cache_storage_primary_access_key2
+    "CacheConfiguration--CacheStorageAccountName3"              = module.cache_storage.cache_storage_name3
+    "CacheConfiguration--CacheStorageAccountKey3"               = module.cache_storage.cache_storage_primary_access_key3
 
   }
   medium_exchange_set_secrets = {
@@ -224,6 +228,8 @@ module "fulfilment_keyvaults" {
     "CacheConfiguration--CacheStorageAccountKey"                = module.cache_storage.cache_storage_primary_access_key
     "CacheConfiguration--CacheStorageAccountName2"              = module.cache_storage.cache_storage_name2
     "CacheConfiguration--CacheStorageAccountKey2"               = module.cache_storage.cache_storage_primary_access_key2
+    "CacheConfiguration--CacheStorageAccountName3"              = module.cache_storage.cache_storage_name3
+    "CacheConfiguration--CacheStorageAccountKey3"               = module.cache_storage.cache_storage_primary_access_key3
   }
   large_exchange_set_secrets = {
     "EventHubLoggingConfiguration--ConnectionString"            = module.eventhub.log_primary_connection_string
@@ -235,6 +241,8 @@ module "fulfilment_keyvaults" {
     "CacheConfiguration--CacheStorageAccountKey"                = module.cache_storage.cache_storage_primary_access_key
     "CacheConfiguration--CacheStorageAccountName2"              = module.cache_storage.cache_storage_name2
     "CacheConfiguration--CacheStorageAccountKey2"               = module.cache_storage.cache_storage_primary_access_key2
+    "CacheConfiguration--CacheStorageAccountName3"              = module.cache_storage.cache_storage_name3
+    "CacheConfiguration--CacheStorageAccountKey3"               = module.cache_storage.cache_storage_primary_access_key3
   }
   tags                                      = local.tags
 }
@@ -252,6 +260,7 @@ module "cache_storage" {
   source                                = "./Modules/CacheStorage"
   name                                  = (local.env_name == "prod" || local.env_name == "pre") && var.storage_suffix == "v2" ? "${local.service_name}${local.env_name}cachestorageukho2" : "${local.service_name}${local.env_name}cachestorageukho${var.storage_suffix}"
   name2                                 = (local.env_name == "prod" || local.env_name == "pre") && var.storage_suffix == "v2" ? "${local.service_name}${local.env_name}cachesaukho2" : "${local.service_name}${local.env_name}cachesaukho${var.storage_suffix}"
+  name3                                 = (local.env_name == "prod" || local.env_name == "pre") && var.storage_suffix == "v2" ? "${local.service_name}${local.env_name}cachetblukho2" : "${local.service_name}${local.env_name}cachetblukho${var.storage_suffix}"
   resource_group_name                   = azurerm_resource_group.rg.name
   allowed_ips                           = var.allowed_ips  
   location                              = var.location

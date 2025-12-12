@@ -65,7 +65,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
             fakeFileSystemHelper = A.Fake<IFileSystemHelper>();
             fakeFileShareServiceCache = A.Fake<IFileShareServiceCache>();
             fakeMonitorHelper = A.Fake<IMonitorHelper>();
-            fakeCacheConfiguration = Options.Create(new CacheConfiguration { CacheStorageAccountKey = "key", CacheStorageAccountName = "cache", CacheStorageAccountKey2 = "key2", CacheStorageAccountName2 = "cache2", FssSearchCacheTableName = "AnyName", IsFssCacheEnabled = true });
+            fakeCacheConfiguration = Options.Create(new CacheConfiguration { CacheStorageAccountKey = "key", CacheStorageAccountName = "cache", CacheStorageAccountKey2 = "key2", CacheStorageAccountName2 = "cache2", CacheStorageAccountKey3 = "key3", CacheStorageAccountName3 = "cache3", FssSearchCacheTableName = "AnyName", IsFssCacheEnabled = true });
             fakeAioConfiguration = A.Fake<IOptions<AioConfiguration>>();
 
             ServiceCollection services = new ServiceCollection();

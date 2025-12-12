@@ -72,7 +72,7 @@ namespace UKHO.ExchangeSetService.API.Services
 
         public async Task InvalidateAndInsertCacheDataAsync(EnterpriseEventCacheDataRequest enterpriseEventCacheDataRequest, string correlationId)
         {
-            var storageConnectionString = azureStorageService.GetStorageAccountConnectionString(cacheConfiguration.Value.CacheStorageAccountName, cacheConfiguration.Value.CacheStorageAccountKey);
+            var storageConnectionString = azureStorageService.GetStorageAccountConnectionString(cacheConfiguration.Value.CacheStorageAccountName3, cacheConfiguration.Value.CacheStorageAccountKey3);
             var storageConnectionString2 = azureStorageService.GetStorageAccountConnectionString(cacheConfiguration.Value.CacheStorageAccountName2, cacheConfiguration.Value.CacheStorageAccountKey2);
             var readMeFileExist = enterpriseEventCacheDataRequest.Files?.Exists(x => x.Filename?.ToUpper() == fileShareServiceConfig.Value.ReadMeFileName);
             if (readMeFileExist == true)

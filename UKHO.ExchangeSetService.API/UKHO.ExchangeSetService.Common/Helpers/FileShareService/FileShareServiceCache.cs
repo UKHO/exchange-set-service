@@ -76,7 +76,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
 
                     if (!productList.Contains(compareProducts))
                     {
-                        var storageConnectionString = azureStorageService.GetStorageAccountConnectionString(fssCacheConfiguration.Value.CacheStorageAccountName, fssCacheConfiguration.Value.CacheStorageAccountKey);
+                        var storageConnectionString = azureStorageService.GetStorageAccountConnectionString(fssCacheConfiguration.Value.CacheStorageAccountName3, fssCacheConfiguration.Value.CacheStorageAccountKey3);
                         var storageConnectionString2 = azureStorageService.GetStorageAccountConnectionString(fssCacheConfiguration.Value.CacheStorageAccountName2, fssCacheConfiguration.Value.CacheStorageAccountKey2);
                         var cacheInfo = await azureTableStorageClient.RetrieveFromTableStorageAsync<FssSearchResponseCache>(item.ProductName, item.EditionNumber + "|" + itemUpdateNumber.Value + "|" + businessUnit, fssCacheConfiguration.Value.FssSearchCacheTableName, storageConnectionString);
 
@@ -229,7 +229,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
                 fssSearchResponseCache.Response = string.Empty;
             }
 
-            var storageConnectionString = azureStorageService.GetStorageAccountConnectionString(fssCacheConfiguration.Value.CacheStorageAccountName, fssCacheConfiguration.Value.CacheStorageAccountKey);
+            var storageConnectionString = azureStorageService.GetStorageAccountConnectionString(fssCacheConfiguration.Value.CacheStorageAccountName3, fssCacheConfiguration.Value.CacheStorageAccountKey3);
             await azureTableStorageClient.InsertOrMergeIntoTableStorageAsync(fssSearchResponseCache, fssCacheConfiguration.Value.FssSearchCacheTableName, storageConnectionString);
         }
 
