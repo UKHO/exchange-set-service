@@ -10,7 +10,7 @@ echo "packagePath : $packagePath"
 echo "packageName : $packageName"
 
 function ReplaceQueueAndDeployWebApp($packagePath, $packageName, $exchangeSet, $webAppResourceGroup) {
-    echo "Function ReplaceQueueAndDeployWebApp called with params $packagePath, $packageName, $exchangeSet, $keyVaultUri"
+    echo "Function ReplaceQueueAndDeployWebApp called with params $packagePath, $packageName, $exchangeSet, $webAppResourceGroup"
     $exchangeSetWebapps = @()
     $keyVaultUri = ""
 

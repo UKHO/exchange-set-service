@@ -14,6 +14,7 @@ parameters:
 
 steps:
   - powershell: |
+    displayName: Set QueuesOptions values - ${{ parameters.ExchangeSetSize }} WebJob
       Write-Host "##vso[task.setvariable variable=QueuesOptions.batchSize;]${{ parameters.BatchSize }}"
       Write-Host "##vso[task.setvariable variable=QueuesOptions.newBatchThreshold;]${{ parameters.NewBatchThreshold }}"
 
@@ -26,10 +27,10 @@ steps:
       jsonTargetFiles: '**/appsettings.json'
 
   - task: AzureCLI@2
-    displayName: Fulfilment - ${{ parameters.ExchangeSetSize }} WebJob deployment
+    displayName: Fulfilment deployment - ${{ parameters.ExchangeSetSize }} WebJob
     inputs:
       azureSubscription: "${{ parameters.AzureSubscription }}"
-      scriptType: 'pscore'
-      scriptLocation: 'scriptPath'
+      scriptType: pscore
+      scriptLocation: scriptPath
       scriptPath: '$(Pipeline.Workspace)/terraformartifact/fulfilment_webjob_deployment.ps1'
       arguments: '-terraformJsonOutputFile $(Pipeline.Workspace)/terraformartifact/terraform_output.json -packagePath "$(Pipeline.Workspace)/ExchangeSetService" -packageName "ExchangeSetFulFilmentService.zip" -exchangeSetSize ${{ parameters.ExchangeSetSize }}'  
