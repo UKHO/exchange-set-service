@@ -25,6 +25,7 @@ function ReplaceQueueAndDeployWebApp($exchangeSetWebapps, $packagePath, $package
         echo "Replacing queue name $queueName for $webappName in $exchangeSet exchange set..."
 
         $appSettingFileForFulfilment = "$packagePath/$exchangeSet/App_Data/jobs/continuous/ESSFulfilmentWebJob/appsettings.json"
+        echo "------- $appSettingFileForFulfilment -------"
         $appSettingForFulfilment = Get-Content $appSettingFileForFulfilment |ConvertFrom-Json
 
         if ( !$? ) { echo "Error while Reading json file for fulfilment" ; throw $_ }
