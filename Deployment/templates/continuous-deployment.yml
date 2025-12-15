@@ -45,21 +45,21 @@ steps:
   - template: fulfilment-webjob-deployment.yml
     parameters:
       AzureSubscription: ${{parameters.AzureSubscription}}
-      BatchSizeBatchSize: $(QueuesOptionsBatchSizeSmall)
+      BatchSize: $(QueuesOptionsBatchSizeSmall)
       NewBatchThreshold: $(QueuesOptionsNewBatchThresholdSmall)
       ExchangeSetSize: small
 
   - template: fulfilment-webjob-deployment.yml
     parameters:
       AzureSubscription: ${{parameters.AzureSubscription}}
-      BatchSizeBatchSize: $(QueuesOptionsBatchSizeMedium)
+      BatchSize: $(QueuesOptionsBatchSizeMedium)
       NewBatchThreshold: $(QueuesOptionsNewBatchThresholdMedium)
       ExchangeSetSize: medium
 
   - template: fulfilment-webjob-deployment.yml
     parameters:
       AzureSubscription: ${{parameters.AzureSubscription}}
-      BatchSizeBatchSize: $(QueuesOptionsBatchSizeLarge)
+      BatchSize: $(QueuesOptionsBatchSizeLarge)
       NewBatchThreshold: $(QueuesOptionsNewBatchThresholdLarge)
       ExchangeSetSize: large
 
