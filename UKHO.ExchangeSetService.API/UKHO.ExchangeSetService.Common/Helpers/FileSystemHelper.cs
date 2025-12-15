@@ -232,5 +232,10 @@ namespace UKHO.ExchangeSetService.Common.Helpers
                 return false;
             }
         }
+
+        public bool CheckDirectoryExists(string path)
+        {
+            return _fileSystem.Directory.Exists(path);
+        }
     }
 }

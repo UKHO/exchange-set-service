@@ -109,7 +109,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.FileBuilders
         public async Task WhenCreateAioExchangeSet_WithProducts_ReturnsTrueAndQueriesFss()
         {
             var message = CreateMessage();
-            var batch = new FulfilmentServiceBatch(FakeBatchValue.Configuration, message, FakeBatchValue.CurrentUtcDateTime);
+            var batch = new FulfilmentServiceBatch(FakeBatchValue.Configuration, message);
             var products = CreateProductsAio();
             var fulfilmentDataResponses = CreateFulfilmentDataResponses(products);
             var salesCatalogueDataResponse = new SalesCatalogueDataResponse();
@@ -132,7 +132,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.FileBuilders
         public async Task WhenCreateAioExchangeSet_WithEmptyProducts_DoesNotQueryFssButStillCreatesAncillary()
         {
             var message = CreateMessage();
-            var batch = new FulfilmentServiceBatch(FakeBatchValue.Configuration, message, FakeBatchValue.CurrentUtcDateTime);
+            var batch = new FulfilmentServiceBatch(FakeBatchValue.Configuration, message);
             var empty = new List<Products>();
             var salesCatalogueDataResponse = new SalesCatalogueDataResponse();
             var salesCatalogueProductResponse = new SalesCatalogueProductResponse();
@@ -210,7 +210,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.FileBuilders
         public async Task WhenCreateStandardLargeMediaExchangeSet_Valid_ReturnsTrue()
         {
             var message = CreateMessage();
-            var batch = new FulfilmentServiceBatch(FakeBatchValue.Configuration, message, FakeBatchValue.CurrentUtcDateTime);
+            var batch = new FulfilmentServiceBatch(FakeBatchValue.Configuration, message);
             var products = CreateProducts(1); // one non-AIO cell
             var fulfilmentDataResponses = CreateFulfilmentDataResponses(products);
             var salesCatalogueDataResponse = new SalesCatalogueDataResponse();
@@ -293,7 +293,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.FileBuilders
         public void WhenCreateStandardLargeMediaExchangeSet_ProductValidationFails_ThrowsFulfilmentException()
         {
             var message = CreateMessage();
-            var batch = new FulfilmentServiceBatch(FakeBatchValue.Configuration, message, FakeBatchValue.CurrentUtcDateTime);
+            var batch = new FulfilmentServiceBatch(FakeBatchValue.Configuration, message);
             var salesCatalogueProductResponse = new SalesCatalogueProductResponse { Products = CreateProducts(1) };
             var largeResponse = new LargeExchangeSetDataResponse
             {
