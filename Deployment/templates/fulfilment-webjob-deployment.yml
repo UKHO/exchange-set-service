@@ -5,6 +5,12 @@ parameters:
     type: string
   - name: NewBatchThreshold
     type: string
+  - name: ExchangeSetSize
+    type: string
+    values:
+      - 'small'
+      - 'medium'
+      - 'large'
 
 steps:
   - pscore: |
@@ -12,7 +18,7 @@ steps:
       Write-Host "##vso[task.setvariable variable=QueuesOptions.newBatchThreshold;]${{ parameters.NewBatchThreshold }}"
 
   - task: FileTransform@2
-    displayName: "File Transform: WebJob"
+    displayName: File transform - ${{ parameters.ExchangeSetSize }} WebJob
     inputs:
       folderPath: '$(Pipeline.Workspace)/ExchangeSetService/*.zip'
       enableXmlTransform: false
@@ -20,10 +26,10 @@ steps:
       jsonTargetFiles: '**/appsettings.json'
 
   - task: AzureCLI@2
-    displayName: "Azure Fulfilment Webjob Deployment"
+    displayName: Fulfilment - ${{ parameters.ExchangeSetSize }} WebJob deployment
     inputs:
       azureSubscription: "${{ parameters.AzureSubscription }}"
       scriptType: 'pscore'
       scriptLocation: 'scriptPath'
       scriptPath: '$(Pipeline.Workspace)/terraformartifact/fulfilment_webjob_deployment.ps1'
-      arguments: '-terraformJsonOutputFile $(Pipeline.Workspace)/terraformartifact/terraform_output.json -packagePath "$(Pipeline.Workspace)/ExchangeSetService" -packageName "ExchangeSetFulFilmentService.zip"'  
+      arguments: '-terraformJsonOutputFile $(Pipeline.Workspace)/terraformartifact/terraform_output.json -packagePath "$(Pipeline.Workspace)/ExchangeSetService" -packageName "ExchangeSetFulFilmentService.zip" -exchangeSetSize ${{ parameters.ExchangeSetSize }}'  

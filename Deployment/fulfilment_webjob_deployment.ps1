@@ -1,7 +1,8 @@
 param (
     [Parameter(Mandatory = $true)] [string] $terraformJsonOutputFile,
     [Parameter(Mandatory = $true)] [string] $packagePath,
-    [Parameter(Mandatory = $true)] [string] $packageName
+    [Parameter(Mandatory = $true)] [string] $packageName,
+    [Parameter(Mandatory = $true)] [string] $exchangeSetSize
 )
 
 echo "terraformJsonOutputFile : $terraformJsonOutputFile"
@@ -94,24 +95,9 @@ function ReplaceQueueAndDeployWebApp($packagePath, $packageName, $exchangeSet, $
 $terraformOutput = Get-Content $terraformJsonOutputFile | ConvertFrom-Json
 if ( !$? ) { echo "Error while Reading terraform output" ; throw $_ }
 
+echo "Deploying $exchangeSetSize exchange set ..."
+ReplaceQueueAndDeployWebApp $packagePath $packageName $exchangeSetSize $terraformOutput.web_app_resource_group.value
 
-echo "Deploying small exchange set ..."
-ReplaceQueueAndDeployWebApp $packagePath $packageName "small" $terraformOutput.web_app_resource_group.value
+if ( !$? ) { echo "Error while replacing queue and deploying $exchangeSetSize exchange set webapps" ; throw $_ }
 
-if ( !$? ) { echo "Error while replacing queue and deploying small exchange set webapps" ; throw $_ }
-
-echo "Deploying small exchange set done ..."
-
-echo "Deploying medium exchange set ..."
-ReplaceQueueAndDeployWebApp $packagePath $packageName "medium" $terraformOutput.web_app_resource_group.value
-
-if ( !$? ) { echo "Error while replacing queue and deploying medium exchange set webapps" ; throw $_ }
-
-echo "Deploying medium exchange set done ..."
-
-echo "Deploying large exchange set ..."
-ReplaceQueueAndDeployWebApp $packagePath $packageName "large" $terraformOutput.web_app_resource_group.value
-
-if ( !$? ) { echo "Error while replacing queue and deploying large exchange set webapps" ; throw $_ }
-
-echo "Deploying large exchange set done ..."
+echo "Deploying $exchangeSetSize exchange set done ..."
