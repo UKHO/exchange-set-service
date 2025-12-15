@@ -13,7 +13,7 @@ parameters:
       - 'large'
 
 steps:
-  - pscore: |
+  - powershell: |
       Write-Host "##vso[task.setvariable variable=QueuesOptions.batchSize;]${{ parameters.BatchSize }}"
       Write-Host "##vso[task.setvariable variable=QueuesOptions.newBatchThreshold;]${{ parameters.NewBatchThreshold }}"
 
