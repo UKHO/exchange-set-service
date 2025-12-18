@@ -28,6 +28,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Job
         private IAzureBlobStorageService _fakeAzureBlobStorageService;
         private IFulfilmentCallBackService _fakeFulfilmentCallBackService;
         private IOptions<PeriodicOutputServiceConfiguration> _periodicOutputServiceConfiguration;
+        private IFulfilmentCleanUpService _fakeFulfilmentCleanUpService;
         private FulfilmentServiceJob _fulfilmentServiceJob;
         private const int LargeMediaExchangeSetSizeInMB = 300;
 
@@ -48,6 +49,8 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Job
                 LargeExchangeSetFolderName = FakeBatchValue.LargeExchangeSetFolderNamePattern
             });
 
+            _fakeFulfilmentCleanUpService = A.Fake<IFulfilmentCleanUpService>();
+
             _fulfilmentServiceJob = new FulfilmentServiceJob(
                 FakeBatchValue.Configuration,
                 _fakeFulfilmentDataService,
@@ -58,7 +61,10 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Job
                 FakeBatchValue.FileShareServiceConfiguration,
                 _fakeAzureBlobStorageService,
                 _fakeFulfilmentCallBackService,
-                _periodicOutputServiceConfiguration);
+                _periodicOutputServiceConfiguration,
+                _fakeFulfilmentCleanUpService);
+
+            Environment.SetEnvironmentVariable("WEBSITE_SITE_NAME", "unittestsite");
         }
 
         [TearDown]
@@ -99,10 +105,34 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Job
             Assert.That(CommonHelper.IsPeriodicOutputService, Is.False);
             A.CallTo(() => _fakeFulfilmentDataService.CreateExchangeSet(A<FulfilmentServiceBatch>.Ignored)).MustHaveHappenedOnceExactly();
             A.CallTo(() => _fakeFulfilmentDataService.CreateLargeExchangeSet(A<FulfilmentServiceBatch>.Ignored, A<string>.Ignored)).MustNotHaveHappened();
+            A.CallTo(() => _fakeFulfilmentCleanUpService.DeleteBatchFolder(A<FulfilmentServiceBatch>.That.Matches(m => m.BatchId == FakeBatchValue.BatchId))).MustHaveHappenedOnceExactly();
 
-            _fakeLogger.VerifyLogEntry(EventIds.AIOToggleIsOn, "ESS Webjob : AIO toggle is ON for BatchId:{BatchId} | _X-Correlation-ID : {CorrelationId}");
             _fakeLogger.VerifyLogEntry(EventIds.CreateExchangeSetRequestStart, "Create Exchange Set web job request for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}");
             _fakeLogger.VerifyLogEntry(EventIds.CreateExchangeSetRequestCompleted, "Create Exchange Set web job request for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", true);
+            _fakeLogger.VerifyLogEntry(EventIds.FulfilmentBatchCleanUpStarted, "Deletion of temporary data for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}.");
+            _fakeLogger.VerifyLogEntry(EventIds.FulfilmentBatchCleanUpCompleted, "Deletion of temporary data for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}.", true);
+        }
+
+        [Test]
+        public async Task ProcessQueueMessage_FileSizeOnOrBelowThreshold_CleanUpFails()
+        {
+            var qm = BuildQueueMessage(fileSizeBytes: LargeMediaExchangeSetSizeInMB * 1024 * 1024); // <= LargeMediaExchangeSetSizeInMB
+
+            A.CallTo(() => _fakeFulfilmentDataService.CreateExchangeSet(A<FulfilmentServiceBatch>.That.Matches(m => m.BatchId == FakeBatchValue.BatchId))).Returns("ok");
+            A.CallTo(() => _fakeFulfilmentCleanUpService.DeleteBatchFolder(A<FulfilmentServiceBatch>.That.Matches(m => m.BatchId == FakeBatchValue.BatchId))).Throws(new Exception("Clean up failed"));
+
+            await _fulfilmentServiceJob.ProcessQueueMessage(qm);
+
+            Assert.That(CommonHelper.IsPeriodicOutputService, Is.False);
+            A.CallTo(() => _fakeFulfilmentDataService.CreateExchangeSet(A<FulfilmentServiceBatch>.Ignored)).MustHaveHappenedOnceExactly();
+            A.CallTo(() => _fakeFulfilmentDataService.CreateLargeExchangeSet(A<FulfilmentServiceBatch>.Ignored, A<string>.Ignored)).MustNotHaveHappened();
+            A.CallTo(() => _fakeFulfilmentCleanUpService.DeleteBatchFolder(A<FulfilmentServiceBatch>.That.Matches(m => m.BatchId == FakeBatchValue.BatchId))).MustHaveHappenedOnceExactly();
+
+            _fakeLogger.VerifyLogEntry(EventIds.CreateExchangeSetRequestStart, "Create Exchange Set web job request for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}");
+            _fakeLogger.VerifyLogEntry(EventIds.CreateExchangeSetRequestCompleted, "Create Exchange Set web job request for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", true);
+            _fakeLogger.VerifyLogEntry(EventIds.FulfilmentBatchCleanUpStarted, "Deletion of temporary data for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}.");
+            _fakeLogger.VerifyLogEntry(EventIds.FulfilmentBatchCleanUpCompleted, "Deletion of temporary data for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}.", true);
+            _fakeLogger.VerifyLogEntry(EventIds.FulfilmentBatchCleanUpFailed, "Exception occurred while cleaning up temporary data for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}. Exception:{Message}", logLevel: LogLevel.Error);
         }
 
         [Test]
@@ -117,10 +147,12 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Job
             Assert.That(CommonHelper.IsPeriodicOutputService, Is.True);
             A.CallTo(() => _fakeFulfilmentDataService.CreateLargeExchangeSet(A<FulfilmentServiceBatch>.Ignored, FakeBatchValue.LargeExchangeSetFolderNamePattern)).MustHaveHappenedOnceExactly();
             A.CallTo(() => _fakeFulfilmentDataService.CreateExchangeSet(A<FulfilmentServiceBatch>.Ignored)).MustNotHaveHappened();
+            A.CallTo(() => _fakeFulfilmentCleanUpService.DeleteBatchFolder(A<FulfilmentServiceBatch>.That.Matches(m => m.BatchId == FakeBatchValue.BatchId))).MustHaveHappenedOnceExactly();
 
-            _fakeLogger.VerifyLogEntry(EventIds.AIOToggleIsOn, "ESS Webjob : AIO toggle is ON for BatchId:{BatchId} | _X-Correlation-ID : {CorrelationId}");
             _fakeLogger.VerifyLogEntry(EventIds.CreateLargeExchangeSetRequestStart, "Create Large Exchange Set web job request for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}");
             _fakeLogger.VerifyLogEntry(EventIds.CreateLargeExchangeSetRequestCompleted, "Create Large Exchange Set web job request for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", true);
+            _fakeLogger.VerifyLogEntry(EventIds.FulfilmentBatchCleanUpStarted, "Deletion of temporary data for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}.");
+            _fakeLogger.VerifyLogEntry(EventIds.FulfilmentBatchCleanUpCompleted, "Deletion of temporary data for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}.", true);
         }
 
         [Test]
@@ -145,12 +177,14 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Job
             A.CallTo(() => _fakeFileShareBatchService.CommitBatchToFss(FakeBatchValue.BatchId, FakeBatchValue.CorrelationId, A<string>.That.EndsWith(FakeBatchValue.BatchId), FakeBatchValue.ErrorFileName)).MustHaveHappenedOnceExactly();
             A.CallTo(() => _fakeAzureBlobStorageService.DownloadSalesCatalogueResponse(A<string>.Ignored, FakeBatchValue.BatchId, FakeBatchValue.CorrelationId)).MustHaveHappenedOnceExactly();
             A.CallTo(() => _fakeFulfilmentCallBackService.SendCallBackErrorResponse(salesCatalogueProductResponse, A<SalesCatalogueServiceResponseQueueMessage>.That.Matches(m => m.BatchId == FakeBatchValue.BatchId))).MustHaveHappenedOnceExactly();
+            A.CallTo(() => _fakeFulfilmentCleanUpService.DeleteBatchFolder(A<FulfilmentServiceBatch>.That.Matches(m => m.BatchId == FakeBatchValue.BatchId))).MustHaveHappenedOnceExactly();
 
-            _fakeLogger.VerifyLogEntry(EventIds.AIOToggleIsOn, "ESS Webjob : AIO toggle is ON for BatchId:{BatchId} | _X-Correlation-ID : {CorrelationId}");
             _fakeLogger.VerifyLogEntry(EventIds.CreateExchangeSetRequestStart, "Create Exchange Set web job request for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}");
             _fakeLogger.VerifyLogEntry(EventIds.CreateExchangeSetRequestCompleted, "Create Exchange Set web job request for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", true, times: 0);
             _fakeLogger.VerifyLogEntry(EventIds.ErrorTxtIsUploaded, "Error while processing Exchange Set creation and error.txt file is created and uploaded in file share service with ErrorCode-EventId:{EventId} and EventName:{EventName} for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", logLevel: LogLevel.Error);
             _fakeLogger.VerifyLogEntry(EventIds.ExchangeSetCreatedWithError, "Exchange set is created with error for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", logLevel: LogLevel.Error);
+            _fakeLogger.VerifyLogEntry(EventIds.FulfilmentBatchCleanUpStarted, "Deletion of temporary data for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}.");
+            _fakeLogger.VerifyLogEntry(EventIds.FulfilmentBatchCleanUpCompleted, "Deletion of temporary data for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}.", true);
         }
 
         [Test]

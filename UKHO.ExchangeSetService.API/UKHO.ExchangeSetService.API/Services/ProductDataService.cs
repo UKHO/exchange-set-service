@@ -476,8 +476,6 @@ namespace UKHO.ExchangeSetService.API.Services
             exchangeSetResponse.RequestedAioProductCount = aioCells.Count();
             exchangeSetResponse.AioExchangeSetCellCount = validAioCells.Count();
             exchangeSetResponse.RequestedAioProductsAlreadyUpToDateCount = aioCells.Where(x => !totalAioCells.Any(y => y.Equals(x))).Count();//when requested aio cells are not found in response valid and invalid aio cells then cells are already uptodate
-
-            logger.LogInformation(EventIds.AIOToggleIsOn.ToEventId(), "Aio cell details for AioCells:{AioCells} | BatchId:{BatchId} | _X-Correlation-ID : {CorrelationId}", string.Join(",", aioCells), batchId, correlationId);
         }
 
         private void SetExchangeSetAioDetailsSinceDateTime(ExchangeSetResponse exchangeSetResponse, IEnumerable<string> aioCells, string batchId, string correlationId)
@@ -486,8 +484,6 @@ namespace UKHO.ExchangeSetService.API.Services
             exchangeSetResponse.RequestedAioProductCount = 0;
             exchangeSetResponse.AioExchangeSetCellCount = aioCells.Count();
             exchangeSetResponse.RequestedAioProductsAlreadyUpToDateCount = 0;
-
-            logger.LogInformation(EventIds.AIOToggleIsOn.ToEventId(), "Aio cell details for AioCells:{AioCells} | BatchId:{BatchId} | _X-Correlation-ID : {CorrelationId}", string.Join(",", aioCells), batchId, correlationId);
         }
 
         private void CheckEmptyExchangeSet(ExchangeSetServiceResponse exchangeSetServiceResponse)
