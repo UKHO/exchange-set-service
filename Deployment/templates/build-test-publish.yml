@@ -26,7 +26,7 @@ jobs:
       inputs:
         command: "test"
         projects: "**/*UnitTests.csproj"
-        arguments: '--configuration $(BuildConfiguration) --settings "$(Build.SourcesDirectory)\test.runsettings" /p:CollectCoverage=true /p:CoverletOutputFormat=cobertura'
+        arguments: '--configuration $(BuildConfiguration) --settings "$(Build.SourcesDirectory)\test.runsettings" /p:CollectCoverage=true /p:CoverletOutputFormat=cobertura --no-restore'
         publishTestResults: true
         testRunTitle: "UnitTests"
 
@@ -102,16 +102,6 @@ jobs:
         publishWebProjects: false
         projects: "**/*UKHO.ExchangeSetService.FulfilmentService.csproj"
         arguments: '--configuration $(BuildConfiguration) --output $(Build.ArtifactStagingDirectory)\ExchangeSetFulFilmentService\App_Data\jobs\continuous\ESSFulfilmentWebJob'
-        zipAfterPublish: false
-        modifyOutputPath: false
-
-    - task: DotNetCoreCLI@2
-      displayName: "Publish ESS clean up webjob"
-      inputs:
-        command: "publish"
-        publishWebProjects: false
-        projects: "**/*UKHO.ExchangeSetService.CleanUpJob.csproj"
-        arguments: '--configuration $(BuildConfiguration) --output $(Build.ArtifactStagingDirectory)\ExchangeSetFulFilmentService\App_Data\jobs\triggered\ESSCleanUpWebJob'
         zipAfterPublish: false
         modifyOutputPath: false
 

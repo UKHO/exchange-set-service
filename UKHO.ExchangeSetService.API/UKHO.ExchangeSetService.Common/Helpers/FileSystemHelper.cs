@@ -1,5 +1,4 @@
-﻿using Azure.Storage.Blobs;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
@@ -7,6 +6,7 @@ using System.IO.Abstractions;
 using System.IO.Compression;
 using System.Text;
 using System.Threading.Tasks;
+using Azure.Storage.Blobs;
 using UKHO.ExchangeSetService.Common.Models.FileShareService.Response;
 
 namespace UKHO.ExchangeSetService.Common.Helpers
@@ -60,7 +60,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             return customFileInfo;
         }
 
-        public byte[] UploadFileBlockMetaData(UploadBlockMetaData UploadBlockMetaData)  
+        public byte[] UploadFileBlockMetaData(UploadBlockMetaData UploadBlockMetaData)
         {
             var fileInfo = new FileInfo(UploadBlockMetaData.FullFileName);
             Byte[] byteData = new Byte[UploadBlockMetaData.Length];
@@ -207,15 +207,6 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             return new StreamWriter(filePath);
         }
 
-        public void CreateFile(string filePath)
-        {
-            if (!string.IsNullOrEmpty(filePath))
-            {
-                var file = _fileSystem.File.Create(filePath);
-                file.Close();
-            }
-        }
-
         public IDirectoryInfo[] GetSubDirectories(string folderPath)
         {
             IDirectoryInfo di = _fileSystem.DirectoryInfo.New(folderPath);
@@ -227,6 +218,24 @@ namespace UKHO.ExchangeSetService.Common.Helpers
         {
             IDirectoryInfo di = _fileSystem.DirectoryInfo.New(folderPath);
             return di.GetFiles("*.zip");
+        }
+
+        public bool DeleteFolderIfExists(string folderPath)
+        {
+            if (_fileSystem.Directory.Exists(folderPath))
+            {
+                _fileSystem.Directory.Delete(folderPath, true);
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        public bool CheckDirectoryExists(string path)
+        {
+            return _fileSystem.Directory.Exists(path);
         }
     }
 }

@@ -24,21 +24,17 @@ namespace UKHO.ExchangeSetService.FulfilmentService
                                 IFulfilmentDataService fulFilmentDataService, ILogger<FulfilmentServiceJob> logger, IFileSystemHelper fileSystemHelper,
                                 IFileShareBatchService fileBatchShareService, IFileShareUploadService fileShareUploadService, IOptions<FileShareServiceConfiguration> fileShareServiceConfig,
                                 IAzureBlobStorageService azureBlobStorageService, IFulfilmentCallBackService fulfilmentCallBackService,
-                                IOptions<PeriodicOutputServiceConfiguration> periodicOutputServiceConfiguration)
+                                IOptions<PeriodicOutputServiceConfiguration> periodicOutputServiceConfiguration, IFulfilmentCleanUpService fulfilmentCleanUpService)
     {
-        protected IConfiguration configuration = configuration;
-
         public async Task ProcessQueueMessage([QueueTrigger("%ESSFulfilmentStorageConfiguration:QueueName%")] QueueMessage message)
         {
             var salesCatalogueServiceResponseQueueMessage = message.Body.ToObjectFromJson<SalesCatalogueServiceResponseQueueMessage>();
-            var batch = new FulfilmentServiceBatch(configuration, salesCatalogueServiceResponseQueueMessage, DateTime.UtcNow);
+            var batch = new FulfilmentServiceBatch(configuration, salesCatalogueServiceResponseQueueMessage);
             var fileSizeInMb = CommonHelper.ConvertBytesToMegabytes(batch.Message.FileSize);
             CommonHelper.IsPeriodicOutputService = fileSizeInMb > periodicOutputServiceConfiguration.Value.LargeMediaExchangeSetSizeInMB;
 
             try
             {
-                logger.LogInformation(EventIds.AIOToggleIsOn.ToEventId(), "ESS Webjob : AIO toggle is ON for BatchId:{BatchId} | _X-Correlation-ID : {CorrelationId}", batch.BatchId, batch.CorrelationId);
-
                 var transactionName =
                     $"{Environment.GetEnvironmentVariable("WEBSITE_SITE_NAME")}-fulfilment-transaction";
 
@@ -87,7 +83,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService
             }
             finally
             {
-                Agent.Tracer.CurrentTransaction?.End();
+                CleanUpTemporaryBatchData(batch);
             }
         }
 
@@ -129,6 +125,28 @@ namespace UKHO.ExchangeSetService.FulfilmentService
             var salesCatalogueProductResponse = await azureBlobStorageService.DownloadSalesCatalogueResponse(fulfilmentServiceQueueMessage.ScsResponseUri, fulfilmentServiceQueueMessage.BatchId, fulfilmentServiceQueueMessage.CorrelationId);
 
             await fulfilmentCallBackService.SendCallBackErrorResponse(salesCatalogueProductResponse, fulfilmentServiceQueueMessage);
+        }
+
+        private void CleanUpTemporaryBatchData(FulfilmentServiceBatch batch)
+        {
+            try
+            {
+                logger.LogStartEndAndElapsedTime(EventIds.FulfilmentBatchCleanUpStarted, EventIds.FulfilmentBatchCleanUpCompleted, "Deletion of temporary data for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}.", () =>
+                {
+                    fulfilmentCleanUpService.DeleteBatchFolder(batch);
+                    return true;
+                },
+                batch.BatchId, batch.CorrelationId);
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(EventIds.FulfilmentBatchCleanUpFailed.ToEventId(), ex, "Exception occurred while cleaning up temporary data for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}. Exception:{Message}", batch.BatchId, batch.CorrelationId, ex.Message);
+                Agent.Tracer.CurrentTransaction?.CaptureException(ex);
+            }
+            finally
+            {
+                Agent.Tracer.CurrentTransaction?.End();
+            }
         }
     }
 }

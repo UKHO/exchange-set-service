@@ -91,7 +91,7 @@ stages:
             command: custom
             custom: tool
             workingDirectory: $(Agent.TempDirectory)
-            arguments: install dotnet-stryker --tool-path $(Agent.BuildDirectory)/tools
+            arguments: install dotnet-stryker --tool-path $(Agent.BuildDirectory)/tools --configfile $(Build.SourcesDirectory)/BuildNuget.config
 
         - task: Powershell@2
           displayName: "Run Stryker"
@@ -125,7 +125,7 @@ stages:
           Container: ${{variables.Container}} 
           RunTests: true
 
-      - ${{ if eq(parameters.skipDeploymentOfUIInstance, false) }}:  
+      - ${{ if eq(parameters.skipDeploymentOfUIInstance, false) }}:
         - template: Deployment/templates/app-deploy.yml  
           parameters:  
             Environment: "dev"  
@@ -138,7 +138,7 @@ stages:
 
   - stage: QCdeploy
     dependsOn:
-    - BuildTestPublish
+    - Devdeploy
     displayName: "QCdeploy (inc terraform, mock webapp deploy)"
     jobs:
       - deployment: QCDeployApp
@@ -251,168 +251,28 @@ stages:
                     arguments: '-aiocells $(AioConfiguration.AioCells) -resourcegroup $(webAppResourceGroup) -webappname $(essWebAppName) -fulfilmentwebappsname $(essFulfilmentWebAppname)'
 
   - stage: QAdeploy
-    dependsOn:
+    dependsOn: 
     - Devdeploy
-    - QCdeploy
-    displayName: QAdeploy (inc terraform, webapp deploy)
-    condition: and(succeeded(), or(eq(variables['Build.SourceBranch'], 'refs/heads/main'),startsWith(variables['Build.SourceBranch'], 'refs/heads/release/')))
+    displayName: QA Deploy (inc terraform, webapp deploy)
+    condition: and(succeeded(), or(eq(variables['Build.SourceBranch'], 'refs/heads/main'), startsWith(variables['Build.SourceBranch'], 'refs/heads/release/')))
     jobs:
-      - deployment: QADeployApp
-        displayName: QA - deploy terraform and dotnet App
-        environment: "Ess-Qa"
-        pool: $(DeploymentPool)
-        container: ${{variables.Container}}
-        workspace:
-          clean: all
-        variables:
-          - group: "ESS-Deployment-Variables-QA"
-          - group: "ESS-QA-Variables"
-          - name: "ESSAzureADConfiguration.ClientId"
-            value: $(ESSClientId)
-          - name: "ESSAzureADConfiguration.TenantId"
-            value: $(TenantId)
-          - name: "EssAuthorizationConfiguration.TenantId"
-            value: $(TenantId)
-          - name: "EssAuthorizationConfiguration.AutoTestClientId"
-            value: $(AutoTestClientId_Authed)
-          - name: "EssAuthorizationConfiguration.AutoTestClientSecret"
-            value: $(AutoTestClientSecret_Authed)
-          - name: "EssAuthorizationConfiguration.EssClientId"
-            value: $(ESSClientId)
-          - name: "EssAuthorizationConfiguration.AutoTestClientIdNoAuth"
-            value: $(AutoTestClientId_NoAuth)
-          - name: "EssAuthorizationConfiguration.AutoTestClientSecretNoAuth"
-            value: $(AutoTestClientSecret_NoAuth)
-          - name: "AzureAdB2CTestConfiguration.ClientSecret"
-            value: $(AUTOTEST-ESS-SECRET)
-        strategy:
-          runOnce:
-            deploy:
-              steps:
-                - checkout: self
-                  submodules: recursive
+      - template: Deployment/templates/app-deploy.yml
+        parameters:
+          Environment: "qa"
+          ContinueEvenIfResourcesAreGettingDestroyed: ${{ parameters.ContinueEvenIfResourcesAreGettingDestroyed }}
+          AzureSubscription: "Exchange-Set-Service-QA-A-008-02"
+          Container: ${{variables.Container}} 
 
-                - template: Deployment/templates/continuous-deployment.yml
-                  parameters:
-                    ContinueEvenIfResourcesAreGettingDestroyed: ${{ parameters.ContinueEvenIfResourcesAreGettingDestroyed }}
-                    AzureSubscription: "Exchange-Set-Service-QA-A-008-02"
-
-                - template: Deployment/templates/continuous-deployment-apim.yml
-                  parameters:
-                     ContinueEvenIfResourcesAreGettingDestroyed: ${{ parameters.ContinueEvenIfResourcesAreGettingDestroyed }}
-                     AzureSubscription: "UKHO-APIM-SOLAS-NonLive"
-                     TerraformKeyVault: $(APIM_TERRAFORM_KEYVAULT)
-                     APIMResourceGroup: $(APIM_RESOURCE_GROUP_NAME)
-                     APIMServiceInstance: $(APIM_SERVICE_NAME)
-                     tfstateStorageAccountName: $(APIM_TFSTATE_STORAGE_ACCOUNT_NAME)
-                     
-                - task: DownloadBuildArtifacts@0
-                  displayName: "Download Functional test Artifact"
-                  inputs:
-                    buildType: 'current'
-                    downloadType: 'single'
-                    artifactName: 'functionaltests'
-                    downloadPath: '$(Build.SourcesDirectory)'
-
-                - task: DownloadBuildArtifacts@0
-                  displayName: "Download Terraform Artifact"
-                  inputs:
-                    buildType: 'current'
-                    downloadType: 'single'
-                    artifactName: 'terraformartifact'
-                    downloadPath: '$(Build.SourcesDirectory)'
-
-                - task: FileTransform@2
-                  displayName: "File Transform: functionaltests"
-                  inputs:
-                    folderPath: '$(Build.SourcesDirectory)/functionaltests/'
-                    enableXmlTransform: false
-                    xmlTransformationRules: ''
-                    jsonTargetFiles: '**/appsettings.json'
-
-                - task: UseDotNet@2
-                  displayName: 'Use .NET SDK'
-                  inputs:
-                    packageType: sdk
-                    version: $(SdkVersion)
-
-                - task: AzureCLI@2
-                  displayName: "Swap ESS API and ESS FulfilmentService Configuration"
-                  condition: always()
-                  inputs:
-                    azureSubscription: "Exchange-Set-Service-QA-A-008-02"
-                    scriptType: 'pscore'
-                    scriptLocation: 'scriptPath'
-                    scriptPath: "$(Build.SourcesDirectory)/terraformartifact/set_api_webjob_aio_feature_configuration.ps1"
-                    arguments: '-aiocells $(AioConfiguration.AioCells) -resourcegroup $(RESOURCE_GROUP_NAME) -webappname $(WEB_APP_NAME) -fulfilmentwebappsname $(fulfilmentWebAppsName)'
-
-      - ${{ if eq(parameters.skipDeploymentOfUIInstance, false) }}:  
-        - deployment: QADeployApp2  
-          dependsOn:  
-          - QADeployApp  
-          displayName: "QA - deploy terraform and dotnet App for FSS UI"  
-          environment: "Ess-Qa"  
-          pool: $(DeploymentPool)  
-          container: ${{variables.Container}}  
-          workspace:  
-            clean: all  
-          variables:  
-            - group: "ESS-Deployment-Variables-QA"  
-            - group: "ESS-QA2-Variables"  
-            - name: "ESSAzureADConfiguration.ClientId"  
-              value: $(ESSClientId)  
-            - name: "ESSAzureADConfiguration.TenantId"  
-              value: $(TenantId)  
-            - name: "EssAuthorizationConfiguration.TenantId"  
-              value: $(TenantId)  
-            - name: "EssAuthorizationConfiguration.AutoTestClientId"  
-              value: $(AutoTestClientId_Authed)  
-            - name: "EssAuthorizationConfiguration.AutoTestClientSecret"  
-              value: $(AutoTestClientSecret_Authed)  
-            - name: "EssAuthorizationConfiguration.EssClientId"  
-              value: $(ESSClientId)  
-            - name: "EssAuthorizationConfiguration.AutoTestClientIdNoAuth"  
-              value: $(AutoTestClientId_NoAuth)  
-            - name: "EssAuthorizationConfiguration.AutoTestClientSecretNoAuth"  
-              value: $(AutoTestClientSecret_NoAuth)  
-            - name: "AzureAdB2CTestConfiguration.ClientSecret"  
-              value: $(AUTOTEST-ESS-SECRET)  
-          strategy:  
-            runOnce:  
-              deploy:  
-                steps:  
-                  - checkout: self  
-                    submodules: recursive  
-
-                  - template: Deployment/templates/continuous-deployment-v2.yml  
-                    parameters:  
-                      ContinueEvenIfResourcesAreGettingDestroyed: ${{ parameters.ContinueEvenIfResourcesAreGettingDestroyed }}  
-                      AzureSubscription: "Exchange-Set-Service-QA-A-008-02"  
-
-                  - template: Deployment/templates/continuous-deployment-apim-v2.yml  
-                    parameters:  
-                      ContinueEvenIfResourcesAreGettingDestroyed: ${{ parameters.ContinueEvenIfResourcesAreGettingDestroyed }}  
-                      AzureSubscription: "UKHO-APIM-SOLAS-NonLive"  
-                      TerraformKeyVault: $(APIM_TERRAFORM_KEYVAULT)  
-                      APIMResourceGroup: $(APIM_RESOURCE_GROUP_NAME)  
-                      APIMServiceInstance: $(APIM_SERVICE_NAME)  
-                      tfstateStorageAccountName: $(APIM_TFSTATE_STORAGE_ACCOUNT_NAME)
-
-      - job: Run_ADDS_E2E_tests
-        displayName: Run ADDS E2E tests
-        dependsOn: QADeployApp
-        pool: $(DeploymentPool)
-        variables:
-          - group: "ADDS-E2E"
-        container: ${{variables.Container}}
-        steps:
-        - task: PowerShell@2          
-          displayName: "Run ADDS E2E pipeline tests"
-          inputs:
-              pwsh: true
-              targetType: filePath
-              filePath: '$(System.DefaultWorkingDirectory)/Deployment/ADDS-e2e-tests.ps1'
-              arguments: '-queueSecret $(QueueSecret) -pollSecret $(PollSecret) -pollTimeInSecs $(PollTimeInSecs) -functionEndPoint $(FunctionEndPoint)'
+      - ${{ if eq(parameters.skipDeploymentOfUIInstance, false) }}:
+        - template: Deployment/templates/app-deploy.yml
+          parameters:
+            Environment: "qa"
+            ContinueEvenIfResourcesAreGettingDestroyed: ${{ parameters.ContinueEvenIfResourcesAreGettingDestroyed }}
+            AzureSubscription: "Exchange-Set-Service-QA-A-008-02"
+            Container: ${{variables.Container}} 
+            RunTests: false
+            pathSuffix: "-v2"
+            v2Modifier: "2"
 
   - stage: vnextiatDeploy
     dependsOn:
@@ -444,6 +304,7 @@ stages:
   - stage: IatDeploy
     dependsOn: 
     - Devdeploy
+    - QCdeploy
     displayName: IAT Deploy (inc terraform, webapp deploy)
     condition: and(succeeded(), or(eq(variables['Build.SourceBranch'], 'refs/heads/main'), startsWith(variables['Build.SourceBranch'], 'refs/heads/release/')))
     jobs:

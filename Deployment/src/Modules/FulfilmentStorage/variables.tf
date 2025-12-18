@@ -50,3 +50,7 @@ variable "agent_prd_subnet" {
 variable "suffix" {
   default     = ""
 }
+
+variable "scs_response_retention" {
+  type = number
+}

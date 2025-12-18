@@ -244,7 +244,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
         {
             var salesCatalogueDataResponse = GetSalesCatalogueDataResponse();
             var message = GetScsResponseQueueMessage(exchangeSetStandard);
-            var batch = new FulfilmentServiceBatch(FakeBatchValue.Configuration, message, FakeBatchValue.CurrentUtcDateTime);
+            var batch = new FulfilmentServiceBatch(FakeBatchValue.Configuration, message);
             var salesCatalogueProductResponse = GetSalesCatalogueProductResponse();
             A.CallTo(() => _fakeFulfilmentSalesCatalogueService.GetSalesCatalogueDataResponse(FakeBatchValue.BatchId, FakeBatchValue.CorrelationId)).Returns(salesCatalogueDataResponse);
             A.CallTo(() => _fakeAzureBlobStorageService.DownloadSalesCatalogueResponse(message.ScsResponseUri, FakeBatchValue.BatchId, FakeBatchValue.CorrelationId)).Returns(salesCatalogueProductResponse);
@@ -279,7 +279,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
         {
             var salesCatalogueDataResponse = GetSalesCatalogueDataResponse();
             var message = GetScsResponseQueueMessage(exchangeSetStandard);
-            var batch = new FulfilmentServiceBatch(FakeBatchValue.Configuration, message, FakeBatchValue.CurrentUtcDateTime);
+            var batch = new FulfilmentServiceBatch(FakeBatchValue.Configuration, message);
             var salesCatalogueProductResponse = GetSalesCatalogueProductResponse();
             A.CallTo(() => _fakeFulfilmentSalesCatalogueService.GetSalesCatalogueDataResponse(FakeBatchValue.BatchId, FakeBatchValue.CorrelationId)).Returns(salesCatalogueDataResponse);
             A.CallTo(() => _fakeAzureBlobStorageService.DownloadSalesCatalogueResponse(message.ScsResponseUri, FakeBatchValue.BatchId, FakeBatchValue.CorrelationId)).Returns(salesCatalogueProductResponse);
@@ -308,7 +308,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
         {
             var salesCatalogueDataResponse = GetSalesCatalogueDataResponse();
             var message = GetScsResponseQueueMessage(exchangeSetStandard);
-            var batch = new FulfilmentServiceBatch(FakeBatchValue.Configuration, message, FakeBatchValue.CurrentUtcDateTime);
+            var batch = new FulfilmentServiceBatch(FakeBatchValue.Configuration, message);
             var salesCatalogueProductResponse = GetSalesCatalogueProductResponse();
             A.CallTo(() => _fakeFulfilmentSalesCatalogueService.GetSalesCatalogueDataResponse(FakeBatchValue.BatchId, FakeBatchValue.CorrelationId)).Returns(salesCatalogueDataResponse);
             A.CallTo(() => _fakeAzureBlobStorageService.DownloadSalesCatalogueResponse(message.ScsResponseUri, FakeBatchValue.BatchId, FakeBatchValue.CorrelationId)).Returns(salesCatalogueProductResponse);
@@ -325,7 +325,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
         {
             var salesCatalogueDataResponse = GetSalesCatalogueDataResponse();
             var message = GetScsResponseQueueMessage(exchangeSetStandard);
-            var batch = new FulfilmentServiceBatch(FakeBatchValue.Configuration, message, FakeBatchValue.CurrentUtcDateTime);
+            var batch = new FulfilmentServiceBatch(FakeBatchValue.Configuration, message);
             var salesCatalogueProductResponse = GetSalesCatalogueProductResponse(true);
             A.CallTo(() => _fakeFulfilmentSalesCatalogueService.GetSalesCatalogueDataResponse(FakeBatchValue.BatchId, FakeBatchValue.CorrelationId)).Returns(salesCatalogueDataResponse);
             A.CallTo(() => _fakeAzureBlobStorageService.DownloadSalesCatalogueResponse(message.ScsResponseUri, FakeBatchValue.BatchId, FakeBatchValue.CorrelationId)).Returns(salesCatalogueProductResponse);
@@ -364,7 +364,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             _aioConfiguration = Options.Create(new AioConfiguration { AioCells = string.Empty }); // no AIO cells configured
             var salesCatalogueDataResponse = GetSalesCatalogueDataResponse();
             var message = GetScsResponseQueueMessage(exchangeSetStandard);
-            var batch = new FulfilmentServiceBatch(FakeBatchValue.Configuration, message, FakeBatchValue.CurrentUtcDateTime);
+            var batch = new FulfilmentServiceBatch(FakeBatchValue.Configuration, message);
             var salesCatalogueProductResponse = GetSalesCatalogueProductResponse();
             A.CallTo(() => _fakeFulfilmentSalesCatalogueService.GetSalesCatalogueDataResponse(FakeBatchValue.BatchId, FakeBatchValue.CorrelationId)).Returns(salesCatalogueDataResponse);
             A.CallTo(() => _fakeAzureBlobStorageService.DownloadSalesCatalogueResponse(message.ScsResponseUri, FakeBatchValue.BatchId, FakeBatchValue.CorrelationId)).Returns(salesCatalogueProductResponse);
@@ -400,7 +400,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
         {
             var salesCatalogueDataResponse = GetSalesCatalogueDataResponseForAio();
             var message = GetScsResponseQueueMessage(exchangeSetStandard);
-            var batch = new FulfilmentServiceBatch(FakeBatchValue.Configuration, message, FakeBatchValue.CurrentUtcDateTime);
+            var batch = new FulfilmentServiceBatch(FakeBatchValue.Configuration, message);
             message.IsEmptyAioExchangeSet = true;
             var salesCatalogueProductResponse = new SalesCatalogueProductResponse { Products = [] };
             A.CallTo(() => _fakeFulfilmentSalesCatalogueService.GetSalesCatalogueDataResponse(FakeBatchValue.BatchId, FakeBatchValue.CorrelationId)).Returns(salesCatalogueDataResponse);
@@ -438,7 +438,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             _aioConfiguration = Options.Create(new AioConfiguration { AioCells = null }); // no AIO cells configured
             var salesCatalogueDataResponse = GetSalesCatalogueDataResponse();
             var message = GetScsResponseQueueMessage(exchangeSetStandard);
-            var batch = new FulfilmentServiceBatch(FakeBatchValue.Configuration, message, FakeBatchValue.CurrentUtcDateTime);
+            var batch = new FulfilmentServiceBatch(FakeBatchValue.Configuration, message);
             message.IsEmptyEncExchangeSet = true;
             var salesCatalogueProductResponse = new SalesCatalogueProductResponse { Products = [] };
             A.CallTo(() => _fakeFulfilmentSalesCatalogueService.GetSalesCatalogueDataResponse(FakeBatchValue.BatchId, FakeBatchValue.CorrelationId)).Returns(salesCatalogueDataResponse);
@@ -475,7 +475,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
         {
             var salesCatalogueDataResponse = GetSalesCatalogueDataResponse();
             var message = GetScsResponseQueueMessage(exchangeSetStandard);
-            var batch = new FulfilmentServiceBatch(FakeBatchValue.Configuration, message, FakeBatchValue.CurrentUtcDateTime);
+            var batch = new FulfilmentServiceBatch(FakeBatchValue.Configuration, message);
             var salesCatalogueProductResponse = GetSalesCatalogueProductResponse(true);
             A.CallTo(() => _fakeFulfilmentSalesCatalogueService.GetSalesCatalogueDataResponse(FakeBatchValue.BatchId, FakeBatchValue.CorrelationId)).Returns(salesCatalogueDataResponse);
             A.CallTo(() => _fakeAzureBlobStorageService.DownloadSalesCatalogueResponse(message.ScsResponseUri, FakeBatchValue.BatchId, FakeBatchValue.CorrelationId)).Returns(salesCatalogueProductResponse);
@@ -513,7 +513,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
         {
             var salesCatalogueDataResponse = GetSalesCatalogueDataResponse();
             var message = GetScsResponseQueueMessage(exchangeSetStandard);
-            var batch = new FulfilmentServiceBatch(FakeBatchValue.Configuration, message, FakeBatchValue.CurrentUtcDateTime);
+            var batch = new FulfilmentServiceBatch(FakeBatchValue.Configuration, message);
             var salesCatalogueProductResponse = GetSalesCatalogueProductResponse(true);
             A.CallTo(() => _fakeFulfilmentSalesCatalogueService.GetSalesCatalogueDataResponse(FakeBatchValue.BatchId, FakeBatchValue.CorrelationId)).Returns(salesCatalogueDataResponse);
             A.CallTo(() => _fakeAzureBlobStorageService.DownloadSalesCatalogueResponse(message.ScsResponseUri, FakeBatchValue.BatchId, FakeBatchValue.CorrelationId)).Returns(salesCatalogueProductResponse);
@@ -553,7 +553,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
         {
             var salesCatalogueDataResponse = GetSalesCatalogueDataResponse();
             var message = GetScsResponseQueueMessage(exchangeSetStandard);
-            var batch = new FulfilmentServiceBatch(FakeBatchValue.Configuration, message, FakeBatchValue.CurrentUtcDateTime);
+            var batch = new FulfilmentServiceBatch(FakeBatchValue.Configuration, message);
             var salesCatalogueProductResponse = GetSalesCatalogueProductResponse(true);
             A.CallTo(() => _fakeFulfilmentSalesCatalogueService.GetSalesCatalogueDataResponse(FakeBatchValue.BatchId, FakeBatchValue.CorrelationId)).Returns(salesCatalogueDataResponse);
             A.CallTo(() => _fakeAzureBlobStorageService.DownloadSalesCatalogueResponse(message.ScsResponseUri, FakeBatchValue.BatchId, FakeBatchValue.CorrelationId)).Returns(salesCatalogueProductResponse);
@@ -588,7 +588,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
         {
             var salesCatalogueDataResponse = GetSalesCatalogueDataResponse();
             var message = GetScsResponseQueueMessage(exchangeSetStandard);
-            var batch = new FulfilmentServiceBatch(FakeBatchValue.Configuration, message, FakeBatchValue.CurrentUtcDateTime);
+            var batch = new FulfilmentServiceBatch(FakeBatchValue.Configuration, message);
             var salesCatalogueProductResponse = GetSalesCatalogueProductResponse(false);
             A.CallTo(() => _fakeFulfilmentSalesCatalogueService.GetSalesCatalogueDataResponse(FakeBatchValue.BatchId, FakeBatchValue.CorrelationId)).Returns(salesCatalogueDataResponse);
             A.CallTo(() => _fakeAzureBlobStorageService.DownloadSalesCatalogueResponse(message.ScsResponseUri, FakeBatchValue.BatchId, FakeBatchValue.CorrelationId)).Returns(salesCatalogueProductResponse);
@@ -625,7 +625,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
         {
             var salesCatalogueDataResponse = GetSalesCatalogueDataResponse();
             var message = GetScsResponseQueueMessage(exchangeSetStandard);
-            var batch = new FulfilmentServiceBatch(FakeBatchValue.Configuration, message, FakeBatchValue.CurrentUtcDateTime);
+            var batch = new FulfilmentServiceBatch(FakeBatchValue.Configuration, message);
             var salesCatalogueProductResponse = GetSalesCatalogueProductResponseAioOnly();
             A.CallTo(() => _fakeFulfilmentSalesCatalogueService.GetSalesCatalogueDataResponse(FakeBatchValue.BatchId, FakeBatchValue.CorrelationId)).Returns(salesCatalogueDataResponse);
             A.CallTo(() => _fakeAzureBlobStorageService.DownloadSalesCatalogueResponse(message.ScsResponseUri, FakeBatchValue.BatchId, FakeBatchValue.CorrelationId)).Returns(salesCatalogueProductResponse);
