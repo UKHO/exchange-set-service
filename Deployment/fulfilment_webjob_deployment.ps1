@@ -1,17 +1,35 @@
 param (
     [Parameter(Mandatory = $true)] [string] $terraformJsonOutputFile,
     [Parameter(Mandatory = $true)] [string] $packagePath,
-    [Parameter(Mandatory = $true)] [string] $packageName
+    [Parameter(Mandatory = $true)] [string] $packageName,
+    [Parameter(Mandatory = $true)] [string] $exchangeSetSize
 )
 
 echo "terraformJsonOutputFile : $terraformJsonOutputFile"
 echo "packagePath : $packagePath"
 echo "packageName : $packageName"
 
-function ReplaceQueueAndDeployWebApp($exchangeSetWebapps, $packagePath, $packageName, $exchangeSet, $KeyVaultUri, $webAppResourceGroup){
-    
-    echo "Function ReplaceQueueAndDeployWebApp called with params $exchangeSetWebapps, $packagePath, $packageName, $exchangeSet, $KeyVaultUri"
+function ReplaceQueueAndDeployWebApp($packagePath, $packageName, $exchangeSet, $webAppResourceGroup) {
+    echo "Function ReplaceQueueAndDeployWebApp called with params $packagePath, $packageName, $exchangeSet, $webAppResourceGroup"
+    $exchangeSetWebapps = @()
+    $keyVaultUri = ""
 
+    if ( $exchangeSet -eq "small" ) {
+        $exchangeSetWebapps = $terraformOutput.small_exchange_set_webapps.value
+        $keyVaultUri = $terraformOutput.small_exchange_set_keyvault_uri.value
+    }
+    elseif ( $exchangeSet -eq "medium" ) {
+        $exchangeSetWebapps = $terraformOutput.medium_exchange_set_webapps.value
+        $keyVaultUri = $terraformOutput.medium_exchange_set_keyvault_uri.value
+    }
+    elseif ( $exchangeSet -eq "large" ) {
+        $exchangeSetWebapps = $terraformOutput.large_exchange_set_webapps.value
+        $keyVaultUri = $terraformOutput.large_exchange_set_keyvault_uri.value
+    }
+    else {
+        throw "Invalid exchange set type: $exchangeSet"
+    }
+    
     Expand-Archive -Path "$packagePath/$packageName" -DestinationPath "$packagePath/$exchangeSet/"
     if ( !$? ) { echo "Error while unzip" ; throw $_ }
 
@@ -30,7 +48,7 @@ function ReplaceQueueAndDeployWebApp($exchangeSetWebapps, $packagePath, $package
         if ( !$? ) { echo "Error while Reading json file for fulfilment" ; throw $_ }
 
         $appSettingForFulfilment.ESSFulfilmentStorageConfiguration.QueueName = $queueName
-        $appSettingForFulfilment.KeyVaultSettings.ServiceUri = $KeyVaultUri
+        $appSettingForFulfilment.KeyVaultSettings.ServiceUri = $keyVaultUri
         $appSettingForFulfilment | ConvertTo-Json -Depth 5 | set-content $appSettingFileForFulfilment
         
         if ( !$? ) { echo "Error while updating json file for fulfilment" ; throw $_ }
@@ -77,24 +95,9 @@ function ReplaceQueueAndDeployWebApp($exchangeSetWebapps, $packagePath, $package
 $terraformOutput = Get-Content $terraformJsonOutputFile | ConvertFrom-Json
 if ( !$? ) { echo "Error while Reading terraform output" ; throw $_ }
 
+echo "Deploying $exchangeSetSize exchange set ..."
+ReplaceQueueAndDeployWebApp $packagePath $packageName $exchangeSetSize $terraformOutput.web_app_resource_group.value
 
-echo "Deploying small exchange set ..."
-ReplaceQueueAndDeployWebApp $terraformOutput.small_exchange_set_webapps.value $packagePath $packageName "small" $terraformOutput.small_exchange_set_keyvault_uri.value $terraformOutput.web_app_resource_group.value
+if ( !$? ) { echo "Error while replacing queue and deploying $exchangeSetSize exchange set webapps" ; throw $_ }
 
-if ( !$? ) { echo "Error while replacing queue and deploying small exchange set webapps" ; throw $_ }
-
-echo "Deploying small exchange set done ..."
-
-echo "Deploying medium exchange set ..."
-ReplaceQueueAndDeployWebApp $terraformOutput.medium_exchange_set_webapps.value $packagePath $packageName "medium" $terraformOutput.medium_exchange_set_keyvault_uri.value $terraformOutput.web_app_resource_group.value
-
-if ( !$? ) { echo "Error while replacing queue and deploying medium exchange set webapps" ; throw $_ }
-
-echo "Deploying medium exchange set done ..."
-
-echo "Deploying large exchange set ..."
-ReplaceQueueAndDeployWebApp $terraformOutput.large_exchange_set_webapps.value $packagePath $packageName "large" $terraformOutput.large_exchange_set_keyvault_uri.value $terraformOutput.web_app_resource_group.value
-
-if ( !$? ) { echo "Error while replacing queue and deploying large exchange set webapps" ; throw $_ }
-
-echo "Deploying large exchange set done ..."
+echo "Deploying $exchangeSetSize exchange set done ..."

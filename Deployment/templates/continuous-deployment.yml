@@ -42,22 +42,26 @@ steps:
       TF_VAR_asp_control_webapp: $(appServicePlanControlWebApp)
       TF_VAR_scs_response_retention: $(SalesCatalogueResponseRetentionInDays)
 
-  - task: FileTransform@2
-    displayName: "File Transform: WebJob"
-    inputs:
-      folderPath: '$(Pipeline.Workspace)/ExchangeSetService/*.zip'
-      enableXmlTransform: false
-      xmlTransformationRules: ''
-      jsonTargetFiles: '**/appsettings.json'
+  - template: fulfilment-webjob-deployment.yml
+    parameters:
+      AzureSubscription: ${{parameters.AzureSubscription}}
+      BatchSize: $(QueuesOptionsBatchSizeSmall)
+      NewBatchThreshold: $(QueuesOptionsNewBatchThresholdSmall)
+      ExchangeSetSize: small
 
-  - task: AzureCLI@2
-    displayName: "Azure Fulfilment Webjob Deployment"
-    inputs:
-      azureSubscription: "${{ parameters.AzureSubscription }}"
-      scriptType: 'pscore'
-      scriptLocation: 'scriptPath'
-      scriptPath: '$(Pipeline.Workspace)/terraformartifact/fulfilment_webjob_deployment.ps1'
-      arguments: '-terraformJsonOutputFile $(Pipeline.Workspace)/terraformartifact/terraform_output.json -packagePath "$(Pipeline.Workspace)/ExchangeSetService" -packageName "ExchangeSetFulFilmentService.zip"'
+  - template: fulfilment-webjob-deployment.yml
+    parameters:
+      AzureSubscription: ${{parameters.AzureSubscription}}
+      BatchSize: $(QueuesOptionsBatchSizeMedium)
+      NewBatchThreshold: $(QueuesOptionsNewBatchThresholdMedium)
+      ExchangeSetSize: medium
+
+  - template: fulfilment-webjob-deployment.yml
+    parameters:
+      AzureSubscription: ${{parameters.AzureSubscription}}
+      BatchSize: $(QueuesOptionsBatchSizeLarge)
+      NewBatchThreshold: $(QueuesOptionsNewBatchThresholdLarge)
+      ExchangeSetSize: large
 
   - task: FileTransform@2
     displayName: "File Transform: WebAppSettings"
