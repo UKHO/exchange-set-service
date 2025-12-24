@@ -179,12 +179,32 @@ namespace UKHO.ExchangeSetService.FulfilmentService.FileBuilders
             await Task.CompletedTask;
         }
 
-        private async Task<bool> BuildLargeMediaVolumeAsync(SalesCatalogueServiceResponseQueueMessage message, IDirectoryInfo rootDirectoryFolder, LargeExchangeSetDataResponse response,
+        // Build a single large media volume:
+        // - Validate cancellation
+        // - Derive volume path and DVD number
+        // - Pre-compute INFO and ADC paths
+        // - Run ancillary tasks concurrently for the volume:
+        //     - Create POS folder structure
+        //     - Create media file
+        //     - Download README
+        //     - Create serial ENC file for large media
+        //     - Create Product.txt in INFO (encryption=true)
+        //     - Download INFO folder files
+        //     - Download ADC folder files
+        //     - Create ENC_UPDATE.CSV
+        // - Await all tasks
+        // - Validate cancellation
+        // - Create catalog file for the volume (returns bool)
+        private async Task<bool> BuildLargeMediaVolumeAsync(SalesCatalogueServiceResponseQueueMessage message, IFileSystemInfo rootDirectoryFolder, LargeExchangeSetDataResponse response,
                     string largeExchangeSetFolderName, string largeMediaExchangeSetFilePath, CancellationToken cancellationToken)
         {
             cancellationToken.ThrowIfCancellationRequested();
 
-            var volumePath = rootDirectoryFolder.FullName;
+            // Null-safety and early exits to avoid throwing later
+            if (message is null || response is null || rootDirectoryFolder is null)
+                return false;
+
+            var volumePath = rootDirectoryFolder.ToString();
             var dvdNumber = ParseDvdNumber(rootDirectoryFolder.Name);
 
             // Run ancillary tasks concurrently per volume.
