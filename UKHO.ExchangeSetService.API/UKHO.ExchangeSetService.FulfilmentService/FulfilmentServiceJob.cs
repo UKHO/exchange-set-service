@@ -13,6 +13,7 @@ using UKHO.ExchangeSetService.Common.Configuration;
 using UKHO.ExchangeSetService.Common.Extensions;
 using UKHO.ExchangeSetService.Common.Helpers;
 using UKHO.ExchangeSetService.Common.Logging;
+using UKHO.ExchangeSetService.Common.Models.Enums;
 using UKHO.ExchangeSetService.Common.Models.SalesCatalogue;
 using UKHO.ExchangeSetService.Common.Models.WebJobs;
 using UKHO.ExchangeSetService.FulfilmentService.Services;
@@ -31,7 +32,9 @@ namespace UKHO.ExchangeSetService.FulfilmentService
             var salesCatalogueServiceResponseQueueMessage = message.Body.ToObjectFromJson<SalesCatalogueServiceResponseQueueMessage>();
             var batch = new FulfilmentServiceBatch(configuration, salesCatalogueServiceResponseQueueMessage);
             var fileSizeInMb = CommonHelper.ConvertBytesToMegabytes(batch.Message.FileSize);
-            CommonHelper.IsPeriodicOutputService = fileSizeInMb > periodicOutputServiceConfiguration.Value.LargeMediaExchangeSetSizeInMB;
+
+            CommonHelper.IsPeriodicOutputService = string.Equals(
+                batch.Message.ExchangeSetLayout, ExchangeSetLayout.large.ToString(), StringComparison.OrdinalIgnoreCase);
 
             try
             {
