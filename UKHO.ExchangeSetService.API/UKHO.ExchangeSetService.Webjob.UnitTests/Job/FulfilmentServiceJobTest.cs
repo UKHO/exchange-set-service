@@ -73,14 +73,15 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Job
             CommonHelper.IsPeriodicOutputService = false;
         }
 
-        private static QueueMessage BuildQueueMessage(long fileSizeBytes, bool includeScsUri = false)
+        private static QueueMessage BuildQueueMessage(long fileSizeBytes, bool includeScsUri = false, string exchangeSetLayout = "standard")
         {
             var payload = new SalesCatalogueServiceResponseQueueMessage
             {
                 BatchId = FakeBatchValue.BatchId,
                 CorrelationId = FakeBatchValue.CorrelationId,
                 FileSize = fileSizeBytes,
-                ScsResponseUri = includeScsUri ? "https://test/response.json" : null
+                ScsResponseUri = includeScsUri ? "https://test/response.json" : null,
+                ExchangeSetLayout = exchangeSetLayout,
             };
             var json = JsonSerializer.Serialize(payload);
             return QueuesModelFactory.QueueMessage(
@@ -94,9 +95,9 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Job
         }
 
         [Test]
-        public async Task ProcessQueueMessage_FileSizeOnOrBelowThreshold_CallsCreateExchangeSet()
+        public async Task ProcessQueueMessage_ExchangeSetLayoutIsStandard_CallsCreateExchangeSet()
         {
-            var qm = BuildQueueMessage(fileSizeBytes: LargeMediaExchangeSetSizeInMB * 1024 * 1024); // <= LargeMediaExchangeSetSizeInMB
+            var qm = BuildQueueMessage(fileSizeBytes: LargeMediaExchangeSetSizeInMB * 1024 * 1024, exchangeSetLayout: "standard"); // <= LargeMediaExchangeSetSizeInMB
 
             A.CallTo(() => _fakeFulfilmentDataService.CreateExchangeSet(A<FulfilmentServiceBatch>.That.Matches(m => m.BatchId == FakeBatchValue.BatchId))).Returns("ok");
 
@@ -136,9 +137,9 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Job
         }
 
         [Test]
-        public async Task ProcessQueueMessage_FileSizeAboveThreshold_CallsCreateLargeExchangeSet()
+        public async Task ProcessQueueMessage_ExchangeSetLayoutIsLarge_CallsCreateLargeExchangeSet()
         {
-            var qm = BuildQueueMessage(fileSizeBytes: (LargeMediaExchangeSetSizeInMB * 1024 * 1024) + 1); // > LargeMediaExchangeSetSizeInMB
+            var qm = BuildQueueMessage(fileSizeBytes: (LargeMediaExchangeSetSizeInMB * 1024 * 1024) + 1, exchangeSetLayout: "large"); // > LargeMediaExchangeSetSizeInMB
 
             A.CallTo(() => _fakeFulfilmentDataService.CreateLargeExchangeSet(A<FulfilmentServiceBatch>.That.Matches(m => m.BatchId == FakeBatchValue.BatchId), FakeBatchValue.LargeExchangeSetFolderNamePattern)).Returns("large");
 

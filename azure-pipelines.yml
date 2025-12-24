@@ -274,25 +274,25 @@ stages:
             pathSuffix: "-v2"
             v2Modifier: "2"
 
-  - stage: vnextiatDeploy
-    dependsOn:
-      - Devdeploy
-    displayName: vNext IAT Deploy (inc terraform, webapp deploy)
-    condition: and(succeeded(), or(eq(variables['Build.SourceBranch'], 'refs/heads/develop'), startsWith(variables['Build.SourceBranch'], 'refs/heads/dev/')))
-    jobs:
-      - template: Deployment/templates/app-deploy.yml
-        parameters:
-          Environment: "vnextiat"
-          ContinueEvenIfResourcesAreGettingDestroyed: ${{ parameters.ContinueEvenIfResourcesAreGettingDestroyed }}
-          AzureSubscription: "Exchange-Set-Service-vNext-IAT-A.011.08"
-          Container: ${{variables.Container}}
-          RunAddsTests: vNextIAT
+  # - stage: vnextiatDeploy
+  #   dependsOn:
+  #     - Devdeploy
+  #   displayName: vNext IAT Deploy (inc terraform, webapp deploy)
+  #   condition: and(succeeded(), or(eq(variables['Build.SourceBranch'], 'refs/heads/develop'), startsWith(variables['Build.SourceBranch'], 'refs/heads/dev/')))
+  #   jobs:
+  #     - template: Deployment/templates/app-deploy.yml
+  #       parameters:
+  #         Environment: "vnextiat"
+  #         ContinueEvenIfResourcesAreGettingDestroyed: ${{ parameters.ContinueEvenIfResourcesAreGettingDestroyed }}
+  #         AzureSubscription: "Exchange-Set-Service-vNext-IAT-A.011.08"
+  #         Container: ${{variables.Container}}
+  #         RunAddsTests: vNextIAT
 
   - stage: vnexte2eDeploy
     dependsOn: 
-      - vnextiatDeploy
+      - Devdeploy
     displayName: vNext E2E Deploy (inc terraform, webapp deploy)
-    condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/develop'))
+    condition: and(succeeded(), or(eq(variables['Build.SourceBranch'], 'refs/heads/develop'), startsWith(variables['Build.SourceBranch'], 'refs/heads/dev/')))
     jobs:
       - template: Deployment/templates/app-deploy.yml
         parameters:

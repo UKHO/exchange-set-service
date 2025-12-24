@@ -43,7 +43,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             this.largeExchangeSetInstance = largeExchangeSetInstance;
         }
         
-        public async Task<bool> StoreSaleCatalogueServiceResponseAsync(string containerName, string batchId, SalesCatalogueProductResponse salesCatalogueResponse, string callBackUri, string exchangeSetStandard, string correlationId, CancellationToken cancellationToken, string expiryDate, DateTime scsRequestDateTime, bool isEmptyEncExchangeSet, bool isEmptyAioExchangeSet, ExchangeSetResponse exchangeSetResponse)
+        public async Task<bool> StoreSaleCatalogueServiceResponseAsync(string containerName, string batchId, SalesCatalogueProductResponse salesCatalogueResponse, string callBackUri, string exchangeSetStandard, string correlationId, CancellationToken cancellationToken, string expiryDate, DateTime scsRequestDateTime, bool isEmptyEncExchangeSet, bool isEmptyAioExchangeSet, ExchangeSetResponse exchangeSetResponse, string exchangeSetLayout)
         {
             var uploadFileName = string.Concat(batchId, ".json");
             var fileSize = salesCatalogueResponse.Products?.Sum(p => (long)p.FileSize) ?? 0;
@@ -75,7 +75,8 @@ namespace UKHO.ExchangeSetService.Common.Helpers
                     RequestedProductCount = exchangeSetResponse?.RequestedProductCount ?? 0,
                     RequestedAioProductCount = exchangeSetResponse?.RequestedAioProductCount ?? 0,
                     RequestedProductsAlreadyUpToDateCount = exchangeSetResponse?.RequestedProductsAlreadyUpToDateCount ?? 0,
-                    RequestedAioProductsAlreadyUpToDateCount = exchangeSetResponse?.RequestedAioProductsAlreadyUpToDateCount ?? 0
+                    RequestedAioProductsAlreadyUpToDateCount = exchangeSetResponse?.RequestedAioProductsAlreadyUpToDateCount ?? 0,
+                    ExchangeSetLayout = exchangeSetLayout
                 };
 
                 await AddQueueMessage(scsResponseQueueMessage, instanceCountAndType.InstanceNumber, connectionString); 
