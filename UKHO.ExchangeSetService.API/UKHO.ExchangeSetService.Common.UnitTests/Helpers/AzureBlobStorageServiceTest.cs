@@ -134,7 +134,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
 
             A.CallTo(() => fakeBlobClient.UploadAsync(A<MemoryStream>.Ignored)).Returns(Task.FromResult(A.Dummy<Response<BlobContentInfo>>()));
 
-            var response = await azureBlobStorageService.StoreSaleCatalogueServiceResponseAsync(containerName, batchId, salesCatalogueProductResponse, callBackUri, exchangeSetStandard.ToString(), correlationId, cancellationToken, fakeExpiryDate, fakeScsRequestDateTime, fakeIsEmptyEncExchangeSet, fakeIsEmptyAioExchangeSet, exchangeSetResponse);
+            var response = await azureBlobStorageService.StoreSaleCatalogueServiceResponseAsync(containerName, batchId, salesCatalogueProductResponse, callBackUri, exchangeSetStandard.ToString(), correlationId, cancellationToken, fakeExpiryDate, fakeScsRequestDateTime, fakeIsEmptyEncExchangeSet, fakeIsEmptyAioExchangeSet, exchangeSetResponse, ExchangeSetLayout.standard.ToString());
 
             Assert.That(response, Is.True);
         }
