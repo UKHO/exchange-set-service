@@ -128,7 +128,7 @@ namespace UKHO.ExchangeSetService.API.Controllers
                         return BuildBadRequestErrorResponseForTooLargeExchangeSet();
                     }
                     return GetEssResponse(productDetail);
-                }, GetCurrentCorrelationId(), exchangeSetStandard);
+                }, GetCurrentCorrelationId(), exchangeSetStandard, exchangeSetLayout);
         }
 
         /// <summary>
@@ -219,7 +219,7 @@ namespace UKHO.ExchangeSetService.API.Controllers
                         return BuildBadRequestErrorResponseForTooLargeExchangeSet();
                     }
                     return GetEssResponse(productDetail);
-                }, GetCurrentCorrelationId(), exchangeSetStandard);
+                }, GetCurrentCorrelationId(), exchangeSetStandard, exchangeSetLayout);
         }
 
         /// <summary>
@@ -301,7 +301,7 @@ namespace UKHO.ExchangeSetService.API.Controllers
                     }
 
                     return GetEssResponse(productDetail);
-                }, GetCurrentCorrelationId(), exchangeSetStandard);
+                }, GetCurrentCorrelationId(), exchangeSetStandard, exchangeSetLayout);
         }
 
         private string[] SanitizeProductIdentifiers(string[] productIdentifiers)
