@@ -263,6 +263,8 @@ namespace UKHO.ExchangeSetService.FulfilmentService.FileBuilders
             var exchangeSetRootPath = Path.Combine(batchPath, "{1}", fileShareServiceConfig.Value.EncRoot);
             var listFulfilmentData = new List<FulfilmentDataResponse>();
 
+            var businessUnit = batch.Message.ExchangeSetStandard.GetBusinessUnit(fileShareServiceConfig.Value);
+
             List<string> aioCells = !string.IsNullOrEmpty(aioConfiguration.Value.AioCells) ? new(aioConfiguration.Value.AioCells.Split(',')) : new List<string>();
 
             var essItems = largeExchangeSetDataResponse.SalesCatalogueProductResponse.Products
@@ -307,7 +309,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.FileBuilders
                         batch.Message,
                         chunk,
                         exchangeSetRootPath,
-                        fileShareServiceConfig.Value.S63BusinessUnit,
+                        businessUnit,
                         cancellationTokenSource, cancellationToken);
 
                     if (result.Any())
