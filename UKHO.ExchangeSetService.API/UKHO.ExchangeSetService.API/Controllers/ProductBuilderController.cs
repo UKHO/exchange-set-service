@@ -16,6 +16,7 @@ using UKHO.ExchangeSetService.API.Services;
 using UKHO.ExchangeSetService.Common.Extensions;
 using UKHO.ExchangeSetService.Common.Logging;
 using UKHO.ExchangeSetService.Common.Models.AzureADB2C;
+using UKHO.ExchangeSetService.Common.Models.Enums;
 using UKHO.ExchangeSetService.Common.Models.Request;
 using UKHO.ExchangeSetService.Common.Models.Response;
 
@@ -76,7 +77,7 @@ namespace UKHO.ExchangeSetService.API.Controllers
         public virtual Task<IActionResult> PostProductIdentifiers([FromBody] string[] productIdentifiers, [FromQuery] string callbackUri, [FromQuery] string exchangeSetStandard, [FromQuery] string exchangeSetLayout)
         {
             exchangeSetStandard = SanitizeString(exchangeSetStandard);
-            exchangeSetLayout = SanitizeString(exchangeSetLayout);
+            exchangeSetLayout = SanitizeLayoutString(exchangeSetLayout);
             productIdentifiers = SanitizeProductIdentifiers(productIdentifiers);
             return Logger.LogStartEndAndElapsedTimeAsync(EventIds.ESSPostProductIdentifiersRequestStart, EventIds.ESSPostProductIdentifiersRequestCompleted,
                 "Product Identifiers Endpoint request for _X-Correlation-ID:{correlationId}, ExchangeSetStandard:{exchangeSetStandard} and ExchangeSetLayout:{exchangeSetLayout}",
@@ -168,7 +169,7 @@ namespace UKHO.ExchangeSetService.API.Controllers
         public virtual Task<IActionResult> PostproductBuilderByProductVersions([FromBody] List<ProductVersionRequest> productVersionsRequest, string callbackUri, [FromQuery] string exchangeSetStandard, [FromQuery] string exchangeSetLayout)
         {
             exchangeSetStandard = SanitizeString(exchangeSetStandard);
-            exchangeSetLayout = SanitizeString(exchangeSetLayout);
+            exchangeSetLayout = SanitizeLayoutString(exchangeSetLayout);
             return Logger.LogStartEndAndElapsedTimeAsync(EventIds.ESSPostProductVersionsRequestStart, EventIds.ESSPostProductVersionsRequestCompleted,
                 "Product Versions Endpoint request for _X-Correlation-ID:{correlationId}, ExchangeSetStandard:{exchangeSetStandard} and ExchangeSetLayout:{exchangeSetLayout}",
                 async () =>
@@ -253,7 +254,7 @@ namespace UKHO.ExchangeSetService.API.Controllers
             [FromQuery] string callbackUri, [FromQuery] string exchangeSetStandard, [FromQuery] string exchangeSetLayout)
         {
             exchangeSetStandard = SanitizeString(exchangeSetStandard);
-            exchangeSetLayout = SanitizeString(exchangeSetLayout);
+            exchangeSetLayout = SanitizeLayoutString(exchangeSetLayout);
             return Logger.LogStartEndAndElapsedTimeAsync(EventIds.ESSGetProductsFromSpecificDateRequestStart, EventIds.ESSGetProductsFromSpecificDateRequestCompleted,
                 "Product Data SinceDateTime Endpoint request for _X-Correlation-ID:{correlationId}, ExchangeSetStandard:{exchangeSetStandard}, and ExchangeSetLayout:{exchangeSetLayout}",
                 async () =>
@@ -337,6 +338,16 @@ namespace UKHO.ExchangeSetService.API.Controllers
             sanitizedString = Regex.Replace(sanitizedString, @"[^a-zA-Z0-9]", "");
 
             return sanitizedString;
+        }
+
+        private string SanitizeLayoutString(string input)
+        {
+            if (string.IsNullOrEmpty(input))
+            {
+                return ExchangeSetLayout.standard.ToString();
+            }
+
+            return SanitizeLayoutString(input);
         }
     }
 }
