@@ -70,7 +70,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Job
         [TearDown]
         public void TearDown()
         {
-            CommonHelper.IsPeriodicOutputService = false;
+            CommonHelper.IsLargeLayout = false;
         }
 
         private static QueueMessage BuildQueueMessage(long fileSizeBytes, bool includeScsUri = false, string exchangeSetLayout = "standard")
@@ -103,7 +103,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Job
 
             await _fulfilmentServiceJob.ProcessQueueMessage(qm);
 
-            Assert.That(CommonHelper.IsPeriodicOutputService, Is.False);
+            Assert.That(CommonHelper.IsLargeLayout, Is.False);
             A.CallTo(() => _fakeFulfilmentDataService.CreateExchangeSet(A<FulfilmentServiceBatch>.Ignored)).MustHaveHappenedOnceExactly();
             A.CallTo(() => _fakeFulfilmentDataService.CreateLargeExchangeSet(A<FulfilmentServiceBatch>.Ignored, A<string>.Ignored)).MustNotHaveHappened();
             A.CallTo(() => _fakeFulfilmentCleanUpService.DeleteBatchFolder(A<FulfilmentServiceBatch>.That.Matches(m => m.BatchId == FakeBatchValue.BatchId))).MustHaveHappenedOnceExactly();
@@ -124,7 +124,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Job
 
             await _fulfilmentServiceJob.ProcessQueueMessage(qm);
 
-            Assert.That(CommonHelper.IsPeriodicOutputService, Is.False);
+            Assert.That(CommonHelper.IsLargeLayout, Is.False);
             A.CallTo(() => _fakeFulfilmentDataService.CreateExchangeSet(A<FulfilmentServiceBatch>.Ignored)).MustHaveHappenedOnceExactly();
             A.CallTo(() => _fakeFulfilmentDataService.CreateLargeExchangeSet(A<FulfilmentServiceBatch>.Ignored, A<string>.Ignored)).MustNotHaveHappened();
             A.CallTo(() => _fakeFulfilmentCleanUpService.DeleteBatchFolder(A<FulfilmentServiceBatch>.That.Matches(m => m.BatchId == FakeBatchValue.BatchId))).MustHaveHappenedOnceExactly();
@@ -145,7 +145,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Job
 
             await _fulfilmentServiceJob.ProcessQueueMessage(qm);
 
-            Assert.That(CommonHelper.IsPeriodicOutputService, Is.True);
+            Assert.That(CommonHelper.IsLargeLayout, Is.True);
             A.CallTo(() => _fakeFulfilmentDataService.CreateLargeExchangeSet(A<FulfilmentServiceBatch>.Ignored, FakeBatchValue.LargeExchangeSetFolderNamePattern)).MustHaveHappenedOnceExactly();
             A.CallTo(() => _fakeFulfilmentDataService.CreateExchangeSet(A<FulfilmentServiceBatch>.Ignored)).MustNotHaveHappened();
             A.CallTo(() => _fakeFulfilmentCleanUpService.DeleteBatchFolder(A<FulfilmentServiceBatch>.That.Matches(m => m.BatchId == FakeBatchValue.BatchId))).MustHaveHappenedOnceExactly();

@@ -31,9 +31,8 @@ namespace UKHO.ExchangeSetService.FulfilmentService
         {
             var salesCatalogueServiceResponseQueueMessage = message.Body.ToObjectFromJson<SalesCatalogueServiceResponseQueueMessage>();
             var batch = new FulfilmentServiceBatch(configuration, salesCatalogueServiceResponseQueueMessage);
-            var fileSizeInMb = CommonHelper.ConvertBytesToMegabytes(batch.Message.FileSize);
-
-            CommonHelper.IsPeriodicOutputService = string.Equals(
+            
+            CommonHelper.IsLargeLayout = string.Equals(
                 batch.Message.ExchangeSetLayout, ExchangeSetLayout.large.ToString(), StringComparison.OrdinalIgnoreCase);
 
             try
@@ -43,7 +42,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService
 
                 await Agent.Tracer.CaptureTransaction(transactionName, ApiConstants.TypeRequest, async () =>
                 {
-                    if (CommonHelper.IsPeriodicOutputService)
+                    if (CommonHelper.IsLargeLayout)
                     {
                         await logger.LogStartEndAndElapsedTimeAsync(EventIds.CreateLargeExchangeSetRequestStart,
                             EventIds.CreateLargeExchangeSetRequestCompleted,

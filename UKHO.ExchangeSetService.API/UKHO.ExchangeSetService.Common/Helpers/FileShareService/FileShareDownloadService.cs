@@ -197,7 +197,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
                     var serverValue = httpResponse.Headers.Server.ToString().Split('/').First();
                     fileSystemHelper.CheckAndCreateFolder(downloadPath);
                     var path = Path.Combine(downloadPath, fileName);
-                    if (!fileSystemHelper.CheckFileExists(path) || CommonHelper.IsPeriodicOutputService)
+                    if (!fileSystemHelper.CheckFileExists(path) || CommonHelper.IsLargeLayout)
                     {
                         await CopyFileToFolder(httpResponse, path, fileName, entry, queueMessage);
                         result = true;

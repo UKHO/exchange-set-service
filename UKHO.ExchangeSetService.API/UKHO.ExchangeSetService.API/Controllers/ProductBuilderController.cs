@@ -347,7 +347,7 @@ namespace UKHO.ExchangeSetService.API.Controllers
                 return ExchangeSetLayout.standard.ToString();
             }
 
-            return SanitizeLayoutString(input);
+            return SanitizeString(input);
         }
     }
 }
