@@ -10,6 +10,7 @@ using System.Linq;
 using System.Net;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using FluentValidation.Results;
 using UKHO.ExchangeSetService.API.Extensions;
 using UKHO.ExchangeSetService.API.Filters;
 using UKHO.ExchangeSetService.API.Services;
@@ -79,56 +80,33 @@ namespace UKHO.ExchangeSetService.API.Controllers
             exchangeSetStandard = SanitizeString(exchangeSetStandard);
             exchangeSetLayout = SanitizeLayoutString(exchangeSetLayout);
             productIdentifiers = SanitizeProductIdentifiers(productIdentifiers);
+
             return Logger.LogStartEndAndElapsedTimeAsync(EventIds.ESSPostProductIdentifiersRequestStart, EventIds.ESSPostProductIdentifiersRequestCompleted,
                 "Product Identifiers Endpoint request for _X-Correlation-ID:{correlationId}, ExchangeSetStandard:{exchangeSetStandard} and ExchangeSetLayout:{exchangeSetLayout}",
                 async () =>
                 {
                     if (productIdentifiers == null || productIdentifiers.Length == 0)
                     {
-                        var error = new List<Error>
+                        return BuildBadRequestErrorResponse(new List<Error>
                         {
-                            new()
-                            {
-                                Source = "requestBody",
-                                Description = "Either body is null or malformed."
-                            }
-                        };
-                        return BuildBadRequestErrorResponse(error);
+                            new() { Source = "requestBody", Description = "Either body is null or malformed." }
+                        });
                     }
-                    var productIdentifierRequest = new ProductIdentifierRequest()
+
+                    var request = new ProductIdentifierRequest
                     {
                         ProductIdentifier = productIdentifiers,
                         CallbackUri = callbackUri,
                         ExchangeSetStandard = exchangeSetStandard,
-                        CorrelationId = GetCurrentCorrelationId(),
-                        ExchangeSetLayout = exchangeSetLayout
+                        ExchangeSetLayout = exchangeSetLayout,
+                        CorrelationId = GetCurrentCorrelationId()
                     };
 
-                    var validationResult = await productDataService.ValidateProductDataByProductIdentifiers(productIdentifierRequest);
-
-                    if (!validationResult.IsValid)
-                    {
-                        List<Error> errors;
-
-                        if (validationResult.HasBadRequestErrors(out errors))
-                        {
-                            return BuildBadRequestErrorResponse(errors);
-                        }
-                    }
-                    var azureAdB2C = new AzureAdB2C()
-                    {
-                        AudToken = TokenAudience,
-                        IssToken = TokenIssuer
-                    };
-
-                    var productDetail = await productDataService.CreateProductDataByProductIdentifiers(productIdentifierRequest, azureAdB2C);
-
-                    if (productDetail.IsExchangeSetTooLarge)
-                    {
-                        Logger.LogError(EventIds.ExchangeSetTooLarge.ToEventId(), "Requested exchange set is too large for product identifiers endpoint for _X-Correlation-ID:{correlationId}", GetCurrentCorrelationId());
-                        return BuildBadRequestErrorResponseForTooLargeExchangeSet();
-                    }
-                    return GetEssResponse(productDetail);
+                    return await ExecuteBuilderRequest(
+                        request,
+                        productDataService.ValidateProductDataByProductIdentifiers,
+                        productDataService.CreateProductDataByProductIdentifiers,
+                        "Requested exchange set is too large for product identifiers endpoint for _X-Correlation-ID:{correlationId}");
                 }, GetCurrentCorrelationId(), exchangeSetStandard, exchangeSetLayout);
         }
 
@@ -170,23 +148,20 @@ namespace UKHO.ExchangeSetService.API.Controllers
         {
             exchangeSetStandard = SanitizeString(exchangeSetStandard);
             exchangeSetLayout = SanitizeLayoutString(exchangeSetLayout);
+
             return Logger.LogStartEndAndElapsedTimeAsync(EventIds.ESSPostProductVersionsRequestStart, EventIds.ESSPostProductVersionsRequestCompleted,
                 "Product Versions Endpoint request for _X-Correlation-ID:{correlationId}, ExchangeSetStandard:{exchangeSetStandard} and ExchangeSetLayout:{exchangeSetLayout}",
                 async () =>
                 {
                     if (productVersionsRequest == null || !productVersionsRequest.Any())
                     {
-                        var error = new List<Error>
+                        return BuildBadRequestErrorResponse(new List<Error>
                         {
-                            new()
-                            {
-                                Source = "requestBody",
-                                Description = "Either body is null or malformed."
-                            }
-                        };
-                        return BuildBadRequestErrorResponse(error);
+                            new() { Source = "requestBody", Description = "Either body is null or malformed." }
+                        });
                     }
-                    ProductDataProductVersionsRequest request = new()
+
+                    var request = new ProductDataProductVersionsRequest
                     {
                         ProductVersions = productVersionsRequest,
                         CallbackUri = callbackUri,
@@ -195,31 +170,11 @@ namespace UKHO.ExchangeSetService.API.Controllers
                         CorrelationId = GetCurrentCorrelationId()
                     };
 
-                    var validationResult = await productDataService.ValidateProductDataByProductVersions(request);
-
-                    if (!validationResult.IsValid)
-                    {
-                        List<Error> errors;
-
-                        if (validationResult.HasBadRequestErrors(out errors))
-                        {
-                            return BuildBadRequestErrorResponse(errors);
-                        }
-                    }
-                    AzureAdB2C azureAdB2C = new()
-                    {
-                        AudToken = TokenAudience,
-                        IssToken = TokenIssuer
-                    };
-
-                    var productDetail = await productDataService.CreateProductDataByProductVersions(request, azureAdB2C);
-
-                    if (productDetail.IsExchangeSetTooLarge)
-                    {
-                        Logger.LogError(EventIds.ExchangeSetTooLarge.ToEventId(), "Requested exchange set is too large for product versions endpoint for _X-Correlation-ID:{correlationId}.", GetCurrentCorrelationId());
-                        return BuildBadRequestErrorResponseForTooLargeExchangeSet();
-                    }
-                    return GetEssResponse(productDetail);
+                    return await ExecuteBuilderRequest(
+                        request,
+                        productDataService.ValidateProductDataByProductVersions,
+                        productDataService.CreateProductDataByProductVersions,
+                        "Requested exchange set is too large for product versions endpoint for _X-Correlation-ID:{correlationId}.");
                 }, GetCurrentCorrelationId(), exchangeSetStandard, exchangeSetLayout);
         }
 
@@ -255,11 +210,12 @@ namespace UKHO.ExchangeSetService.API.Controllers
         {
             exchangeSetStandard = SanitizeString(exchangeSetStandard);
             exchangeSetLayout = SanitizeLayoutString(exchangeSetLayout);
+
             return Logger.LogStartEndAndElapsedTimeAsync(EventIds.ESSGetProductsFromSpecificDateRequestStart, EventIds.ESSGetProductsFromSpecificDateRequestCompleted,
                 "Product Data SinceDateTime Endpoint request for _X-Correlation-ID:{correlationId}, ExchangeSetStandard:{exchangeSetStandard}, and ExchangeSetLayout:{exchangeSetLayout}",
                 async () =>
                 {
-                    var productDataSinceDateTimeRequest = new ProductDataSinceDateTimeRequest()
+                    var request = new ProductDataSinceDateTimeRequest
                     {
                         SinceDateTime = sinceDateTime,
                         CallbackUri = callbackUri,
@@ -268,42 +224,53 @@ namespace UKHO.ExchangeSetService.API.Controllers
                         CorrelationId = GetCurrentCorrelationId()
                     };
 
-                    if (productDataSinceDateTimeRequest.SinceDateTime == null)
+                    if (request.SinceDateTime == null)
                     {
-                        var error = new List<Error>
+                        return BuildBadRequestErrorResponse(new List<Error>
                         {
-                            new()
-                            {
-                                Source = "sinceDateTime",
-                                Description = "Query parameter 'sinceDateTime' is required."
-                            }
-                        };
-                        return BuildBadRequestErrorResponse(error);
+                            new() { Source = "sinceDateTime", Description = "Query parameter 'sinceDateTime' is required." }
+                        });
                     }
 
-                    var validationResult = await productDataService.ValidateProductDataSinceDateTime(productDataSinceDateTimeRequest);
-
-                    if (!validationResult.IsValid && validationResult.HasBadRequestErrors(out List<Error> errors))
-                    {
-                        return BuildBadRequestErrorResponse(errors);
-                    }
-                    AzureAdB2C azureAdB2C = new()
-                    {
-                        AudToken = TokenAudience,
-                        IssToken = TokenIssuer
-                    };
-
-                    var productDetail = await productDataService.CreateProductDataSinceDateTime(productDataSinceDateTimeRequest, azureAdB2C);
-
-                    if (productDetail.IsExchangeSetTooLarge)
-                    {
-                        Logger.LogError(EventIds.ExchangeSetTooLarge.ToEventId(), "Requested exchange set is too large for SinceDateTime endpoint for _X-Correlation-ID:{correlationId}.", GetCurrentCorrelationId());
-                        return BuildBadRequestErrorResponseForTooLargeExchangeSet();
-                    }
-
-                    return GetEssResponse(productDetail);
+                    return await ExecuteBuilderRequest(
+                        request,
+                        productDataService.ValidateProductDataSinceDateTime,
+                        productDataService.CreateProductDataSinceDateTime,
+                        "Requested exchange set is too large for SinceDateTime endpoint for _X-Correlation-ID:{correlationId}.");
                 }, GetCurrentCorrelationId(), exchangeSetStandard, exchangeSetLayout);
         }
+
+        // Shared executor to remove duplication across endpoints
+        private async Task<IActionResult> ExecuteBuilderRequest<TRequest>(
+            TRequest request,
+            Func<TRequest, Task<ValidationResult>> validate,
+            Func<TRequest, AzureAdB2C, Task<ExchangeSetServiceResponse>> execute,
+            string tooLargeLogTemplate)
+        {
+            var validationResult = await validate(request);
+
+            if (!validationResult.IsValid && validationResult.HasBadRequestErrors(out List<Error> errors))
+            {
+                return BuildBadRequestErrorResponse(errors);
+            }
+
+            var azureAdB2C = CreateAzureAdB2C();
+            var productDetail = await execute(request, azureAdB2C);
+
+            if (productDetail.IsExchangeSetTooLarge)
+            {
+                Logger.LogError(EventIds.ExchangeSetTooLarge.ToEventId(), tooLargeLogTemplate, GetCurrentCorrelationId());
+                return BuildBadRequestErrorResponseForTooLargeExchangeSet();
+            }
+
+            return GetEssResponse(productDetail);
+        }
+
+        private AzureAdB2C CreateAzureAdB2C() => new()
+        {
+            AudToken = TokenAudience,
+            IssToken = TokenIssuer
+        };
 
         private string[] SanitizeProductIdentifiers(string[] productIdentifiers)
         {
@@ -329,25 +296,32 @@ namespace UKHO.ExchangeSetService.API.Controllers
 
             return sanitizedIdentifiers.ToArray();
         }
+       
         private string SanitizeString(string input)
         {
-            // Remove leading and trailing white spaces
-            string sanitizedString = input.Trim();
+            if (string.IsNullOrEmpty(input))
+                return string.Empty;
 
+            var sanitizedString = input.Trim();
             // Remove any special characters or symbols
-            sanitizedString = Regex.Replace(sanitizedString, @"[^a-zA-Z0-9]", "");
-
+            sanitizedString = Regex.Replace(sanitizedString, @"[^a-zA-Z0-9]", "", RegexOptions.None, TimeSpan.FromMilliseconds(500));
             return sanitizedString;
         }
 
         private string SanitizeLayoutString(string input)
         {
-            if (string.IsNullOrEmpty(input))
+            if (string.IsNullOrWhiteSpace(input))
             {
                 return ExchangeSetLayout.standard.ToString();
             }
 
-            return SanitizeString(input);
+            // Try parse enum (case-insensitive); fallback to "standard"
+            if (Enum.TryParse<ExchangeSetLayout>(input.Trim(), ignoreCase: true, out var parsed))
+            {
+                return parsed.ToString();
+            }
+
+            return ExchangeSetLayout.standard.ToString();
         }
     }
 }
