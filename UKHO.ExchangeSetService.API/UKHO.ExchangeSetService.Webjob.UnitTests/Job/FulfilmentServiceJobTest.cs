@@ -70,17 +70,18 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Job
         [TearDown]
         public void TearDown()
         {
-            CommonHelper.IsPeriodicOutputService = false;
+            CommonHelper.IsLargeLayout = false;
         }
 
-        private static QueueMessage BuildQueueMessage(long fileSizeBytes, bool includeScsUri = false)
+        private static QueueMessage BuildQueueMessage(long fileSizeBytes, bool includeScsUri = false, string exchangeSetLayout = "standard")
         {
             var payload = new SalesCatalogueServiceResponseQueueMessage
             {
                 BatchId = FakeBatchValue.BatchId,
                 CorrelationId = FakeBatchValue.CorrelationId,
                 FileSize = fileSizeBytes,
-                ScsResponseUri = includeScsUri ? "https://test/response.json" : null
+                ScsResponseUri = includeScsUri ? "https://test/response.json" : null,
+                ExchangeSetLayout = exchangeSetLayout,
             };
             var json = JsonSerializer.Serialize(payload);
             return QueuesModelFactory.QueueMessage(
@@ -94,15 +95,15 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Job
         }
 
         [Test]
-        public async Task ProcessQueueMessage_FileSizeOnOrBelowThreshold_CallsCreateExchangeSet()
+        public async Task ProcessQueueMessage_ExchangeSetLayoutIsStandard_CallsCreateExchangeSet()
         {
-            var qm = BuildQueueMessage(fileSizeBytes: LargeMediaExchangeSetSizeInMB * 1024 * 1024); // <= LargeMediaExchangeSetSizeInMB
+            var qm = BuildQueueMessage(fileSizeBytes: LargeMediaExchangeSetSizeInMB * 1024 * 1024, exchangeSetLayout: "standard"); // <= LargeMediaExchangeSetSizeInMB
 
             A.CallTo(() => _fakeFulfilmentDataService.CreateExchangeSet(A<FulfilmentServiceBatch>.That.Matches(m => m.BatchId == FakeBatchValue.BatchId))).Returns("ok");
 
             await _fulfilmentServiceJob.ProcessQueueMessage(qm);
 
-            Assert.That(CommonHelper.IsPeriodicOutputService, Is.False);
+            Assert.That(CommonHelper.IsLargeLayout, Is.False);
             A.CallTo(() => _fakeFulfilmentDataService.CreateExchangeSet(A<FulfilmentServiceBatch>.Ignored)).MustHaveHappenedOnceExactly();
             A.CallTo(() => _fakeFulfilmentDataService.CreateLargeExchangeSet(A<FulfilmentServiceBatch>.Ignored, A<string>.Ignored)).MustNotHaveHappened();
             A.CallTo(() => _fakeFulfilmentCleanUpService.DeleteBatchFolder(A<FulfilmentServiceBatch>.That.Matches(m => m.BatchId == FakeBatchValue.BatchId))).MustHaveHappenedOnceExactly();
@@ -123,7 +124,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Job
 
             await _fulfilmentServiceJob.ProcessQueueMessage(qm);
 
-            Assert.That(CommonHelper.IsPeriodicOutputService, Is.False);
+            Assert.That(CommonHelper.IsLargeLayout, Is.False);
             A.CallTo(() => _fakeFulfilmentDataService.CreateExchangeSet(A<FulfilmentServiceBatch>.Ignored)).MustHaveHappenedOnceExactly();
             A.CallTo(() => _fakeFulfilmentDataService.CreateLargeExchangeSet(A<FulfilmentServiceBatch>.Ignored, A<string>.Ignored)).MustNotHaveHappened();
             A.CallTo(() => _fakeFulfilmentCleanUpService.DeleteBatchFolder(A<FulfilmentServiceBatch>.That.Matches(m => m.BatchId == FakeBatchValue.BatchId))).MustHaveHappenedOnceExactly();
@@ -136,15 +137,15 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Job
         }
 
         [Test]
-        public async Task ProcessQueueMessage_FileSizeAboveThreshold_CallsCreateLargeExchangeSet()
+        public async Task ProcessQueueMessage_ExchangeSetLayoutIsLarge_CallsCreateLargeExchangeSet()
         {
-            var qm = BuildQueueMessage(fileSizeBytes: (LargeMediaExchangeSetSizeInMB * 1024 * 1024) + 1); // > LargeMediaExchangeSetSizeInMB
+            var qm = BuildQueueMessage(fileSizeBytes: (LargeMediaExchangeSetSizeInMB * 1024 * 1024) + 1, exchangeSetLayout: "large"); // > LargeMediaExchangeSetSizeInMB
 
             A.CallTo(() => _fakeFulfilmentDataService.CreateLargeExchangeSet(A<FulfilmentServiceBatch>.That.Matches(m => m.BatchId == FakeBatchValue.BatchId), FakeBatchValue.LargeExchangeSetFolderNamePattern)).Returns("large");
 
             await _fulfilmentServiceJob.ProcessQueueMessage(qm);
 
-            Assert.That(CommonHelper.IsPeriodicOutputService, Is.True);
+            Assert.That(CommonHelper.IsLargeLayout, Is.True);
             A.CallTo(() => _fakeFulfilmentDataService.CreateLargeExchangeSet(A<FulfilmentServiceBatch>.Ignored, FakeBatchValue.LargeExchangeSetFolderNamePattern)).MustHaveHappenedOnceExactly();
             A.CallTo(() => _fakeFulfilmentDataService.CreateExchangeSet(A<FulfilmentServiceBatch>.Ignored)).MustNotHaveHappened();
             A.CallTo(() => _fakeFulfilmentCleanUpService.DeleteBatchFolder(A<FulfilmentServiceBatch>.That.Matches(m => m.BatchId == FakeBatchValue.BatchId))).MustHaveHappenedOnceExactly();

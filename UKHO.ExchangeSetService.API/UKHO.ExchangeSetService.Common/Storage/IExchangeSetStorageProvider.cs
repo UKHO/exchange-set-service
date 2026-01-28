@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
+using UKHO.ExchangeSetService.Common.Models.Enums;
 using UKHO.ExchangeSetService.Common.Models.Response;
 using UKHO.ExchangeSetService.Common.Models.SalesCatalogue;
 
@@ -20,7 +21,8 @@ namespace UKHO.ExchangeSetService.Common.Storage
         /// <param name="isEmptyEncExchangeSet">"create empty enc exchange set"</param>
         /// <param name="isEmptyAioExchangeSet">"create empty aio exchange set"</param>
         /// <param name="exchangeSetResponse">Exchange set response</param>
+        /// <param name="exchangeSetLayout">Exchange set layout</param>
         /// <returns></returns>
-        Task<bool> SaveSalesCatalogueStorageDetails(SalesCatalogueProductResponse salesCatalogueResponse, string batchId, string callBackUri, string exchangeSetStandard, string correlationId, string expiryDate, DateTime scsRequestDateTime, bool isEmptyEncExchangeSet, bool isEmptyAioExchangeSet, ExchangeSetResponse exchangeSetResponse);
+        Task<bool> SaveSalesCatalogueStorageDetails(SalesCatalogueProductResponse salesCatalogueResponse, string batchId, string callBackUri, string exchangeSetStandard, string correlationId, string expiryDate, DateTime scsRequestDateTime, bool isEmptyEncExchangeSet, bool isEmptyAioExchangeSet, ExchangeSetResponse exchangeSetResponse, string exchangeSetLayout);
     }
 }
