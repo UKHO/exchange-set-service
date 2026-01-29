@@ -35,6 +35,23 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.FileBuilders
         private IFileBuilder _fakeFileBuilder;
         private IDownloader _fakeDownloader;
         private ExchangeSetBuilder _exchangeSetBuilder;
+        // Replace the invalid field initializers with typed fields and add proper setup/teardown.
+
+        private CancellationTokenSource _cancellationTokenSource;
+        private CancellationToken _cancellationToken;
+
+        [OneTimeSetUp]
+        public void OneTimeSetUp()
+        {
+            _cancellationTokenSource = new CancellationTokenSource();
+            _cancellationToken = _cancellationTokenSource.Token;
+        }
+
+        [OneTimeTearDown]
+        public void OneTimeTearDown()
+        {
+            _cancellationTokenSource?.Dispose();
+        }
 
         private static SalesCatalogueServiceResponseQueueMessage CreateMessage() =>
             new()
@@ -207,87 +224,87 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.FileBuilders
         }
 
         [Test]
-        public async Task WhenCreateStandardLargeMediaExchangeSet_Valid_ReturnsTrue()
-        {
-            var message = CreateMessage();
-            var batch = new FulfilmentServiceBatch(FakeBatchValue.Configuration, message);
-            var products = CreateProducts(1); // one non-AIO cell
-            var fulfilmentDataResponses = CreateFulfilmentDataResponses(products);
-            var salesCatalogueDataResponse = new SalesCatalogueDataResponse();
-            var salesCatalogueProductResponse = new SalesCatalogueProductResponse { Products = products };
-            var largeExchangeSetDataResponse = new LargeExchangeSetDataResponse
+            public async Task WhenCreateStandardLargeMediaExchangeSet_Valid_ReturnsTrue()
             {
-                SalesCatalogueProductResponse = salesCatalogueProductResponse,
-                SalesCatalogueDataResponse = salesCatalogueDataResponse
-            };
+                var message = CreateMessage();
+                var batch = new FulfilmentServiceBatch(FakeBatchValue.Configuration, message);
+                var products = CreateProducts(1); // one non-AIO cell
+                var fulfilmentDataResponses = CreateFulfilmentDataResponses(products);
+                var salesCatalogueDataResponse = new SalesCatalogueDataResponse();
+                var salesCatalogueProductResponse = new SalesCatalogueProductResponse { Products = products };
+                var largeExchangeSetDataResponse = new LargeExchangeSetDataResponse
+                {
+                    SalesCatalogueProductResponse = salesCatalogueProductResponse,
+                    SalesCatalogueDataResponse = salesCatalogueDataResponse
+                };
 
-            // Validation passes
-            A.CallTo(() => _fakeProductDataValidator.Validate(A<List<Products>>.Ignored)).Returns(Task.FromResult(new ValidationResult()));
+                // Validation passes
+                A.CallTo(() => _fakeProductDataValidator.Validate(A<List<Products>>.Ignored)).Returns(Task.FromResult(new ValidationResult()));
 
-            // Query to FSS returns fulfilment data
-            A.CallTo(() => _fakeFulfilmentFileShareService.QueryFileShareServiceData(A<List<Products>>.Ignored, message, A<CancellationTokenSource>.Ignored, A<CancellationToken>.Ignored, FakeBatchValue.LargeExchangeSetEncRootPattern, FakeBatchValue.S63BusinessUnit)).Returns(fulfilmentDataResponses);
+                // Query to FSS returns fulfilment data
+                A.CallTo(() => _fakeFulfilmentFileShareService.QueryFileShareServiceData(A<List<Products>>.Ignored, message, _cancellationTokenSource, _cancellationToken, FakeBatchValue.LargeExchangeSetEncRootPattern, FakeBatchValue.S63BusinessUnit)).Returns(fulfilmentDataResponses);
 
-            // Root M0* directories
-            var m05 = A.Fake<IDirectoryInfo>();
-            A.CallTo(() => m05.Name).Returns(FakeBatchValue.LargeExchangeSetFolderName5);
-            A.CallTo(() => m05.ToString()).Returns(FakeBatchValue.LargeExchangeSetMediaPath5);
-            var m06 = A.Fake<IDirectoryInfo>();
-            A.CallTo(() => m06.Name).Returns(FakeBatchValue.LargeExchangeSetFolderName6);
-            A.CallTo(() => m06.ToString()).Returns(FakeBatchValue.LargeExchangeSetMediaPath6);
+                // Root M0* directories
+                var m05 = A.Fake<IDirectoryInfo>();
+                A.CallTo(() => m05.Name).Returns(FakeBatchValue.LargeExchangeSetFolderName5);
+                A.CallTo(() => m05.ToString()).Returns(FakeBatchValue.LargeExchangeSetMediaPath5);
+                var m06 = A.Fake<IDirectoryInfo>();
+                A.CallTo(() => m06.Name).Returns(FakeBatchValue.LargeExchangeSetFolderName6);
+                A.CallTo(() => m06.ToString()).Returns(FakeBatchValue.LargeExchangeSetMediaPath6);
 
-            A.CallTo(() => _fakeFileSystemHelper.GetDirectoryInfo(FakeBatchValue.BatchPath)).Returns([m05, m06]);
+                A.CallTo(() => _fakeFileSystemHelper.GetDirectoryInfo(FakeBatchValue.BatchPath)).Returns([m05, m06]);
 
-            // Ancillary / file builder & downloader calls
-            A.CallTo(() => _fakeFulfilmentAncillaryFiles.CreateMediaFile(FakeBatchValue.BatchId, FakeBatchValue.LargeExchangeSetMediaPath5, FakeBatchValue.CorrelationId, FakeBatchValue.MediaBaseNumber5)).Returns(Task.FromResult(true));
-            A.CallTo(() => _fakeFulfilmentAncillaryFiles.CreateMediaFile(FakeBatchValue.BatchId, FakeBatchValue.LargeExchangeSetMediaPath6, FakeBatchValue.CorrelationId, FakeBatchValue.MediaBaseNumber6)).Returns(Task.FromResult(true));
-            A.CallTo(() => _fakeDownloader.DownloadLargeMediaReadMeFile(FakeBatchValue.BatchId, FakeBatchValue.LargeExchangeSetMediaPath5, FakeBatchValue.CorrelationId)).Returns(Task.CompletedTask);
-            A.CallTo(() => _fakeDownloader.DownloadLargeMediaReadMeFile(FakeBatchValue.BatchId, FakeBatchValue.LargeExchangeSetMediaPath6, FakeBatchValue.CorrelationId)).Returns(Task.CompletedTask);
-            A.CallTo(() => _fakeFileBuilder.CreateLargeMediaSerialEncFile(FakeBatchValue.BatchId, FakeBatchValue.BatchPath, FakeBatchValue.LargeExchangeSetFolderName5, FakeBatchValue.CorrelationId)).Returns(Task.FromResult(true));
-            A.CallTo(() => _fakeFileBuilder.CreateLargeMediaSerialEncFile(FakeBatchValue.BatchId, FakeBatchValue.BatchPath, FakeBatchValue.LargeExchangeSetFolderName6, FakeBatchValue.CorrelationId)).Returns(Task.FromResult(true));
-            A.CallTo(() => _fakeFileBuilder.CreateProductFile(FakeBatchValue.BatchId, FakeBatchValue.LargeExchangeSetMediaInfoPath5, FakeBatchValue.CorrelationId, salesCatalogueDataResponse, message.ScsRequestDateTime, true)).Returns(Task.FromResult(true));
-            A.CallTo(() => _fakeFileBuilder.CreateProductFile(FakeBatchValue.BatchId, FakeBatchValue.LargeExchangeSetMediaInfoPath6, FakeBatchValue.CorrelationId, salesCatalogueDataResponse, message.ScsRequestDateTime, true)).Returns(Task.FromResult(true));
-            A.CallTo(() => _fakeDownloader.DownloadInfoFolderFiles(FakeBatchValue.BatchId, FakeBatchValue.LargeExchangeSetMediaInfoPath5, FakeBatchValue.CorrelationId)).Returns(Task.CompletedTask);
-            A.CallTo(() => _fakeDownloader.DownloadInfoFolderFiles(FakeBatchValue.BatchId, FakeBatchValue.LargeExchangeSetMediaInfoPath6, FakeBatchValue.CorrelationId)).Returns(Task.CompletedTask);
-            A.CallTo(() => _fakeDownloader.DownloadAdcFolderFiles(FakeBatchValue.BatchId, FakeBatchValue.LargeExchangeSetMediaInfoAdcPath5, FakeBatchValue.CorrelationId)).Returns(Task.CompletedTask);
-            A.CallTo(() => _fakeDownloader.DownloadAdcFolderFiles(FakeBatchValue.BatchId, FakeBatchValue.LargeExchangeSetMediaInfoAdcPath6, FakeBatchValue.CorrelationId)).Returns(Task.CompletedTask);
-            A.CallTo(() => _fakeFulfilmentAncillaryFiles.CreateEncUpdateCsv(salesCatalogueDataResponse, FakeBatchValue.LargeExchangeSetMediaInfoPath5, FakeBatchValue.BatchId, FakeBatchValue.CorrelationId)).Returns(Task.FromResult(true));
-            A.CallTo(() => _fakeFulfilmentAncillaryFiles.CreateEncUpdateCsv(salesCatalogueDataResponse, FakeBatchValue.LargeExchangeSetMediaInfoPath6, FakeBatchValue.BatchId, FakeBatchValue.CorrelationId)).Returns(Task.FromResult(true));
-            A.CallTo(() => _fakeFileBuilder.CreateLargeMediaExchangesetCatalogFile(FakeBatchValue.BatchId, FakeBatchValue.LargeExchangeSetMediaPath5, FakeBatchValue.CorrelationId, fulfilmentDataResponses, salesCatalogueDataResponse, salesCatalogueProductResponse)).Returns(Task.FromResult(true));
-            A.CallTo(() => _fakeFileBuilder.CreateLargeMediaExchangesetCatalogFile(FakeBatchValue.BatchId, FakeBatchValue.LargeExchangeSetMediaPath6, FakeBatchValue.CorrelationId, fulfilmentDataResponses, salesCatalogueDataResponse, salesCatalogueProductResponse)).Returns(Task.FromResult(true));
+                // Ancillary / file builder & downloader calls
+                A.CallTo(() => _fakeFulfilmentAncillaryFiles.CreateMediaFile(FakeBatchValue.BatchId, FakeBatchValue.LargeExchangeSetMediaPath5, FakeBatchValue.CorrelationId, FakeBatchValue.MediaBaseNumber5)).Returns(Task.FromResult(true));
+                A.CallTo(() => _fakeFulfilmentAncillaryFiles.CreateMediaFile(FakeBatchValue.BatchId, FakeBatchValue.LargeExchangeSetMediaPath6, FakeBatchValue.CorrelationId, FakeBatchValue.MediaBaseNumber6)).Returns(Task.FromResult(true));
+                A.CallTo(() => _fakeDownloader.DownloadLargeMediaReadMeFile(FakeBatchValue.BatchId, FakeBatchValue.LargeExchangeSetMediaPath5, FakeBatchValue.CorrelationId)).Returns(Task.CompletedTask);
+                A.CallTo(() => _fakeDownloader.DownloadLargeMediaReadMeFile(FakeBatchValue.BatchId, FakeBatchValue.LargeExchangeSetMediaPath6, FakeBatchValue.CorrelationId)).Returns(Task.CompletedTask);
+                A.CallTo(() => _fakeFileBuilder.CreateLargeMediaSerialEncFile(FakeBatchValue.BatchId, FakeBatchValue.BatchPath, FakeBatchValue.LargeExchangeSetFolderName5, FakeBatchValue.CorrelationId)).Returns(Task.FromResult(true));
+                A.CallTo(() => _fakeFileBuilder.CreateLargeMediaSerialEncFile(FakeBatchValue.BatchId, FakeBatchValue.BatchPath, FakeBatchValue.LargeExchangeSetFolderName6, FakeBatchValue.CorrelationId)).Returns(Task.FromResult(true));
+                A.CallTo(() => _fakeFileBuilder.CreateProductFile(FakeBatchValue.BatchId, FakeBatchValue.LargeExchangeSetMediaInfoPath5, FakeBatchValue.CorrelationId, salesCatalogueDataResponse, message.ScsRequestDateTime, true)).Returns(Task.FromResult(true));
+                A.CallTo(() => _fakeFileBuilder.CreateProductFile(FakeBatchValue.BatchId, FakeBatchValue.LargeExchangeSetMediaInfoPath6, FakeBatchValue.CorrelationId, salesCatalogueDataResponse, message.ScsRequestDateTime, true)).Returns(Task.FromResult(true));
+                A.CallTo(() => _fakeDownloader.DownloadInfoFolderFiles(FakeBatchValue.BatchId, FakeBatchValue.LargeExchangeSetMediaInfoPath5, FakeBatchValue.CorrelationId)).Returns(Task.CompletedTask);
+                A.CallTo(() => _fakeDownloader.DownloadInfoFolderFiles(FakeBatchValue.BatchId, FakeBatchValue.LargeExchangeSetMediaInfoPath6, FakeBatchValue.CorrelationId)).Returns(Task.CompletedTask);
+                A.CallTo(() => _fakeDownloader.DownloadAdcFolderFiles(FakeBatchValue.BatchId, FakeBatchValue.LargeExchangeSetMediaInfoAdcPath5, FakeBatchValue.CorrelationId)).Returns(Task.CompletedTask);
+                A.CallTo(() => _fakeDownloader.DownloadAdcFolderFiles(FakeBatchValue.BatchId, FakeBatchValue.LargeExchangeSetMediaInfoAdcPath6, FakeBatchValue.CorrelationId)).Returns(Task.CompletedTask);
+                A.CallTo(() => _fakeFulfilmentAncillaryFiles.CreateEncUpdateCsv(salesCatalogueDataResponse, FakeBatchValue.LargeExchangeSetMediaInfoPath5, FakeBatchValue.BatchId, FakeBatchValue.CorrelationId)).Returns(Task.FromResult(true));
+                A.CallTo(() => _fakeFulfilmentAncillaryFiles.CreateEncUpdateCsv(salesCatalogueDataResponse, FakeBatchValue.LargeExchangeSetMediaInfoPath6, FakeBatchValue.BatchId, FakeBatchValue.CorrelationId)).Returns(Task.FromResult(true));
+                A.CallTo(() => _fakeFileBuilder.CreateLargeMediaExchangesetCatalogFile(FakeBatchValue.BatchId, FakeBatchValue.LargeExchangeSetMediaPath5, FakeBatchValue.CorrelationId, fulfilmentDataResponses, salesCatalogueDataResponse, salesCatalogueProductResponse)).Returns(Task.FromResult(true));
+                A.CallTo(() => _fakeFileBuilder.CreateLargeMediaExchangesetCatalogFile(FakeBatchValue.BatchId, FakeBatchValue.LargeExchangeSetMediaPath6, FakeBatchValue.CorrelationId, fulfilmentDataResponses, salesCatalogueDataResponse, salesCatalogueProductResponse)).Returns(Task.FromResult(true));
 
-            var result = await _exchangeSetBuilder.CreateStandardLargeMediaExchangeSet(batch, largeExchangeSetDataResponse, FakeBatchValue.LargeExchangeSetFolderNamePattern, FakeBatchValue.BatchPath);
+                var result = await _exchangeSetBuilder.CreateStandardLargeMediaExchangeSet(batch, largeExchangeSetDataResponse, FakeBatchValue.LargeExchangeSetFolderNamePattern, FakeBatchValue.BatchPath, _cancellationTokenSource, _cancellationToken);
 
-            Assert.That(result, Is.True);
-            A.CallTo(() => _fakeFulfilmentFileShareService.QueryFileShareServiceData(A<List<Products>>.Ignored, message, A<CancellationTokenSource>.Ignored, A<CancellationToken>.Ignored, FakeBatchValue.LargeExchangeSetEncRootPattern, FakeBatchValue.S63BusinessUnit)).MustHaveHappenedOnceExactly();
-            A.CallTo(() => _fakeFileSystemHelper.GetDirectoryInfo(FakeBatchValue.BatchPath)).MustHaveHappenedOnceExactly();
+                Assert.That(result, Is.True);
+                A.CallTo(() => _fakeFulfilmentFileShareService.QueryFileShareServiceData(A<List<Products>>.Ignored, message, A<CancellationTokenSource>.Ignored, A<CancellationToken>.Ignored, FakeBatchValue.LargeExchangeSetEncRootPattern, FakeBatchValue.S63BusinessUnit)).MustHaveHappenedOnceExactly();
+                A.CallTo(() => _fakeFileSystemHelper.GetDirectoryInfo(FakeBatchValue.BatchPath)).MustHaveHappenedOnceExactly();
 
-            // The following calls are made twice, once per M0* directory
-            A.CallTo(() => _fakeFileSystemHelper.CheckAndCreateFolder(FakeBatchValue.LargeExchangeSetMediaPath5)).MustHaveHappenedOnceExactly();
-            A.CallTo(() => _fakeFileSystemHelper.CheckAndCreateFolder(FakeBatchValue.LargeExchangeSetMediaInfoPath5)).MustHaveHappenedOnceExactly();
-            A.CallTo(() => _fakeFileSystemHelper.CheckAndCreateFolder(FakeBatchValue.LargeExchangeSetMediaInfoAdcPath5)).MustHaveHappenedOnceExactly();
-            A.CallTo(() => _fakeFileSystemHelper.CheckAndCreateFolder(FakeBatchValue.LargeExchangeSetMediaPath6)).MustHaveHappenedOnceExactly();
-            A.CallTo(() => _fakeFileSystemHelper.CheckAndCreateFolder(FakeBatchValue.LargeExchangeSetMediaInfoPath6)).MustHaveHappenedOnceExactly();
-            A.CallTo(() => _fakeFileSystemHelper.CheckAndCreateFolder(FakeBatchValue.LargeExchangeSetMediaInfoAdcPath6)).MustHaveHappenedOnceExactly();
-            A.CallTo(() => _fakeFulfilmentAncillaryFiles.CreateMediaFile(FakeBatchValue.BatchId, FakeBatchValue.LargeExchangeSetMediaPath5, FakeBatchValue.CorrelationId, FakeBatchValue.MediaBaseNumber5)).MustHaveHappenedOnceExactly();
-            A.CallTo(() => _fakeFulfilmentAncillaryFiles.CreateMediaFile(FakeBatchValue.BatchId, FakeBatchValue.LargeExchangeSetMediaPath6, FakeBatchValue.CorrelationId, FakeBatchValue.MediaBaseNumber6)).MustHaveHappenedOnceExactly();
-            A.CallTo(() => _fakeDownloader.DownloadLargeMediaReadMeFile(FakeBatchValue.BatchId, FakeBatchValue.LargeExchangeSetMediaPath5, FakeBatchValue.CorrelationId)).MustHaveHappenedOnceExactly();
-            A.CallTo(() => _fakeDownloader.DownloadLargeMediaReadMeFile(FakeBatchValue.BatchId, FakeBatchValue.LargeExchangeSetMediaPath6, FakeBatchValue.CorrelationId)).MustHaveHappenedOnceExactly();
-            A.CallTo(() => _fakeFileBuilder.CreateLargeMediaSerialEncFile(FakeBatchValue.BatchId, FakeBatchValue.BatchPath, FakeBatchValue.LargeExchangeSetFolderName5, FakeBatchValue.CorrelationId)).MustHaveHappenedOnceExactly();
-            A.CallTo(() => _fakeFileBuilder.CreateLargeMediaSerialEncFile(FakeBatchValue.BatchId, FakeBatchValue.BatchPath, FakeBatchValue.LargeExchangeSetFolderName6, FakeBatchValue.CorrelationId)).MustHaveHappenedOnceExactly();
-            A.CallTo(() => _fakeFileBuilder.CreateProductFile(FakeBatchValue.BatchId, FakeBatchValue.LargeExchangeSetMediaInfoPath5, FakeBatchValue.CorrelationId, salesCatalogueDataResponse, message.ScsRequestDateTime, true)).MustHaveHappenedOnceExactly();
-            A.CallTo(() => _fakeFileBuilder.CreateProductFile(FakeBatchValue.BatchId, FakeBatchValue.LargeExchangeSetMediaInfoPath6, FakeBatchValue.CorrelationId, salesCatalogueDataResponse, message.ScsRequestDateTime, true)).MustHaveHappenedOnceExactly();
-            A.CallTo(() => _fakeDownloader.DownloadInfoFolderFiles(FakeBatchValue.BatchId, FakeBatchValue.LargeExchangeSetMediaInfoPath5, FakeBatchValue.CorrelationId)).MustHaveHappenedOnceExactly();
-            A.CallTo(() => _fakeDownloader.DownloadInfoFolderFiles(FakeBatchValue.BatchId, FakeBatchValue.LargeExchangeSetMediaInfoPath6, FakeBatchValue.CorrelationId)).MustHaveHappenedOnceExactly();
-            A.CallTo(() => _fakeDownloader.DownloadAdcFolderFiles(FakeBatchValue.BatchId, FakeBatchValue.LargeExchangeSetMediaInfoAdcPath5, FakeBatchValue.CorrelationId)).MustHaveHappenedOnceExactly();
-            A.CallTo(() => _fakeDownloader.DownloadAdcFolderFiles(FakeBatchValue.BatchId, FakeBatchValue.LargeExchangeSetMediaInfoAdcPath6, FakeBatchValue.CorrelationId)).MustHaveHappenedOnceExactly();
-            A.CallTo(() => _fakeFulfilmentAncillaryFiles.CreateEncUpdateCsv(salesCatalogueDataResponse, FakeBatchValue.LargeExchangeSetMediaInfoPath5, FakeBatchValue.BatchId, FakeBatchValue.CorrelationId)).MustHaveHappenedOnceExactly();
-            A.CallTo(() => _fakeFulfilmentAncillaryFiles.CreateEncUpdateCsv(salesCatalogueDataResponse, FakeBatchValue.LargeExchangeSetMediaInfoPath6, FakeBatchValue.BatchId, FakeBatchValue.CorrelationId)).MustHaveHappenedOnceExactly();
-            A.CallTo(() => _fakeFileBuilder.CreateLargeMediaExchangesetCatalogFile(FakeBatchValue.BatchId, FakeBatchValue.LargeExchangeSetMediaPath5, FakeBatchValue.CorrelationId, fulfilmentDataResponses, salesCatalogueDataResponse, salesCatalogueProductResponse)).MustHaveHappenedOnceExactly();
-            A.CallTo(() => _fakeFileBuilder.CreateLargeMediaExchangesetCatalogFile(FakeBatchValue.BatchId, FakeBatchValue.LargeExchangeSetMediaPath6, FakeBatchValue.CorrelationId, fulfilmentDataResponses, salesCatalogueDataResponse, salesCatalogueProductResponse)).MustHaveHappenedOnceExactly();
+                // The following calls are made twice, once per M0* directory
+                A.CallTo(() => _fakeFileSystemHelper.CheckAndCreateFolder(FakeBatchValue.LargeExchangeSetMediaPath5)).MustHaveHappenedOnceExactly();
+                A.CallTo(() => _fakeFileSystemHelper.CheckAndCreateFolder(FakeBatchValue.LargeExchangeSetMediaInfoPath5)).MustHaveHappenedOnceExactly();
+                A.CallTo(() => _fakeFileSystemHelper.CheckAndCreateFolder(FakeBatchValue.LargeExchangeSetMediaInfoAdcPath5)).MustHaveHappenedOnceExactly();
+                A.CallTo(() => _fakeFileSystemHelper.CheckAndCreateFolder(FakeBatchValue.LargeExchangeSetMediaPath6)).MustHaveHappenedOnceExactly();
+                A.CallTo(() => _fakeFileSystemHelper.CheckAndCreateFolder(FakeBatchValue.LargeExchangeSetMediaInfoPath6)).MustHaveHappenedOnceExactly();
+                A.CallTo(() => _fakeFileSystemHelper.CheckAndCreateFolder(FakeBatchValue.LargeExchangeSetMediaInfoAdcPath6)).MustHaveHappenedOnceExactly();
+                A.CallTo(() => _fakeFulfilmentAncillaryFiles.CreateMediaFile(FakeBatchValue.BatchId, FakeBatchValue.LargeExchangeSetMediaPath5, FakeBatchValue.CorrelationId, FakeBatchValue.MediaBaseNumber5)).MustHaveHappenedOnceExactly();
+                A.CallTo(() => _fakeFulfilmentAncillaryFiles.CreateMediaFile(FakeBatchValue.BatchId, FakeBatchValue.LargeExchangeSetMediaPath6, FakeBatchValue.CorrelationId, FakeBatchValue.MediaBaseNumber6)).MustHaveHappenedOnceExactly();
+                A.CallTo(() => _fakeDownloader.DownloadLargeMediaReadMeFile(FakeBatchValue.BatchId, FakeBatchValue.LargeExchangeSetMediaPath5, FakeBatchValue.CorrelationId)).MustHaveHappenedOnceExactly();
+                A.CallTo(() => _fakeDownloader.DownloadLargeMediaReadMeFile(FakeBatchValue.BatchId, FakeBatchValue.LargeExchangeSetMediaPath6, FakeBatchValue.CorrelationId)).MustHaveHappenedOnceExactly();
+                A.CallTo(() => _fakeFileBuilder.CreateLargeMediaSerialEncFile(FakeBatchValue.BatchId, FakeBatchValue.BatchPath, FakeBatchValue.LargeExchangeSetFolderName5, FakeBatchValue.CorrelationId)).MustHaveHappenedOnceExactly();
+                A.CallTo(() => _fakeFileBuilder.CreateLargeMediaSerialEncFile(FakeBatchValue.BatchId, FakeBatchValue.BatchPath, FakeBatchValue.LargeExchangeSetFolderName6, FakeBatchValue.CorrelationId)).MustHaveHappenedOnceExactly();
+                A.CallTo(() => _fakeFileBuilder.CreateProductFile(FakeBatchValue.BatchId, FakeBatchValue.LargeExchangeSetMediaInfoPath5, FakeBatchValue.CorrelationId, salesCatalogueDataResponse, message.ScsRequestDateTime, true)).MustHaveHappenedOnceExactly();
+                A.CallTo(() => _fakeFileBuilder.CreateProductFile(FakeBatchValue.BatchId, FakeBatchValue.LargeExchangeSetMediaInfoPath6, FakeBatchValue.CorrelationId, salesCatalogueDataResponse, message.ScsRequestDateTime, true)).MustHaveHappenedOnceExactly();
+                A.CallTo(() => _fakeDownloader.DownloadInfoFolderFiles(FakeBatchValue.BatchId, FakeBatchValue.LargeExchangeSetMediaInfoPath5, FakeBatchValue.CorrelationId)).MustHaveHappenedOnceExactly();
+                A.CallTo(() => _fakeDownloader.DownloadInfoFolderFiles(FakeBatchValue.BatchId, FakeBatchValue.LargeExchangeSetMediaInfoPath6, FakeBatchValue.CorrelationId)).MustHaveHappenedOnceExactly();
+                A.CallTo(() => _fakeDownloader.DownloadAdcFolderFiles(FakeBatchValue.BatchId, FakeBatchValue.LargeExchangeSetMediaInfoAdcPath5, FakeBatchValue.CorrelationId)).MustHaveHappenedOnceExactly();
+                A.CallTo(() => _fakeDownloader.DownloadAdcFolderFiles(FakeBatchValue.BatchId, FakeBatchValue.LargeExchangeSetMediaInfoAdcPath6, FakeBatchValue.CorrelationId)).MustHaveHappenedOnceExactly();
+                A.CallTo(() => _fakeFulfilmentAncillaryFiles.CreateEncUpdateCsv(salesCatalogueDataResponse, FakeBatchValue.LargeExchangeSetMediaInfoPath5, FakeBatchValue.BatchId, FakeBatchValue.CorrelationId)).MustHaveHappenedOnceExactly();
+                A.CallTo(() => _fakeFulfilmentAncillaryFiles.CreateEncUpdateCsv(salesCatalogueDataResponse, FakeBatchValue.LargeExchangeSetMediaInfoPath6, FakeBatchValue.BatchId, FakeBatchValue.CorrelationId)).MustHaveHappenedOnceExactly();
+                A.CallTo(() => _fakeFileBuilder.CreateLargeMediaExchangesetCatalogFile(FakeBatchValue.BatchId, FakeBatchValue.LargeExchangeSetMediaPath5, FakeBatchValue.CorrelationId, fulfilmentDataResponses, salesCatalogueDataResponse, salesCatalogueProductResponse)).MustHaveHappenedOnceExactly();
+                A.CallTo(() => _fakeFileBuilder.CreateLargeMediaExchangesetCatalogFile(FakeBatchValue.BatchId, FakeBatchValue.LargeExchangeSetMediaPath6, FakeBatchValue.CorrelationId, fulfilmentDataResponses, salesCatalogueDataResponse, salesCatalogueProductResponse)).MustHaveHappenedOnceExactly();
 
-            _fakeLogger.VerifyLogEntry(EventIds.LargeExchangeSetCreatedWithError, "Large media exchange set is not created for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", logLevel: LogLevel.Error, times: 0);
-            _fakeLogger.VerifyLogEntry(EventIds.LargeExchangeSetCreatedWithError, "Operation Cancelled as product validation failed for BatchId:{BatchId}, _X-Correlation-ID:{CorrelationId} and Validation message :{Message}", logLevel: LogLevel.Error, times: 0);
-        }
+                _fakeLogger.VerifyLogEntry(EventIds.LargeExchangeSetCreatedWithError, "Large media exchange set is not created for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", logLevel: LogLevel.Error, times: 0);
+                _fakeLogger.VerifyLogEntry(EventIds.LargeExchangeSetCreatedWithError, "Operation Cancelled as product validation failed for BatchId:{BatchId}, _X-Correlation-ID:{CorrelationId} and Validation message :{Message}", logLevel: LogLevel.Error, times: 0);
+            }
 
         [Test]
         public void WhenCreateStandardLargeMediaExchangeSet_ProductValidationFails_ThrowsFulfilmentException()
@@ -306,7 +323,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.FileBuilders
 
             A.CallTo(() => _fakeProductDataValidator.Validate(A<List<Products>>.Ignored)).Returns(Task.FromResult(validationResult));
 
-            Assert.ThrowsAsync<FulfilmentException>(async () => await _exchangeSetBuilder.CreateStandardLargeMediaExchangeSet(batch, largeResponse, FakeBatchValue.LargeExchangeSetFolderNamePattern, FakeBatchValue.BatchPath));
+            Assert.ThrowsAsync<FulfilmentException>(async () => await _exchangeSetBuilder.CreateStandardLargeMediaExchangeSet(batch, largeResponse, FakeBatchValue.LargeExchangeSetFolderNamePattern, FakeBatchValue.BatchPath, _cancellationTokenSource, _cancellationToken));
 
             _fakeLogger.VerifyLogEntry(EventIds.LargeExchangeSetCreatedWithError, "Large media exchange set is not created for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", logLevel: LogLevel.Error);
             _fakeLogger.VerifyLogEntry(EventIds.LargeExchangeSetCreatedWithError, "Operation Cancelled as product validation failed for BatchId:{BatchId}, _X-Correlation-ID:{CorrelationId} and Validation message :{Message}", logLevel: LogLevel.Error);

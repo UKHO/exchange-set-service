@@ -16,7 +16,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
 {
     public static class CommonHelper
     {
-        public static bool IsPeriodicOutputService { get; set; }
+        public static bool IsLargeLayout { get; set; }
 
         public static IEnumerable<List<T>> SplitList<T>(List<T> masterList, int nSize = 30)
         {
