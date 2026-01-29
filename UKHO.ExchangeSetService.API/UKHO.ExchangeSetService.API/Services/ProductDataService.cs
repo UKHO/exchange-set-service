@@ -94,7 +94,7 @@ namespace UKHO.ExchangeSetService.API.Services
             if (!string.IsNullOrEmpty(exchangeSetServiceResponse.BatchId))
             {
                 CheckEmptyExchangeSet(exchangeSetServiceResponse);
-                var successful = await SaveSalesCatalogueStorageDetails(salesCatalogueResponse.ResponseBody, exchangeSetServiceResponse.BatchId, productIdentifierRequest.CallbackUri, productIdentifierRequest.ExchangeSetStandard, productIdentifierRequest.CorrelationId, expiryDate, salesCatalogueResponse.ScsRequestDateTime, isEmptyEncExchangeSet, isEmptyAioExchangeSet, exchangeSetServiceResponse.ExchangeSetResponse);
+                var successful = await SaveSalesCatalogueStorageDetails(salesCatalogueResponse.ResponseBody, exchangeSetServiceResponse.BatchId, productIdentifierRequest.CallbackUri, productIdentifierRequest.ExchangeSetStandard, productIdentifierRequest.CorrelationId, expiryDate, salesCatalogueResponse.ScsRequestDateTime, isEmptyEncExchangeSet, isEmptyAioExchangeSet, exchangeSetServiceResponse.ExchangeSetResponse, productIdentifierRequest.ExchangeSetLayout ?? ExchangeSetLayout.standard.ToString());
                 if (!successful)
                 {
                     logger.LogInformation(EventIds.CreateProductDataError.ToEventId(), "CreateProductDataByProductIdentifiers failed for BatchId:{BatchId} | _X-Correlation-ID : {CorrelationId}", exchangeSetServiceResponse.BatchId, productIdentifierRequest.CorrelationId);
@@ -236,7 +236,7 @@ namespace UKHO.ExchangeSetService.API.Services
             {
                 CheckEmptyExchangeSet(exchangeSetServiceResponse);
 
-                var successful = await SaveSalesCatalogueStorageDetails(salesCatalogueResponse.ResponseBody, exchangeSetServiceResponse.BatchId, request.CallbackUri, request.ExchangeSetStandard, request.CorrelationId, expiryDate, salesCatalogueResponse.ScsRequestDateTime, isEmptyEncExchangeSet, isEmptyAioExchangeSet, exchangeSetServiceResponse.ExchangeSetResponse);
+                var successful = await SaveSalesCatalogueStorageDetails(salesCatalogueResponse.ResponseBody, exchangeSetServiceResponse.BatchId, request.CallbackUri, request.ExchangeSetStandard, request.CorrelationId, expiryDate, salesCatalogueResponse.ScsRequestDateTime, isEmptyEncExchangeSet, isEmptyAioExchangeSet, exchangeSetServiceResponse.ExchangeSetResponse, request.ExchangeSetLayout ?? ExchangeSetLayout.standard.ToString());
                 if (!successful)
                 {
                     logger.LogInformation(EventIds.CreateProductDataError.ToEventId(), "CreateProductDataByProductVersions failed for BatchId:{BatchId} | _X-Correlation-ID : {CorrelationId}", exchangeSetServiceResponse.BatchId, request.CorrelationId);
@@ -299,7 +299,7 @@ namespace UKHO.ExchangeSetService.API.Services
 
             if (!string.IsNullOrEmpty(exchangeSetServiceResponse.BatchId))
             {
-                var successful = await SaveSalesCatalogueStorageDetails(salesCatalogueResponse.ResponseBody, exchangeSetServiceResponse.BatchId, productDataSinceDateTimeRequest.CallbackUri, productDataSinceDateTimeRequest.ExchangeSetStandard, productDataSinceDateTimeRequest.CorrelationId, expiryDate, salesCatalogueResponse.ScsRequestDateTime, isEmptyEncExchangeSet, isEmptyAioExchangeSet, exchangeSetServiceResponse.ExchangeSetResponse);
+                var successful = await SaveSalesCatalogueStorageDetails(salesCatalogueResponse.ResponseBody, exchangeSetServiceResponse.BatchId, productDataSinceDateTimeRequest.CallbackUri, productDataSinceDateTimeRequest.ExchangeSetStandard, productDataSinceDateTimeRequest.CorrelationId, expiryDate, salesCatalogueResponse.ScsRequestDateTime, isEmptyEncExchangeSet, isEmptyAioExchangeSet, exchangeSetServiceResponse.ExchangeSetResponse, productDataSinceDateTimeRequest.ExchangeSetLayout ?? ExchangeSetLayout.standard.ToString());
                 if (!successful)
                 {
                     logger.LogInformation(EventIds.CreateProductDataError.ToEventId(), "CreateProductDataSinceDateTime failed for BatchId:{BatchId} | _X-Correlation-ID : {CorrelationId}", exchangeSetServiceResponse.BatchId, productDataSinceDateTimeRequest.CorrelationId);
@@ -412,14 +412,14 @@ namespace UKHO.ExchangeSetService.API.Services
             return (salesCatalougeResponse.LastModified.HasValue) ? salesCatalougeResponse.LastModified.Value.ToString(RFC1123Format) : null;
         }
 
-        private Task<bool> SaveSalesCatalogueStorageDetails(SalesCatalogueProductResponse salesCatalogueResponse, string batchId, string callBackUri, string exchangeSetStandard, string correlationId, string expiryDate, DateTime scsRequestDateTime, bool isEmptyEncExchangeSet, bool isEmptyAioExchangeSet, ExchangeSetResponse exchangeSetResponse)
+        private Task<bool> SaveSalesCatalogueStorageDetails(SalesCatalogueProductResponse salesCatalogueResponse, string batchId, string callBackUri, string exchangeSetStandard, string correlationId, string expiryDate, DateTime scsRequestDateTime, bool isEmptyEncExchangeSet, bool isEmptyAioExchangeSet, ExchangeSetResponse exchangeSetResponse, string exchangeSetLayout)
         {
             return logger.LogStartEndAndElapsedTimeAsync(EventIds.SCSResponseStoreRequestStart,
                 EventIds.SCSResponseStoreRequestCompleted,
                 "SCS response store request for BatchId:{batchId} and _X-Correlation-ID:{CorrelationId}",
                 async () =>
                 {
-                    bool result = await exchangeSetStorageProvider.SaveSalesCatalogueStorageDetails(salesCatalogueResponse, batchId, callBackUri, exchangeSetStandard, correlationId, expiryDate, scsRequestDateTime, isEmptyEncExchangeSet, isEmptyAioExchangeSet, exchangeSetResponse);
+                    bool result = await exchangeSetStorageProvider.SaveSalesCatalogueStorageDetails(salesCatalogueResponse, batchId, callBackUri, exchangeSetStandard, correlationId, expiryDate, scsRequestDateTime, isEmptyEncExchangeSet, isEmptyAioExchangeSet, exchangeSetResponse, exchangeSetLayout);
 
                     return result;
                 }, batchId, correlationId);

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.IO.Abstractions;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -86,6 +87,9 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             bool isExchangeSetFolderCreated = false;
             bool isZipAndUploadSuccessful = false;
 
+            var cancellationTokenSource = new CancellationTokenSource();
+            var cancellationToken = cancellationTokenSource.Token;
+
             var response = new LargeExchangeSetDataResponse
             {
                 //Get SCS catalogue essData response
@@ -112,7 +116,7 @@ namespace UKHO.ExchangeSetService.FulfilmentService.Services
             {
                 response.SalesCatalogueDataResponse.ResponseBody = response.SalesCatalogueDataResponse.ResponseBody
                                                                    .Where(x => !aioCells.Any(productName => productName == x.ProductName)).ToList();
-                isExchangeSetFolderCreated = await exchangeSetBuilder.CreateStandardLargeMediaExchangeSet(batch, response, largeExchangeSetFolderName, batch.BatchDirectory);
+                isExchangeSetFolderCreated = await exchangeSetBuilder.CreateStandardLargeMediaExchangeSet(batch, response, largeExchangeSetFolderName, batch.BatchDirectory, cancellationTokenSource, cancellationToken);
 
                 if (!isExchangeSetFolderCreated)
                 {

@@ -572,7 +572,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
                 Cancellation = new Cancellation { EditionNumber = 3, UpdateNumber = 0 }
             });
             A.CallTo(() => fakeFileShareServiceCache.GetNonCachedProductDataForFss(A<List<Products>>.Ignored, A<SearchBatchResponse>.Ignored, A<string>.Ignored, A<SalesCatalogueServiceResponseQueueMessage>.Ignored, A<CancellationTokenSource>.Ignored, A<CancellationToken>.Ignored, A<string>.Ignored)).Returns(productList);
-            CommonHelper.IsPeriodicOutputService = false;
+            CommonHelper.IsLargeLayout = false;
 
             var response = await fileShareService.GetBatchInfoBasedOnProducts(productList, GetScsResponseQueueMessage(), null, CancellationToken.None, string.Empty, businessUnit);
 
@@ -1235,7 +1235,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
                    correlationIdParam = correlationId;
                })
                .Returns(httpResponse);
-            CommonHelper.IsPeriodicOutputService = true;
+            CommonHelper.IsLargeLayout = true;
 
             var response = await fileShareService.GetBatchInfoBasedOnProducts(GetProductdetails(), GetScsResponseQueueMessage(), null, CancellationToken.None, string.Empty, businessUnit);
 
@@ -1317,7 +1317,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
                 Bundle = new List<Bundle> { new Bundle { BundleType = "DVD", Location = "M1;B1" } }
             });
             A.CallTo(() => fakeFileShareServiceCache.GetNonCachedProductDataForFss(A<List<Products>>.Ignored, A<SearchBatchResponse>.Ignored, A<string>.Ignored, A<SalesCatalogueServiceResponseQueueMessage>.Ignored, A<CancellationTokenSource>.Ignored, A<CancellationToken>.Ignored, A<string>.Ignored)).Returns(productList);
-            CommonHelper.IsPeriodicOutputService = true;
+            CommonHelper.IsLargeLayout = true;
 
             var response = await fileShareService.GetBatchInfoBasedOnProducts(productList, GetScsResponseQueueMessage(), null, CancellationToken.None, string.Empty, businessUnit);
 
@@ -1656,7 +1656,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
                    correlationIdParam = correlationId;
                })
                .Returns(httpResponse);
-            CommonHelper.IsPeriodicOutputService = true;
+            CommonHelper.IsLargeLayout = true;
             fakeAioConfiguration.Value.AioCells = "GB800001";
 
             var response = await fileShareService.GetBatchInfoBasedOnProducts(GetAioProductdetails(), GetScsResponseQueueMessage(), null, CancellationToken.None, string.Empty, businessUnit);

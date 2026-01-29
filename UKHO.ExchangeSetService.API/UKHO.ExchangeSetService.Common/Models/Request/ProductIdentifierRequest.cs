@@ -6,5 +6,6 @@
         public string CallbackUri { get; set; }
         public string ExchangeSetStandard { get; set; }
         public string CorrelationId { get; set; }
+        public string ExchangeSetLayout { get; set; }
     }
 }

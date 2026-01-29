@@ -137,7 +137,7 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             logger.LogInformation(EventIds.FileShareServiceSearchENCFilesFromCacheCompleted.ToEventId(), "File share service search request from cache completed for Product/CellName:{ProductName}, EditionNumber:{EditionNumber}, UpdateNumber:{UpdateNumber} and BusinessUnit:{BusinessUnit}. BatchId:{batchId} and _X-Correlation-ID:{CorrelationId}", item.ProductName, item.EditionNumber, itemUpdateNumber, businessUnit, queueMessage.BatchId, queueMessage.CorrelationId);
             string downloadPath;
 
-            if (CommonHelper.IsPeriodicOutputService)
+            if (CommonHelper.IsLargeLayout)
             {
                 var bundleLocation = item.Bundle.FirstOrDefault().Location.Split(";");
                 exchangeSetRootPath = string.Format(exchangeSetRootPath, bundleLocation[0].Substring(1, 1), bundleLocation[1]);
