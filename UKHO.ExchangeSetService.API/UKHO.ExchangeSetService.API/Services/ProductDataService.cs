@@ -1,13 +1,12 @@
-﻿using AutoMapper;
-using FluentValidation.Results;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
+using FluentValidation.Results;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using UKHO.ExchangeSetService.API.Configuration;
 using UKHO.ExchangeSetService.API.Validation;
 using UKHO.ExchangeSetService.Common.Configuration;
@@ -29,7 +28,6 @@ namespace UKHO.ExchangeSetService.API.Services
         IScsProductIdentifierValidator scsProductIdentifierValidator,
         IProductDataSinceDateTimeValidator productDataSinceDateTimeValidator,
         ISalesCatalogueService salesCatalogueService,
-        IMapper mapper,
         IFileShareService fileShareService,
         ILogger<ProductDataService> logger, IExchangeSetStorageProvider exchangeSetStorageProvider,
         IOptions<EssFulfilmentStorageConfiguration> essFulfilmentStorageconfig, IMonitorHelper monitorHelper,
@@ -400,10 +398,21 @@ namespace UKHO.ExchangeSetService.API.Services
                 }, correlationId);
         }
 
-        private ExchangeSetResponse MapExchangeSetResponse(SalesCatalogueResponse salesCatalougeResponse)
+        private static ExchangeSetResponse MapExchangeSetResponse(SalesCatalogueResponse salesCatalogueResponse)
         {
-            var model = mapper.Map<ExchangeSetResponse>(salesCatalougeResponse.ResponseBody?.ProductCounts);
-            model.RequestedProductsNotInExchangeSet = mapper.Map<IEnumerable<RequestedProductsNotInExchangeSet>>(salesCatalougeResponse.ResponseBody?.ProductCounts?.RequestedProductsNotReturned).ToList();
+            var model = new ExchangeSetResponse();
+            var productCounts = salesCatalogueResponse.ResponseBody?.ProductCounts;
+
+            if (productCounts is not null)
+            {
+                model.RequestedProductCount = productCounts.RequestedProductCount ?? 0;
+                model.ExchangeSetCellCount = productCounts.ReturnedProductCount ?? 0;
+                model.RequestedProductsAlreadyUpToDateCount = productCounts.RequestedProductsAlreadyUpToDateCount ?? 0;
+                model.RequestedProductsNotInExchangeSet = productCounts.RequestedProductsNotReturned is null
+                                    ? []
+                                    : productCounts.RequestedProductsNotReturned.ConvertAll(x => new RequestedProductsNotInExchangeSet { ProductName = x.ProductName, Reason = x.Reason });
+            }
+
             return model;
         }
 
