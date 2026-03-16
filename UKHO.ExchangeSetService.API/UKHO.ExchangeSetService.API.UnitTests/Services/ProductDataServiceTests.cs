@@ -663,8 +663,10 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
                 }, azureAdToken);
 
             var exchangeSetResponseWithAio = GetExchangeSetResponseWithAio();
+            exchangeSetResponseWithAio.RequestedProductCount = (int)salesCatalogueResponse.ResponseBody.ProductCounts.RequestedProductCount - 1; // Subtract 1 for AIO cell
+            exchangeSetResponseWithAio.ExchangeSetCellCount = salesCatalogueResponse.ResponseBody.Products.Count - 1;                            // Subtract 1 for AIO cell
 
-            Assert.Multiple(() =>
+            using (Assert.EnterMultipleScope())
             {
                 Assert.That(result.HttpStatusCode, Is.EqualTo(HttpStatusCode.Created));
                 Assert.That(exchangeSetResponseWithAio.ExchangeSetCellCount, Is.EqualTo(result.ExchangeSetResponse.ExchangeSetCellCount));
@@ -681,7 +683,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
                 Assert.That(exchangeSetResponseWithAio.RequestedAioProductsAlreadyUpToDateCount, Is.EqualTo(result.ExchangeSetResponse.RequestedAioProductsAlreadyUpToDateCount));
                 Assert.That(exchangeSetResponseWithAio.RequestedProductsNotInExchangeSet, Has.Count.EqualTo(result.ExchangeSetResponse.RequestedProductsNotInExchangeSet.Count));
                 Assert.That(exchangeSetResponseWithAio.Links.AioExchangeSetFileUri.Href, Is.EqualTo(result.ExchangeSetResponse.Links.AioExchangeSetFileUri.Href));
-            });
+            }
 
             A.CallTo(logger).Where(call => call.Method.Name == "Log"
             && call.GetArgument<LogLevel>(0) == LogLevel.Information
@@ -1272,9 +1274,12 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
             }, azureAdToken);
 
             var exchangeSetResponseWithAio = GetExchangeSetResponseWithAio();
+            exchangeSetResponseWithAio.RequestedProductCount = (int)salesCatalogueResponse.ResponseBody.ProductCounts.RequestedProductCount - 1; // Subtract 1 for AIO cell
+            exchangeSetResponseWithAio.ExchangeSetCellCount = salesCatalogueResponse.ResponseBody.Products.Count - 1;                            // Subtract 1 for AIO cell
 
             Assert.That(result, Is.InstanceOf<ExchangeSetServiceResponse>());
-            Assert.Multiple(() =>
+
+            using (Assert.EnterMultipleScope())
             {
                 Assert.That(result.HttpStatusCode, Is.EqualTo(HttpStatusCode.Created));
                 Assert.That(exchangeSetResponseWithAio.ExchangeSetCellCount, Is.EqualTo(result.ExchangeSetResponse.ExchangeSetCellCount));
@@ -1291,7 +1296,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
                 Assert.That(exchangeSetResponseWithAio.RequestedAioProductsAlreadyUpToDateCount, Is.EqualTo(result.ExchangeSetResponse.RequestedAioProductsAlreadyUpToDateCount));
                 Assert.That(exchangeSetResponseWithAio.RequestedProductsNotInExchangeSet, Has.Count.EqualTo(result.ExchangeSetResponse.RequestedProductsNotInExchangeSet.Count));
                 Assert.That(exchangeSetResponseWithAio.Links.AioExchangeSetFileUri.Href, Is.EqualTo(result.ExchangeSetResponse.Links.AioExchangeSetFileUri.Href));
-            });
+            }
 
             A.CallTo(logger).Where(call => call.Method.Name == "Log"
             && call.GetArgument<LogLevel>(0) == LogLevel.Information
@@ -1693,13 +1698,14 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
             var result = await service.CreateProductDataSinceDateTime(new ProductDataSinceDateTimeRequest(), GetAzureB2CToken());//B2C token passed and file size less than 300 mb
 
             var exchangeSetResponseWithAio = GetExchangeSetResponseWithAio();
-            exchangeSetResponseWithAio.RequestedProductCount = 0;
-            exchangeSetResponseWithAio.ExchangeSetCellCount = 0;
+            exchangeSetResponseWithAio.RequestedProductCount = (int)salesCatalogueResponse.ResponseBody.ProductCounts.RequestedProductCount;
+            exchangeSetResponseWithAio.ExchangeSetCellCount = (int)salesCatalogueResponse.ResponseBody.ProductCounts.ReturnedProductCount - 1; // Subtract 1 for AIO cell
+            exchangeSetResponseWithAio.RequestedProductsAlreadyUpToDateCount = (int)salesCatalogueResponse.ResponseBody.ProductCounts.RequestedProductsAlreadyUpToDateCount;
             exchangeSetResponseWithAio.RequestedProductsNotInExchangeSet = new List<RequestedProductsNotInExchangeSet>();
             exchangeSetResponseWithAio.RequestedAioProductCount = 0;
 
             Assert.That(result, Is.InstanceOf<ExchangeSetServiceResponse>());
-            Assert.Multiple(() =>
+            using (Assert.EnterMultipleScope())
             {
                 Assert.That(result.HttpStatusCode, Is.EqualTo(HttpStatusCode.Created));
                 Assert.That(exchangeSetResponseWithAio.ExchangeSetCellCount, Is.EqualTo(result.ExchangeSetResponse.ExchangeSetCellCount));
@@ -1715,7 +1721,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
                 Assert.That(exchangeSetResponseWithAio.RequestedAioProductsAlreadyUpToDateCount, Is.EqualTo(result.ExchangeSetResponse.RequestedAioProductsAlreadyUpToDateCount));
                 Assert.That(exchangeSetResponseWithAio.RequestedProductsNotInExchangeSet, Has.Count.EqualTo(result.ExchangeSetResponse.RequestedProductsNotInExchangeSet.Count));
                 Assert.That(exchangeSetResponseWithAio.Links.AioExchangeSetFileUri.Href, Is.EqualTo(result.ExchangeSetResponse.Links.AioExchangeSetFileUri.Href));
-            });
+            }
 
             A.CallTo(logger).Where(call => call.Method.Name == "Log"
             && call.GetArgument<LogLevel>(0) == LogLevel.Information
