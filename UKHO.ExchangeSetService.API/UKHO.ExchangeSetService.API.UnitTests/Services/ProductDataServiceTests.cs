@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
-using AutoMapper;
 using FakeItEasy;
 using FluentValidation.Results;
 using Microsoft.Extensions.Logging;
@@ -36,7 +35,6 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
         private ISalesCatalogueService fakeSalesCatalogueService;
         private IFileShareService fakeFileShareService;
         private ILogger<ProductDataService> logger;
-        private IMapper fakeMapper;
         private IExchangeSetStorageProvider fakeExchangeSetStorageProvider;
         private IOptions<EssFulfilmentStorageConfiguration> fakeEssFulfilmentStorageConfig;
         private IMonitorHelper fakeMonitorHelper;
@@ -53,7 +51,6 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
             fakeProductVersionValidator = A.Fake<IProductDataProductVersionsValidator>();
             fakeProductDataSinceDateTimeValidator = A.Fake<IProductDataSinceDateTimeValidator>();
             fakeSalesCatalogueService = A.Fake<ISalesCatalogueService>();
-            fakeMapper = A.Fake<IMapper>();
             fakeFileShareService = A.Fake<IFileShareService>();
             logger = A.Fake<ILogger<ProductDataService>>();
             fakeExchangeSetStorageProvider = A.Fake<ExchangeSetStorageProvider>();
@@ -68,66 +65,11 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
             fakeScsDataSinceDateTimeValidator = A.Fake<IScsDataSinceDateTimeValidator>();
 
             service = new ProductDataService(fakeProductIdentifierValidator, fakeProductVersionValidator, fakeScsProductIdentifierValidator, fakeProductDataSinceDateTimeValidator,
-                fakeSalesCatalogueService, fakeMapper, fakeFileShareService, logger, fakeExchangeSetStorageProvider
+                fakeSalesCatalogueService, fakeFileShareService, logger, fakeExchangeSetStorageProvider
             , fakeEssFulfilmentStorageConfig, fakeMonitorHelper, fakeUserIdentifier, fakeAzureAdB2CHelper, fakeAioConfiguration, fakeScsDataSinceDateTimeValidator);
         }
 
         #region GetExchangeSetResponse
-
-        private ExchangeSetResponse GetExchangeSetResponse()
-        {
-            LinkSetBatchStatusUri linkSetBatchStatusUri = new()
-            {
-                Href = @"http://fss.ukho.gov.uk/batch/7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272/status"
-            };
-            LinkSetBatchDetailsUri linkSetBatchDetailsUri = new()
-            {
-                Href = @"http://fss.ukho.gov.uk/batch/7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272"
-            };
-            LinkSetFileUri linkSetFileUri = new()
-            {
-                Href = @"http://fss.ukho.gov.uk/batch/7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272/files/exchangeset123.zip",
-            };
-            LinkSetFileUri AiolinkSetFileUri = new()
-            {
-                Href = @"http://fss.ukho.gov.uk/batch/7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272/files/aio123.zip",
-            };
-            Common.Models.Response.Links links = new()
-            {
-                ExchangeSetBatchStatusUri = linkSetBatchStatusUri,
-                ExchangeSetBatchDetailsUri = linkSetBatchDetailsUri,
-                ExchangeSetFileUri = linkSetFileUri,
-                AioExchangeSetFileUri = AiolinkSetFileUri
-            };
-            List<RequestedProductsNotInExchangeSet> lstRequestedProductsNotInExchangeSet = new List<RequestedProductsNotInExchangeSet>()
-            {
-                new RequestedProductsNotInExchangeSet()
-                {
-                    ProductName = "GB123456",
-                    Reason = "productWithdrawn"
-                },
-                new RequestedProductsNotInExchangeSet()
-                {
-                    ProductName = "GB160060",
-                    Reason = "invalidProduct"
-                }
-            };
-            ExchangeSetResponse exchangeSetResponse = new()
-            {
-                Links = links,
-                ExchangeSetUrlExpiryDateTime = Convert.ToDateTime("2021-02-17T16:19:32.269Z").ToUniversalTime(),
-                RequestedProductsAlreadyUpToDateCount = 0,
-                RequestedProductsNotInExchangeSet = lstRequestedProductsNotInExchangeSet,
-                ExchangeSetCellCount = 1,
-                RequestedProductCount = 3
-            };
-
-                exchangeSetResponse.RequestedAioProductCount = 1;
-                exchangeSetResponse.AioExchangeSetCellCount = 1;
-                exchangeSetResponse.RequestedAioProductsAlreadyUpToDateCount = 0;
-
-            return exchangeSetResponse;
-        }
 
         private static ExchangeSetResponse GetExchangeSetResponseWithOutAio()
         {
@@ -492,11 +434,6 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
                 .Returns(salesCatalogueResponse);
             A.CallTo(() => fakeAzureAdB2CHelper.IsAzureB2CUser(A<AzureAdB2C>.Ignored, A<string>.Ignored)).Returns(false);
 
-            var exchangeSetResponse = GetExchangeSetResponse();
-            A.CallTo(() => fakeMapper.Map<ExchangeSetResponse>(A<ProductCounts>.Ignored)).Returns(exchangeSetResponse);
-            A.CallTo(() => fakeMapper.Map<IEnumerable<RequestedProductsNotInExchangeSet>>(A<List<RequestedProductsNotReturned>>.Ignored))
-                .Returns(exchangeSetResponse.RequestedProductsNotInExchangeSet);
-
             var CreateBatchResponseModel = CreateBatchResponse();
             string callBackUri = "https://exchange-set-service.com/myCallback?secret=sharedSecret&po=1234";
             string correlationId = "a6670458-9bbc-4b52-95a2-d1f50fe9e3ae";
@@ -538,10 +475,6 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
             salesCatalogueResponse.LastModified = DateTime.Now.AddDays(-4);
             A.CallTo(() => fakeSalesCatalogueService.PostProductIdentifiersAsync(A<List<string>>.Ignored, A<string>.Ignored))
                 .Returns(salesCatalogueResponse);
-            var exchangeSetResponse = GetExchangeSetResponse();
-            A.CallTo(() => fakeMapper.Map<ExchangeSetResponse>(A<ProductCounts>.Ignored)).Returns(exchangeSetResponse);
-            A.CallTo(() => fakeMapper.Map<IEnumerable<RequestedProductsNotInExchangeSet>>(A<List<RequestedProductsNotReturned>>.Ignored))
-                .Returns(exchangeSetResponse.RequestedProductsNotInExchangeSet);
             A.CallTo(() => fakeAzureAdB2CHelper.IsAzureB2CUser(A<AzureAdB2C>.Ignored, A<string>.Ignored)).Returns(true);
 
             var CreateBatchResponseModel = CreateBatchResponse();
@@ -585,10 +518,6 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
             salesCatalogueResponse.ResponseCode = HttpStatusCode.BadRequest;
             A.CallTo(() => fakeSalesCatalogueService.PostProductIdentifiersAsync(A<List<string>>.Ignored, A<string>.Ignored))
                 .Returns(salesCatalogueResponse);
-            var exchangeSetResponse = GetExchangeSetResponse();
-            A.CallTo(() => fakeMapper.Map<ExchangeSetResponse>(A<ProductCounts>.Ignored)).Returns(exchangeSetResponse);
-            A.CallTo(() => fakeMapper.Map<IEnumerable<RequestedProductsNotInExchangeSet>>(A<List<RequestedProductsNotReturned>>.Ignored))
-                .Returns(exchangeSetResponse.RequestedProductsNotInExchangeSet);
             A.CallTo(() => fakeAzureAdB2CHelper.IsAzureB2CUser(A<AzureAdB2C>.Ignored, A<string>.Ignored)).Returns(true);
 
             var result = await service.CreateProductDataByProductIdentifiers(
@@ -622,12 +551,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
             A.CallTo(() => fakeSalesCatalogueService.PostProductIdentifiersAsync(A<List<string>>.Ignored, A<string>.Ignored))
                 .Returns(salesCatalogueResponse);
 
-            var exchangeSetResponse = GetExchangeSetResponse();
             var azureAdToken = GetAzureADToken();
-            A.CallTo(() => fakeMapper.Map<ExchangeSetResponse>(A<ProductCounts>.Ignored)).Returns(exchangeSetResponse);
-
-            A.CallTo(() => fakeMapper.Map<IEnumerable<RequestedProductsNotInExchangeSet>>(A<List<RequestedProductsNotReturned>>.Ignored))
-                .Returns(exchangeSetResponse.RequestedProductsNotInExchangeSet);
             A.CallTo(() => fakeAzureAdB2CHelper.IsAzureB2CUser(A<AzureAdB2C>.Ignored, A<string>.Ignored)).Returns(false);
 
             var CreateBatchResponseModel = CreateBatchResponse();
@@ -664,11 +588,6 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
             A.CallTo(() => fakeSalesCatalogueService.PostProductIdentifiersAsync(A<List<string>>.Ignored, A<string>.Ignored))
                 .Returns(salesCatalogueResponse);
             A.CallTo(() => fakeAzureAdB2CHelper.IsAzureB2CUser(A<AzureAdB2C>.Ignored, A<string>.Ignored)).Returns(false);
-
-            var exchangeSetResponse = GetExchangeSetResponse();
-            A.CallTo(() => fakeMapper.Map<ExchangeSetResponse>(A<ProductCounts>.Ignored)).Returns(exchangeSetResponse);
-            A.CallTo(() => fakeMapper.Map<IEnumerable<RequestedProductsNotInExchangeSet>>(A<List<RequestedProductsNotReturned>>.Ignored))
-                .Returns(exchangeSetResponse.RequestedProductsNotInExchangeSet);
 
             var CreateBatchResponseModel = CreateBatchResponse();
             CreateBatchResponseModel.ResponseCode = HttpStatusCode.NotModified;
@@ -726,12 +645,6 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
             A.CallTo(() => fakeSalesCatalogueService.PostProductIdentifiersAsync(A<List<string>>.Ignored, A<string>.Ignored))
                 .Returns(salesCatalogueResponse);
             A.CallTo(() => fakeAzureAdB2CHelper.IsAzureB2CUser(A<AzureAdB2C>.Ignored, A<string>.Ignored)).Returns(false);
-
-            var exchangeSetResponse = GetExchangeSetResponse();
-            exchangeSetResponse.RequestedProductCount += 1; //one aio cell passed
-            A.CallTo(() => fakeMapper.Map<ExchangeSetResponse>(A<ProductCounts>.Ignored)).Returns(exchangeSetResponse);
-            A.CallTo(() => fakeMapper.Map<IEnumerable<RequestedProductsNotInExchangeSet>>(A<List<RequestedProductsNotReturned>>.Ignored))
-                .Returns(exchangeSetResponse.RequestedProductsNotInExchangeSet);
 
             var CreateBatchResponseModel = CreateBatchResponse();
             CreateBatchResponseModel.ResponseCode = HttpStatusCode.Created;
@@ -815,11 +728,6 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
             A.CallTo(() => fakeSalesCatalogueService.PostProductIdentifiersAsync(A<List<string>>.Ignored, A<string>.Ignored))
                 .Returns(salesCatalogueResponse);
             A.CallTo(() => fakeAzureAdB2CHelper.IsAzureB2CUser(A<AzureAdB2C>.Ignored, A<string>.Ignored)).Returns(false);
-
-            var exchangeSetResponse = GetExchangeSetResponse();
-            A.CallTo(() => fakeMapper.Map<ExchangeSetResponse>(A<ProductCounts>.Ignored)).Returns(exchangeSetResponse);
-            A.CallTo(() => fakeMapper.Map<IEnumerable<RequestedProductsNotInExchangeSet>>(A<List<RequestedProductsNotReturned>>.Ignored))
-                .Returns(exchangeSetResponse.RequestedProductsNotInExchangeSet);
 
             var CreateBatchResponseModel = CreateBatchResponse();
             string callBackUri = "https://exchange-set-service.com/myCallback?secret=sharedSecret&po=1234";
@@ -963,10 +871,6 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
             A.CallTo(() => fakeSalesCatalogueService.PostProductVersionsAsync(A<List<ProductVersionRequest>>.Ignored, A<string>.Ignored))
                 .Returns(salesCatalogueResponse);
 
-            var exchangeSetResponse = GetExchangeSetResponse();
-            A.CallTo(() => fakeMapper.Map<ExchangeSetResponse>(A<ProductCounts>.Ignored)).Returns(exchangeSetResponse);
-            A.CallTo(() => fakeMapper.Map<IEnumerable<RequestedProductsNotInExchangeSet>>(A<List<RequestedProductsNotReturned>>.Ignored))
-                .Returns(exchangeSetResponse.RequestedProductsNotInExchangeSet);
             A.CallTo(() => fakeAzureAdB2CHelper.IsAzureB2CUser(A<AzureAdB2C>.Ignored, A<string>.Ignored)).Returns(false);
 
             var CreateBatchResponseModel = CreateBatchResponse();
@@ -1176,13 +1080,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
             A.CallTo(() => fakeSalesCatalogueService.PostProductVersionsAsync(A<List<ProductVersionRequest>>.Ignored, A<string>.Ignored))
                 .Returns(salesCatalogueResponse);
 
-            var exchangeSetResponse = GetExchangeSetResponse();
             var azureAdToken = GetAzureADToken();
-
-            A.CallTo(() => fakeMapper.Map<ExchangeSetResponse>(A<ProductCounts>.Ignored)).Returns(exchangeSetResponse);
-            A.CallTo(() => fakeMapper.Map<IEnumerable<RequestedProductsNotInExchangeSet>>(A<List<RequestedProductsNotReturned>>.Ignored))
-                .Returns(exchangeSetResponse.RequestedProductsNotInExchangeSet);
-
             var CreateBatchResponseModel = CreateBatchResponse();
             CreateBatchResponseModel.ResponseCode = HttpStatusCode.InternalServerError;
 
@@ -1216,10 +1114,6 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
             A.CallTo(() => fakeSalesCatalogueService.PostProductVersionsAsync(A<List<ProductVersionRequest>>.Ignored, A<string>.Ignored))
                 .Returns(salesCatalogueResponse);
 
-            var exchangeSetResponse = GetExchangeSetResponse();
-            A.CallTo(() => fakeMapper.Map<ExchangeSetResponse>(A<ProductCounts>.Ignored)).Returns(exchangeSetResponse);
-            A.CallTo(() => fakeMapper.Map<IEnumerable<RequestedProductsNotInExchangeSet>>(A<List<RequestedProductsNotReturned>>.Ignored))
-                .Returns(exchangeSetResponse.RequestedProductsNotInExchangeSet);
             A.CallTo(() => fakeAzureAdB2CHelper.IsAzureB2CUser(A<AzureAdB2C>.Ignored, A<string>.Ignored)).Returns(false);
 
             var CreateBatchResponseModel = CreateBatchResponse();
@@ -1293,11 +1187,6 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
             var salesCatalogueResponse = GetSalesCatalogueFileSizeResponse();
             A.CallTo(() => fakeSalesCatalogueService.PostProductVersionsAsync(A<List<ProductVersionRequest>>.Ignored, A<string>.Ignored))
                 .Returns(salesCatalogueResponse);
-
-            var exchangeSetResponse = GetExchangeSetResponse();
-            A.CallTo(() => fakeMapper.Map<ExchangeSetResponse>(A<ProductCounts>.Ignored)).Returns(exchangeSetResponse);
-            A.CallTo(() => fakeMapper.Map<IEnumerable<RequestedProductsNotInExchangeSet>>(A<List<RequestedProductsNotReturned>>.Ignored))
-                .Returns(exchangeSetResponse.RequestedProductsNotInExchangeSet);
             A.CallTo(() => fakeAzureAdB2CHelper.IsAzureB2CUser(A<AzureAdB2C>.Ignored, A<string>.Ignored)).Returns(false);
 
             var CreateBatchResponseModel = CreateBatchResponse();
@@ -1357,13 +1246,6 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
             salesCatalogueResponse.ResponseCode = HttpStatusCode.OK;
             A.CallTo(() => fakeSalesCatalogueService.PostProductVersionsAsync(A<List<ProductVersionRequest>>.Ignored, A<string>.Ignored))
                 .Returns(salesCatalogueResponse);
-
-            var exchangeSetResponse = GetExchangeSetResponse();
-            exchangeSetResponse.RequestedProductCount += 1; //one aio cell passed
-
-            A.CallTo(() => fakeMapper.Map<ExchangeSetResponse>(A<ProductCounts>.Ignored)).Returns(exchangeSetResponse);
-            A.CallTo(() => fakeMapper.Map<IEnumerable<RequestedProductsNotInExchangeSet>>(A<List<RequestedProductsNotReturned>>.Ignored))
-                .Returns(exchangeSetResponse.RequestedProductsNotInExchangeSet);
             A.CallTo(() => fakeAzureAdB2CHelper.IsAzureB2CUser(A<AzureAdB2C>.Ignored, A<string>.Ignored)).Returns(false);
 
             var CreateBatchResponseModel = CreateBatchResponse();
@@ -1576,15 +1458,11 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
                 .Returns(new ValidationResult(new List<ValidationFailure>()));
             var salesCatalogueResponse = GetSalesCatalogueResponse();
             salesCatalogueResponse.LastModified = DateTime.UtcNow;
-            var exchangeSetResponse = GetExchangeSetResponse();
             var CreateBatchResponseModel = CreateBatchResponse();
 
             A.CallTo(() => fakeSalesCatalogueService.GetProductsFromSpecificDateAsync(A<string>.Ignored, A<string>.Ignored))
                 .Returns(salesCatalogueResponse);
             A.CallTo(() => fakeAzureAdB2CHelper.IsAzureB2CUser(A<AzureAdB2C>.Ignored, A<string>.Ignored)).Returns(false);
-            A.CallTo(() => fakeMapper.Map<ExchangeSetResponse>(A<ProductCounts>.Ignored)).Returns(exchangeSetResponse);
-            A.CallTo(() => fakeMapper.Map<IEnumerable<RequestedProductsNotInExchangeSet>>(A<List<RequestedProductsNotReturned>>.Ignored))
-                .Returns(exchangeSetResponse.RequestedProductsNotInExchangeSet);
             A.CallTo(() => fakeFileShareService.CreateBatch(A<string>.Ignored, A<string>.Ignored)).Returns(CreateBatchResponseModel);
 
             var result = await service.CreateProductDataSinceDateTime(new ProductDataSinceDateTimeRequest()
@@ -1594,7 +1472,31 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
             }, GetAzureADToken());
 
             Assert.That(result, Is.TypeOf<ExchangeSetServiceResponse>());
-            Assert.That(result.HttpStatusCode, Is.EqualTo(HttpStatusCode.Created));
+
+            using (Assert.EnterMultipleScope())
+            {
+                Assert.That(result.HttpStatusCode, Is.EqualTo(HttpStatusCode.Created));
+                Assert.That(result.ExchangeSetResponse, Is.Not.Null);
+            }
+
+            // Check SCS response mappings. This test should return data from SCS unchanged.
+            using (Assert.EnterMultipleScope())
+            {
+                Assert.That(result.ExchangeSetResponse.RequestedProductCount, Is.EqualTo(salesCatalogueResponse.ResponseBody.ProductCounts.RequestedProductCount));
+                Assert.That(result.ExchangeSetResponse.ExchangeSetCellCount, Is.EqualTo(salesCatalogueResponse.ResponseBody.ProductCounts.ReturnedProductCount));
+                Assert.That(result.ExchangeSetResponse.RequestedProductsAlreadyUpToDateCount, Is.EqualTo(salesCatalogueResponse.ResponseBody.ProductCounts.RequestedProductsAlreadyUpToDateCount));
+                Assert.That(result.ExchangeSetResponse.RequestedProductsNotInExchangeSet, Is.Not.Null);
+            }
+            Assert.That(result.ExchangeSetResponse.RequestedProductsNotInExchangeSet, Has.Count.EqualTo(salesCatalogueResponse.ResponseBody.ProductCounts.RequestedProductsNotReturned.Count));
+
+            for (var i = 0; i < salesCatalogueResponse.ResponseBody.ProductCounts.RequestedProductsNotReturned.Count; i++)
+            {
+                using (Assert.EnterMultipleScope())
+                {
+                    Assert.That(result.ExchangeSetResponse.RequestedProductsNotInExchangeSet[i].ProductName, Is.EqualTo(salesCatalogueResponse.ResponseBody.ProductCounts.RequestedProductsNotReturned[i].ProductName));
+                    Assert.That(result.ExchangeSetResponse.RequestedProductsNotInExchangeSet[i].Reason, Is.EqualTo(salesCatalogueResponse.ResponseBody.ProductCounts.RequestedProductsNotReturned[i].Reason));
+                }
+            }
 
             A.CallTo(logger).Where(call => call.Method.Name == "Log"
             && call.GetArgument<LogLevel>(0) == LogLevel.Information
@@ -1676,16 +1578,12 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
             var salesCatalogueResponse = GetSalesCatalogueResponse();
             salesCatalogueResponse.ResponseCode = HttpStatusCode.OK;
             salesCatalogueResponse.LastModified = DateTime.UtcNow;
-            var exchangeSetResponse = GetExchangeSetResponse();
             var CreateBatchResponseModel = CreateBatchResponse();
             CreateBatchResponseModel.ResponseCode = HttpStatusCode.Created;
 
             A.CallTo(() => fakeSalesCatalogueService.GetProductsFromSpecificDateAsync(A<string>.Ignored, A<string>.Ignored))
                 .Returns(salesCatalogueResponse);
             A.CallTo(() => fakeAzureAdB2CHelper.IsAzureB2CUser(A<AzureAdB2C>.Ignored, A<string>.Ignored)).Returns(true);
-            A.CallTo(() => fakeMapper.Map<ExchangeSetResponse>(A<ProductCounts>.Ignored)).Returns(exchangeSetResponse);
-            A.CallTo(() => fakeMapper.Map<IEnumerable<RequestedProductsNotInExchangeSet>>(A<List<RequestedProductsNotReturned>>.Ignored))
-                .Returns(exchangeSetResponse.RequestedProductsNotInExchangeSet);
             A.CallTo(() => fakeFileShareService.CreateBatch(A<string>.Ignored, A<string>.Ignored)).Returns(CreateBatchResponseModel);
 
             var result = await service.CreateProductDataSinceDateTime(new ProductDataSinceDateTimeRequest(), GetAzureB2CToken());//B2C token passed and file size less than 300 mb
@@ -1737,7 +1635,6 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
             var salesCatalogueResponse = GetSalesCatalogueResponse();
             salesCatalogueResponse.ResponseCode = HttpStatusCode.OK;
             salesCatalogueResponse.LastModified = DateTime.UtcNow;
-            var exchangeSetResponse = GetExchangeSetResponse();
             var CreateBatchResponseModel = CreateBatchResponse();
             CreateBatchResponseModel.ResponseCode = HttpStatusCode.NotModified;
             string callBackUri = "https://exchange-set-service.com/myCallback?secret=sharedSecret&po=1234";
@@ -1746,9 +1643,6 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
             A.CallTo(() => fakeSalesCatalogueService.GetProductsFromSpecificDateAsync(A<string>.Ignored, A<string>.Ignored))
                 .Returns(salesCatalogueResponse);
             A.CallTo(() => fakeAzureAdB2CHelper.IsAzureB2CUser(A<AzureAdB2C>.Ignored, A<string>.Ignored)).Returns(true);
-            A.CallTo(() => fakeMapper.Map<ExchangeSetResponse>(A<ProductCounts>.Ignored)).Returns(exchangeSetResponse);
-            A.CallTo(() => fakeMapper.Map<IEnumerable<RequestedProductsNotInExchangeSet>>(A<List<RequestedProductsNotReturned>>.Ignored))
-                .Returns(exchangeSetResponse.RequestedProductsNotInExchangeSet);
             A.CallTo(() => fakeFileShareService.CreateBatch(A<string>.Ignored, A<string>.Ignored)).Returns(CreateBatchResponseModel);
 
             await service.CreateProductDataSinceDateTime(new ProductDataSinceDateTimeRequest(), GetAzureB2CToken());//B2C token passed and file size less than 300 mb
@@ -1788,18 +1682,12 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
                 },
                 FileSize = 400
             });
-            var exchangeSetResponse = GetExchangeSetResponse();
-            exchangeSetResponse.RequestedProductCount = 0;
-            exchangeSetResponse.RequestedProductsNotInExchangeSet = new List<RequestedProductsNotInExchangeSet>();
             var CreateBatchResponseModel = CreateBatchResponse();
             CreateBatchResponseModel.ResponseCode = HttpStatusCode.Created;
 
             A.CallTo(() => fakeSalesCatalogueService.GetProductsFromSpecificDateAsync(A<string>.Ignored, A<string>.Ignored))
                 .Returns(salesCatalogueResponse);
             A.CallTo(() => fakeAzureAdB2CHelper.IsAzureB2CUser(A<AzureAdB2C>.Ignored, A<string>.Ignored)).Returns(true);
-            A.CallTo(() => fakeMapper.Map<ExchangeSetResponse>(A<ProductCounts>.Ignored)).Returns(exchangeSetResponse);
-            A.CallTo(() => fakeMapper.Map<IEnumerable<RequestedProductsNotInExchangeSet>>(A<List<RequestedProductsNotReturned>>.Ignored))
-                .Returns(exchangeSetResponse.RequestedProductsNotInExchangeSet);
             A.CallTo(() => fakeFileShareService.CreateBatch(A<string>.Ignored, A<string>.Ignored)).Returns(CreateBatchResponseModel);
 
             var result = await service.CreateProductDataSinceDateTime(new ProductDataSinceDateTimeRequest(), GetAzureB2CToken());//B2C token passed and file size less than 300 mb
@@ -1868,15 +1756,11 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
                 .Returns(new ValidationResult(new List<ValidationFailure>()));
             var salesCatalogueResponse = GetSalesCatalogueFileSizeResponse();
             salesCatalogueResponse.LastModified = DateTime.UtcNow;
-            var exchangeSetResponse = GetExchangeSetResponse();
             var CreateBatchResponseModel = CreateBatchResponse();
 
             A.CallTo(() => fakeSalesCatalogueService.GetProductsFromSpecificDateAsync(A<string>.Ignored, A<string>.Ignored))
                 .Returns(salesCatalogueResponse);
             A.CallTo(() => fakeAzureAdB2CHelper.IsAzureB2CUser(A<AzureAdB2C>.Ignored, A<string>.Ignored)).Returns(false);
-            A.CallTo(() => fakeMapper.Map<ExchangeSetResponse>(A<ProductCounts>.Ignored)).Returns(exchangeSetResponse);
-            A.CallTo(() => fakeMapper.Map<IEnumerable<RequestedProductsNotInExchangeSet>>(A<List<RequestedProductsNotReturned>>.Ignored))
-                .Returns(exchangeSetResponse.RequestedProductsNotInExchangeSet);
             A.CallTo(() => fakeFileShareService.CreateBatch(A<string>.Ignored, A<string>.Ignored)).Returns(CreateBatchResponseModel);
 
             var result = await service.CreateProductDataSinceDateTime(new ProductDataSinceDateTimeRequest()
