@@ -13,6 +13,14 @@ parameters:
     displayName: "Skip deployment of UI instance"
     type: boolean
     default: false
+  - name: SnykOnlyFailIfFixable
+    displayName: "Snyk - fail only if an issue has an available fix"
+    type: boolean
+    default: false
+  - name: SnykPassOnIssues
+    displayName: "Snyk - don't fail if issues found"
+    type: boolean
+    default: false
 
 trigger:
   - main
@@ -50,10 +58,14 @@ variables:
     value: "ukhydrographicoffice/terraform-azure-powershell-unzip:1.9.6"
   - name: DeploymentPool
     value: "Mare Nectaris"
-  - name: SdkVersion
+  - name: DotNetSdkVersion
     value: "8.0.x"
-  - name: WindowPool
+  - name: WindowPool1
     value: "NautilusBuild"
+  - name: WindowsPool2
+    value: "Mare Nubium"
+  - name: snykAbzuOrganizationId
+    value: aeb7543b-8394-457c-8334-a31493d8910d
 
 resources:
   repositories:
@@ -64,6 +76,15 @@ resources:
     ref: refs/heads/main 
 
 stages:
+  - stage: VulnerabilityChecks
+    displayName: Snyk checks
+    dependsOn: []
+    jobs:
+    - template: Deployment/templates/vulnerability-checks.yml
+      parameters:
+        SnykOnlyFailIfFixable: ${{ parameters.SnykOnlyFailIfFixable }}
+        SnykPassOnIssues: ${{ parameters.SnykPassOnIssues }}
+
   - stage: Stryker_Mutator
     displayName: "Stryker Mutator"
     condition: ${{ eq(parameters.disableStryker, false) }}
@@ -77,13 +98,13 @@ stages:
           displayName: 'Use .NET SDK'
           inputs:
             packageType: sdk
-            version: $(SdkVersion)
+            version: $(DotNetSdkVersion)
 
         - task: UseDotNet@2
           displayName: 'Use .NET SDK for Stryker'
           inputs:
             packageType: sdk
-            version: $(SdkVersion)
+            version: $(DotNetSdkVersion)
 
         - task: DotNetCoreCLI@2
           displayName: "Install Stryker"
@@ -217,7 +238,7 @@ stages:
                   displayName: 'Use .NET SDK'
                   inputs:
                     packageType: sdk
-                    version: $(SdkVersion)
+                    version: $(DotNetSdkVersion)
 
                 - task: AzureCLI@2
                   displayName: "Swap ESS API and ESS FulfilmentService Configuration AIOEnabled"
@@ -418,7 +439,7 @@ stages:
         - ${{ if eq(parameters.skipDeploymentOfUIInstance, false) }}:  
           - LiveDeployApp2
         
-        pool: $(WindowPool)        
+        pool: $(WindowPool1)        
         displayName: Post Deployment Actions
         steps:
           - template: Deployment/templates/retain-pipeline.yml
