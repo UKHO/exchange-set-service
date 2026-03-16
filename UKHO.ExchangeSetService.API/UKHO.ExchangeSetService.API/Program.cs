@@ -1,5 +1,13 @@
+using System;
+using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
+using System.IO;
+using System.IO.Abstractions;
+using System.Linq;
+using System.Net.Http.Headers;
+using System.Reflection;
+using System.Security.Claims;
 using Azure.Identity;
-using Elastic.Apm.Api;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
@@ -13,15 +21,6 @@ using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Models;
 using Newtonsoft.Json.Serialization;
 using Swashbuckle.AspNetCore.Filters;
-using System;
-using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
-using System.IO;
-using System.IO.Abstractions;
-using System.Linq;
-using System.Net.Http.Headers;
-using System.Reflection;
-using System.Security.Claims;
 using UKHO.ExchangeSetService.API.Configuration;
 using UKHO.ExchangeSetService.API.Filters;
 using UKHO.ExchangeSetService.API.Services;
@@ -51,7 +50,7 @@ namespace UKHO.ExchangeSetService.API
             if (!string.IsNullOrWhiteSpace(kvServiceUri))
             {
                 builder.Configuration.AddAzureKeyVault(new Uri(kvServiceUri),
-                    new DefaultAzureCredential( new DefaultAzureCredentialOptions { ManagedIdentityClientId = builder.Configuration["ESSManagedIdentity:ClientId"] }));
+                    new DefaultAzureCredential(new DefaultAzureCredentialOptions { ManagedIdentityClientId = builder.Configuration["ESSManagedIdentity:ClientId"] }));
             }
 
 #if DEBUG
