@@ -60,7 +60,7 @@ variables:
     value: "Mare Nectaris"
   - name: DotNetSdkVersion
     value: "8.0.x"
-  - name: WindowPool1
+  - name: WindowsPool1
     value: "NautilusBuild"
   - name: WindowsPool2
     value: "Mare Nubium"
@@ -439,7 +439,7 @@ stages:
         - ${{ if eq(parameters.skipDeploymentOfUIInstance, false) }}:  
           - LiveDeployApp2
         
-        pool: $(WindowPool1)        
+        pool: $(WindowsPool1)        
         displayName: Post Deployment Actions
         steps:
           - template: Deployment/templates/retain-pipeline.yml
