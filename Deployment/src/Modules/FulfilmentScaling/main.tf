@@ -10,8 +10,8 @@ resource "azurerm_monitor_autoscale_setting" "autoscale_setting_sxs" {
     name = "defaultProfile"
 
     capacity {
-      default = var.asp_control_sxs.zoneRedundant ? 3 : 1
-      minimum = var.asp_control_sxs.zoneRedundant ? 3 : 1
+      default = var.asp_control_sxs.autoScaleMinInstances
+      minimum = var.asp_control_sxs.autoScaleMinInstances
       maximum = var.asp_control_sxs.autoScaleMaxInstances
     }
 
@@ -71,8 +71,8 @@ resource "azurerm_monitor_autoscale_setting" "autoscale_setting_mxs" {
     name = "defaultProfile"
 
     capacity {
-      default = var.asp_control_mxs.zoneRedundant ? 3 : 1
-      minimum = var.asp_control_mxs.zoneRedundant ? 3 : 1
+      default = var.asp_control_mxs.autoScaleMinInstances
+      minimum = var.asp_control_mxs.autoScaleMinInstances
       maximum = var.asp_control_mxs.autoScaleMaxInstances
     }
 
@@ -132,8 +132,8 @@ resource "azurerm_monitor_autoscale_setting" "autoscale_setting_lxs" {
     name = "defaultProfile"
 
     capacity {
-      default = var.asp_control_lxs.zoneRedundant ? 3 : 1
-      minimum = var.asp_control_lxs.zoneRedundant ? 3 : 1
+      default = var.asp_control_lxs.autoScaleMinInstances
+      minimum = var.asp_control_lxs.autoScaleMinInstances
       maximum = var.asp_control_lxs.autoScaleMaxInstances
     }
 

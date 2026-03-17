@@ -1,11 +1,11 @@
-﻿using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
-using Newtonsoft.Json;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+using Newtonsoft.Json;
 using UKHO.ExchangeSetService.Common.Configuration;
 using UKHO.ExchangeSetService.Common.Extensions;
 using UKHO.ExchangeSetService.Common.Helpers.Auth;
@@ -44,10 +44,11 @@ namespace UKHO.ExchangeSetService.Common.Helpers.SalesCatalogue
                     var accessToken = await authScsTokenProvider.GetManagedIdentityAuthAsync(salesCatalogueConfig.Value.ResourceId);
                     var uri = $"/{salesCatalogueConfig.Value.Version}/productData/{salesCatalogueConfig.Value.ProductType}/products?sinceDateTime={sinceDateTime}";
 
-                    var httpResponse = await salesCatalogueClient.CallSalesCatalogueServiceApi(HttpMethod.Get, null, accessToken, uri);
-
-                    var response = await CreateSalesCatalogueServiceResponse(httpResponse, correlationId);
-                    return response;
+                    using (var httpResponse = await salesCatalogueClient.CallSalesCatalogueServiceApi(HttpMethod.Get, null, accessToken, uri))
+                    {
+                        var response = await CreateSalesCatalogueServiceResponse(httpResponse, correlationId);
+                        return response;
+                    }
                 },
                 correlationId);
         }
@@ -65,11 +66,11 @@ namespace UKHO.ExchangeSetService.Common.Helpers.SalesCatalogue
 
                     var payloadJson = JsonConvert.SerializeObject(productIdentifiers);
 
-                    var httpResponse = await salesCatalogueClient.CallSalesCatalogueServiceApi(HttpMethod.Post, payloadJson, accessToken, uri);
-
-                    var response = await CreateSalesCatalogueServiceResponse(httpResponse, correlationId);
-
-                    return response;
+                    using (var httpResponse = await salesCatalogueClient.CallSalesCatalogueServiceApi(HttpMethod.Post, payloadJson, accessToken, uri))
+                    {
+                        var response = await CreateSalesCatalogueServiceResponse(httpResponse, correlationId);
+                        return response;
+                    }
                 },
                 correlationId);
         }
@@ -88,11 +89,11 @@ namespace UKHO.ExchangeSetService.Common.Helpers.SalesCatalogue
 
                     var payloadJson = JsonConvert.SerializeObject(productVersions);
 
-                    var httpResponse = await salesCatalogueClient.CallSalesCatalogueServiceApi(HttpMethod.Post, payloadJson, accessToken, uri);
-
-                    var response = await CreateSalesCatalogueServiceResponse(httpResponse, correlationId);
-
-                    return response;
+                    using (var httpResponse = await salesCatalogueClient.CallSalesCatalogueServiceApi(HttpMethod.Post, payloadJson, accessToken, uri))
+                    {
+                        var response = await CreateSalesCatalogueServiceResponse(httpResponse, correlationId);
+                        return response;
+                    }
                 },
                 correlationId);
         }
@@ -107,10 +108,11 @@ namespace UKHO.ExchangeSetService.Common.Helpers.SalesCatalogue
                     var accessToken = await authScsTokenProvider.GetManagedIdentityAuthAsync(salesCatalogueConfig.Value.ResourceId);
                     var uri = $"/{salesCatalogueConfig.Value.Version}/productData/{salesCatalogueConfig.Value.ProductType}/catalogue/{salesCatalogueConfig.Value.CatalogueType}";
 
-                    var httpResponse = await salesCatalogueClient.CallSalesCatalogueServiceApi(HttpMethod.Get, null, accessToken, uri, correlationId);
-
-                    var response = await CreateSalesCatalogueDataResponse(httpResponse, batchId, correlationId);
-                    return response;
+                    using (var httpResponse = await salesCatalogueClient.CallSalesCatalogueServiceApi(HttpMethod.Get, null, accessToken, uri, correlationId))
+                    {
+                        var response = await CreateSalesCatalogueDataResponse(httpResponse, batchId, correlationId);
+                        return response;
+                    }
                 }, batchId, correlationId);
         }
 
