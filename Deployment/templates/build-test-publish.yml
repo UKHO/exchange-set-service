@@ -8,7 +8,7 @@ jobs:
       displayName: 'Use .NET SDK'
       inputs:
         packageType: sdk
-        version: $(SdkVersion)
+        version: $(DotNetSdkVersion)
 
     - task: DotNetCoreCLI@2
       displayName: ".Net Core - NuGet restore test projects only"
@@ -59,7 +59,7 @@ jobs:
       displayName: 'Use .NET SDK'
       inputs:
         packageType: sdk
-        version: $(SdkVersion)
+        version: $(DotNetSdkVersion)
 
     - task: DotNetCoreCLI@2
       displayName: ".Net Core - NuGet restore"
@@ -129,7 +129,7 @@ jobs:
       displayName: 'Use .NET SDK'
       inputs:
         packageType: sdk
-        version: $(SdkVersion)
+        version: $(DotNetSdkVersion)
 
     - task: DotNetCoreCLI@2
       displayName: ".Net Core - NuGet restore"
@@ -229,7 +229,7 @@ jobs:
       displayName: 'Use .NET SDK'
       inputs:
         packageType: sdk
-        version: $(SdkVersion)
+        version: $(DotNetSdkVersion)
 
     - task: DotNetCoreCLI@2
       displayName: ".Net Core - NuGet restore"
