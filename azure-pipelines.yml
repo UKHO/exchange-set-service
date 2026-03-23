@@ -159,7 +159,8 @@ stages:
 
   - stage: QCdeploy
     dependsOn:
-    - Devdeploy
+    #- Devdeploy
+    - BuildTestPublish
     displayName: "QCdeploy (inc terraform, mock webapp deploy)"
     jobs:
       - deployment: QCDeployApp
