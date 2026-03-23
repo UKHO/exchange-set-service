@@ -8,6 +8,19 @@ module "user_identity" {
   tags                = local.tags
 }
 
+module "app_insights" {
+  source              = "./Modules/AppInsights"
+  name                = "${local.service_name}-${local.env_name}-fulfillment-${local.unique_string}-webapp"
+  resource_group_name = azurerm_resource_group.rg.name
+  location            = azurerm_resource_group.rg.location
+  tags                = local.tags
+}
+
+import {
+  to = module.app_insights.azurerm_application_insights.app_insights
+  id = "/subscriptions/f34020e8-74d2-4c45-b769-362ffa18a656/resourceGroups/essft-qc-webapp-rg/providers/microsoft.insights/components/essft-qc-fulfillment-yh3r1-webapp"
+}
+
 module "webapp_service" {
   source              = "./Modules/Webapp"
   service_name        = local.service_name
@@ -22,8 +35,15 @@ module "webapp_service" {
     "WEBSITE_ENABLE_SYNC_UPDATE_SITE"                      = "true"
     "APPLICATIONINSIGHTS_CONNECTION_STRING"                = "NOT_CONFIGURED"
   }
+  app_settings2 = {
+    "ASPNETCORE_ENVIRONMENT"                               = local.env_name
+    "WEBSITE_RUN_FROM_PACKAGE"                             = "1"
+    "WEBSITE_ENABLE_SYNC_UPDATE_SITE"                      = "true"
+    "WEBSITE_ADD_SITENAME_BINDINGS_IN_APPHOST_CONFIG"      = "1"
+    "APPLICATIONINSIGHTS_CONNECTION_STRING"                = module.app_insights.connection_string
+  }
   tags = local.tags
-
+  unique_string = local.unique_string
 }
 
 module "storage" {
@@ -59,9 +79,4 @@ module "key_vault" {
     "CacheConfiguration--CacheStorageAccountKey"                = module.storage.storage_primary_access_key
   }
   tags                                         = local.tags
-}
-
-import {
-  to = module.webapp_service.azurerm_service_plan.app_service_plan
-  id = "/subscriptions/f34020e8-74d2-4c45-b769-362ffa18a656/resourceGroups/essft-qc-webapp-rg/providers/Microsoft.Web/serverFarms/essft-qc-yh3r1-asp"
 }
