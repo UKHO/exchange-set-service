@@ -18,7 +18,7 @@ module "app_insights" {
 
 import {
   to = module.app_insights.azurerm_application_insights.app_insights
-  id = "/subscriptions/f34020e8-74d2-4c45-b769-362ffa18a656/resourceGroups/essft-qc-webapp-rg/providers/microsoft.insights/components/essft-qc-fulfillment-yh3r1-webapp"
+  id = "/subscriptions/f34020e8-74d2-4c45-b769-362ffa18a656/resourceGroups/essft-qc-webapp-rg/providers/Microsoft.Insights/components/essft-qc-fulfillment-yh3r1-webapp"
 }
 
 module "webapp_service" {
