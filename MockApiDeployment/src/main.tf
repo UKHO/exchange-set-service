@@ -10,15 +10,10 @@ module "user_identity" {
 
 module "app_insights" {
   source              = "./Modules/AppInsights"
-  name                = "${local.service_name}-${local.env_name}-fulfillment-${local.unique_string}-webapp"
-  resource_group_name = azurerm_resource_group.rg.name
-  location            = azurerm_resource_group.rg.location
+  name                = "${local.service_name}-${local.env_name}-fulfillment-${random_string.unique_string.result}-webapp"
+  resource_group_name = azurerm_resource_group.webapp_rg.name
+  location            = azurerm_resource_group.webapp_rg.location
   tags                = local.tags
-}
-
-import {
-  to = module.app_insights.azurerm_application_insights.app_insights
-  id = "/subscriptions/f34020e8-74d2-4c45-b769-362ffa18a656/resourceGroups/essft-qc-webapp-rg/providers/Microsoft.Insights/components/essft-qc-fulfillment-yh3r1-webapp"
 }
 
 module "webapp_service" {
@@ -43,7 +38,7 @@ module "webapp_service" {
     "APPLICATIONINSIGHTS_CONNECTION_STRING"                = module.app_insights.connection_string
   }
   tags = local.tags
-  unique_string = local.unique_string
+  unique_string = random_string.unique_string.result
 }
 
 module "storage" {
