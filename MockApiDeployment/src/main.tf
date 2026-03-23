@@ -60,3 +60,8 @@ module "key_vault" {
   }
   tags                                         = local.tags
 }
+
+import {
+  to = module.webapp_service.azurerm_service_plan.app_service_plan
+  id = "/subscriptions/f34020e8-74d2-4c45-b769-362ffa18a656/resourceGroups/essft-qc-webapp-rg/providers/Microsoft.Web/serverFarms/essft-qc-yh3r1-asp"
+}
