@@ -7,7 +7,7 @@ output "web_app_object_id_fulfillment" {
 }
 
 output "default_site_hostname_fulfillment" {
-  value = azurerm_windows_web_app.fulfillment_webapp.default_site_hostname
+  value = azurerm_windows_web_app.fulfillment_webapp.default_hostname
 }
 
 output "scs_fss_mock_webapp" {
@@ -19,7 +19,7 @@ output "web_app_object_id_scs_fss_mock" {
 }
 
 output "default_site_hostname_scs_fss_mock" {
-  value = azurerm_windows_web_app.scs_fss_mock_webapp.default_site_hostname
+  value = azurerm_windows_web_app.scs_fss_mock_webapp.default_hostname
 }
 
 output "ess_webapp" {
@@ -31,5 +31,5 @@ output "web_app_object_id_ess" {
 }
 
 output "default_site_hostname_ess" {
-  value = azurerm_windows_web_app.ess_webapp.default_site_hostname
+  value = azurerm_windows_web_app.ess_webapp.default_hostname
 }
