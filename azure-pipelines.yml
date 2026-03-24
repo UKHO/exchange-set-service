@@ -159,7 +159,6 @@ stages:
 
   - stage: QCdeploy
     dependsOn:
-    #- Devdeploy
     - BuildTestPublish
     displayName: "QCdeploy (inc terraform, mock webapp deploy)"
     jobs:
@@ -278,57 +277,6 @@ stages:
                     scriptLocation: 'scriptPath'
                     scriptPath: "$(Pipeline.Workspace)/terraformartifact/set_api_webjob_aio_feature_configuration.ps1"
                     arguments: '-aiocells $(AioConfiguration.AioCells) -resourcegroup $(webAppResourceGroup) -webappname $(essWebAppName) -fulfilmentwebappsname $(essFulfilmentWebAppname)'
-
-  - stage: QAdeploy
-    dependsOn: 
-    - Devdeploy
-    displayName: QA Deploy (inc terraform, webapp deploy)
-    condition: and(succeeded(), or(eq(variables['Build.SourceBranch'], 'refs/heads/main'), startsWith(variables['Build.SourceBranch'], 'refs/heads/release/')))
-    jobs:
-      - template: Deployment/templates/app-deploy.yml
-        parameters:
-          Environment: "qa"
-          ContinueEvenIfResourcesAreGettingDestroyed: ${{ parameters.ContinueEvenIfResourcesAreGettingDestroyed }}
-          AzureSubscription: "Exchange-Set-Service-QA-A-008-02"
-          Container: ${{variables.Container}} 
-
-      - ${{ if eq(parameters.skipDeploymentOfUIInstance, false) }}:
-        - template: Deployment/templates/app-deploy.yml
-          parameters:
-            Environment: "qa"
-            ContinueEvenIfResourcesAreGettingDestroyed: ${{ parameters.ContinueEvenIfResourcesAreGettingDestroyed }}
-            AzureSubscription: "Exchange-Set-Service-QA-A-008-02"
-            Container: ${{variables.Container}} 
-            RunTests: false
-            pathSuffix: "-v2"
-            v2Modifier: "2"
-
-  - stage: vnextiatDeploy
-    dependsOn:
-      - Devdeploy
-    displayName: vNext IAT Deploy (inc terraform, webapp deploy)
-    condition: and(succeeded(), or(eq(variables['Build.SourceBranch'], 'refs/heads/develop'), startsWith(variables['Build.SourceBranch'], 'refs/heads/dev/')))
-    jobs:
-      - template: Deployment/templates/app-deploy.yml
-        parameters:
-          Environment: "vnextiat"
-          ContinueEvenIfResourcesAreGettingDestroyed: ${{ parameters.ContinueEvenIfResourcesAreGettingDestroyed }}
-          AzureSubscription: "Exchange-Set-Service-vNext-IAT-A.011.08"
-          Container: ${{variables.Container}}
-          RunAddsTests: vNextIAT
-
-  - stage: vnexte2eDeploy
-    dependsOn: 
-      - vnextiatDeploy
-    displayName: vNext E2E Deploy (inc terraform, webapp deploy)
-    condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/develop'))
-    jobs:
-      - template: Deployment/templates/app-deploy.yml
-        parameters:
-          Environment: "vnexte2e"
-          ContinueEvenIfResourcesAreGettingDestroyed: ${{ parameters.ContinueEvenIfResourcesAreGettingDestroyed }}
-          AzureSubscription: "Exchange-Set-Service-vNext-E2E-A.011.08"
-          Container: ${{variables.Container}}
 
   - stage: IatDeploy
     dependsOn: 
@@ -451,3 +399,54 @@ stages:
         displayName: Post Deployment Actions
         steps:
           - template: Deployment/templates/retain-pipeline.yml
+
+  - stage: vnextiatDeploy
+    dependsOn:
+      - Devdeploy
+    displayName: vNext IAT Deploy (inc terraform, webapp deploy)
+    condition: and(succeeded(), or(eq(variables['Build.SourceBranch'], 'refs/heads/develop'), startsWith(variables['Build.SourceBranch'], 'refs/heads/dev/')))
+    jobs:
+      - template: Deployment/templates/app-deploy.yml
+        parameters:
+          Environment: "vnextiat"
+          ContinueEvenIfResourcesAreGettingDestroyed: ${{ parameters.ContinueEvenIfResourcesAreGettingDestroyed }}
+          AzureSubscription: "Exchange-Set-Service-vNext-IAT-A.011.08"
+          Container: ${{variables.Container}}
+          RunAddsTests: vNextIAT
+
+  - stage: vnexte2eDeploy
+    dependsOn: 
+      - vnextiatDeploy
+    displayName: vNext E2E Deploy (inc terraform, webapp deploy)
+    condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/develop'))
+    jobs:
+      - template: Deployment/templates/app-deploy.yml
+        parameters:
+          Environment: "vnexte2e"
+          ContinueEvenIfResourcesAreGettingDestroyed: ${{ parameters.ContinueEvenIfResourcesAreGettingDestroyed }}
+          AzureSubscription: "Exchange-Set-Service-vNext-E2E-A.011.08"
+          Container: ${{variables.Container}}
+
+  - stage: QAdeploy
+    dependsOn: 
+    - Devdeploy
+    displayName: QA Deploy (inc terraform, webapp deploy)
+    condition: and(succeeded(), or(eq(variables['Build.SourceBranch'], 'refs/heads/main'), startsWith(variables['Build.SourceBranch'], 'refs/heads/release/')))
+    jobs:
+      - template: Deployment/templates/app-deploy.yml
+        parameters:
+          Environment: "qa"
+          ContinueEvenIfResourcesAreGettingDestroyed: ${{ parameters.ContinueEvenIfResourcesAreGettingDestroyed }}
+          AzureSubscription: "Exchange-Set-Service-QA-A-008-02"
+          Container: ${{variables.Container}} 
+
+      - ${{ if eq(parameters.skipDeploymentOfUIInstance, false) }}:
+        - template: Deployment/templates/app-deploy.yml
+          parameters:
+            Environment: "qa"
+            ContinueEvenIfResourcesAreGettingDestroyed: ${{ parameters.ContinueEvenIfResourcesAreGettingDestroyed }}
+            AzureSubscription: "Exchange-Set-Service-QA-A-008-02"
+            Container: ${{variables.Container}} 
+            RunTests: false
+            pathSuffix: "-v2"
+            v2Modifier: "2"

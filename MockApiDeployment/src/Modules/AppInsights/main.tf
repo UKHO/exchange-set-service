@@ -5,4 +5,10 @@ resource "azurerm_application_insights" "app_insights" {
   application_type     = "web"
   daily_data_cap_in_gb = 5
   tags                 = var.tags
+
+  lifecycle {
+    ignore_changes = [
+      workspaceid
+    ]
+  }
 }
