@@ -28,6 +28,8 @@ module "webapp_service" {
     "ASPNETCORE_ENVIRONMENT"                               = local.env_name
     "WEBSITE_RUN_FROM_PACKAGE"                             = "1"
     "WEBSITE_ENABLE_SYNC_UPDATE_SITE"                      = "true"
+  }
+  app_settings_insights = {
     "APPLICATIONINSIGHTS_CONNECTION_STRING"                = module.app_insights.connection_string
   }
   tags = local.tags

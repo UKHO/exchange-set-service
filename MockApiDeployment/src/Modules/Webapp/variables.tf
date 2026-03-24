@@ -14,6 +14,10 @@ variable "app_settings" {
   type = map(string)
 }
 
+variable "app_settings_insights" {
+  type = map(string)
+}
+
 variable "tags" {
 
 }

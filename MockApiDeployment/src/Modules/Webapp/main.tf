@@ -25,7 +25,7 @@ resource "azurerm_windows_web_app" "fulfillment_webapp" {
     use_32_bit_worker = false
   }
 
-  app_settings = var.app_settings
+  app_settings = merge(var.app_settings, var.app_settings_insights)
 
   identity {
     type = "UserAssigned"
@@ -77,7 +77,7 @@ resource "azurerm_windows_web_app" "ess_webapp" {
     use_32_bit_worker = false
   }
 
-  app_settings = var.app_settings
+  app_settings = merge(var.app_settings, var.app_settings_insights)
 
   identity {
     type = "UserAssigned"
