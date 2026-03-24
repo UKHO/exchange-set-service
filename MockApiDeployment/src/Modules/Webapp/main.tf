@@ -25,7 +25,7 @@ resource "azurerm_windows_web_app" "fulfillment_webapp" {
     use_32_bit_worker = false
   }
 
-  app_settings = var.app_settings_with_insights
+  app_settings = var.app_settings
 
   identity {
     type = "UserAssigned"

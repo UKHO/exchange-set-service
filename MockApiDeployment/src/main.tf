@@ -28,12 +28,6 @@ module "webapp_service" {
     "ASPNETCORE_ENVIRONMENT"                               = local.env_name
     "WEBSITE_RUN_FROM_PACKAGE"                             = "1"
     "WEBSITE_ENABLE_SYNC_UPDATE_SITE"                      = "true"
-    "APPLICATIONINSIGHTS_CONNECTION_STRING"                = "NOT_CONFIGURED"
-  }
-  app_settings_with_insights = {
-    "ASPNETCORE_ENVIRONMENT"                               = local.env_name
-    "WEBSITE_RUN_FROM_PACKAGE"                             = "1"
-    "WEBSITE_ENABLE_SYNC_UPDATE_SITE"                      = "true"
     "WEBSITE_ADD_SITENAME_BINDINGS_IN_APPHOST_CONFIG"      = "1"
     "APPLICATIONINSIGHTS_CONNECTION_STRING"                = module.app_insights.connection_string
   }
