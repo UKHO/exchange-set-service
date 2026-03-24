@@ -204,8 +204,7 @@ stages:
           runOnce:
             deploy:
               steps:
-                - checkout: self
-                  submodules: recursive
+                - checkout: none
 
                 - download: current
                   displayName: Download mock Terraform artifact
@@ -223,30 +222,22 @@ stages:
                   displayName: Download mock API artifact
                   artifact: MockWebAPI
 
+                - download: current
+                  displayName: Download functional test artifact
+                  artifact: functionaltests
+
+                - download: current
+                  displayName: Download Terraform artifact
+                  artifact: terraformartifact
+
                 - template: MockApiDeployment/templates/mock-api-continuous-deployment.yml
                   parameters:
                     AzureSubscription: "Exchange-Set-Service-Dev-A-008-02"
 
-                - task: DownloadBuildArtifacts@0
-                  displayName: "Download Functional test Artifact"
-                  inputs:
-                    buildType: 'current'
-                    downloadType: 'single'
-                    artifactName: 'functionaltests'
-                    downloadPath: '$(Build.SourcesDirectory)'
-
-                - task: DownloadBuildArtifacts@0
-                  displayName: "Download Terraform Artifact"
-                  inputs:
-                    buildType: 'current'
-                    downloadType: 'single'
-                    artifactName: 'terraformartifact'
-                    downloadPath: '$(Build.SourcesDirectory)'
-
                 - task: FileTransform@2
                   displayName: "File Transform: functionaltests"
                   inputs:
-                    folderPath: '$(Build.SourcesDirectory)/functionaltests/'
+                    folderPath: '$(Pipeline.Workspace)/functionaltests/'
                     enableXmlTransform: false
                     xmlTransformationRules: ''
                     jsonTargetFiles: '**/appsettings.json'
@@ -264,7 +255,7 @@ stages:
                     azureSubscription: "Exchange-Set-Service-Dev-A-008-02"
                     scriptType: 'pscore'
                     scriptLocation: 'scriptPath'
-                    scriptPath: "$(Build.SourcesDirectory)/terraformartifact/set_api_webjob_aio_feature_configuration.ps1"
+                    scriptPath: "$(Pipeline.Workspace)/terraformartifact/set_api_webjob_aio_feature_configuration.ps1"
                     arguments: '-aiocells $(AioConfiguration.AioCells_FT) -resourcegroup $(webAppResourceGroup) -webappname $(essWebAppName) -fulfilmentwebappsname $(essFulfilmentWebAppname)'
 
                 - task: DotNetCoreCLI@2
@@ -276,7 +267,7 @@ stages:
                       !**/*TestAdapter.dll
                       !**/obj/**
                     testRunTitle: "QC-AutomationTests"
-                    workingDirectory: '$(Build.SourcesDirectory)/functionaltests'
+                    workingDirectory: '$(Pipeline.Workspace)/functionaltests'
 
                 - task: AzureCLI@2
                   displayName: "Swap ESS API and ESS FulfilmentService Configuration"
@@ -285,7 +276,7 @@ stages:
                     azureSubscription: "Exchange-Set-Service-Dev-A-008-02"
                     scriptType: 'pscore'
                     scriptLocation: 'scriptPath'
-                    scriptPath: "$(Build.SourcesDirectory)/terraformartifact/set_api_webjob_aio_feature_configuration.ps1"
+                    scriptPath: "$(Pipeline.Workspace)/terraformartifact/set_api_webjob_aio_feature_configuration.ps1"
                     arguments: '-aiocells $(AioConfiguration.AioCells) -resourcegroup $(webAppResourceGroup) -webappname $(essWebAppName) -fulfilmentwebappsname $(essFulfilmentWebAppname)'
 
   - stage: QAdeploy
