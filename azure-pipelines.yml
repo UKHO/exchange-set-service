@@ -207,6 +207,22 @@ stages:
                 - checkout: self
                   submodules: recursive
 
+                - download: current
+                  displayName: Download mock Terraform artifact
+                  artifact: mockapiterraformartifact
+
+                - download: current
+                  displayName: Download API artifact
+                  artifact: ExchangeSetServiceWebAPI
+
+                - download: current
+                  displayName: Download webjob artifact
+                  artifact: ExchangeSetService
+
+                - download: current
+                  displayName: Download mock API artifact
+                  artifact: MockWebAPI
+
                 - template: MockApiDeployment/templates/mock-api-continuous-deployment.yml
                   parameters:
                     AzureSubscription: "Exchange-Set-Service-Dev-A-008-02"

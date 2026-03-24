@@ -3,43 +3,11 @@ parameters:
     type: string
 
 steps:
-  - task: DownloadBuildArtifacts@0
-    displayName: Download mock Terraform artifact
-    inputs:
-      buildType: current
-      downloadType: single
-      artifactName: mockapiterraformartifact
-      downloadPath: $(System.ArtifactsDirectory)
-
-  - task: DownloadBuildArtifacts@0
-    displayName: Download API artifact
-    inputs:
-      buildType: current
-      downloadType: single
-      artifactName: ExchangeSetServiceWebAPI
-      downloadPath: $(System.ArtifactsDirectory)
-
-  - task: DownloadBuildArtifacts@0
-    displayName: Download webjob artifact
-    inputs:
-      buildType: current
-      downloadType: single
-      artifactName: ExchangeSetService
-      downloadPath: $(System.ArtifactsDirectory)
-
-  - task: DownloadBuildArtifacts@0
-    displayName: Download mock API artifact
-    inputs:
-      buildType: current
-      downloadType: single
-      artifactName: MockWebAPI
-      downloadPath: $(System.ArtifactsDirectory)
-
   - task: PowerShell@2
     displayName: "terraform QCdeploy"
     inputs:
       targetType: filePath
-      filePath: '$(System.ArtifactsDirectory)/mockapiterraformartifact/mock_api_terraform_run.ps1'
+      filePath: '$(Pipeline.Workspace)/mockapiterraformartifact/mock_api_terraform_run.ps1'
       arguments: '-deploymentResourceGroupName $(DeploymentResourceGroupName) -deploymentStorageAccountName $(DeploymentStorageAccountName) -workSpace $(Environment)'
     env:
       ARM_CLIENT_ID: $(TERRAFORM-CLIENT-ID)
@@ -50,7 +18,7 @@ steps:
   - task: FileTransform@2
     displayName: "File Transform: WebAppSettings"
     inputs:
-      folderPath: '$(System.ArtifactsDirectory)/ExchangeSetServiceWebAPI/*.zip'
+      folderPath: '$(Pipeline.Workspace)/ExchangeSetServiceWebAPI/*.zip'
       enableXmlTransform: false
       xmlTransformationRules: ''
       jsonTargetFiles: '**/appsettings.json'
@@ -58,7 +26,7 @@ steps:
   - task: FileTransform@2
     displayName: "File Transform: WebJob"
     inputs:
-      folderPath: '$(System.ArtifactsDirectory)/ExchangeSetService/*.zip'
+      folderPath: '$(Pipeline.Workspace)/ExchangeSetService/*.zip'
       enableXmlTransform: false
       xmlTransformationRules: ''
       jsonTargetFiles: '**/appsettings.json'
@@ -69,5 +37,5 @@ steps:
       azureSubscription: "${{ parameters.AzureSubscription }}"
       scriptType: 'pscore'
       scriptLocation: 'scriptPath'
-      scriptPath: '$(System.ArtifactsDirectory)/mockapiterraformartifact/mock_api_deployment.ps1'
-      arguments: '-essWebAppName $(essWebAppName) -essApipackagePath "$(System.ArtifactsDirectory)/ExchangeSetServiceWebAPI/UKHO.ExchangeSetService.API.zip" -mockWebAppName $(mockWebAppName) -mockApipackagePath "$(System.ArtifactsDirectory)/MockWebAPI/UKHO.SalesCatalogueFileShareServicesMock.API.zip" -essFulfilmentWebAppname $(essFulfilmentWebAppname) -essFulfilmentpackagePath "$(System.ArtifactsDirectory)/ExchangeSetService/ExchangeSetFulFilmentService.zip" -webAppResourceGroup $(webAppResourceGroup)'
+      scriptPath: '$(Pipeline.Workspace)/mockapiterraformartifact/mock_api_deployment.ps1'
+      arguments: '-essWebAppName $(essWebAppName) -essApipackagePath "$(Pipeline.Workspace)/ExchangeSetServiceWebAPI/UKHO.ExchangeSetService.API.zip" -mockWebAppName $(mockWebAppName) -mockApipackagePath "$(Pipeline.Workspace)/MockWebAPI/UKHO.SalesCatalogueFileShareServicesMock.API.zip" -essFulfilmentWebAppname $(essFulfilmentWebAppname) -essFulfilmentpackagePath "$(Pipeline.Workspace)/ExchangeSetService/ExchangeSetFulFilmentService.zip" -webAppResourceGroup $(webAppResourceGroup)'
