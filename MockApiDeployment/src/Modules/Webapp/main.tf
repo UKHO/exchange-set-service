@@ -26,19 +26,6 @@ resource "azurerm_service_plan" "app_service_plan" {
 #  }
 #}
 
-removed {
-  from = module.webapp_service.azurerm_app_service.fulfillment_webapp
-
-  lifecycle {
-    destroy = false
-  }
-}
-
-import {
-  to = module.webapp_service.azurerm_windows_web_app.fulfillment_webapp
-  id = "/subscriptions/f34020e8-74d2-4c45-b769-362ffa18a656/resourceGroups/essft-qc-webapp-rg/providers/Microsoft.Web/sites/essft-qc-fulfillment-yh3r1-webapp"
-}
-
 resource "azurerm_windows_web_app" "fulfillment_webapp" {
   name                      = "${var.service_name}-${var.env_name}-fulfillment-${var.unique_string}-webapp"
   location                  = var.location
@@ -88,19 +75,6 @@ resource "azurerm_windows_web_app" "fulfillment_webapp" {
 #
 #}
 
-removed {
-  from = module.webapp_service.azurerm_app_service.scs_fss_mock_webapp
-
-  lifecycle {
-    destroy = false
-  }
-}
-
-import {
-  to = module.webapp_service.azurerm_windows_web_app.scs_fss_mock_webapp
-  id = "/subscriptions/f34020e8-74d2-4c45-b769-362ffa18a656/resourceGroups/essft-qc-webapp-rg/providers/Microsoft.Web/sites/essft-qc-mock-yh3r1-webapp"
-}
-
 resource "azurerm_windows_web_app" "scs_fss_mock_webapp" {
   name                      = "${var.service_name}-${var.env_name}-mock-${var.unique_string}-webapp"
   location                  = var.location
@@ -147,19 +121,6 @@ resource "azurerm_windows_web_app" "scs_fss_mock_webapp" {
 #  }
 #
 #}
-
-removed {
-  from = module.webapp_service.azurerm_app_service.ess_webapp
-
-  lifecycle {
-    destroy = false
-  }
-}
-
-import {
-  to = module.webapp_service.azurerm_windows_web_app.ess_webapp
-  id = "/subscriptions/f34020e8-74d2-4c45-b769-362ffa18a656/resourceGroups/essft-qc-webapp-rg/providers/Microsoft.Web/sites/essft-qc-yh3r1-webapp"
-}
 
 resource "azurerm_windows_web_app" "ess_webapp" {
   name                      = "${var.service_name}-${var.env_name}-${var.unique_string}-webapp"
