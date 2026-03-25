@@ -122,7 +122,7 @@ stages:
             pwsh: true
             script: $(Agent.BuildDirectory)/tools/dotnet-stryker
 
-        - task: PublishMutationReport@1
+        - task: PublishMutationReport@2
           displayName: 'Publish Stryker Mutator Report'
           inputs:
             reportPattern: '**/mutation-report.html'
@@ -159,7 +159,7 @@ stages:
 
   - stage: QCdeploy
     dependsOn:
-    - Devdeploy
+    - BuildTestPublish
     displayName: "QCdeploy (inc terraform, mock webapp deploy)"
     jobs:
       - deployment: QCDeployApp
@@ -203,33 +203,40 @@ stages:
           runOnce:
             deploy:
               steps:
-                - checkout: self
-                  submodules: recursive
+                - checkout: none
+
+                - download: current
+                  displayName: Download mock Terraform artifact
+                  artifact: mockapiterraformartifact
+
+                - download: current
+                  displayName: Download API artifact
+                  artifact: ExchangeSetServiceWebAPI
+
+                - download: current
+                  displayName: Download webjob artifact
+                  artifact: ExchangeSetService
+
+                - download: current
+                  displayName: Download mock API artifact
+                  artifact: MockWebAPI
+
+                - download: current
+                  displayName: Download functional test artifact
+                  artifact: functionaltests
+
+                - download: current
+                  displayName: Download Terraform artifact
+                  artifact: terraformartifact
 
                 - template: MockApiDeployment/templates/mock-api-continuous-deployment.yml
                   parameters:
                     AzureSubscription: "Exchange-Set-Service-Dev-A-008-02"
 
-                - task: DownloadBuildArtifacts@0
-                  displayName: "Download Functional test Artifact"
-                  inputs:
-                    buildType: 'current'
-                    downloadType: 'single'
-                    artifactName: 'functionaltests'
-                    downloadPath: '$(Build.SourcesDirectory)'
-
-                - task: DownloadBuildArtifacts@0
-                  displayName: "Download Terraform Artifact"
-                  inputs:
-                    buildType: 'current'
-                    downloadType: 'single'
-                    artifactName: 'terraformartifact'
-                    downloadPath: '$(Build.SourcesDirectory)'
-
                 - task: FileTransform@2
                   displayName: "File Transform: functionaltests"
                   inputs:
-                    folderPath: '$(Build.SourcesDirectory)/functionaltests/'
+                    folderPath: '$(Pipeline.Workspace)/functionaltests/'
                     enableXmlTransform: false
                     xmlTransformationRules: ''
                     jsonTargetFiles: '**/appsettings.json'
@@ -247,7 +254,7 @@ stages:
                     azureSubscription: "Exchange-Set-Service-Dev-A-008-02"
                     scriptType: 'pscore'
                     scriptLocation: 'scriptPath'
-                    scriptPath: "$(Build.SourcesDirectory)/terraformartifact/set_api_webjob_aio_feature_configuration.ps1"
+                    scriptPath: "$(Pipeline.Workspace)/terraformartifact/set_api_webjob_aio_feature_configuration.ps1"
                     arguments: '-aiocells $(AioConfiguration.AioCells_FT) -resourcegroup $(webAppResourceGroup) -webappname $(essWebAppName) -fulfilmentwebappsname $(essFulfilmentWebAppname)'
 
                 - task: DotNetCoreCLI@2
@@ -255,11 +262,9 @@ stages:
                   inputs:
                     command: "test"
                     projects: |
-                      **/*FunctionalTest*.dll
-                      !**/*TestAdapter.dll
-                      !**/obj/**
+                      $(Pipeline.Workspace)/functionaltests/**/*FunctionalTest*.dll
                     testRunTitle: "QC-AutomationTests"
-                    workingDirectory: '$(Build.SourcesDirectory)/functionaltests'
+                    workingDirectory: '$(Pipeline.Workspace)/functionaltests'
 
                 - task: AzureCLI@2
                   displayName: "Swap ESS API and ESS FulfilmentService Configuration"
@@ -268,59 +273,8 @@ stages:
                     azureSubscription: "Exchange-Set-Service-Dev-A-008-02"
                     scriptType: 'pscore'
                     scriptLocation: 'scriptPath'
-                    scriptPath: "$(Build.SourcesDirectory)/terraformartifact/set_api_webjob_aio_feature_configuration.ps1"
+                    scriptPath: "$(Pipeline.Workspace)/terraformartifact/set_api_webjob_aio_feature_configuration.ps1"
                     arguments: '-aiocells $(AioConfiguration.AioCells) -resourcegroup $(webAppResourceGroup) -webappname $(essWebAppName) -fulfilmentwebappsname $(essFulfilmentWebAppname)'
-
-  - stage: QAdeploy
-    dependsOn: 
-    - Devdeploy
-    displayName: QA Deploy (inc terraform, webapp deploy)
-    condition: and(succeeded(), or(eq(variables['Build.SourceBranch'], 'refs/heads/main'), startsWith(variables['Build.SourceBranch'], 'refs/heads/release/')))
-    jobs:
-      - template: Deployment/templates/app-deploy.yml
-        parameters:
-          Environment: "qa"
-          ContinueEvenIfResourcesAreGettingDestroyed: ${{ parameters.ContinueEvenIfResourcesAreGettingDestroyed }}
-          AzureSubscription: "Exchange-Set-Service-QA-A-008-02"
-          Container: ${{variables.Container}} 
-
-      - ${{ if eq(parameters.skipDeploymentOfUIInstance, false) }}:
-        - template: Deployment/templates/app-deploy.yml
-          parameters:
-            Environment: "qa"
-            ContinueEvenIfResourcesAreGettingDestroyed: ${{ parameters.ContinueEvenIfResourcesAreGettingDestroyed }}
-            AzureSubscription: "Exchange-Set-Service-QA-A-008-02"
-            Container: ${{variables.Container}} 
-            RunTests: false
-            pathSuffix: "-v2"
-            v2Modifier: "2"
-
-  - stage: vnextiatDeploy
-    dependsOn:
-      - Devdeploy
-    displayName: vNext IAT Deploy (inc terraform, webapp deploy)
-    condition: and(succeeded(), or(eq(variables['Build.SourceBranch'], 'refs/heads/develop'), startsWith(variables['Build.SourceBranch'], 'refs/heads/dev/')))
-    jobs:
-      - template: Deployment/templates/app-deploy.yml
-        parameters:
-          Environment: "vnextiat"
-          ContinueEvenIfResourcesAreGettingDestroyed: ${{ parameters.ContinueEvenIfResourcesAreGettingDestroyed }}
-          AzureSubscription: "Exchange-Set-Service-vNext-IAT-A.011.08"
-          Container: ${{variables.Container}}
-          RunAddsTests: vNextIAT
-
-  - stage: vnexte2eDeploy
-    dependsOn: 
-      - vnextiatDeploy
-    displayName: vNext E2E Deploy (inc terraform, webapp deploy)
-    condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/develop'))
-    jobs:
-      - template: Deployment/templates/app-deploy.yml
-        parameters:
-          Environment: "vnexte2e"
-          ContinueEvenIfResourcesAreGettingDestroyed: ${{ parameters.ContinueEvenIfResourcesAreGettingDestroyed }}
-          AzureSubscription: "Exchange-Set-Service-vNext-E2E-A.011.08"
-          Container: ${{variables.Container}}
 
   - stage: IatDeploy
     dependsOn: 
@@ -443,3 +397,54 @@ stages:
         displayName: Post Deployment Actions
         steps:
           - template: Deployment/templates/retain-pipeline.yml
+
+  - stage: vnextiatDeploy
+    dependsOn:
+      - Devdeploy
+    displayName: vNext IAT Deploy (inc terraform, webapp deploy)
+    condition: and(succeeded(), or(eq(variables['Build.SourceBranch'], 'refs/heads/develop'), startsWith(variables['Build.SourceBranch'], 'refs/heads/dev/')))
+    jobs:
+      - template: Deployment/templates/app-deploy.yml
+        parameters:
+          Environment: "vnextiat"
+          ContinueEvenIfResourcesAreGettingDestroyed: ${{ parameters.ContinueEvenIfResourcesAreGettingDestroyed }}
+          AzureSubscription: "Exchange-Set-Service-vNext-IAT-A.011.08"
+          Container: ${{variables.Container}}
+          RunAddsTests: vNextIAT
+
+  - stage: vnexte2eDeploy
+    dependsOn: 
+      - vnextiatDeploy
+    displayName: vNext E2E Deploy (inc terraform, webapp deploy)
+    condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/develop'))
+    jobs:
+      - template: Deployment/templates/app-deploy.yml
+        parameters:
+          Environment: "vnexte2e"
+          ContinueEvenIfResourcesAreGettingDestroyed: ${{ parameters.ContinueEvenIfResourcesAreGettingDestroyed }}
+          AzureSubscription: "Exchange-Set-Service-vNext-E2E-A.011.08"
+          Container: ${{variables.Container}}
+
+  - stage: QAdeploy
+    dependsOn: 
+    - Devdeploy
+    displayName: QA Deploy (inc terraform, webapp deploy)
+    condition: and(succeeded(), or(eq(variables['Build.SourceBranch'], 'refs/heads/main'), startsWith(variables['Build.SourceBranch'], 'refs/heads/release/')))
+    jobs:
+      - template: Deployment/templates/app-deploy.yml
+        parameters:
+          Environment: "qa"
+          ContinueEvenIfResourcesAreGettingDestroyed: ${{ parameters.ContinueEvenIfResourcesAreGettingDestroyed }}
+          AzureSubscription: "Exchange-Set-Service-QA-A-008-02"
+          Container: ${{variables.Container}} 
+
+      - ${{ if eq(parameters.skipDeploymentOfUIInstance, false) }}:
+        - template: Deployment/templates/app-deploy.yml
+          parameters:
+            Environment: "qa"
+            ContinueEvenIfResourcesAreGettingDestroyed: ${{ parameters.ContinueEvenIfResourcesAreGettingDestroyed }}
+            AzureSubscription: "Exchange-Set-Service-QA-A-008-02"
+            Container: ${{variables.Container}} 
+            RunTests: false
+            pathSuffix: "-v2"
+            v2Modifier: "2"

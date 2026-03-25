@@ -14,6 +14,9 @@ variable "app_settings" {
   type = map(string)
 }
 
+variable "app_settings_insights" {
+  type = map(string)
+}
 
 variable "tags" {
 
@@ -28,5 +31,9 @@ variable "env_name" {
 }
 
 variable "user_assigned_identity" {
+  type = string
+}
+
+variable "unique_string" {
   type = string
 }
