@@ -8,6 +8,14 @@ module "user_identity" {
   tags                = local.tags
 }
 
+module "app_insights" {
+  source              = "./Modules/AppInsights"
+  name                = "${local.service_name}-${local.env_name}-fulfillment-${random_string.unique_string.result}-webapp"
+  resource_group_name = azurerm_resource_group.webapp_rg.name
+  location            = azurerm_resource_group.webapp_rg.location
+  tags                = local.tags
+}
+
 module "webapp_service" {
   source              = "./Modules/Webapp"
   service_name        = local.service_name
@@ -20,10 +28,12 @@ module "webapp_service" {
     "ASPNETCORE_ENVIRONMENT"                               = local.env_name
     "WEBSITE_RUN_FROM_PACKAGE"                             = "1"
     "WEBSITE_ENABLE_SYNC_UPDATE_SITE"                      = "true"
-    "APPLICATIONINSIGHTS_CONNECTION_STRING"                = "NOT_CONFIGURED"
+  }
+  app_settings_insights = {
+    "APPLICATIONINSIGHTS_CONNECTION_STRING"                = module.app_insights.connection_string
   }
   tags = local.tags
-
+  unique_string = random_string.unique_string.result
 }
 
 module "storage" {
