@@ -51,17 +51,17 @@ resource "azurerm_eventhub_authorization_rule" "log" {
 }
 
 resource "azurerm_storage_account" "logstashStorage" {
-  name                      = var.logstashStorageName
-  resource_group_name       = var.resource_group_name
-  location                  = var.location
-  account_kind              = "StorageV2"
-  min_tls_version           = "TLS1_2"
-  account_tier              = "Standard"
-  account_replication_type  = "LRS"
-  access_tier               = "Hot"
-  enable_https_traffic_only = true
-  tags                      = var.tags
-  allow_nested_items_to_be_public  = false
+  name                            = var.logstashStorageName
+  resource_group_name             = var.resource_group_name
+  location                        = var.location
+  account_kind                    = "StorageV2"
+  min_tls_version                 = "TLS1_2"
+  account_tier                    = "Standard"
+  account_replication_type        = "LRS"
+  access_tier                     = "Hot"
+  https_traffic_only_enabled      = true
+  tags                            = var.tags
+  allow_nested_items_to_be_public = false
   network_rules {
     default_action             = "Deny"
     ip_rules                   = var.allowed_ips
