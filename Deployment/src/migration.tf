@@ -77,6 +77,20 @@ import {
 }
 
 removed {
+  from = module.fulfilment_webapp.azurerm_app_service_slot.small_exchange_set_staging
+
+  lifecycle {
+    destroy = false
+  }
+}
+
+import {
+  for_each = range(local.config_data.ESSFulfilmentConfiguration.SmallExchangeSetInstance)
+  to = module.fulfilment_webapp.azurerm_windows_web_app_slot.small_exchange_set_staging[each.key]
+  id = "${azurerm_resource_group.rg.id}/providers/Microsoft.Web/sites/${local.as_name_sxs[each.key]}/slots/staging"
+}
+
+removed {
   from = module.fulfilment_webapp.azurerm_app_service_virtual_network_swift_connection.small_exchange_set_webapp_vnet_integration
 
   lifecycle {
