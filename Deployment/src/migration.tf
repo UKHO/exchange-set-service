@@ -60,3 +60,34 @@ removed {
     destroy = false
   }
 }
+
+# Fulfilment - SXS
+removed {
+  from = module.fulfilment_webapp.azurerm_app_service.small_exchange_set_webapp
+
+  lifecycle {
+    destroy = false
+  }
+}
+
+import {
+  for_each = range(local.config_data.ESSFulfilmentConfiguration.SmallExchangeSetInstance)
+  to = module.fulfilment_webapp.azurerm_windows_web_app.small_exchange_set_webapp[each.key]
+  id = "${azurerm_resource_group.rg.id}/providers/Microsoft.Web/sites/${local.as_name_sxs[each.key]}"
+}
+
+removed {
+  from = module.fulfilment_webapp.azurerm_app_service_virtual_network_swift_connection.small_exchange_set_webapp_vnet_integration
+
+  lifecycle {
+    destroy = false
+  }
+}
+
+removed {
+  from = module.fulfilment_webapp.azurerm_app_service_slot_virtual_network_swift_connection.small_exchange_set_slot_vnet_integration
+
+  lifecycle {
+    destroy = false
+  }
+}
