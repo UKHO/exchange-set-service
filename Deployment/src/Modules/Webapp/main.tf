@@ -12,22 +12,27 @@ resource "azurerm_service_plan" "app_service_plan" {
   zone_balancing_enabled = var.asp_control_webapp.zoneRedundant
 }
 
-resource "azurerm_app_service" "webapp_service" {
+resource "azurerm_windows_web_app" "webapp_service" {
   lifecycle {
     replace_triggered_by = [terraform_data.replacement]
   }
 
-  name                = var.name
-  location            = var.location
-  resource_group_name = var.resource_group_name
-  app_service_plan_id = azurerm_service_plan.app_service_plan.id
-  tags                = var.tags
+  name                      = var.name
+  location                  = var.location
+  resource_group_name       = var.resource_group_name
+  service_plan_id           = azurerm_service_plan.app_service_plan.id
+  tags                      = var.tags
+  virtual_network_subnet_id = var.subnet_id
 
   site_config {
-    windows_fx_version  =   "DOTNETCORE|6.0"
+    application_stack {
+      current_stack = "dotnet"
+      dotnet_version = "v8.0"
+    }
     
-    always_on  = true
-    ftps_state = "Disabled"
+    always_on         = true
+    ftps_state        = "Disabled"
+    use_32_bit_worker = false
 
     ip_restriction {
       virtual_network_subnet_id = var.subnet_id
@@ -43,6 +48,10 @@ resource "azurerm_app_service" "webapp_service" {
 
   app_settings = var.app_settings
 
+  sticky_settings {
+    app_setting_names = [ "WEBJOBS_STOPPED" ]
+  }
+
   identity {
     type = "UserAssigned"
     identity_ids = [var.user_assigned_identity]
@@ -51,24 +60,26 @@ resource "azurerm_app_service" "webapp_service" {
   https_only = true
 }
 
-resource "azurerm_app_service_slot" "staging" {
+resource "azurerm_windows_web_app_slot" "staging" {
   lifecycle {
     replace_triggered_by = [terraform_data.replacement]
   }
 
-  name                = "staging"
-  app_service_name    = azurerm_app_service.webapp_service.name
-  location            = azurerm_app_service.webapp_service.location
-  resource_group_name = azurerm_app_service.webapp_service.resource_group_name
-  app_service_plan_id = azurerm_app_service.webapp_service.app_service_plan_id
-  tags                = azurerm_app_service.webapp_service.tags
+  name                      = "staging"
+  app_service_id            = azurerm_windows_web_app.webapp_service.id
+  tags                      = azurerm_windows_web_app.webapp_service.tags
+  virtual_network_subnet_id = var.subnet_id
 
   site_config {
-    windows_fx_version  =   "DOTNETCORE|6.0"
+    application_stack {
+      current_stack = "dotnet"
+      dotnet_version = "v8.0"
+    }
     
-    always_on  = true
-    ftps_state = "Disabled"
-    
+    always_on         = true
+    ftps_state        = "Disabled"
+    use_32_bit_worker = false
+
     ip_restriction {
       virtual_network_subnet_id = var.subnet_id
     }
@@ -81,23 +92,12 @@ resource "azurerm_app_service_slot" "staging" {
     }
   }
 
-  app_settings        = azurerm_app_service.webapp_service.app_settings
+  app_settings = merge(azurerm_windows_web_app.webapp_service.app_settings, { "WEBJOBS_STOPPED" = "1" })
 
-   identity {
+  identity {
     type = "UserAssigned"
     identity_ids = [var.user_assigned_identity]
   }
 
-  https_only          = azurerm_app_service.webapp_service.https_only
-}
-
-resource "azurerm_app_service_virtual_network_swift_connection" "webapp_vnet_integration" {
-  app_service_id = azurerm_app_service.webapp_service.id
-  subnet_id      = var.subnet_id
-}
-
-resource "azurerm_app_service_slot_virtual_network_swift_connection" "slot_vnet_integration" {
-  app_service_id = azurerm_app_service.webapp_service.id
-  subnet_id      = var.subnet_id
-  slot_name      = azurerm_app_service_slot.staging.name
+  https_only = azurerm_windows_web_app.webapp_service.https_only
 }

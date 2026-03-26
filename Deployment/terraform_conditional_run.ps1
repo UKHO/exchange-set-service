@@ -46,6 +46,8 @@ if($totalDestroyLines -ge 2)
     write-host("Continue executing terraform apply - as continueEvenIfResourcesAreGettingDestroyed param is set to true in pipeline")
 }
 
+throw "Stop here!"
+
 Write-output "Executing terraform apply"
 terraform apply  "terraform.deployment.tfplan"
 if ( !$? ) { echo "Something went wrong during terraform apply" ; throw "Error" }
