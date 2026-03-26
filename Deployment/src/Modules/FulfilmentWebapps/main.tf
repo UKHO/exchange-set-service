@@ -82,14 +82,14 @@ resource "azurerm_windows_web_app_slot" "small_exchange_set_staging" {
     }
   }
 
-  app_settings = merge(azurerm_windows_web_app.small_exchange_set_app_service_plan[count.index].app_settings, { "WEBJOBS_STOPPED" = "1" })
+  app_settings = merge(azurerm_windows_web_app.small_exchange_set_webapp[count.index].app_settings, { "WEBJOBS_STOPPED" = "1" })
 
   identity {
     type = "UserAssigned"
     identity_ids = [var.user_assigned_identity]
   }
 
-  https_only = azurerm_windows_web_app.small_exchange_set_app_service_plan[count.index].https_only
+  https_only = azurerm_windows_web_app.small_exchange_set_webapp[count.index].https_only
 }
 
 # Medium exchange set
