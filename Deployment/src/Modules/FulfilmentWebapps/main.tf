@@ -63,7 +63,7 @@ resource "azurerm_windows_web_app_slot" "small_exchange_set_staging" {
 
   count                     = var.exchange_set_config.SmallExchangeSetInstance
   name                      = "staging"
-  app_service_id            = azurerm_service_plan.small_exchange_set_app_service_plan[count.index].id
+  app_service_id            = azurerm_windows_web_app.small_exchange_set_webapp[count.index].id
   tags                      = azurerm_windows_web_app.small_exchange_set_webapp[count.index].tags
   virtual_network_subnet_id = var.small_exchange_set_subnets[count.index]
 
