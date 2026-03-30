@@ -105,3 +105,93 @@ removed {
     destroy = false
   }
 }
+
+# Fulfilment - MXS
+removed {
+  from = module.fulfilment_webapp.azurerm_app_service.medium_exchange_set_webapp
+
+  lifecycle {
+    destroy = false
+  }
+}
+
+import {
+  for_each = range(local.config_data.ESSFulfilmentConfiguration.MediumExchangeSetInstance)
+  to = module.fulfilment_webapp.azurerm_windows_web_app.medium_exchange_set_webapp[each.key]
+  id = "${azurerm_resource_group.rg.id}/providers/Microsoft.Web/sites/${local.as_name_mxs[each.key]}"
+}
+
+removed {
+  from = module.fulfilment_webapp.azurerm_app_service_slot.medium_exchange_set_staging
+
+  lifecycle {
+    destroy = false
+  }
+}
+
+import {
+  for_each = range(local.config_data.ESSFulfilmentConfiguration.MediumExchangeSetInstance)
+  to = module.fulfilment_webapp.azurerm_windows_web_app_slot.medium_exchange_set_staging[each.key]
+  id = "${azurerm_resource_group.rg.id}/providers/Microsoft.Web/sites/${local.as_name_mxs[each.key]}/slots/staging"
+}
+
+removed {
+  from = module.fulfilment_webapp.azurerm_app_service_virtual_network_swift_connection.medium_exchange_set_webapp_vnet_integration
+
+  lifecycle {
+    destroy = false
+  }
+}
+
+removed {
+  from = module.fulfilment_webapp.azurerm_app_service_slot_virtual_network_swift_connection.medium_exchange_set_slot_vnet_integration
+
+  lifecycle {
+    destroy = false
+  }
+}
+
+# Fulfilment - LXS
+removed {
+  from = module.fulfilment_webapp.azurerm_app_service.large_exchange_set_webapp
+
+  lifecycle {
+    destroy = false
+  }
+}
+
+import {
+  for_each = range(local.config_data.ESSFulfilmentConfiguration.LargeExchangeSetInstance)
+  to = module.fulfilment_webapp.azurerm_windows_web_app.large_exchange_set_webapp[each.key]
+  id = "${azurerm_resource_group.rg.id}/providers/Microsoft.Web/sites/${local.as_name_lxs[each.key]}"
+}
+
+removed {
+  from = module.fulfilment_webapp.azurerm_app_service_slot.large_exchange_set_staging
+
+  lifecycle {
+    destroy = false
+  }
+}
+
+import {
+  for_each = range(local.config_data.ESSFulfilmentConfiguration.LargeExchangeSetInstance)
+  to = module.fulfilment_webapp.azurerm_windows_web_app_slot.large_exchange_set_staging[each.key]
+  id = "${azurerm_resource_group.rg.id}/providers/Microsoft.Web/sites/${local.as_name_lxs[each.key]}/slots/staging"
+}
+
+removed {
+  from = module.fulfilment_webapp.azurerm_app_service_virtual_network_swift_connection.large_exchange_set_webapp_vnet_integration
+
+  lifecycle {
+    destroy = false
+  }
+}
+
+removed {
+  from = module.fulfilment_webapp.azurerm_app_service_slot_virtual_network_swift_connection.large_exchange_set_slot_vnet_integration
+
+  lifecycle {
+    destroy = false
+  }
+}
