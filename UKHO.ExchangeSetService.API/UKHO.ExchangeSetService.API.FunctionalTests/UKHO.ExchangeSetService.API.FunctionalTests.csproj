@@ -18,7 +18,7 @@
     <PackageReference Include="Microsoft.Extensions.Configuration" Version="9.0.14" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="9.0.14" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="9.0.14" />
-    <PackageReference Include="Microsoft.Identity.Client" Version="4.83.1" />
+    <PackageReference Include="Microsoft.Identity.Client" Version="4.83.3" />
     <PackageReference Include="NUnit" Version="4.5.1" />
     <PackageReference Include="NUnit.Analyzers" Version="4.12.0">
       <PrivateAssets>all</PrivateAssets>
@@ -26,7 +26,7 @@
     </PackageReference>
     <PackageReference Include="NUnit3TestAdapter" Version="5.2.0" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.3.0" />
-    <PackageReference Include="System.Text.Json" Version="10.0.4" />
+    <PackageReference Include="System.Text.Json" Version="10.0.5" />
   </ItemGroup>
   <ItemGroup>
     <None Update="appSettings.json">
