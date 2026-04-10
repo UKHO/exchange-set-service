@@ -1,15 +1,13 @@
-﻿using System;
+﻿using System.Collections.Generic;
+using System.Linq;
+using System.Net;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Swashbuckle.AspNetCore.Annotations;
 using Swashbuckle.AspNetCore.Filters;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 using UKHO.ExchangeSetService.API.Extensions;
 using UKHO.ExchangeSetService.API.Filters;
 using UKHO.ExchangeSetService.API.Services;
@@ -74,7 +72,7 @@ namespace UKHO.ExchangeSetService.API.Controllers
         [SwaggerResponse(statusCode: (int)HttpStatusCode.InternalServerError, type: typeof(InternalServerError), description: "Internal Server Error.")]
         public virtual Task<IActionResult> PostProductIdentifiers([FromBody] string[] productIdentifiers, [FromQuery] string callbackUri, [FromQuery] string exchangeSetStandard)
         {
-            exchangeSetStandard = SanitizeString(exchangeSetStandard);
+            exchangeSetStandard = SanitizeStandardString(exchangeSetStandard);
             productIdentifiers = SanitizeProductIdentifiers(productIdentifiers);
             return Logger.LogStartEndAndElapsedTimeAsync(EventIds.ESSPostProductIdentifiersRequestStart, EventIds.ESSPostProductIdentifiersRequestCompleted,
                 "Product Identifiers Endpoint request for _X-Correlation-ID:{correlationId} and ExchangeSetStandard:{exchangeSetStandard}",
@@ -163,7 +161,7 @@ namespace UKHO.ExchangeSetService.API.Controllers
         [SwaggerResponse(statusCode: (int)HttpStatusCode.InternalServerError, type: typeof(InternalServerError), description: "Internal Server Error.")]
         public virtual Task<IActionResult> PostProductDataByProductVersions([FromBody] List<ProductVersionRequest> productVersionsRequest, string callbackUri, [FromQuery] string exchangeSetStandard)
         {
-            exchangeSetStandard = SanitizeString(exchangeSetStandard);
+            exchangeSetStandard = SanitizeStandardString(exchangeSetStandard);
             return Logger.LogStartEndAndElapsedTimeAsync(EventIds.ESSPostProductVersionsRequestStart, EventIds.ESSPostProductVersionsRequestCompleted,
                 "Product Versions Endpoint request for _X-Correlation-ID:{correlationId} and ExchangeSetStandard:{exchangeSetStandard}",
                 async () =>
@@ -245,7 +243,7 @@ namespace UKHO.ExchangeSetService.API.Controllers
         public virtual Task<IActionResult> GetProductDataSinceDateTime([FromQuery, SwaggerParameter(Required = true), SwaggerSchema(Format = "date-time")] string sinceDateTime,
             [FromQuery] string callbackUri, [FromQuery] string exchangeSetStandard)
         {
-            exchangeSetStandard = SanitizeString(exchangeSetStandard);
+            exchangeSetStandard = SanitizeStandardString(exchangeSetStandard);
             return Logger.LogStartEndAndElapsedTimeAsync(EventIds.ESSGetProductsFromSpecificDateRequestStart, EventIds.ESSGetProductsFromSpecificDateRequestCompleted,
                 "Product Data SinceDateTime Endpoint request for _X-Correlation-ID:{correlationId} and ExchangeSetStandard:{exchangeSetStandard}",
                 async () =>
@@ -293,41 +291,6 @@ namespace UKHO.ExchangeSetService.API.Controllers
 
                     return GetEssResponse(productDetail);
                 }, GetCurrentCorrelationId(), exchangeSetStandard);
-        }
-
-        private string[] SanitizeProductIdentifiers(string[] productIdentifiers)
-        {
-            if (productIdentifiers == null)
-            {
-                return null;
-            }
-
-            if (productIdentifiers.Any(x => x == null))
-            {
-                return new string[] { null };
-            }
-
-            List<string> sanitizedIdentifiers = new List<string>();
-            if (productIdentifiers.Length > 0)
-            {
-                foreach (string identifier in productIdentifiers)
-                {
-                    string sanitizedIdentifier = identifier.Trim();
-                    sanitizedIdentifiers.Add(sanitizedIdentifier);
-                }
-            }
-
-            return sanitizedIdentifiers.ToArray();
-        }
-        private string SanitizeString(string input)
-        {
-            // Remove leading and trailing white spaces
-            string sanitizedString = input.Trim();
-
-            // Remove any special characters or symbols
-            sanitizedString = Regex.Replace(sanitizedString, @"[^a-zA-Z0-9]", "");
-
-            return sanitizedString;
         }
     }
 }
