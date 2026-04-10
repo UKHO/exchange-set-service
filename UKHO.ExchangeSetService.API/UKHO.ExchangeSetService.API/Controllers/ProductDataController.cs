@@ -72,8 +72,8 @@ namespace UKHO.ExchangeSetService.API.Controllers
         [SwaggerResponse(statusCode: (int)HttpStatusCode.InternalServerError, type: typeof(InternalServerError), description: "Internal Server Error.")]
         public virtual Task<IActionResult> PostProductIdentifiers([FromBody] string[] productIdentifiers, [FromQuery] string callbackUri, [FromQuery] string exchangeSetStandard)
         {
-            exchangeSetStandard = SanitizeStandardString(exchangeSetStandard);
-            productIdentifiers = SanitizeProductIdentifiers(productIdentifiers);
+            exchangeSetStandard = exchangeSetStandard.SanitizeExchangeSetStandard();
+            productIdentifiers = productIdentifiers.SanitizeProductIdentifiers();
             return Logger.LogStartEndAndElapsedTimeAsync(EventIds.ESSPostProductIdentifiersRequestStart, EventIds.ESSPostProductIdentifiersRequestCompleted,
                 "Product Identifiers Endpoint request for _X-Correlation-ID:{correlationId} and ExchangeSetStandard:{exchangeSetStandard}",
                 async () =>
@@ -161,7 +161,7 @@ namespace UKHO.ExchangeSetService.API.Controllers
         [SwaggerResponse(statusCode: (int)HttpStatusCode.InternalServerError, type: typeof(InternalServerError), description: "Internal Server Error.")]
         public virtual Task<IActionResult> PostProductDataByProductVersions([FromBody] List<ProductVersionRequest> productVersionsRequest, string callbackUri, [FromQuery] string exchangeSetStandard)
         {
-            exchangeSetStandard = SanitizeStandardString(exchangeSetStandard);
+            exchangeSetStandard = exchangeSetStandard.SanitizeExchangeSetStandard();
             return Logger.LogStartEndAndElapsedTimeAsync(EventIds.ESSPostProductVersionsRequestStart, EventIds.ESSPostProductVersionsRequestCompleted,
                 "Product Versions Endpoint request for _X-Correlation-ID:{correlationId} and ExchangeSetStandard:{exchangeSetStandard}",
                 async () =>
@@ -243,7 +243,7 @@ namespace UKHO.ExchangeSetService.API.Controllers
         public virtual Task<IActionResult> GetProductDataSinceDateTime([FromQuery, SwaggerParameter(Required = true), SwaggerSchema(Format = "date-time")] string sinceDateTime,
             [FromQuery] string callbackUri, [FromQuery] string exchangeSetStandard)
         {
-            exchangeSetStandard = SanitizeStandardString(exchangeSetStandard);
+            exchangeSetStandard = exchangeSetStandard.SanitizeExchangeSetStandard();
             return Logger.LogStartEndAndElapsedTimeAsync(EventIds.ESSGetProductsFromSpecificDateRequestStart, EventIds.ESSGetProductsFromSpecificDateRequestCompleted,
                 "Product Data SinceDateTime Endpoint request for _X-Correlation-ID:{correlationId} and ExchangeSetStandard:{exchangeSetStandard}",
                 async () =>
