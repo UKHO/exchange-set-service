@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using UKHO.ExchangeSetService.Common.Models.Enums;
 
 namespace UKHO.ExchangeSetService.Common.Extensions
@@ -63,6 +64,26 @@ namespace UKHO.ExchangeSetService.Common.Extensions
             }
 
             return ExchangeSetStandard.s63.ToString();
+        }
+
+        public static string SanitizeString(this string value)
+        {
+            if (string.IsNullOrEmpty(value))
+            {
+                return value;
+            }
+
+            var sb = new StringBuilder(value.Length);
+
+            foreach (var ch in value)
+            {
+                if (!char.IsControl(ch))
+                {
+                    sb.Append(ch);
+                }
+            }
+
+            return sb.ToString();
         }
     }
 }

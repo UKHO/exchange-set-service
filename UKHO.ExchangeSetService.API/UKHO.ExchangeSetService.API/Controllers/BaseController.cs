@@ -8,8 +8,8 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using UKHO.ExchangeSetService.API.Filters;
+using UKHO.ExchangeSetService.Common.Extensions;
 using UKHO.ExchangeSetService.Common.Logging;
-using UKHO.ExchangeSetService.Common.Models.Enums;
 using UKHO.ExchangeSetService.Common.Models.Response;
 using UKHO.ExchangeSetService.Common.Models.SalesCatalogue;
 
@@ -131,12 +131,14 @@ namespace UKHO.ExchangeSetService.API.Controllers
 
         private void LogError(EventId eventId, List<Error> errors, string errorType, string correlationId)
         {
-            Logger.LogError(eventId, $"{HttpContext.Request.Path} - {errorType} - {{Errors}} for CorrelationId - {{correlationId}}", errors, correlationId);
+            var path = HttpContext.Request.Path.ToString().SanitizeString();
+            Logger.LogError(eventId, $"{path} - {errorType} - {{Errors}} for CorrelationId - {{correlationId}}", errors, correlationId);
         }
 
         private void LogInfo(EventId eventId, string infoType, string correlationId)
         {
-            Logger.LogInformation(eventId, $"{HttpContext.Request.Path} - {infoType} - for CorrelationId - {{correlationId}}", correlationId);
+            var path = HttpContext.Request.Path.ToString().SanitizeString();
+            Logger.LogInformation(eventId, $"{path} - {infoType} - for CorrelationId - {{correlationId}}", correlationId);
         }
         protected IActionResult GetScsResponse(SalesCatalogueResponse model, List<Error> errors = null)
         {

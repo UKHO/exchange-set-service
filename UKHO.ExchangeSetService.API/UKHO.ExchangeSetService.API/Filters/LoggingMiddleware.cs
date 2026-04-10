@@ -1,10 +1,4 @@
-﻿using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Http.Extensions;
-using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
@@ -12,6 +6,13 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.Extensions;
+using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using UKHO.ExchangeSetService.Common.Extensions;
 using UKHO.ExchangeSetService.Common.Logging;
 
 namespace UKHO.ExchangeSetService.API.Filters
@@ -20,7 +21,7 @@ namespace UKHO.ExchangeSetService.API.Filters
     public static class LoggingMiddleware
     {
         private const string RedactedValue = "********";
-        private static readonly string[] HeadersToRedact = { "userpass", "token" };
+        private static readonly string[] s_headersToRedact = { "userpass", "token" };
         private const int MaxBodyCharSize = 1000;
         private const int TruncatedBodyCharSize = 987;
 
@@ -92,11 +93,11 @@ namespace UKHO.ExchangeSetService.API.Filters
                         stopwatch.Stop();
                         logger.LogInformation(EventIds.LogRequest.ToEventId(),
                                               "Request Method: {requestMethod}, Request Url: {url}, Request IP: {ipAddress}, Request Header:{requestHeaders}, Request Body: {requestBodyText}, Response Code: {responseCode}, Response Content Length: {responseContentLength}, Response Content Type: {responseContentType}, Response Headers:{responseHeaders}, Response Body: {responseBody}, Processing Time: {processingDuration}",
-                                              context.Request.Method,
+                                              context.Request.Method.SanitizeString(),
                                               url,
                                               ipAddress,
                                               requestHeaders,
-                                              requestBodyText,
+                                              requestBodyText.SanitizeString(),
                                               context.Response.StatusCode,
                                               responseBody.Length,
                                               context.Response.ContentType,
@@ -120,7 +121,7 @@ namespace UKHO.ExchangeSetService.API.Filters
             var bodyAsString = await ReadAndResetStream(responseBody);
             if (!string.IsNullOrEmpty(bodyAsString))
             {
-                foreach (var propertyToRedact in HeadersToRedact.Where(propertyToRedact => bodyAsString.Contains(propertyToRedact)))
+                foreach (var propertyToRedact in s_headersToRedact.Where(propertyToRedact => bodyAsString.Contains(propertyToRedact)))
                 {
                     bodyAsString = RedactBody(propertyToRedact, bodyAsString, logger);
                 }
@@ -167,7 +168,7 @@ namespace UKHO.ExchangeSetService.API.Filters
                                                && !h.Key.Equals("X-ARR-ClientCert", StringComparison.InvariantCultureIgnoreCase)
                                                && !h.Key.Equals("MS-ASPNETCORE-CLIENTCERT", StringComparison.InvariantCultureIgnoreCase)
                                          )
-                .ToDictionary(h => h.Key, h => HeadersToRedact.Any(r => r.Equals(h.Key, StringComparison.InvariantCultureIgnoreCase)) ? RedactedValue : string.Join(", ", (object[])h.Value));
+                .ToDictionary(h => h.Key, h => s_headersToRedact.Any(r => r.Equals(h.Key, StringComparison.InvariantCultureIgnoreCase)) ? RedactedValue : string.Join(", ", (object[])h.Value).SanitizeString());
         }
 
         private static async Task<string> ReadAndResetStream(Stream stream)
