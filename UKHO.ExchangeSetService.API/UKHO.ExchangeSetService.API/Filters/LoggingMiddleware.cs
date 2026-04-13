@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -17,11 +16,10 @@ using UKHO.ExchangeSetService.Common.Logging;
 
 namespace UKHO.ExchangeSetService.API.Filters
 {
-    [ExcludeFromCodeCoverage]   //Used in Startup.cs
     public static class LoggingMiddleware
     {
         private const string RedactedValue = "********";
-        private static readonly string[] s_headersToRedact = { "userpass", "token" };
+        private static readonly string[] s_headersToRedact = ["userpass", "token"];
         private const int MaxBodyCharSize = 1000;
         private const int TruncatedBodyCharSize = 987;
 
