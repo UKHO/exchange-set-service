@@ -34,36 +34,24 @@ namespace UKHO.ExchangeSetService.Common.Extensions
             return [.. sanitizedIdentifiers];
         }
 
-        public static string SanitizeExchangeSetLayout(this string input)
+        public static string SanitizeExchangeSetLayout(this string input) => SanitizeEnum(input, ExchangeSetLayout.standard);
+
+        public static string SanitizeExchangeSetStandard(this string input) => SanitizeEnum(input, ExchangeSetStandard.s63);
+
+        private static string SanitizeEnum<T>(string input, T defaultValue) where T : struct, Enum
         {
             if (string.IsNullOrWhiteSpace(input))
             {
-                return ExchangeSetLayout.standard.ToString();
+                return defaultValue.ToString();
             }
-
-            // Try parse enum (case-insensitive); fallback to "standard"
-            if (Enum.TryParse<ExchangeSetLayout>(input.Trim(), ignoreCase: true, out var parsed))
+            else if (Enum.TryParse<T>(input.Trim(), true, out var parsed))
             {
                 return parsed.ToString();
             }
-
-            return ExchangeSetLayout.standard.ToString();
-        }
-
-        public static string SanitizeExchangeSetStandard(this string input)
-        {
-            if (string.IsNullOrWhiteSpace(input))
+            else
             {
-                return ExchangeSetStandard.s63.ToString();
+                return defaultValue.ToString();
             }
-
-            // Try parse enum (case-insensitive); fallback to "s63"
-            if (Enum.TryParse<ExchangeSetStandard>(input.Trim(), ignoreCase: true, out var parsed))
-            {
-                return parsed.ToString();
-            }
-
-            return ExchangeSetStandard.s63.ToString();
         }
 
         public static string SanitizeString(this string value)

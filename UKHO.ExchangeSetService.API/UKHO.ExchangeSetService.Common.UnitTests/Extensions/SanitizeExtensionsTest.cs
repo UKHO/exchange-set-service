@@ -135,5 +135,13 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Extensions
 
             Assert.That(result, Is.EqualTo("value with spaces"));
         }
+
+        [Test]
+        public void WhenStringIsUri_ThenSanitizeStringPreservesIt()
+        {
+            var result = "http://example.com".SanitizeString();
+
+            Assert.That(result, Is.EqualTo("http://example.com"));
+        }
     }
 }
