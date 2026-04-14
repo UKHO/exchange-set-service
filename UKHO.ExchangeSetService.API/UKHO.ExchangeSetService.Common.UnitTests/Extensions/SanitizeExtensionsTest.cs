@@ -103,13 +103,13 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Extensions
         }
 
         [Test]
-        public void WhenStringIsNull_ThenSanitizeStringReturnsNull()
+        public void WhenStringIsNull_ThenSanitizeStringReturnsEmptyString()
         {
             string input = null;
 
             var result = input.SanitizeString();
 
-            Assert.That(result, Is.Null);
+            Assert.That(result, Is.EqualTo(string.Empty));
         }
 
         [Test]
