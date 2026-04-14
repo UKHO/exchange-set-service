@@ -58,7 +58,7 @@ namespace UKHO.ExchangeSetService.Common.Extensions
         {
             if (string.IsNullOrEmpty(value))
             {
-                return value;
+                return string.Empty;
             }
 
             var sb = new StringBuilder(value.Length);
