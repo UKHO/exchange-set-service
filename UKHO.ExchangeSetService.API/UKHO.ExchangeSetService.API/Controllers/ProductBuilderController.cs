@@ -1,23 +1,21 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Net;
+using System.Threading.Tasks;
+using FluentValidation.Results;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Swashbuckle.AspNetCore.Annotations;
 using Swashbuckle.AspNetCore.Filters;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
-using FluentValidation.Results;
 using UKHO.ExchangeSetService.API.Extensions;
 using UKHO.ExchangeSetService.API.Filters;
 using UKHO.ExchangeSetService.API.Services;
 using UKHO.ExchangeSetService.Common.Extensions;
 using UKHO.ExchangeSetService.Common.Logging;
 using UKHO.ExchangeSetService.Common.Models.AzureADB2C;
-using UKHO.ExchangeSetService.Common.Models.Enums;
 using UKHO.ExchangeSetService.Common.Models.Request;
 using UKHO.ExchangeSetService.Common.Models.Response;
 
@@ -77,9 +75,9 @@ namespace UKHO.ExchangeSetService.API.Controllers
         [SwaggerResponse(statusCode: (int)HttpStatusCode.InternalServerError, type: typeof(InternalServerError), description: "Internal Server Error.")]
         public virtual Task<IActionResult> PostProductIdentifiers([FromBody] string[] productIdentifiers, [FromQuery] string callbackUri, [FromQuery] string exchangeSetStandard, [FromQuery] string exchangeSetLayout)
         {
-            exchangeSetStandard = SanitizeString(exchangeSetStandard);
-            exchangeSetLayout = SanitizeLayoutString(exchangeSetLayout);
-            productIdentifiers = SanitizeProductIdentifiers(productIdentifiers);
+            exchangeSetStandard = exchangeSetStandard.SanitizeExchangeSetStandard();
+            exchangeSetLayout = exchangeSetLayout.SanitizeExchangeSetLayout();
+            productIdentifiers = productIdentifiers.SanitizeProductIdentifiers();
 
             return Logger.LogStartEndAndElapsedTimeAsync(EventIds.ESSPostProductIdentifiersRequestStart, EventIds.ESSPostProductIdentifiersRequestCompleted,
                 "Product Identifiers Endpoint request for _X-Correlation-ID:{correlationId}, ExchangeSetStandard:{exchangeSetStandard} and ExchangeSetLayout:{exchangeSetLayout}",
@@ -146,8 +144,8 @@ namespace UKHO.ExchangeSetService.API.Controllers
         [SwaggerResponse(statusCode: (int)HttpStatusCode.InternalServerError, type: typeof(InternalServerError), description: "Internal Server Error.")]
         public virtual Task<IActionResult> PostproductBuilderByProductVersions([FromBody] List<ProductVersionRequest> productVersionsRequest, string callbackUri, [FromQuery] string exchangeSetStandard, [FromQuery] string exchangeSetLayout)
         {
-            exchangeSetStandard = SanitizeString(exchangeSetStandard);
-            exchangeSetLayout = SanitizeLayoutString(exchangeSetLayout);
+            exchangeSetStandard = exchangeSetStandard.SanitizeExchangeSetStandard();
+            exchangeSetLayout = exchangeSetLayout.SanitizeExchangeSetLayout();
 
             return Logger.LogStartEndAndElapsedTimeAsync(EventIds.ESSPostProductVersionsRequestStart, EventIds.ESSPostProductVersionsRequestCompleted,
                 "Product Versions Endpoint request for _X-Correlation-ID:{correlationId}, ExchangeSetStandard:{exchangeSetStandard} and ExchangeSetLayout:{exchangeSetLayout}",
@@ -208,8 +206,8 @@ namespace UKHO.ExchangeSetService.API.Controllers
         public virtual Task<IActionResult> GetproductBuilderSinceDateTime([FromQuery, SwaggerParameter(Required = true), SwaggerSchema(Format = "date-time")] string sinceDateTime,
             [FromQuery] string callbackUri, [FromQuery] string exchangeSetStandard, [FromQuery] string exchangeSetLayout)
         {
-            exchangeSetStandard = SanitizeString(exchangeSetStandard);
-            exchangeSetLayout = SanitizeLayoutString(exchangeSetLayout);
+            exchangeSetStandard = exchangeSetStandard.SanitizeExchangeSetStandard();
+            exchangeSetLayout = exchangeSetLayout.SanitizeExchangeSetLayout();
 
             return Logger.LogStartEndAndElapsedTimeAsync(EventIds.ESSGetProductsFromSpecificDateRequestStart, EventIds.ESSGetProductsFromSpecificDateRequestCompleted,
                 "Product Data SinceDateTime Endpoint request for _X-Correlation-ID:{correlationId}, ExchangeSetStandard:{exchangeSetStandard}, and ExchangeSetLayout:{exchangeSetLayout}",
@@ -271,57 +269,6 @@ namespace UKHO.ExchangeSetService.API.Controllers
             AudToken = TokenAudience,
             IssToken = TokenIssuer
         };
-
-        private string[] SanitizeProductIdentifiers(string[] productIdentifiers)
-        {
-            if (productIdentifiers == null)
-            {
-                return null;
-            }
-
-            if (productIdentifiers.Any(x => x == null))
-            {
-                return new string[] { null };
-            }
-
-            List<string> sanitizedIdentifiers = new List<string>();
-            if (productIdentifiers.Length > 0)
-            {
-                foreach (string identifier in productIdentifiers)
-                {
-                    string sanitizedIdentifier = identifier.Trim();
-                    sanitizedIdentifiers.Add(sanitizedIdentifier);
-                }
-            }
-
-            return sanitizedIdentifiers.ToArray();
-        }
-       
-        private string SanitizeString(string input)
-        {
-            if (string.IsNullOrEmpty(input))
-                return string.Empty;
-
-            var sanitizedString = input.Trim();
-            // Remove any special characters or symbols
-            sanitizedString = Regex.Replace(sanitizedString, @"[^a-zA-Z0-9]", "", RegexOptions.None, TimeSpan.FromMilliseconds(500));
-            return sanitizedString;
-        }
-
-        private string SanitizeLayoutString(string input)
-        {
-            if (string.IsNullOrWhiteSpace(input))
-            {
-                return ExchangeSetLayout.standard.ToString();
-            }
-
-            // Try parse enum (case-insensitive); fallback to "standard"
-            if (Enum.TryParse<ExchangeSetLayout>(input.Trim(), ignoreCase: true, out var parsed))
-            {
-                return parsed.ToString();
-            }
-
-            return ExchangeSetLayout.standard.ToString();
-        }
+      
     }
 }
