@@ -115,7 +115,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             cancellationTokenSource.Cancel();
             var cancellationToken = cancellationTokenSource.Token;
 
-            Assert.ThrowsAsync<OperationCanceledException>(async () => await fulfilmentFileShareService.QueryFileShareServiceData(GetProductdetails(), GetScsResponseQueueMessage(), cancellationTokenSource, cancellationToken, FakeBatchValue.ExchangeSetEncRootPath, businessUnit));
+            Assert.ThrowsAsync<OperationCanceledException>((Func<Task>)(async () => await fulfilmentFileShareService.QueryFileShareServiceData(GetProductdetails(), GetScsResponseQueueMessage(), cancellationTokenSource, cancellationToken, FakeBatchValue.ExchangeSetEncRootPath, businessUnit)));
 
             A.CallTo(() => fakefileShareService.GetBatchInfoBasedOnProducts(A<List<Products>>.Ignored, A<SalesCatalogueServiceResponseQueueMessage>.Ignored, A<CancellationTokenSource>.Ignored, A<CancellationToken>.Ignored, A<string>.Ignored, A<string>.Ignored)).MustNotHaveHappened();
         }

@@ -51,7 +51,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Job
             var schedule = CrontabSchedule.Parse("0 0 1 * * *", new CrontabSchedule.ParseOptions { IncludingSeconds = true });
             A.CallTo(() => _fakeMaintenanceBackgroundService.GetSchedule()).Returns((false, string.Empty, schedule));
 
-            Assert.DoesNotThrowAsync(async () => await _job.StartAsync(_cancellationTokenSource.Token));
+            Assert.DoesNotThrowAsync((Func<Task>)(async () => await _job.StartAsync(_cancellationTokenSource.Token)));
         }
 
         [Test]

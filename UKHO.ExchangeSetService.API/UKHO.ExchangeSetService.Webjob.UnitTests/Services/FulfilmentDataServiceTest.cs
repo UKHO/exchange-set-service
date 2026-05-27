@@ -288,7 +288,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             A.CallTo(() => _fakeFulfilmentFileShareService.CreateZipFileForExchangeSet(FakeBatchValue.BatchId, FakeBatchValue.ExchangeSetPath, FakeBatchValue.CorrelationId)).Returns(false);
 
             Assert.ThrowsAsync(Is.TypeOf<FulfilmentException>().And.Message.EqualTo(FulfilmentExceptionMessage),
-                async delegate { await _fulfilmentDataService.CreateExchangeSet(batch); });
+                (Func<Task>)(async () => await _fulfilmentDataService.CreateExchangeSet(batch)));
 
             A.CallTo(() => _fakeExchangeSetBuilder.CreateStandardExchangeSet(message, salesCatalogueProductResponse, A<List<Products>>.Ignored, FakeBatchValue.ExchangeSetPath, salesCatalogueDataResponse, businessUnit)).MustHaveHappenedOnceExactly();
             A.CallTo(() => _fakeExchangeSetBuilder.CreateAioExchangeSet(A<FulfilmentServiceBatch>.Ignored, A<List<Products>>.Ignored, A<SalesCatalogueDataResponse>.Ignored, A<SalesCatalogueProductResponse>.Ignored)).MustNotHaveHappened();
@@ -315,7 +315,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             A.CallTo(() => _fakeAzureBlobStorageService.DownloadSalesCatalogueResponse(message.ScsResponseUri, FakeBatchValue.BatchId, FakeBatchValue.CorrelationId)).Returns(salesCatalogueProductResponse);
 
             Assert.ThrowsAsync(Is.TypeOf<FulfilmentException>().And.Message.EqualTo(FulfilmentExceptionMessage),
-                async delegate { await _fulfilmentDataService.CreateExchangeSet(batch); });
+                (Func<Task>)(async () => await _fulfilmentDataService.CreateExchangeSet(batch)));
         }
 
         #region AIO
@@ -562,7 +562,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             A.CallTo(() => _fakeExchangeSetBuilder.CreateAioExchangeSet(batch, A<List<Products>>.Ignored, A<SalesCatalogueDataResponse>.Ignored, salesCatalogueProductResponse)).Returns(false);
 
             Assert.ThrowsAsync(Is.TypeOf<FulfilmentException>().And.Message.EqualTo(FulfilmentExceptionMessage),
-                async delegate { await _fulfilmentDataService.CreateLargeExchangeSet(batch, FakeBatchValue.LargeExchangeSetFolderNamePattern); });
+                (Func<Task>)(async () => await _fulfilmentDataService.CreateLargeExchangeSet(batch, FakeBatchValue.LargeExchangeSetFolderNamePattern)));
 
             A.CallTo(() => _fakeFulfilmentSalesCatalogueService.GetSalesCatalogueDataResponse(FakeBatchValue.BatchId, FakeBatchValue.CorrelationId)).MustHaveHappenedOnceExactly();
             A.CallTo(() => _fakeAzureBlobStorageService.DownloadSalesCatalogueResponse(message.ScsResponseUri, FakeBatchValue.BatchId, FakeBatchValue.CorrelationId)).MustHaveHappenedOnceExactly();

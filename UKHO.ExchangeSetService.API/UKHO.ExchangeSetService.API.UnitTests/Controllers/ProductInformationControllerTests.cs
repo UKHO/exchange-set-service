@@ -90,11 +90,11 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
             var result = (BadRequestObjectResult)await controller.PostProductIdentifiers(productIdentifiers);
 
             var errors = (ErrorDescription)result.Value;
-            Assert.Multiple(() =>
+            using (Assert.EnterMultipleScope())
             {
                 Assert.That(result.StatusCode, Is.EqualTo(400));
                 Assert.That(errors.Errors.Single().Description, Is.EqualTo("Product Identifiers cannot be null or empty."));
-            });
+            }
         }
 
         [Test]
@@ -118,11 +118,11 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
 
             var result = (BadRequestObjectResult)await controller.PostProductIdentifiers(null);
             var errors = (ErrorDescription)result.Value;
-            Assert.Multiple(() =>
+            using (Assert.EnterMultipleScope())
             {
                 Assert.That(result.StatusCode, Is.EqualTo(400));
                 Assert.That(errors.Errors.Single().Description, Is.EqualTo("Either body is null or malformed."));
-            });
+            }
         }
 
         [Test]
@@ -141,11 +141,11 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
             string[] productIdentifiers = new string[] { "GB123456", "GB160060", "AU334550" };
 
             var result = (ObjectResult)await controller.PostProductIdentifiers(productIdentifiers);
-            Assert.Multiple(() =>
+            using (Assert.EnterMultipleScope())
             {
                 Assert.That(((InternalServerError)result.Value).Detail, Is.SameAs("Internal Server Error"));
                 Assert.That(result.StatusCode, Is.EqualTo(500));
-            });
+            }
         }
 
         #endregion PostProductIdentifiers
@@ -193,12 +193,12 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
             var result = (BadRequestObjectResult)await controller.GetProductInformationSinceDateTime("Fri, 8 Mar 2024");
             var errors = (ErrorDescription)result.Value;
 
-            Assert.Multiple(() =>
+            using (Assert.EnterMultipleScope())
             {
                 Assert.That(result.StatusCode, Is.EqualTo(400));
                 Assert.That(errors.Errors.Single().Source, Is.EqualTo("sinceDateTime"));
                 Assert.That(errors.Errors.Single().Description, Is.EqualTo("Provided sinceDateTime is either invalid or invalid format, the valid format is 'RFC1123 format' (e.g. 'Wed, 21 Oct 2020 07:28:00 GMT')."));
-            });
+            }
         }
 
         [Test]
@@ -207,12 +207,12 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
             var result = (BadRequestObjectResult)await controller.GetProductInformationSinceDateTime(null);
             var errors = (ErrorDescription)result.Value;
 
-            Assert.Multiple(() =>
+            using (Assert.EnterMultipleScope())
             {
                 Assert.That(result.StatusCode, Is.EqualTo(400));
                 Assert.That(errors.Errors.Single().Source, Is.EqualTo("sinceDateTime"));
                 Assert.That(errors.Errors.Single().Description, Is.EqualTo("Query parameter 'sinceDateTime' is required."));
-            });
+            }
         }
 
         [Test]
@@ -230,11 +230,11 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
                 .Returns(salesCatalogueResponse);
 
             var result = (ObjectResult)await controller.GetProductInformationSinceDateTime("Fri, 22 Mar 2024");
-            Assert.Multiple(() =>
+            using (Assert.EnterMultipleScope())
             {
                 Assert.That(((InternalServerError)result.Value).Detail, Is.SameAs("Internal Server Error"));
                 Assert.That(result.StatusCode, Is.EqualTo(500));
-            });
+            }
         }
 
         #endregion GetScsResponsebySinceDateTime
