@@ -1,17 +1,19 @@
-﻿using FakeItEasy;
-using Azure.Data.Tables;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
-using Azure.Storage.Blobs;
-using Newtonsoft.Json;
-using NUnit.Framework;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Azure;
+using Azure.Data.Tables;
+using Azure.Storage.Blobs;
+using Azure.Storage.Blobs.Models;
+using FakeItEasy;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+using Newtonsoft.Json;
+using NUnit.Framework;
 using UKHO.ExchangeSetService.Common.Configuration;
 using UKHO.ExchangeSetService.Common.Helpers;
 using UKHO.ExchangeSetService.Common.Logging;
@@ -20,8 +22,6 @@ using UKHO.ExchangeSetService.Common.Models.FileShareService.Response;
 using UKHO.ExchangeSetService.Common.Models.SalesCatalogue;
 using UKHO.ExchangeSetService.Common.Storage;
 using Attribute = UKHO.ExchangeSetService.Common.Models.FileShareService.Response.Attribute;
-using Azure;
-using Azure.Storage.Blobs.Models;
 
 namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
 {
@@ -260,7 +260,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
             cancellationTokenSource.Cancel();
             CancellationToken cancellationToken = cancellationTokenSource.Token;
 
-            Assert.ThrowsAsync<OperationCanceledException>(async () => await fileShareServiceCache.GetNonCachedProductDataForFss(GetProductdetails(), GetSearchBatchResponse(), string.Empty, GetScsResponseQueueMessage(), cancellationTokenSource, cancellationToken, businessUnit));
+            Assert.ThrowsAsync<OperationCanceledException>((Func<Task>)(async () => await fileShareServiceCache.GetNonCachedProductDataForFss(GetProductdetails(), GetSearchBatchResponse(), string.Empty, GetScsResponseQueueMessage(), cancellationTokenSource, cancellationToken, businessUnit)));
 
             A.CallTo(fakeLogger).Where(call => call.Method.Name == "Log"
             && call.GetArgument<LogLevel>(0) == LogLevel.Error
@@ -344,7 +344,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
             CommonHelper.IsLargeLayout = false;
 
             Assert.ThrowsAsync(Is.TypeOf<FulfilmentException>().And.Message.EqualTo(fulfilmentExceptionMessage),
-                 async delegate { await fileShareServiceCache.GetNonCachedProductDataForFss(GetProductdetails(), GetSearchBatchResponse(), exchangeSetRootPath, GetScsResponseQueueMessage(), null, CancellationToken.None, businessUnit); });
+                 (Func<Task>)(async () => await fileShareServiceCache.GetNonCachedProductDataForFss(GetProductdetails(), GetSearchBatchResponse(), exchangeSetRootPath, GetScsResponseQueueMessage(), null, CancellationToken.None, businessUnit)));
 
             A.CallTo(fakeLogger).Where(call => call.Method.Name == "Log"
             && call.GetArgument<LogLevel>(0) == LogLevel.Information

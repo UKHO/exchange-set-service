@@ -1,11 +1,4 @@
-﻿using Azure.Data.Tables;
-using FakeItEasy;
-using FluentValidation.Results;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
-using Newtonsoft.Json;
-using NUnit.Framework;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -13,6 +6,13 @@ using System.Net;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
+using Azure.Data.Tables;
+using FakeItEasy;
+using FluentValidation.Results;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+using Newtonsoft.Json;
+using NUnit.Framework;
 using UKHO.ExchangeSetService.API.Services;
 using UKHO.ExchangeSetService.API.Validation;
 using UKHO.ExchangeSetService.Common.Configuration;
@@ -387,29 +387,29 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
         [Test]
         public void WhenParameterIsNull_ThenConstructorThrowsArgumentNullException()
         {
-            var nullAzureClientEx = Assert.Throws<ArgumentNullException>(() => new EssWebhookService(null, fakeAzureStorageService, fakeAzureBlobStorageClient, fakeEnterpriseEventCacheDataRequestValidator, fakeCacheConfiguration, fakeLogger, fakeEssFulfilmentStorageConfig, fakeFileShareServiceCache, fakeFileShareServiceClient, fakeFileSystemHelper, fakeFileShareServiceConfig, fakeAuthFssTokenProvider));
+            var nullAzureClientEx = Assert.Throws<ArgumentNullException>((Action)(() => new EssWebhookService(null, fakeAzureStorageService, fakeAzureBlobStorageClient, fakeEnterpriseEventCacheDataRequestValidator, fakeCacheConfiguration, fakeLogger, fakeEssFulfilmentStorageConfig, fakeFileShareServiceCache, fakeFileShareServiceClient, fakeFileSystemHelper, fakeFileShareServiceConfig, fakeAuthFssTokenProvider)));
             Assert.That(nullAzureClientEx!.Message, Is.EqualTo("Value cannot be null. (Parameter 'azureTableStorageClient')"));
-            var nullAzureServiceEx = Assert.Throws<ArgumentNullException>(() => new EssWebhookService(fakeAzureTableStorageClient, null, fakeAzureBlobStorageClient, fakeEnterpriseEventCacheDataRequestValidator, fakeCacheConfiguration, fakeLogger, fakeEssFulfilmentStorageConfig, fakeFileShareServiceCache, fakeFileShareServiceClient, fakeFileSystemHelper, fakeFileShareServiceConfig, fakeAuthFssTokenProvider));
+            var nullAzureServiceEx = Assert.Throws<ArgumentNullException>((Action)(() => new EssWebhookService(fakeAzureTableStorageClient, null, fakeAzureBlobStorageClient, fakeEnterpriseEventCacheDataRequestValidator, fakeCacheConfiguration, fakeLogger, fakeEssFulfilmentStorageConfig, fakeFileShareServiceCache, fakeFileShareServiceClient, fakeFileSystemHelper, fakeFileShareServiceConfig, fakeAuthFssTokenProvider)));
             Assert.That(nullAzureServiceEx!.Message, Is.EqualTo("Value cannot be null. (Parameter 'azureStorageService')"));
-            var nullAzureBlobEx = Assert.Throws<ArgumentNullException>(() => new EssWebhookService(fakeAzureTableStorageClient, fakeAzureStorageService, null, fakeEnterpriseEventCacheDataRequestValidator, fakeCacheConfiguration, fakeLogger, fakeEssFulfilmentStorageConfig, fakeFileShareServiceCache, fakeFileShareServiceClient, fakeFileSystemHelper, fakeFileShareServiceConfig, fakeAuthFssTokenProvider));
+            var nullAzureBlobEx = Assert.Throws<ArgumentNullException>((Action)(() => new EssWebhookService(fakeAzureTableStorageClient, fakeAzureStorageService, null, fakeEnterpriseEventCacheDataRequestValidator, fakeCacheConfiguration, fakeLogger, fakeEssFulfilmentStorageConfig, fakeFileShareServiceCache, fakeFileShareServiceClient, fakeFileSystemHelper, fakeFileShareServiceConfig, fakeAuthFssTokenProvider)));
             Assert.That(nullAzureBlobEx!.Message, Is.EqualTo("Value cannot be null. (Parameter 'azureBlobStorageClient')"));
-            var nullCacheEventDataRequestEx = Assert.Throws<ArgumentNullException>(() => new EssWebhookService(fakeAzureTableStorageClient, fakeAzureStorageService, fakeAzureBlobStorageClient, null, fakeCacheConfiguration, fakeLogger, fakeEssFulfilmentStorageConfig, fakeFileShareServiceCache, fakeFileShareServiceClient, fakeFileSystemHelper, fakeFileShareServiceConfig, fakeAuthFssTokenProvider));
+            var nullCacheEventDataRequestEx = Assert.Throws<ArgumentNullException>((Action)(() => new EssWebhookService(fakeAzureTableStorageClient, fakeAzureStorageService, fakeAzureBlobStorageClient, null, fakeCacheConfiguration, fakeLogger, fakeEssFulfilmentStorageConfig, fakeFileShareServiceCache, fakeFileShareServiceClient, fakeFileSystemHelper, fakeFileShareServiceConfig, fakeAuthFssTokenProvider)));
             Assert.That(nullCacheEventDataRequestEx!.Message, Is.EqualTo("Value cannot be null. (Parameter 'enterpriseEventCacheDataRequestValidator')"));
-            var nullCacheConfigEx = Assert.Throws<ArgumentNullException>(() => new EssWebhookService(fakeAzureTableStorageClient, fakeAzureStorageService, fakeAzureBlobStorageClient, fakeEnterpriseEventCacheDataRequestValidator, null, fakeLogger, fakeEssFulfilmentStorageConfig, fakeFileShareServiceCache, fakeFileShareServiceClient, fakeFileSystemHelper, fakeFileShareServiceConfig, fakeAuthFssTokenProvider));
+            var nullCacheConfigEx = Assert.Throws<ArgumentNullException>((Action)(() => new EssWebhookService(fakeAzureTableStorageClient, fakeAzureStorageService, fakeAzureBlobStorageClient, fakeEnterpriseEventCacheDataRequestValidator, null, fakeLogger, fakeEssFulfilmentStorageConfig, fakeFileShareServiceCache, fakeFileShareServiceClient, fakeFileSystemHelper, fakeFileShareServiceConfig, fakeAuthFssTokenProvider)));
             Assert.That(nullCacheConfigEx!.Message, Is.EqualTo("Value cannot be null. (Parameter 'cacheConfiguration')"));
-            var nullLoggerEx = Assert.Throws<ArgumentNullException>(() => new EssWebhookService(fakeAzureTableStorageClient, fakeAzureStorageService, fakeAzureBlobStorageClient, fakeEnterpriseEventCacheDataRequestValidator, fakeCacheConfiguration, null, fakeEssFulfilmentStorageConfig, fakeFileShareServiceCache, fakeFileShareServiceClient, fakeFileSystemHelper, fakeFileShareServiceConfig, fakeAuthFssTokenProvider));
+            var nullLoggerEx = Assert.Throws<ArgumentNullException>((Action)(() => new EssWebhookService(fakeAzureTableStorageClient, fakeAzureStorageService, fakeAzureBlobStorageClient, fakeEnterpriseEventCacheDataRequestValidator, fakeCacheConfiguration, null, fakeEssFulfilmentStorageConfig, fakeFileShareServiceCache, fakeFileShareServiceClient, fakeFileSystemHelper, fakeFileShareServiceConfig, fakeAuthFssTokenProvider)));
             Assert.That(nullLoggerEx!.Message, Is.EqualTo("Value cannot be null. (Parameter 'logger')"));
-            var nullFulFilmentStorageEx = Assert.Throws<ArgumentNullException>(() => new EssWebhookService(fakeAzureTableStorageClient, fakeAzureStorageService, fakeAzureBlobStorageClient, fakeEnterpriseEventCacheDataRequestValidator, fakeCacheConfiguration, fakeLogger, null, fakeFileShareServiceCache, fakeFileShareServiceClient, fakeFileSystemHelper, fakeFileShareServiceConfig, fakeAuthFssTokenProvider));
+            var nullFulFilmentStorageEx = Assert.Throws<ArgumentNullException>((Action)(() => new EssWebhookService(fakeAzureTableStorageClient, fakeAzureStorageService, fakeAzureBlobStorageClient, fakeEnterpriseEventCacheDataRequestValidator, fakeCacheConfiguration, fakeLogger, null, fakeFileShareServiceCache, fakeFileShareServiceClient, fakeFileSystemHelper, fakeFileShareServiceConfig, fakeAuthFssTokenProvider)));
             Assert.That(nullFulFilmentStorageEx!.Message, Is.EqualTo("Value cannot be null. (Parameter 'essFulfilmentStorageconfig')"));
-            var nullFssCacheStorageEx = Assert.Throws<ArgumentNullException>(() => new EssWebhookService(fakeAzureTableStorageClient, fakeAzureStorageService, fakeAzureBlobStorageClient, fakeEnterpriseEventCacheDataRequestValidator, fakeCacheConfiguration, fakeLogger, fakeEssFulfilmentStorageConfig, null, fakeFileShareServiceClient, fakeFileSystemHelper, fakeFileShareServiceConfig, fakeAuthFssTokenProvider));
+            var nullFssCacheStorageEx = Assert.Throws<ArgumentNullException>((Action)(() => new EssWebhookService(fakeAzureTableStorageClient, fakeAzureStorageService, fakeAzureBlobStorageClient, fakeEnterpriseEventCacheDataRequestValidator, fakeCacheConfiguration, fakeLogger, fakeEssFulfilmentStorageConfig, null, fakeFileShareServiceClient, fakeFileSystemHelper, fakeFileShareServiceConfig, fakeAuthFssTokenProvider)));
             Assert.That(nullFssCacheStorageEx!.Message, Is.EqualTo("Value cannot be null. (Parameter 'fileShareServiceCache')"));
-            var nullFssClientEx = Assert.Throws<ArgumentNullException>(() => new EssWebhookService(fakeAzureTableStorageClient, fakeAzureStorageService, fakeAzureBlobStorageClient, fakeEnterpriseEventCacheDataRequestValidator, fakeCacheConfiguration, fakeLogger, fakeEssFulfilmentStorageConfig, fakeFileShareServiceCache, null, fakeFileSystemHelper, fakeFileShareServiceConfig, fakeAuthFssTokenProvider));
+            var nullFssClientEx = Assert.Throws<ArgumentNullException>((Action)(() => new EssWebhookService(fakeAzureTableStorageClient, fakeAzureStorageService, fakeAzureBlobStorageClient, fakeEnterpriseEventCacheDataRequestValidator, fakeCacheConfiguration, fakeLogger, fakeEssFulfilmentStorageConfig, fakeFileShareServiceCache, null, fakeFileSystemHelper, fakeFileShareServiceConfig, fakeAuthFssTokenProvider)));
             Assert.That(nullFssClientEx!.Message, Is.EqualTo("Value cannot be null. (Parameter 'fileShareServiceClient')"));
-            var nullFileSystemHelperEx = Assert.Throws<ArgumentNullException>(() => new EssWebhookService(fakeAzureTableStorageClient, fakeAzureStorageService, fakeAzureBlobStorageClient, fakeEnterpriseEventCacheDataRequestValidator, fakeCacheConfiguration, fakeLogger, fakeEssFulfilmentStorageConfig, fakeFileShareServiceCache, fakeFileShareServiceClient, null, fakeFileShareServiceConfig, fakeAuthFssTokenProvider));
+            var nullFileSystemHelperEx = Assert.Throws<ArgumentNullException>((Action)(() => new EssWebhookService(fakeAzureTableStorageClient, fakeAzureStorageService, fakeAzureBlobStorageClient, fakeEnterpriseEventCacheDataRequestValidator, fakeCacheConfiguration, fakeLogger, fakeEssFulfilmentStorageConfig, fakeFileShareServiceCache, fakeFileShareServiceClient, null, fakeFileShareServiceConfig, fakeAuthFssTokenProvider)));
             Assert.That(nullFileSystemHelperEx!.Message, Is.EqualTo("Value cannot be null. (Parameter 'fileSystemHelper')"));
-            var nullFssConfigEx = Assert.Throws<ArgumentNullException>(() => new EssWebhookService(fakeAzureTableStorageClient, fakeAzureStorageService, fakeAzureBlobStorageClient, fakeEnterpriseEventCacheDataRequestValidator, fakeCacheConfiguration, fakeLogger, fakeEssFulfilmentStorageConfig, fakeFileShareServiceCache, fakeFileShareServiceClient, fakeFileSystemHelper, null, fakeAuthFssTokenProvider));
+            var nullFssConfigEx = Assert.Throws<ArgumentNullException>((Action)(() => new EssWebhookService(fakeAzureTableStorageClient, fakeAzureStorageService, fakeAzureBlobStorageClient, fakeEnterpriseEventCacheDataRequestValidator, fakeCacheConfiguration, fakeLogger, fakeEssFulfilmentStorageConfig, fakeFileShareServiceCache, fakeFileShareServiceClient, fakeFileSystemHelper, null, fakeAuthFssTokenProvider)));
             Assert.That(nullFssConfigEx!.Message, Is.EqualTo("Value cannot be null. (Parameter 'fileShareServiceConfig')"));
-            var nullAuthTokenProviderEx = Assert.Throws<ArgumentNullException>(() => new EssWebhookService(fakeAzureTableStorageClient, fakeAzureStorageService, fakeAzureBlobStorageClient, fakeEnterpriseEventCacheDataRequestValidator, fakeCacheConfiguration, fakeLogger, fakeEssFulfilmentStorageConfig, fakeFileShareServiceCache, fakeFileShareServiceClient, fakeFileSystemHelper, fakeFileShareServiceConfig, null));
+            var nullAuthTokenProviderEx = Assert.Throws<ArgumentNullException>((Action)(() => new EssWebhookService(fakeAzureTableStorageClient, fakeAzureStorageService, fakeAzureBlobStorageClient, fakeEnterpriseEventCacheDataRequestValidator, fakeCacheConfiguration, fakeLogger, fakeEssFulfilmentStorageConfig, fakeFileShareServiceCache, fakeFileShareServiceClient, fakeFileSystemHelper, fakeFileShareServiceConfig, null)));
             Assert.That(nullAuthTokenProviderEx!.Message, Is.EqualTo("Value cannot be null. (Parameter 'authFssTokenProvider')"));
 
         }
