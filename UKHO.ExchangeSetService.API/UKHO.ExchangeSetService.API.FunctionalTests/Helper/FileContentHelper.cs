@@ -471,12 +471,12 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
             var year = DateTime.UtcNow.Year.ToString().Substring(DateTime.UtcNow.Year.ToString().Length - 2);
             var currentDate = DateTime.UtcNow.ToString("yyyyMMdd");
 
-            Assert.Multiple(() =>
+            using (Assert.EnterMultipleScope())
             {
                 Assert.That($"GBWK{weekNumber}-{year}", Is.EqualTo(dataServerAndWeek), $"Incorrect weeknumber and year is returned 'GBWK{weekNumber}-{year}', instead of the expected {dataServerAndWeek}.");
                 Assert.That($"{currentDate}{cdType}", Is.EqualTo(dateAndCdType), $"Incorrect date is returned '{currentDate}UPDATE', instead of the expected {dateAndCdType}.");
                 Assert.That(formatVersionAndExchangeSetNumber, Does.StartWith("02.00"), $"Expected format version {formatVersionAndExchangeSetNumber}");
-            });
+            }
         }
 
         public static async Task<bool> WaitForContainerAsync(BlobServiceClient blobServiceClient, string containerName, int maxAttempts, int delayInMilliSeconds)
