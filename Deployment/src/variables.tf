@@ -19,7 +19,7 @@ locals {
     SERVICE_OWNER    = "Robin Chapman"
     RESPONSIBLE_TEAM = "Abzu"
     CALLOUT_TEAM     = "On-Call_N/A"
-    COST_CENTRE      = local.env_name == "dev" || local.env_name == "qa" || local.env_name == "prod" ? "A.008.02" : "A.011.08"
+    COST_CENTRE      = local.env_name == "dev" || local.env_name == "prod" ? "A.008.02" : "A.011.08"
   }
   config_data = jsondecode(file("${path.module}/appsettings.json"))
   # These names should match those used in AzureWebJobsHealthCheckService in UKHO.ExchangeSetService.Common.

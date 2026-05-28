@@ -67,7 +67,6 @@ variable "env_suffix" {
   type = map(string)
   default = {
     "dev"         = "Dev"
-    "qa"          = "QA"
     "vne"         = "VNE"
     "vni"         = "VNI"
     "iat"         = "IAT"
