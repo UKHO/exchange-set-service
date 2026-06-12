@@ -141,13 +141,13 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
 
             var response = await fulfilmentCallBackService.SendCallBackResponse(salesCatalogueProductResponse, scsResponseQueueMessage);
 
-            Assert.Multiple(() =>
+            using (Assert.EnterMultipleScope())
             {
                 Assert.That(response, Is.True);
                 Assert.That(uriParam, Is.EqualTo(scsResponseQueueMessage.CallbackUri));
                 Assert.That(httpMethodParam, Is.EqualTo(HttpMethod.Post));
                 Assert.That(postBodyParam, Is.Not.Null);
-            });
+            }
         }
 
 
@@ -185,13 +185,13 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
 
             var response = await fulfilmentCallBackService.SendCallBackErrorResponse(salesCatalogueProductResponse, scsResponseQueueMessage);
 
-            Assert.Multiple(() =>
+            using (Assert.EnterMultipleScope())
             {
                 Assert.That(response, Is.True);
                 Assert.That(uriParam, Is.EqualTo(scsResponseQueueMessage.CallbackUri));
                 Assert.That(httpMethodParam, Is.EqualTo(HttpMethod.Post));
                 Assert.That(postBodyParam, Is.Not.Null);
-            });
+            }
         }
 
         #region ValidateCallbackRequestPayload
@@ -448,11 +448,11 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
                 Assert.That(result.Links.AioExchangeSetFileUri, Is.Null, "AioExchangeSetFileUri should be null");
             }
 
-            Assert.Multiple(() =>
+            using (Assert.EnterMultipleScope())
             {
                 Assert.That(result.AioExchangeSetCellCount, Is.Not.Null);
                 Assert.That(result.RequestedAioProductsAlreadyUpToDateCount, Is.Not.Null);
-            });
+            }
 
             if (isEncReturned || isEmptyEncExchangeSet || result.RequestedProductsNotInExchangeSet.Count != 0)
             {
@@ -463,11 +463,11 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
                 Assert.That(result.Links.ExchangeSetFileUri, Is.Null);
             }
 
-            Assert.Multiple(() =>
+            using (Assert.EnterMultipleScope())
             {
                 Assert.That(result.ExchangeSetCellCount, Is.GreaterThanOrEqualTo(0));
                 Assert.That(result.RequestedProductsAlreadyUpToDateCount, Is.GreaterThanOrEqualTo(0));
-            });
+            }
         }
 
         #endregion

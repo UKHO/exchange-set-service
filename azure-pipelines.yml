@@ -24,7 +24,6 @@ parameters:
 
 trigger:
   - main
-  - release/*
   - develop
 
 schedules:
@@ -424,27 +423,3 @@ stages:
           ContinueEvenIfResourcesAreGettingDestroyed: ${{ parameters.ContinueEvenIfResourcesAreGettingDestroyed }}
           AzureSubscription: "Exchange-Set-Service-vNext-E2E-A.011.08"
           Container: ${{variables.Container}}
-
-  - stage: QAdeploy
-    dependsOn: 
-    - Devdeploy
-    displayName: QA Deploy (inc terraform, webapp deploy)
-    condition: and(succeeded(), or(eq(variables['Build.SourceBranch'], 'refs/heads/main'), startsWith(variables['Build.SourceBranch'], 'refs/heads/release/')))
-    jobs:
-      - template: Deployment/templates/app-deploy.yml
-        parameters:
-          Environment: "qa"
-          ContinueEvenIfResourcesAreGettingDestroyed: ${{ parameters.ContinueEvenIfResourcesAreGettingDestroyed }}
-          AzureSubscription: "Exchange-Set-Service-QA-A-008-02"
-          Container: ${{variables.Container}} 
-
-      - ${{ if eq(parameters.skipDeploymentOfUIInstance, false) }}:
-        - template: Deployment/templates/app-deploy.yml
-          parameters:
-            Environment: "qa"
-            ContinueEvenIfResourcesAreGettingDestroyed: ${{ parameters.ContinueEvenIfResourcesAreGettingDestroyed }}
-            AzureSubscription: "Exchange-Set-Service-QA-A-008-02"
-            Container: ${{variables.Container}} 
-            RunTests: false
-            pathSuffix: "-v2"
-            v2Modifier: "2"

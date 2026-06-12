@@ -315,11 +315,11 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
 
             var result = await service.ValidateProductDataByProductIdentifiers(new ProductIdentifierRequest());
 
-            Assert.Multiple(() =>
+            using (Assert.EnterMultipleScope())
             {
                 Assert.That(result.IsValid, Is.False);
                 Assert.That(result.Errors.Single().ErrorMessage, Is.EqualTo("Product Identifiers cannot be blank or null."));
-            });
+            }
         }
 
         [Test]
@@ -330,11 +330,11 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
                     {new ValidationFailure("RequestBody", "Either body is null or malformed.")}));
 
             var result = await service.ValidateProductDataByProductIdentifiers(null);
-            Assert.Multiple(() =>
+            using (Assert.EnterMultipleScope())
             {
                 Assert.That(result.IsValid, Is.False);
                 Assert.That(result.Errors.Single().ErrorMessage, Is.EqualTo("Either body is null or malformed."));
-            });
+            }
         }
 
         [Test]
@@ -381,11 +381,11 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
                     CallbackUri = callbackUri
                 }, azureB2CToken); //B2C Token with file Size less than 300 mb
 
-            Assert.Multiple(() =>
+            using (Assert.EnterMultipleScope())
             {
                 Assert.That(result, Is.InstanceOf<ExchangeSetServiceResponse>());
                 Assert.That(result.HttpStatusCode, Is.EqualTo(HttpStatusCode.BadRequest));
-            });
+            }
         }
 
         [Test]
@@ -410,11 +410,11 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
                     CallbackUri = callbackUri
                 }, azureAdB2CToken); //AdB2C token with file size large than 300 mb
 
-            Assert.Multiple(() =>
+            using (Assert.EnterMultipleScope())
             {
                 Assert.That(result, Is.InstanceOf<ExchangeSetServiceResponse>());
                 Assert.That(result.HttpStatusCode, Is.EqualTo(HttpStatusCode.BadRequest));
-            });
+            }
         }
 
         [Test]
@@ -489,11 +489,11 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
                     CallbackUri = callbackUri
                 }, azureB2CToken); // AzureB2C Token but file size is less than 300 Mb
 
-            Assert.Multiple(() =>
+            using (Assert.EnterMultipleScope())
             {
                 Assert.That(result.HttpStatusCode, Is.EqualTo(HttpStatusCode.Created));
                 Assert.That(result.LastModified, Is.Not.Null);
-            });
+            }
 
             A.CallTo(logger).Where(call => call.Method.Name == "Log"
             && call.GetArgument<LogLevel>(0) == LogLevel.Information
@@ -527,11 +527,11 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
                     CallbackUri = callbackUri
                 }, azureAdB2CToken);//azure Ad B2C token when file size is less than 300 Mb
 
-            Assert.Multiple(() =>
+            using (Assert.EnterMultipleScope())
             {
                 Assert.That(result, Is.InstanceOf<ExchangeSetServiceResponse>());
                 Assert.That(result.HttpStatusCode, Is.EqualTo(HttpStatusCode.InternalServerError));
-            });
+            }
         }
 
         [Test]
@@ -567,11 +567,11 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
                     ExchangeSetStandard = exchangeSetStandard.ToString()
                 }, azureAdToken);
 
-            Assert.Multiple(() =>
+            using (Assert.EnterMultipleScope())
             {
                 Assert.That(result.ExchangeSetResponse, Is.Null);
                 Assert.That(result.HttpStatusCode, Is.EqualTo(HttpStatusCode.InternalServerError));
-            });
+            }
         }
 
         [Test]
@@ -775,11 +775,11 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
             var result = await service.ValidateProductDataByProductVersions(new ProductDataProductVersionsRequest()
             { ProductVersions = new List<ProductVersionRequest>() { new ProductVersionRequest() { ProductName = null } } });
 
-            Assert.Multiple(() =>
+            using (Assert.EnterMultipleScope())
             {
                 Assert.That(result.IsValid, Is.False);
                 Assert.That(result.Errors.Single().ErrorMessage, Is.EqualTo("productName cannot be blank or null."));
-            });
+            }
         }
 
         [Test]
@@ -791,11 +791,11 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
 
             var result = await service.ValidateProductDataByProductVersions(null);
 
-            Assert.Multiple(() =>
+            using (Assert.EnterMultipleScope())
             {
                 Assert.That(result.IsValid, Is.False);
                 Assert.That(result.Errors.Single().ErrorMessage, Is.EqualTo("Either body is null or malformed."));
-            });
+            }
         }
 
         [Test]
@@ -828,11 +828,11 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
                 CallbackUri = ""
             }, azureB2CToken);//valid AzureAdB2c Token , but filesize is large than 300 mb
 
-            Assert.Multiple(() =>
+            using (Assert.EnterMultipleScope())
             {
                 Assert.That(result, Is.InstanceOf<ExchangeSetServiceResponse>());
                 Assert.That(result.HttpStatusCode, Is.EqualTo(HttpStatusCode.BadRequest));
-            });
+            }
         }
 
         [Test]
@@ -853,11 +853,11 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
                 CallbackUri = ""
             }, azureAdB2CToken);//valid AzureAdB2c Token , but filesize is large than 300 mb
 
-            Assert.Multiple(() =>
+            using (Assert.EnterMultipleScope())
             {
                 Assert.That(result, Is.InstanceOf<ExchangeSetServiceResponse>());
                 Assert.That(result.HttpStatusCode, Is.EqualTo(HttpStatusCode.BadRequest));
-            });
+            }
         }
 
         [Test]
@@ -951,7 +951,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
             exchangeSetResponsWithOutAio.RequestedProductsAlreadyUpToDateCount = 3;//RequestedProductsAlreadyUpToDateCount
 
             Assert.That(result, Is.InstanceOf<ExchangeSetServiceResponse>());
-            Assert.Multiple(() =>
+            using (Assert.EnterMultipleScope())
             {
                 Assert.That(result.HttpStatusCode, Is.EqualTo(HttpStatusCode.Created));
                 Assert.That(result.LastModified, Is.Null);
@@ -960,7 +960,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
                 Assert.That(exchangeSetResponsWithOutAio.RequestedProductsAlreadyUpToDateCount, Is.EqualTo(result.ExchangeSetResponse.RequestedProductsAlreadyUpToDateCount));
                 Assert.That(exchangeSetResponsWithOutAio.ExchangeSetUrlExpiryDateTime, Is.EqualTo(result.ExchangeSetResponse.ExchangeSetUrlExpiryDateTime));
                 Assert.That(exchangeSetResponsWithOutAio.BatchId, Is.EqualTo(result.BatchId));
-            });
+            }
 
             A.CallTo(logger).Where(call => call.Method.Name == "Log"
             && call.GetArgument<LogLevel>(0) == LogLevel.Information
@@ -1014,7 +1014,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
             exchangeSetResponseWithOutAio.RequestedProductsAlreadyUpToDateCount = 3;//RequestedProductsAlreadyUpToDateCount
 
             Assert.That(result, Is.InstanceOf<ExchangeSetServiceResponse>());
-            Assert.Multiple(() =>
+            using (Assert.EnterMultipleScope())
             {
                 Assert.That(result.HttpStatusCode, Is.EqualTo(HttpStatusCode.Created));
                 Assert.That(result.LastModified, Is.Not.Null);
@@ -1023,7 +1023,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
                 Assert.That(exchangeSetResponseWithOutAio.RequestedProductsAlreadyUpToDateCount, Is.EqualTo(result.ExchangeSetResponse.RequestedProductsAlreadyUpToDateCount));
                 Assert.That(exchangeSetResponseWithOutAio.ExchangeSetUrlExpiryDateTime, Is.EqualTo(result.ExchangeSetResponse.ExchangeSetUrlExpiryDateTime));
                 Assert.That(exchangeSetResponseWithOutAio.BatchId, Is.EqualTo(result.BatchId));
-            });
+            }
 
             A.CallTo(logger).Where(call => call.Method.Name == "Log"
             && call.GetArgument<LogLevel>(0) == LogLevel.Information
@@ -1061,11 +1061,11 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
             }, azureADToken);
 
             Assert.That(result, Is.InstanceOf<ExchangeSetServiceResponse>());
-            Assert.Multiple(() =>
+            using (Assert.EnterMultipleScope())
             {
                 Assert.That(result.HttpStatusCode, Is.EqualTo(HttpStatusCode.InternalServerError));
                 Assert.That(result.LastModified, Is.Null);
-            });
+            }
         }
 
         [Test]
@@ -1097,11 +1097,11 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
                 ExchangeSetStandard = exchangeSetStandard.ToString()
             }, azureAdToken);
 
-            Assert.Multiple(() =>
+            using (Assert.EnterMultipleScope())
             {
                 Assert.That(result.ExchangeSetResponse, Is.Null);
                 Assert.That(result.HttpStatusCode, Is.EqualTo(HttpStatusCode.InternalServerError));
-            });
+            }
         }
 
         [Test]
@@ -1322,11 +1322,11 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
 
             var result = await service.ValidateScsProductDataByProductIdentifiers(new ScsProductIdentifierRequest());
 
-            Assert.Multiple(() =>
+            using (Assert.EnterMultipleScope())
             {
                 Assert.That(result.IsValid, Is.False);
                 Assert.That(result.Errors.Single().ErrorMessage, Is.EqualTo("Product Identifiers cannot be blank or null."));
-            });
+            }
         }
 
         [Test]
@@ -1337,11 +1337,11 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
                     {new ValidationFailure("RequestBody", "Either body is null or malformed.")}));
 
             var result = await service.ValidateScsProductDataByProductIdentifiers(null);
-            Assert.Multiple(() =>
+            using (Assert.EnterMultipleScope())
             {
                 Assert.That(result.IsValid, Is.False);
                 Assert.That(result.Errors.Single().ErrorMessage, Is.EqualTo("Either body is null or malformed."));
-            });
+            }
         }
 
         [Test]
@@ -1415,11 +1415,11 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
 
             var result = await service.ValidateProductDataSinceDateTime(new ProductDataSinceDateTimeRequest());
 
-            Assert.Multiple(() =>
+            using (Assert.EnterMultipleScope())
             {
                 Assert.That(result.IsValid, Is.False);
                 Assert.That(result.Errors.Single().ErrorMessage, Is.EqualTo("Provided sinceDateTime is either invalid or invalid format, the valid format is 'RFC1123 format'."));
-            });
+            }
         }
 
         [Test]
@@ -1431,11 +1431,11 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
 
             var result = await service.ValidateProductDataSinceDateTime(new ProductDataSinceDateTimeRequest());
 
-            Assert.Multiple(() =>
+            using (Assert.EnterMultipleScope())
             {
                 Assert.That(result.IsValid, Is.False);
                 Assert.That(result.Errors.Single().ErrorMessage, Is.EqualTo("Provided sinceDateTime cannot be a future date."));
-            });
+            }
         }
 
         [Test]
@@ -1447,11 +1447,11 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
 
             var result = await service.ValidateProductDataSinceDateTime(new ProductDataSinceDateTimeRequest());
 
-            Assert.Multiple(() =>
+            using (Assert.EnterMultipleScope())
             {
                 Assert.That(result.IsValid, Is.False);
                 Assert.That(result.Errors.Single().ErrorMessage, Is.EqualTo("Invalid callbackUri format."));
-            });
+            }
         }
 
         [Test]
@@ -1625,11 +1625,11 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
 
             var result = await service.CreateProductDataSinceDateTime(new ProductDataSinceDateTimeRequest(), GetAzureAdB2CToken());// ADB2C Token with File size less than 300 mb
 
-            Assert.Multiple(() =>
+            using (Assert.EnterMultipleScope())
             {
                 Assert.That(result.ExchangeSetResponse, Is.Null);
                 Assert.That(result.HttpStatusCode, Is.EqualTo(HttpStatusCode.InternalServerError));
-            });
+            }
         }
 
         [Test]
@@ -1835,11 +1835,11 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
 
             var result = await service.ValidateScsDataSinceDateTime(new ProductDataSinceDateTimeRequest());
 
-            Assert.Multiple(() =>
+            using (Assert.EnterMultipleScope())
             {
                 Assert.That(result.IsValid, Is.False);
                 Assert.That(result.Errors.Single().ErrorMessage, Is.EqualTo("Provided sinceDateTime is either invalid or invalid format, the valid format is 'RFC1123 format'."));
-            });
+            }
         }
 
         [Test]
@@ -1851,11 +1851,11 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Services
 
             var result = await service.ValidateScsDataSinceDateTime(new ProductDataSinceDateTimeRequest());
 
-            Assert.Multiple(() =>
+            using (Assert.EnterMultipleScope())
             {
                 Assert.That(result.IsValid, Is.False);
                 Assert.That(result.Errors.Single().ErrorMessage, Is.EqualTo("Provided sinceDateTime cannot be a future date."));
-            });
+            }
         }
 
         #endregion ScsProductDataSinceDateTime

@@ -1,20 +1,20 @@
-﻿using FakeItEasy;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
-using NUnit.Framework;
-using System;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Net;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
-using UKHO.ExchangeSetService.Common.Configuration;
-using System.Collections.Generic;
-using UKHO.ExchangeSetService.Common.Models.SalesCatalogue;
+using FakeItEasy;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
-using UKHO.ExchangeSetService.Common.Models.Request;
-using UKHO.ExchangeSetService.Common.Helpers.SalesCatalogue;
+using NUnit.Framework;
+using UKHO.ExchangeSetService.Common.Configuration;
 using UKHO.ExchangeSetService.Common.Helpers.Auth;
+using UKHO.ExchangeSetService.Common.Helpers.SalesCatalogue;
+using UKHO.ExchangeSetService.Common.Models.Request;
+using UKHO.ExchangeSetService.Common.Models.SalesCatalogue;
 
 namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
 {
@@ -347,7 +347,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
                 .Returns(new HttpResponseMessage() { StatusCode = HttpStatusCode.BadRequest, RequestMessage = new HttpRequestMessage() { RequestUri = new Uri("http://abc.com") }, Content = new StreamContent(new MemoryStream(Encoding.UTF8.GetBytes("Bad request"))) });
 
             Assert.ThrowsAsync(Is.TypeOf<FulfilmentException>().And.Message.EqualTo(fulfilmentExceptionMessage),
-                 async delegate { await salesCatalogueService.GetSalesCatalogueDataResponse(fakeBatchId, null); });
+                 (Func<Task>)(async () => await salesCatalogueService.GetSalesCatalogueDataResponse(fakeBatchId, null)));
         }
 
         [Test]

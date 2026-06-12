@@ -64,11 +64,11 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
               && call.GetArgument<IEnumerable<KeyValuePair<string, object>>>(2)!.ToDictionary(c => c.Key, c => c.Value)["{OriginalFormat}"].ToString() == "Completed processing the Options request for the New Files Published event webhook for WebHook-Request-Origin:{webhookRequestOrigin}").MustHaveHappenedOnceExactly();
 
             Assert.That(responseHeaders, Has.Count.EqualTo(2));
-            Assert.Multiple(() =>
+            using (Assert.EnterMultipleScope())
             {
                 Assert.That(responseHeaders["WebHook-Allowed-Rate"].ToString(), Is.EqualTo("*"));
                 Assert.That(responseHeaders["WebHook-Allowed-Origin"].ToString(), Is.EqualTo("test.com"));
-            });
+            }
         }
 
         [Test]

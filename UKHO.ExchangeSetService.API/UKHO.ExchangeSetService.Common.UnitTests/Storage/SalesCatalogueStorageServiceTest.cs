@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Microsoft.Extensions.Options;
 using NUnit.Framework;
 using UKHO.ExchangeSetService.Common.Configuration;
@@ -55,7 +56,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Storage
         {
             var expectedErrorMessage = "Storage account accesskey not found";
 
-            var ex = Assert.Throws<KeyNotFoundException>(() => _salesCatalogueStorageService.GetStorageAccountConnectionString(null, null));
+            var ex = Assert.Throws<KeyNotFoundException>((Action)(() => _salesCatalogueStorageService.GetStorageAccountConnectionString(null, null)));
 
             Assert.That(expectedErrorMessage, Is.EqualTo(ex.Message));
         }

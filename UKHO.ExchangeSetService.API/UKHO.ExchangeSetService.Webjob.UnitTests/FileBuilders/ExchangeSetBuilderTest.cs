@@ -323,7 +323,7 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.FileBuilders
 
             A.CallTo(() => _fakeProductDataValidator.Validate(A<List<Products>>.Ignored)).Returns(Task.FromResult(validationResult));
 
-            Assert.ThrowsAsync<FulfilmentException>(async () => await _exchangeSetBuilder.CreateStandardLargeMediaExchangeSet(batch, largeResponse, FakeBatchValue.LargeExchangeSetFolderNamePattern, FakeBatchValue.BatchPath, _cancellationTokenSource, _cancellationToken));
+            Assert.ThrowsAsync<FulfilmentException>((Func<Task>)(async () => await _exchangeSetBuilder.CreateStandardLargeMediaExchangeSet(batch, largeResponse, FakeBatchValue.LargeExchangeSetFolderNamePattern, FakeBatchValue.BatchPath, _cancellationTokenSource, _cancellationToken)));
 
             _fakeLogger.VerifyLogEntry(EventIds.LargeExchangeSetCreatedWithError, "Large media exchange set is not created for BatchId:{BatchId} and _X-Correlation-ID:{CorrelationId}", logLevel: LogLevel.Error);
             _fakeLogger.VerifyLogEntry(EventIds.LargeExchangeSetCreatedWithError, "Operation Cancelled as product validation failed for BatchId:{BatchId}, _X-Correlation-ID:{CorrelationId} and Validation message :{Message}", logLevel: LogLevel.Error);

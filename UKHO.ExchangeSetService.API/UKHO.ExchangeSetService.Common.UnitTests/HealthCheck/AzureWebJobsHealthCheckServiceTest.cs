@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Configuration;
 using System.Threading.Tasks;
 using FakeItEasy;
@@ -94,7 +95,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.HealthCheck
         {
             _essFulfilmentStorageConfiguration = new EssFulfilmentStorageConfiguration { ExchangeSetTypes = "osx,sxs,mxs,lxs", WebAppVersion = "" };
 
-            Assert.ThrowsAsync<ConfigurationErrorsException>(() => _azureWebJobsHealthCheckService.CheckHealthAsync());
+            Assert.ThrowsAsync<ConfigurationErrorsException>((Func<Task>)(async () => await _azureWebJobsHealthCheckService.CheckHealthAsync()));
         }
     }
 }

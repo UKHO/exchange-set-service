@@ -115,11 +115,11 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
 
             var result = (BadRequestObjectResult)await controller.PostProductIdentifiers(productIdentifiers, callbackUri, exchangeSetStandard.ToString().ToString());
             var errors = (ErrorDescription)result.Value;
-            Assert.Multiple(() =>
+            using (Assert.EnterMultipleScope())
             {
                 Assert.That(result.StatusCode, Is.EqualTo(400));
                 Assert.That(errors.Errors.Single().Description, Is.EqualTo("Product Identifiers cannot be null or empty."));
-            });
+            }
         }
 
         [Test]
@@ -145,11 +145,11 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
 
             var result = (BadRequestObjectResult)await controller.PostProductIdentifiers(null, null, exchangeSetStandard.ToString());
             var errors = (ErrorDescription)result.Value;
-            Assert.Multiple(() =>
+            using (Assert.EnterMultipleScope())
             {
                 Assert.That(result.StatusCode, Is.EqualTo(400));
                 Assert.That(errors.Errors.Single().Description, Is.EqualTo("Either body is null or malformed."));
-            });
+            }
         }
 
         [Test]
@@ -178,12 +178,12 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
 
             var result = (BadRequestObjectResult)await controller.PostProductIdentifiers(productIdentifiers, callbackUri, exchangeSetStandard.ToString());
             var errors = (ErrorDescription)result.Value;
-            Assert.Multiple(() =>
+            using (Assert.EnterMultipleScope())
             {
                 Assert.That(result.StatusCode, Is.EqualTo(400));
                 Assert.That(errors.Errors.Single().Source, Is.EqualTo("requestBody"));
                 Assert.That(errors.Errors.Single().Description, Is.EqualTo("Either body is null or malformed."));
-            });
+            }
         }
 
         [Test]
@@ -211,11 +211,11 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
             string callbackUri = string.Empty;
 
             var result = (ObjectResult)await controller.PostProductIdentifiers(productIdentifiers, callbackUri, exchangeSetStandard.ToString());
-            Assert.Multiple(() =>
+            using (Assert.EnterMultipleScope())
             {
                 Assert.That(((InternalServerError)result.Value).Detail, Is.SameAs("Internal Server Error"));
                 Assert.That(result.StatusCode, Is.EqualTo(500));
-            });
+            }
         }
 
         [Test]
@@ -269,11 +269,11 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
             var result = (BadRequestObjectResult)await controller.PostProductIdentifiers(productIdentifiers, callbackUri, ExchangeSetStandard.s57.ToString());
             var errors = (ErrorDescription)result.Value;
 
-            Assert.Multiple(() =>
+            using (Assert.EnterMultipleScope())
             {
                 Assert.That(result.StatusCode, Is.EqualTo(400));
                 Assert.That(errors.Errors.Single().Description, Is.EqualTo("The Exchange Set requested is very large and will not be created, please use a standard Exchange Set provided by the UKHO."));
-            });
+            }
 
             A.CallTo(fakeLogger).Where(call => call.Method.Name == "Log"
             && call.GetArgument<LogLevel>(0) == LogLevel.Error
@@ -303,11 +303,11 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
 
             var result = (OkObjectResult)await controller.PostProductIdentifiers(productIdentifiers, callbackUri, ExchangeSetStandard.s63.ToString());
 
-            Assert.Multiple(() =>
+            using (Assert.EnterMultipleScope())
             {
                 Assert.That(result.StatusCode, Is.EqualTo(200));
                 Assert.That(((ExchangeSetResponse)result.Value).ExchangeSetCellCount, Is.EqualTo(exchangeSetServiceResponse.ExchangeSetResponse.ExchangeSetCellCount));
-            });
+            }
 
             A.CallTo(fakeLogger).Where(call => call.Method.Name == "Log"
             && call.GetArgument<LogLevel>(0) == LogLevel.Information
@@ -383,11 +383,11 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
 
             var errors = (ErrorDescription)result.Value;
 
-            Assert.Multiple(() =>
+            using (Assert.EnterMultipleScope())
             {
                 Assert.That(result.StatusCode, Is.EqualTo(400));
                 Assert.That(errors.Errors.Single().Description, Is.EqualTo("productName cannot be blank or null."));
-            });
+            }
         }
 
         [Test]
@@ -416,12 +416,12 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
             var result = (BadRequestObjectResult)await controller.PostProductDataByProductVersions(new List<ProductVersionRequest>(), "", exchangeSetStandard.ToString());
             var errors = (ErrorDescription)result.Value;
 
-            Assert.Multiple(() =>
+            using (Assert.EnterMultipleScope())
             {
                 Assert.That(result.StatusCode, Is.EqualTo(400));
                 Assert.That(errors.Errors.Single().Source, Is.EqualTo("requestBody"));
                 Assert.That(errors.Errors.Single().Description, Is.EqualTo("Either body is null or malformed."));
-            });
+            }
         }
 
         [Test]
@@ -448,11 +448,11 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
             var result = (ObjectResult)await controller.PostProductDataByProductVersions(new List<ProductVersionRequest>()
                             { new ProductVersionRequest() { ProductName = "demo" } }, "", exchangeSetStandard.ToString());
 
-            Assert.Multiple(() =>
+            using (Assert.EnterMultipleScope())
             {
                 Assert.That(((InternalServerError)result.Value).Detail, Is.SameAs("Internal Server Error"));
                 Assert.That(result.StatusCode, Is.EqualTo(500));
-            });
+            }
         }
 
         [Test]
@@ -502,11 +502,11 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
                             { new() { ProductName = "demo" } }, "", ExchangeSetStandard.s57.ToString());
             var errors = (ErrorDescription)result.Value;
 
-            Assert.Multiple(() =>
+            using (Assert.EnterMultipleScope())
             {
                 Assert.That(result.StatusCode, Is.EqualTo(400));
                 Assert.That(errors.Errors.Single().Description, Is.EqualTo("The Exchange Set requested is very large and will not be created, please use a standard Exchange Set provided by the UKHO."));
-            });
+            }
 
             A.CallTo(fakeLogger).Where(call => call.Method.Name == "Log"
             && call.GetArgument<LogLevel>(0) == LogLevel.Error
@@ -534,11 +534,11 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
             var result = (OkObjectResult)await controller.PostProductDataByProductVersions(new List<ProductVersionRequest>()
                             { new() { ProductName = "demo" } }, "", ExchangeSetStandard.s63.ToString());
 
-            Assert.Multiple(() =>
+            using (Assert.EnterMultipleScope())
             {
                 Assert.That(result.StatusCode, Is.EqualTo(200));
                 Assert.That(((ExchangeSetResponse)result.Value).ExchangeSetCellCount, Is.EqualTo(exchangeSetServiceResponse.ExchangeSetResponse.ExchangeSetCellCount));
-            });
+            }
 
             A.CallTo(fakeLogger).Where(call => call.Method.Name == "Log"
             && call.GetArgument<LogLevel>(0) == LogLevel.Information
@@ -609,12 +609,12 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
             var result = (BadRequestObjectResult)await controller.GetProductDataSinceDateTime(null, "https://www.abc.com", exchangeSetStandard.ToString());
             var errors = (ErrorDescription)result.Value;
 
-            Assert.Multiple(() =>
+            using (Assert.EnterMultipleScope())
             {
                 Assert.That(result.StatusCode, Is.EqualTo(400));
                 Assert.That(errors.Errors.Single().Source, Is.EqualTo("sinceDateTime"));
                 Assert.That(errors.Errors.Single().Description, Is.EqualTo("Query parameter 'sinceDateTime' is required."));
-            });
+            }
         }
 
         [Test]
@@ -640,11 +640,11 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
 
             var result = (ObjectResult)await controller.GetProductDataSinceDateTime("Wed, 21 Oct 2015 07:28:00 GMT", "https://www.abc.com", exchangeSetStandard.ToString());
 
-            Assert.Multiple(() =>
+            using (Assert.EnterMultipleScope())
             {
                 Assert.That(((InternalServerError)result.Value).Detail, Is.SameAs("Internal Server Error"));
                 Assert.That(result.StatusCode, Is.EqualTo(500));
-            });
+            }
         }
 
         [Test]
@@ -692,11 +692,11 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
             var result = (BadRequestObjectResult)await controller.GetProductDataSinceDateTime("Wed, 21 Oct 2015 07:28:00 GMT", "https://www.abc.com", ExchangeSetStandard.s57.ToString());
             var errors = (ErrorDescription)result.Value;
 
-            Assert.Multiple(() =>
+            using (Assert.EnterMultipleScope())
             {
                 Assert.That(result.StatusCode, Is.EqualTo(400));
                 Assert.That(errors.Errors.Single().Description, Is.EqualTo("The Exchange Set requested is very large and will not be created, please use a standard Exchange Set provided by the UKHO."));
-            });
+            }
 
             A.CallTo(fakeLogger).Where(call => call.Method.Name == "Log"
             && call.GetArgument<LogLevel>(0) == LogLevel.Error
@@ -723,11 +723,11 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
 
             var result = (OkObjectResult)await controller.GetProductDataSinceDateTime("Wed, 21 Oct 2015 07:28:00 GMT", "https://www.abc.com", ExchangeSetStandard.s63.ToString());
 
-            Assert.Multiple(() =>
+            using (Assert.EnterMultipleScope())
             {
                 Assert.That(result.StatusCode, Is.EqualTo(200));
                 Assert.That(((ExchangeSetResponse)result.Value).ExchangeSetCellCount, Is.EqualTo(exchangeSetServiceResponse.ExchangeSetResponse.ExchangeSetCellCount));
-            });
+            }
 
             A.CallTo(fakeLogger).Where(call => call.Method.Name == "Log"
             && call.GetArgument<LogLevel>(0) == LogLevel.Information
@@ -760,11 +760,11 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
 
             var result = (OkObjectResult)await controller.GetProductDataSinceDateTime("Wed, 21 Oct 2015 07:28:00 GMT", "https://www.abc.com", exchangeSetStandard.ToString());
 
-            Assert.Multiple(() =>
+            using (Assert.EnterMultipleScope())
             {
                 Assert.That(((ExchangeSetResponse)result.Value).ExchangeSetCellCount, Is.EqualTo(exchangeSetServiceResponse.ExchangeSetResponse.ExchangeSetCellCount));
                 Assert.That(result.StatusCode, Is.EqualTo(200));
-            });
+            }
 
             A.CallTo(fakeLogger).Where(call => call.Method.Name == "Log"
             && call.GetArgument<LogLevel>(0) == LogLevel.Information
