@@ -54,11 +54,11 @@ namespace UKHO.ExchangeSetService.Webjob.UnitTests.Services
             var response = await _fulfilmentSalesCatalogueService.GetSalesCatalogueDataResponse(FakeBatchId, null);
 
             Assert.That(response, Is.Not.Null);
-            Assert.Multiple(() =>
+            using (Assert.EnterMultipleScope())
             {
                 Assert.That(response.ResponseCode, Is.EqualTo(HttpStatusCode.OK));
                 Assert.That(response, Is.InstanceOf(typeof(SalesCatalogueDataResponse)));
-            });
+            }
         }
     }
 }

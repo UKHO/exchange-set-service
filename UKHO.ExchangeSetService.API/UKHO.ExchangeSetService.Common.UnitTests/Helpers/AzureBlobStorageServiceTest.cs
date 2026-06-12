@@ -153,7 +153,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
 
             Assert.ThrowsAsync(Is.TypeOf<KeyNotFoundException>()
                    .And.Message.EqualTo("Storage account credentials missing from config")
-                    , async delegate { await azureBlobStorageService.DownloadSalesCatalogueResponse(scsResponseUri, fakeBatchId, null); });
+                    , (Func<Task>)(async () => await azureBlobStorageService.DownloadSalesCatalogueResponse(scsResponseUri, fakeBatchId, null)));
         }
 
         [Test]
@@ -173,7 +173,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
             var response = await azureBlobStorageService.DownloadSalesCatalogueResponse(scsResponseUri, fakeBatchId, null);
 
             Assert.That(response, Is.InstanceOf<SalesCatalogueProductResponse>());
-            Assert.That(response.Products[0].ProductName,Is.EqualTo("DE5NOBRK"));
+            Assert.That(response.Products[0].ProductName, Is.EqualTo("DE5NOBRK"));
             Assert.That(response.Products[0].EditionNumber, Is.EqualTo(1));
             Assert.That(response.Products[0].UpdateNumbers[0].Value, Is.EqualTo(0));
         }

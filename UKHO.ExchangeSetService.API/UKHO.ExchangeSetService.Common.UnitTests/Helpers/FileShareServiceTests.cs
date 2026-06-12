@@ -389,7 +389,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
                  .Returns(new HttpResponseMessage() { StatusCode = HttpStatusCode.BadRequest, RequestMessage = new HttpRequestMessage() { RequestUri = new Uri("http://test.com") }, Content = new StreamContent(new MemoryStream(Encoding.UTF8.GetBytes("Bad request"))) });
 
             Assert.ThrowsAsync(Is.TypeOf<FulfilmentException>().And.Message.EqualTo(fulfilmentExceptionMessage),
-                  async delegate { await fileShareService.GetBatchInfoBasedOnProducts(GetProductdetails(), GetScsResponseQueueMessage(), cancellationTokenSource, CancellationToken.None, string.Empty, businessUnit); });
+                  (Func<Task>)(async () => await fileShareService.GetBatchInfoBasedOnProducts(GetProductdetails(), GetScsResponseQueueMessage(), cancellationTokenSource, CancellationToken.None, string.Empty, businessUnit)));
         }
 
         [Test]
@@ -497,7 +497,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
             });
 
             Assert.ThrowsAsync(Is.TypeOf<FulfilmentException>().And.Message.EqualTo(fulfilmentExceptionMessage),
-                async delegate { await fileShareService.GetBatchInfoBasedOnProducts(productList, GetScsResponseQueueMessage(), cancellationTokenSource, CancellationToken.None, string.Empty, businessUnit); });
+                (Func<Task>)(async () => await fileShareService.GetBatchInfoBasedOnProducts(productList, GetScsResponseQueueMessage(), cancellationTokenSource, CancellationToken.None, string.Empty, businessUnit)));
         }
 
         [Test]
@@ -656,7 +656,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
             });
 
             Assert.ThrowsAsync(Is.TypeOf<FulfilmentException>().And.Message.EqualTo(fulfilmentExceptionMessage),
-                async delegate { await fileShareService.GetBatchInfoBasedOnProducts(productList, GetScsResponseQueueMessage(), cancellationTokenSource, CancellationToken.None, string.Empty, businessUnit); });
+                (Func<Task>)(async () => await fileShareService.GetBatchInfoBasedOnProducts(productList, GetScsResponseQueueMessage(), cancellationTokenSource, CancellationToken.None, string.Empty, businessUnit)));
 
         }
         #endregion GetBatchInfoBasedOnProducts
@@ -744,7 +744,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
                  });
 
             Assert.ThrowsAsync(Is.TypeOf<FulfilmentException>().And.Message.EqualTo(fulfilmentExceptionMessage),
-                 async delegate { await fileShareService.DownloadBatchFiles(batchDetail.Entries[0], new List<string> { fakeFilePath }, fakeFolderPath, GetScsResponseQueueMessage(), cancellationTokenSource, CancellationToken.None); });
+                 (Func<Task>)(async () => await fileShareService.DownloadBatchFiles(batchDetail.Entries[0], new List<string> { fakeFilePath }, fakeFolderPath, GetScsResponseQueueMessage(), cancellationTokenSource, CancellationToken.None)));
 
             A.CallTo(fakeLogger).Where(call => call.Method.Name == "Log"
             && call.GetArgument<LogLevel>(0) == LogLevel.Error
@@ -775,7 +775,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
 
             cancellationTokenSource.Cancel();
             CancellationToken cancellationToken = cancellationTokenSource.Token;
-            Assert.ThrowsAsync<OperationCanceledException>(async () => await fileShareService.DownloadBatchFiles(batchDetail.Entries[0], new List<string> { fakeFilePath }, fakeFolderPath, GetScsResponseQueueMessage(), cancellationTokenSource, cancellationToken));
+            Assert.ThrowsAsync<OperationCanceledException>((Func<Task>)(async () => await fileShareService.DownloadBatchFiles(batchDetail.Entries[0], new List<string> { fakeFilePath }, fakeFolderPath, GetScsResponseQueueMessage(), cancellationTokenSource, cancellationToken)));
         }
 
         [Test]
@@ -807,7 +807,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
 
             cancellationTokenSource.Cancel();
             CancellationToken cancellationToken = cancellationTokenSource.Token;
-            Assert.ThrowsAsync<OperationCanceledException>(async () => await fileShareService.GetBatchInfoBasedOnProducts(productList, GetScsResponseQueueMessage(), cancellationTokenSource, cancellationToken, string.Empty, businessUnit));
+            Assert.ThrowsAsync<OperationCanceledException>((Func<Task>)(async () => await fileShareService.GetBatchInfoBasedOnProducts(productList, GetScsResponseQueueMessage(), cancellationTokenSource, cancellationToken, string.Empty, businessUnit)));
         }
 
         #endregion
@@ -821,7 +821,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
                  .Returns(new HttpResponseMessage() { StatusCode = HttpStatusCode.BadRequest, RequestMessage = new HttpRequestMessage() { RequestUri = new Uri("http://test.com") }, Content = new StreamContent(new MemoryStream(Encoding.UTF8.GetBytes("Bad request"))) });
 
             Assert.ThrowsAsync(Is.TypeOf<FulfilmentException>().And.Message.EqualTo(fulfilmentExceptionMessage),
-                  async delegate { await fileShareService.SearchReadMeFilePath(string.Empty, string.Empty); });
+                  (Func<Task>)(async () => await fileShareService.SearchReadMeFilePath(string.Empty, string.Empty)));
         }
 
         [Test]
@@ -850,7 +850,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
                .Returns(httpResponse);
 
             Assert.ThrowsAsync(Is.TypeOf<FulfilmentException>().And.Message.EqualTo(fulfilmentExceptionMessage),
-                  async delegate { await fileShareService.SearchReadMeFilePath(batchId, string.Empty); });
+                  (Func<Task>)(async () => await fileShareService.SearchReadMeFilePath(batchId, string.Empty)));
         }
 
         [Test]
@@ -960,7 +960,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
                .Returns(httpResponse);
 
             Assert.ThrowsAsync(Is.TypeOf<FulfilmentException>().And.Message.EqualTo(fulfilmentExceptionMessage),
-                 async delegate { await fileShareService.DownloadReadMeFileFromFssAsync(readMeFilePath, batchId, exchangeSetRootPath, null); });
+                 (Func<Task>)(async () => await fileShareService.DownloadReadMeFileFromFssAsync(readMeFilePath, batchId, exchangeSetRootPath, null)));
         }
         #endregion
 
@@ -972,7 +972,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
             A.CallTo(() => fakeFileSystemHelper.CheckDirectoryAndFileExists(A<string>.Ignored, A<string>.Ignored)).Returns(false);
 
             Assert.ThrowsAsync(Is.TypeOf<FulfilmentException>().And.Message.EqualTo(fulfilmentExceptionMessage),
-                  async delegate { await fileShareService.CreateZipFileForExchangeSet(fakeBatchId, string.Empty, string.Empty); });
+                  (Func<Task>)(async () => await fileShareService.CreateZipFileForExchangeSet(fakeBatchId, string.Empty, string.Empty)));
         }
 
         [Test]
@@ -1013,7 +1013,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
              });
 
             Assert.ThrowsAsync(Is.TypeOf<FulfilmentException>().And.Message.EqualTo(fulfilmentExceptionMessage),
-                   async delegate { await fileShareService.UploadFileToFileShareService(fakeBatchId, fakeExchangeSetPath, null, fakeFileShareConfig.Value.ExchangeSetFileName); });
+                   (Func<Task>)(async () => await fileShareService.UploadFileToFileShareService(fakeBatchId, fakeExchangeSetPath, null, fakeFileShareConfig.Value.ExchangeSetFileName)));
         }
 
         [Test]
@@ -1047,7 +1047,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
              });
 
             Assert.ThrowsAsync(Is.TypeOf<FulfilmentException>().And.Message.EqualTo(fulfilmentExceptionMessage),
-                  async delegate { await fileShareService.UploadFileToFileShareService(fakeBatchId, fakeExchangeSetPath, null, fakeFileShareConfig.Value.ExchangeSetFileName); });
+                  (Func<Task>)(async () => await fileShareService.UploadFileToFileShareService(fakeBatchId, fakeExchangeSetPath, null, fakeFileShareConfig.Value.ExchangeSetFileName)));
         }
 
         [Test]
@@ -1077,7 +1077,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
             });
 
             Assert.ThrowsAsync(Is.TypeOf<FulfilmentException>().And.Message.EqualTo(fulfilmentExceptionMessage),
-                async delegate { await fileShareService.CommitBatchToFss(fakeBatchId, fakeCorrelationId, fakeExchangeSetPath); });
+                (Func<Task>)(async () => await fileShareService.CommitBatchToFss(fakeBatchId, fakeCorrelationId, fakeExchangeSetPath)));
         }
 
         [Test]
@@ -1110,7 +1110,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
             });
 
             Assert.ThrowsAsync(Is.TypeOf<FulfilmentException>().And.Message.EqualTo(fulfilmentExceptionMessage),
-                   async delegate { await fileShareService.CommitBatchToFss(fakeBatchId, fakeCorrelationId, fakeExchangeSetPath); });
+                   (Func<Task>)(async () => await fileShareService.CommitBatchToFss(fakeBatchId, fakeCorrelationId, fakeExchangeSetPath)));
         }
 
         [Test]
@@ -1192,7 +1192,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
                 .Returns(badUploadResponse);
 
             Assert.ThrowsAsync(Is.TypeOf<FulfilmentException>().And.Message.EqualTo(fulfilmentExceptionMessage),
-                   async delegate { await fileShareService.UploadFileToFileShareService(fakeBatchId, fakeExchangeSetPath, null, fakeFileShareConfig.Value.ExchangeSetFileName); });
+                   (Func<Task>)(async () => await fileShareService.UploadFileToFileShareService(fakeBatchId, fakeExchangeSetPath, null, fakeFileShareConfig.Value.ExchangeSetFileName)));
         }
         #endregion UploadZipFile
 
@@ -1372,7 +1372,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
                 .Returns(badUploadResponse);
 
             Assert.ThrowsAsync(Is.TypeOf<FulfilmentException>().And.Message.EqualTo(fulfilmentExceptionMessage),
-                   async delegate { await fileShareService.UploadFileToFileShareService(fakeBatchId, fakeExchangeSetPath, null, fakeLargeMediaZipFilePath); });
+                   (Func<Task>)(async () => await fileShareService.UploadFileToFileShareService(fakeBatchId, fakeExchangeSetPath, null, fakeLargeMediaZipFilePath)));
         }
 
         [Test]
@@ -1423,7 +1423,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
                 .Returns(badCommitBatchResponse);
 
             Assert.ThrowsAsync(Is.TypeOf<FulfilmentException>().And.Message.EqualTo(fulfilmentExceptionMessage),
-                   async delegate { await fileShareService.CommitAndGetBatchStatusForLargeMediaExchangeSet(fakeBatchId, fakeExchangeSetPath, null); });
+                   (Func<Task>)(async () => await fileShareService.CommitAndGetBatchStatusForLargeMediaExchangeSet(fakeBatchId, fakeExchangeSetPath, null)));
         }
 
         [Test]
@@ -1447,7 +1447,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
                 .Returns(httpResponse);
 
             Assert.ThrowsAsync(Is.TypeOf<FulfilmentException>().And.Message.EqualTo(fulfilmentExceptionMessage),
-                   async delegate { await fileShareService.CommitAndGetBatchStatusForLargeMediaExchangeSet(fakeBatchId, fakeExchangeSetPath, null); });
+                   (Func<Task>)(async () => await fileShareService.CommitAndGetBatchStatusForLargeMediaExchangeSet(fakeBatchId, fakeExchangeSetPath, null)));
         }
 
         #region SearchFolderFiles
@@ -1515,7 +1515,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
                .Returns(httpResponse);
 
             Assert.ThrowsAsync(Is.TypeOf<FulfilmentException>().And.Message.EqualTo(fulfilmentExceptionMessage),
-                 async delegate { await fileShareService.SearchFolderDetails(batchId, string.Empty, searchFolderFileName); });
+                 (Func<Task>)(async () => await fileShareService.SearchFolderDetails(batchId, string.Empty, searchFolderFileName)));
             return Task.CompletedTask;
         }
 
@@ -1527,7 +1527,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
                  .Returns(new HttpResponseMessage() { StatusCode = HttpStatusCode.BadRequest, RequestMessage = new HttpRequestMessage() { RequestUri = new Uri("http://test.com") }, Content = new StreamContent(new MemoryStream(Encoding.UTF8.GetBytes("Bad request"))) });
 
             Assert.ThrowsAsync(Is.TypeOf<FulfilmentException>().And.Message.EqualTo(fulfilmentExceptionMessage),
-                  async delegate { await fileShareService.SearchFolderDetails(string.Empty, string.Empty, string.Empty); });
+                  (Func<Task>)(async () => await fileShareService.SearchFolderDetails(string.Empty, string.Empty, string.Empty)));
         }
         #endregion SearchFolderFiles 
 
@@ -1599,7 +1599,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
             };
 
             Assert.ThrowsAsync(Is.TypeOf<FulfilmentException>().And.Message.EqualTo(fulfilmentExceptionMessage),
-                 async delegate { await fileShareService.DownloadFolderDetails(fakeBatchId, correlationidParam, batchFileList, fakeExchangeSetPath); });
+                 (Func<Task>)(async () => await fileShareService.DownloadFolderDetails(fakeBatchId, correlationidParam, batchFileList, fakeExchangeSetPath)));
         }
         #endregion DownloadFolderFiles 
 
