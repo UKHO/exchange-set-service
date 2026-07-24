@@ -2,11 +2,11 @@ terraform {
   required_providers {
     azurerm = {
       source  = "hashicorp/azurerm"
-      version = "=3.116.0"
+      version = ">=4.54.0"
     }
   }
 
-  required_version = "=1.9.6"
+  required_version = "=1.15.8"
   backend "azurerm" {
     container_name = "tfstate"
   }
@@ -14,10 +14,12 @@ terraform {
 
 provider "azurerm" {
   features {}
+  version = ">=4.54.0"
 }
 
 provider "azurerm" {
   features {}
   alias = "build_agent"
   subscription_id = var.agent_subscription_id
+  version = ">=4.54.0"
 }
