@@ -30,7 +30,7 @@ resource "azurerm_windows_web_app" "small_exchange_set_webapp" {
   site_config {
     application_stack {
       current_stack = "dotnet"
-      dotnet_version = "v10.0"
+      dotnet_version = "v8.0"
     }
     
     always_on         = true
@@ -70,7 +70,7 @@ resource "azurerm_windows_web_app_slot" "small_exchange_set_staging" {
   site_config {
     application_stack {
       current_stack = "dotnet"
-      dotnet_version = "v10.0"
+      dotnet_version = "v8.0"
     }
     
     always_on         = true
@@ -124,7 +124,7 @@ resource "azurerm_windows_web_app" "medium_exchange_set_webapp" {
   site_config {
     application_stack {
       current_stack = "dotnet"
-      dotnet_version = "v10.0"
+      dotnet_version = "v8.0"
     }
     
     always_on         = true
@@ -164,7 +164,7 @@ resource "azurerm_windows_web_app_slot" "medium_exchange_set_staging" {
   site_config {
     application_stack {
       current_stack = "dotnet"
-      dotnet_version = "v10.0"
+      dotnet_version = "v8.0"
     }
     
     always_on         = true
@@ -218,7 +218,7 @@ resource "azurerm_windows_web_app" "large_exchange_set_webapp" {
   site_config {
     application_stack {
       current_stack = "dotnet"
-      dotnet_version = "v10.0"
+      dotnet_version = "v8.0"
     }
     
     always_on         = true
@@ -258,7 +258,7 @@ resource "azurerm_windows_web_app_slot" "large_exchange_set_staging" {
   site_config {
     application_stack {
       current_stack = "dotnet"
-      dotnet_version = "v10.0"
+      dotnet_version = "v8.0"
     }
     
     always_on         = true
