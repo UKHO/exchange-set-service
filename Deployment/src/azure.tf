@@ -2,7 +2,7 @@ terraform {
   required_providers {
     azurerm = {
       source  = "hashicorp/azurerm"
-      version = ">=4.81.0"
+      version = "=4.81.0"
     }
   }
 
@@ -14,12 +14,10 @@ terraform {
 
 provider "azurerm" {
   features {}
-  version = ">=4.81.0"
 }
 
 provider "azurerm" {
   features {}
   alias = "build_agent"
   subscription_id = var.agent_subscription_id
-  version = ">=4.81.0"
 }
