@@ -46,6 +46,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
             fakeAzureStorageService = A.Fake<ISalesCatalogueStorageService>();
             fakeCacheConfiguration = A.Fake<IOptions<CacheConfiguration>>();
             fakeFileSystemHelper = A.Fake<IFileSystemHelper>();
+            // deepcode ignore NoHardcodedCredentials: Test configuration value, not an actual secret
             fakeCacheConfiguration.Value.CacheStorageAccountKey = "testaccountkey";
             fakeCacheConfiguration.Value.CacheStorageAccountName = "testessstorage";
             fakeCacheConfiguration.Value.FssSearchCacheTableName = "testfsscache";
@@ -115,6 +116,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
                     new BatchDetail {
                         BatchId = "7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272",
                         Files= new List<BatchFile>(){ new BatchFile { Filename = "test.txt", FileSize = 400, Links = new Links { Get = new Link { Href = "" }}}},
+                        // deepcode ignore NoHardcodedCredentials: Test data - Key property is an attribute name, not a secret
                         Attributes = new List<Attribute> { new Attribute { Key= "Agency", Value= "DE" } ,
                                                            new Attribute { Key= "CellName", Value= "DE416050" },
                                                            new Attribute { Key= "EditionNumber", Value= "2" } ,
@@ -180,6 +182,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
             {
                 BatchId = "7b4cdf10-adfa-4ed6-b2fe-d1543d8b7272",
                 Files = new List<BatchFile>() { new BatchFile { Filename = "test.txt", FileSize = 400, Links = new Links { Get = new Link { Href = "/batch/26067645-643e-4a56-xy5f-19977b4ae876/files/Test.TXT" } } } },
+                // deepcode ignore NoHardcodedCredentials: Test data - Key property is an attribute name, not a secret
                 Attributes = new List<Attribute> { new Attribute { Key= "Agency", Value= "DE" } ,
                                                            new Attribute { Key= "CellName", Value= "DE416050" },
                                                            new Attribute { Key= "EditionNumber", Value= "2" } ,

@@ -89,6 +89,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
             fileShareService = sp.GetService<IFileShareService>();
         }
 
+        // deepcode ignore NoHardcodedCredentials: Test helper method - Key parameter is an attribute name, not a secret
         private static Attribute GetAttribute(string key, string value) => new() { Key = key, Value = value };
 
         private SalesCatalogueServiceResponseQueueMessage GetScsResponseQueueMessage()

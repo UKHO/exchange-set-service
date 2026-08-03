@@ -30,7 +30,8 @@ namespace UKHO.ExchangeSetService.Common.HealthCheck
                 }
                 else
                 {
-                    logger.LogError(EventIds.AzureWebJobIsUnhealthy.ToEventId(), healthCheckResult.Exception, "Azure webjob is unhealthy with error {Message}", healthCheckResult.Exception.Message);
+                    var sanitizedMessage = SanitizeLogInput(healthCheckResult.Exception?.Message);
+                    logger.LogError(EventIds.AzureWebJobIsUnhealthy.ToEventId(), healthCheckResult.Exception, "Azure webjob is unhealthy with error {Message}", sanitizedMessage);
                 }
                 return healthCheckResult;
             }
@@ -39,6 +40,15 @@ namespace UKHO.ExchangeSetService.Common.HealthCheck
                 logger.LogError(EventIds.AzureWebJobIsUnhealthy.ToEventId(), ex, "Health check for Azure Webjob threw an exception");
                 return HealthCheckResult.Unhealthy("Health check for Azure Webjob threw an exception", ex);
             }
+        }
+
+        private static string SanitizeLogInput(string input)
+        {
+            if (string.IsNullOrEmpty(input))
+                return input;
+
+            // Remove newlines and carriage returns to prevent log forging
+            return input.Replace("\r", "").Replace("\n", "");
         }
     }
 }

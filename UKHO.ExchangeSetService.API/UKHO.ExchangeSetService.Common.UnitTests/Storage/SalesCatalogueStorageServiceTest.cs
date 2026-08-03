@@ -23,6 +23,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Storage
                 StorageAccountName = "test",
                 StorageContainerName = "test",
                 DynamicQueueName = "ess-{0}-test",
+                // deepcode ignore NoHardcodedCredentials: Test configuration values, not actual secrets
                 LargeExchangeSetAccountKey = "LargeExchangeSetAccountKey",
                 LargeExchangeSetAccountName = "LargeExchangeSetAccountName",
                 LargeExchangeSetInstance = 2,

@@ -238,6 +238,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
             {
                 Links = links,
                 BusinessUnit = businessUnit,
+                // deepcode ignore NoHardcodedCredentials: Test data - Key property is an attribute name, not a secret
                 Attributes = new List<Attribute> { new Attribute { Key= "Agency", Value= "DE" } ,
                                                            new Attribute { Key= "CellName", Value= "DE416050" },
                                                            new Attribute { Key= "EditionNumber", Value= "2" } ,
@@ -272,6 +273,7 @@ namespace UKHO.ExchangeSetService.API.UnitTests.Controllers
             {
                 Links = links,
                 BusinessUnit = "",
+                // deepcode ignore NoHardcodedCredentials: Test data - Key property is an attribute name, not a secret
                 Attributes = new List<Attribute> { new Attribute { Key= "Agency", Value= "" } ,
                                                            new Attribute { Key= "CellName", Value= "DE416050" },
                                                            new Attribute { Key= "EditionNumber", Value= "2" } ,

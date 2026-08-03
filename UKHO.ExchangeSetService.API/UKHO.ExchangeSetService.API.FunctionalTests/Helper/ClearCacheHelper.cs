@@ -87,6 +87,7 @@ namespace UKHO.ExchangeSetService.API.FunctionalTests.Helper
             {
                 Links = links,
                 BusinessUnit = businessUnit,
+                // deepcode ignore NoHardcodedCredentials: Test data - Key property is an attribute name, not a secret
                 Attributes = new List<Attribute> { new() { Key= "Agency", Value= agency } ,
                                                            new Attribute { Key= "CellName", Value= product },
                                                            new Attribute { Key= "EditionNumber", Value= editionNumber.ToString() } ,
