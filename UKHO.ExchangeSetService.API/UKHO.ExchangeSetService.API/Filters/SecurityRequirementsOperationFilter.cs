@@ -2,7 +2,7 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.OpenApi;
+using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.SwaggerGen;
 
 namespace UKHO.ExchangeSetService.API.Filters
@@ -22,7 +22,10 @@ namespace UKHO.ExchangeSetService.API.Filters
             if (requiredScopes.Any())
             {
 
-                var oAuthScheme = new OpenApiSecuritySchemeReference("jwtBearerAuth");
+                var oAuthScheme = new OpenApiSecurityScheme
+                {
+                    Reference = new OpenApiReference { Type = ReferenceType.SecurityScheme, Id = "jwtBearerAuth" }
+                };
 
                 operation.Security = new List<OpenApiSecurityRequirement>
                 {

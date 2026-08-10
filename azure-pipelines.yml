@@ -58,7 +58,7 @@ variables:
   - name: DeploymentPool
     value: "Mare Nectaris"
   - name: DotNetSdkVersion
-    value: "8.0.x"
+    value: "10.0.x"
   - name: WindowsPool1
     value: "NautilusBuild"
   - name: WindowsPool2
