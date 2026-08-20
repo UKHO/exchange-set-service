@@ -62,6 +62,8 @@ Write-Host "##vso[task.setvariable variable=ESSManagedIdentity.ClientId]$($terra
 Write-Host "##vso[task.setvariable variable=RESOURCE_GROUP_NAME]$($terraformOutput.web_app_resource_group.value)"
 Write-Host "##vso[task.setvariable variable=WEB_APP_SLOT_NAME]$($terraformOutput.web_app_slot_name.value)"
 Write-Host "##vso[task.setvariable variable=WEB_APP_SLOT_HOST_NAME]$($terraformOutput.web_app_slot_default_site_hostname.value)"
-
+Write-Host "##vso[task.setvariable variable=small_exchange_set_webapps;isOutput=true]$env:small_exchange_set_webapps"
+Write-Host "##vso[task.setvariable variable=medium_exchange_set_webapps;isOutput=true]$env:medium_exchange_set_webapps"
+Write-Host "##vso[task.setvariable variable=large_exchange_set_webapps;isOutput=true]$env:large_exchange_set_webapps"
 
 $terraformOutput | ConvertTo-Json -Depth 5 > $terraformJsonOutputFile
