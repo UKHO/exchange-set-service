@@ -54,7 +54,7 @@ variables:
   - name: UKHOAssemblyCopyright
     value: "Copyright © UK Hydrographic Office"
   - name: Container
-    value: "ukhydrographicoffice/terraform-azure-powershell-unzip:1.9.6"
+    value: "ukhydrographicoffice/terraform-azure-powershell-unzip:1.15.8"
   - name: DeploymentPool
     value: "Mare Nectaris"
   - name: DotNetSdkVersion
