@@ -78,21 +78,30 @@ steps:
         $smallWebapps = terraform output -json small_exchange_set_webapps | ConvertFrom-Json
         foreach ($item in $smallWebapps) {
           Write-Host "Processing small webapp: $($item.webappname)"
-          az webapp <your-command> --name $item.webappname --resource-group $rg
+          az webapp config set `
+           --resource-group $rg `
+           --name $item.webappname `
+           --windows-fx-version "DOTNET|10.0"
         }
         
         # Get and process medium webapps
         $mediumWebapps = terraform output -json medium_exchange_set_webapps | ConvertFrom-Json
         foreach ($item in $mediumWebapps) {
           Write-Host "Processing medium webapp: $($item.webappname)"
-          az webapp <your-command> --name $item.webappname --resource-group $rg
+          az webapp config set `
+           --resource-group $rg `
+           --name $item.webappname `
+           --windows-fx-version "DOTNET|10.0"
         }
         
         # Get and process large webapps
         $largeWebapps = terraform output -json large_exchange_set_webapps | ConvertFrom-Json
         foreach ($item in $largeWebapps) {
           Write-Host "Processing large webapp: $($item.webappname)"
-          az webapp <your-command> --name $item.webappname --resource-group $rg
+          az webapp config set `
+           --resource-group $rg `
+           --name $item.webappname `
+           --windows-fx-version "DOTNET|10.0"
         }
 
   - task: FileTransform@2
