@@ -65,6 +65,8 @@ Write-Host "##vso[task.setvariable variable=WEB_APP_SLOT_HOST_NAME]$($terraformO
 Write-Host "##vso[task.setvariable variable=RESOURCEGROUPNAME;isOutput=true]$($terraformOutput.web_app_resource_group.value)"
 Write-Host "##vso[task.setvariable variable=WEBAPPNAME;isOutput=true]$($terraformOutput.web_app_name.value)"
 Write-Host "##vso[task.setvariable variable=EssURL;isOutput=true]$env:SERVICE_DNS_URL"
-
+Write-Host "##vso[task.setvariable variable=small_exchange_set_webapps;isOutput=true]$env:small_exchange_set_webapps"
+Write-Host "##vso[task.setvariable variable=medium_exchange_set_webapps;isOutput=true]$env:medium_exchange_set_webapps"
+Write-Host "##vso[task.setvariable variable=large_exchange_set_webapps;isOutput=true]$env:large_exchange_set_webapps"
 
 $terraformOutput | ConvertTo-Json -Depth 5 > $terraformJsonOutputFile
