@@ -43,7 +43,7 @@ steps:
       TF_VAR_scs_response_retention: $(SalesCatalogueResponseRetentionInDays)
 
   - task: AzureCLI@2
-    displayName: 'Run script against all fulfilment webapps'
+    displayName: 'Run windows_fx_version Update AZ Script Against All Webapps'
     inputs:
       azureSubscription: ${{parameters.AzureSubscription}}
       scriptType: 'pscore'
