@@ -66,7 +66,7 @@ steps:
   - task: AzureCLI@2
     displayName: 'Run script against all fulfilment webapps'
     inputs:
-      azureSubscription: '$(azureSubscription)'
+      azureSubscription: ${{parameters.AzureSubscription}}
       scriptType: 'pscore'
       scriptLocation: 'inlineScript'
       inlineScript: |
