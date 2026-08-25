@@ -42,6 +42,57 @@ steps:
       TF_VAR_asp_control_webapp: $(appServicePlanControlWebApp)
       TF_VAR_scs_response_retention: $(SalesCatalogueResponseRetentionInDays)
 
+  - task: AzureCLI@2
+    displayName: 'Run windows_fx_version Update AZ Script Against All Webapps'
+    inputs:
+      azureSubscription: ${{parameters.AzureSubscription}}
+      scriptType: 'pscore'
+      scriptLocation: 'inlineScript'
+      inlineScript: |
+        cd $(Pipeline.Workspace)/terraformartifact/src
+        
+        $rg = terraform output -raw web_app_resource_group
+
+        #Update webapp slot windows_fx_version
+        az webapp config set `
+         --resource-group $rg `
+         --name "$env:WEBAPPNAME" `
+         --slot "$env:WEB_APP_SLOT_NAME" `
+         --windows-fx-version "DOTNET|10.0"
+        
+        #Update small fulfilment webapp slots windows_fx_version
+        $smallWebapps = terraform output -json small_exchange_set_webapps | ConvertFrom-Json
+        foreach ($item in $smallWebapps) {
+          Write-Host "Processing small webapp: $($item.webappname)"
+          az webapp config set `
+           --resource-group $rg `
+           --name $item.webappname `
+           --slot "staging" `
+           --windows-fx-version "DOTNET|10.0"
+        }
+        
+        #Update medium fulfilment webapp slots windows_fx_version
+        $mediumWebapps = terraform output -json medium_exchange_set_webapps | ConvertFrom-Json
+        foreach ($item in $mediumWebapps) {
+          Write-Host "Processing medium webapp: $($item.webappname)"
+          az webapp config set `
+           --resource-group $rg `
+           --name $item.webappname `
+           --slot "staging" `
+           --windows-fx-version "DOTNET|10.0"
+        }
+        
+        # #Update large fulfilment webapp slots windows_fx_version
+        $largeWebapps = terraform output -json large_exchange_set_webapps | ConvertFrom-Json
+        foreach ($item in $largeWebapps) {
+          Write-Host "Processing large webapp: $($item.webappname)"
+          az webapp config set `
+           --resource-group $rg `
+           --name $item.webappname `
+           --slot "staging" `
+           --windows-fx-version "DOTNET|10.0"
+        }
+
   - template: fulfilment-webjob-deployment.yml
     parameters:
       AzureSubscription: ${{parameters.AzureSubscription}}
