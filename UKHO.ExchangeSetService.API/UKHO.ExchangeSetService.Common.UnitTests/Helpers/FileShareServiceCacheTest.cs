@@ -46,7 +46,6 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.Helpers
             fakeAzureStorageService = A.Fake<ISalesCatalogueStorageService>();
             fakeCacheConfiguration = A.Fake<IOptions<CacheConfiguration>>();
             fakeFileSystemHelper = A.Fake<IFileSystemHelper>();
-            // deepcode ignore NoHardcodedCredentials: Test configuration value, not an actual secret
             fakeCacheConfiguration.Value.CacheStorageAccountKey = "testaccountkey";
             fakeCacheConfiguration.Value.CacheStorageAccountName = "testessstorage";
             fakeCacheConfiguration.Value.FssSearchCacheTableName = "testfsscache";
