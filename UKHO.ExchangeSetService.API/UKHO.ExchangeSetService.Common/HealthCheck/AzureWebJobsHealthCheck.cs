@@ -45,10 +45,10 @@ namespace UKHO.ExchangeSetService.Common.HealthCheck
         private static string SanitizeLogInput(string input)
         {
             if (string.IsNullOrEmpty(input))
-                return input;
+                return string.Empty;
 
             // Remove newlines and carriage returns to prevent log forging
-            return input.Replace("\r", "").Replace("\n", "");
+            return input.Replace("\r", string.Empty).Replace("\n", string.Empty);
         }
     }
 }
