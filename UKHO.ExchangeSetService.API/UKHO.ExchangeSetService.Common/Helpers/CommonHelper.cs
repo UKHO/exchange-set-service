@@ -40,16 +40,16 @@ namespace UKHO.ExchangeSetService.Common.Helpers
 
         public static byte[] CalculateMD5(byte[] requestBytes)
         {
-            using var sha256 = SHA256.Create();
-            var hash = sha256.ComputeHash(requestBytes);
+            using var md5 = MD5.Create();
+            var hash = md5.ComputeHash(requestBytes);
 
             return hash;
         }
 
         public static byte[] CalculateMD5(Stream requestStream)
         {
-            using var sha256 = SHA256.Create();
-            var hash = sha256.ComputeHash(requestStream);
+            using var md5 = MD5.Create();
+            var hash = md5.ComputeHash(requestStream);
 
             return hash;
         }
