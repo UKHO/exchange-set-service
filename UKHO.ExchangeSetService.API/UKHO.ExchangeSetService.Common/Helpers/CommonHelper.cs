@@ -60,6 +60,14 @@ namespace UKHO.ExchangeSetService.Common.Helpers
             return (bytes / byteSize) / byteSize;
         }
 
+        public static string SanitizeLogInput(string input)
+        {
+            if (string.IsNullOrEmpty(input))
+                return string.Empty;
+
+            // Remove newlines and carriage returns to prevent log forging
+            return input.Replace("\r", string.Empty).Replace("\n", string.Empty);
+        }
 
         public static IAsyncPolicy<HttpResponseMessage> GetRetryPolicy(ILogger logger, string requestType, EventIds eventId, int retryCount, double sleepDuration)
         {

@@ -1,10 +1,4 @@
-﻿using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Http.Extensions;
-using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
@@ -12,6 +6,13 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.Extensions;
+using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using UKHO.ExchangeSetService.Common.Helpers;
 using UKHO.ExchangeSetService.Common.Logging;
 
 namespace UKHO.ExchangeSetService.API.Filters
@@ -167,16 +168,7 @@ namespace UKHO.ExchangeSetService.API.Filters
                                                && !h.Key.Equals("X-ARR-ClientCert", StringComparison.InvariantCultureIgnoreCase)
                                                && !h.Key.Equals("MS-ASPNETCORE-CLIENTCERT", StringComparison.InvariantCultureIgnoreCase)
                                          )
-                .ToDictionary(h => SanitizeLogInput(h.Key), h => HeadersToRedact.Any(r => r.Equals(h.Key, StringComparison.InvariantCultureIgnoreCase)) ? RedactedValue : SanitizeLogInput(string.Join(", ", (object[])h.Value)));
-        }
-
-        private static string SanitizeLogInput(string input)
-        {
-            if (string.IsNullOrEmpty(input))
-                return string.Empty;
-
-            // Remove newlines and carriage returns to prevent log forging
-            return input.Replace("\r", string.Empty).Replace("\n", string.Empty);
+                .ToDictionary(h => CommonHelper.SanitizeLogInput(h.Key), h => HeadersToRedact.Any(r => r.Equals(h.Key, StringComparison.InvariantCultureIgnoreCase)) ? RedactedValue : CommonHelper.SanitizeLogInput(string.Join(", ", (object[])h.Value)));
         }
 
         private static async Task<string> ReadAndResetStream(Stream stream)
