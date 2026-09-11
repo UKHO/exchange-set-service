@@ -31,7 +31,7 @@ namespace UKHO.ExchangeSetService.API.Filters
                 {
                     new OpenApiSecurityRequirement
                     {
-                        [ oAuthScheme ] = requiredScopes.ToList()
+                        [oAuthScheme] = requiredScopes.ToList()
                     }
                 };
             }
