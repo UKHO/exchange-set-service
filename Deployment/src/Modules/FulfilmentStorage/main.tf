@@ -123,13 +123,13 @@ resource "azurerm_storage_account" "large_exchange_set_storage" {
 
 resource "azurerm_storage_container" "large_exchange_set_storage_container" {
   name                  = "ess-fulfilment"
-  storage_account_name  = azurerm_storage_account.large_exchange_set_storage.name
+  storage_account_id    = azurerm_storage_account.large_exchange_set_storage.id
 }
 
 resource "azurerm_storage_queue" "large_exchange_set_storage_queue" {
   count                = var.exchange_set_config.LargeExchangeSetInstance
   name                 = "ess-${sum([1,count.index])}-fulfilment"
-  storage_account_name = azurerm_storage_account.large_exchange_set_storage.name
+  storage_account_id   = azurerm_storage_account.large_exchange_set_storage.id
 }
 
 resource "azurerm_storage_management_policy" "large_exchange_set_storage_policy" {

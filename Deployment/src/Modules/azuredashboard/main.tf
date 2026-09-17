@@ -2,7 +2,7 @@ data "azurerm_subscription" "current" {
 }
 
 
-resource "azurerm_dashboard" "azure-dashboard" {
+resource "azurerm_portal_dashboard" "azure-dashboard" {
   name                = var.name
   resource_group_name = var.resource_group.name
   location            = var.resource_group.location

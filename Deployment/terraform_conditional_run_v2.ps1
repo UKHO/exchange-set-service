@@ -13,7 +13,7 @@ cd $env:AGENT_BUILDDIRECTORY/terraformartifact/src
 terraform --version
 
 Write-output "Executing terraform scripts for deployment in $workSpace enviroment"
-terraform init -backend-config="resource_group_name=$deploymentResourceGroupName" -backend-config="storage_account_name=$deploymentStorageAccountName" -backend-config="key=terraform.deployment.v2.tfplan"
+terraform init -upgrade -backend-config="resource_group_name=$deploymentResourceGroupName" -backend-config="storage_account_name=$deploymentStorageAccountName" -backend-config="key=terraform.deployment.v2.tfplan"
 if ( !$? ) { echo "Something went wrong during terraform initialization"; throw "Error" }
 
 Write-output "Selecting workspace"
@@ -62,6 +62,8 @@ Write-Host "##vso[task.setvariable variable=ESSManagedIdentity.ClientId]$($terra
 Write-Host "##vso[task.setvariable variable=RESOURCE_GROUP_NAME]$($terraformOutput.web_app_resource_group.value)"
 Write-Host "##vso[task.setvariable variable=WEB_APP_SLOT_NAME]$($terraformOutput.web_app_slot_name.value)"
 Write-Host "##vso[task.setvariable variable=WEB_APP_SLOT_HOST_NAME]$($terraformOutput.web_app_slot_default_site_hostname.value)"
-
+Write-Host "##vso[task.setvariable variable=small_exchange_set_webapps;isOutput=true]$env:small_exchange_set_webapps"
+Write-Host "##vso[task.setvariable variable=medium_exchange_set_webapps;isOutput=true]$env:medium_exchange_set_webapps"
+Write-Host "##vso[task.setvariable variable=large_exchange_set_webapps;isOutput=true]$env:large_exchange_set_webapps"
 
 $terraformOutput | ConvertTo-Json -Depth 5 > $terraformJsonOutputFile

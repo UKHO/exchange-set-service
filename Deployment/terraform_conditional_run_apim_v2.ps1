@@ -13,7 +13,7 @@ Write-output "Executing terraform scripts for APIM deployment in $workSpace envi
 
 $backendConfigKey = "terraform.deployment.apim.ess.v2.tfplan"
 Write-output "Using plan $backendConfigKey"
-terraform init -backend-config="resource_group_name=$deploymentResourceGroupName" -backend-config="storage_account_name=$deploymentStorageAccountName" -backend-config="key=$backendConfigKey"
+terraform init -upgrade -backend-config="resource_group_name=$deploymentResourceGroupName" -backend-config="storage_account_name=$deploymentStorageAccountName" -backend-config="key=$backendConfigKey"
 if ( !$? ) { echo "Something went wrong during terraform initialization"; throw "Error" }
 
 Write-output "Selecting workspace..."
