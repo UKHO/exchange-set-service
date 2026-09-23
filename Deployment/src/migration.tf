@@ -195,3 +195,17 @@ removed {
     destroy = false
   }
 }
+
+#dashboard
+removed {
+  from = module.azure-dashboard.azurerm_dashboard.azure-dashboard
+
+  lifecycle {
+    destroy = false
+  }
+}
+
+import {
+  to = module.azure-dashboard.azurerm_portal_dashboard.azure-dashboard
+  id = "${azurerm_resource_group.rg.id}/providers/Microsoft.Portal/dashboards/ESS-${local.env_name}-Monitoring-Dashboard${var.suffix}"
+}
