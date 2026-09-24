@@ -197,13 +197,6 @@ removed {
 }
 
 #dashboard
-removed {
-  from = module.azure-dashboard.azurerm_dashboard.azure-dashboard
-
-  lifecycle {
-    destroy = false
-  }
-}
 
 import {
   to = module.azure-dashboard.azurerm_portal_dashboard.azure-dashboard
