@@ -36,7 +36,7 @@ resource "azurerm_windows_web_app" "webapp_service" {
     ip_restriction_default_action     = "Deny"
     scm_ip_restriction_default_action = "Deny"
     scm_use_main_ip_restriction       = true
-    vnet_route_all_enabled            = true
+    vnet_route_all_enabled            = false
 
 
     ip_restriction {
@@ -91,7 +91,7 @@ resource "azurerm_windows_web_app_slot" "staging" {
     ip_restriction_default_action     = "Deny"
     scm_ip_restriction_default_action = "Deny"
     scm_use_main_ip_restriction       = true
-    vnet_route_all_enabled            = true
+    vnet_route_all_enabled            = false
 
 
     ip_restriction {
