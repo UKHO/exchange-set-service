@@ -34,6 +34,8 @@ resource "azurerm_windows_web_app" "webapp_service" {
     ftps_state        = "Disabled"
     use_32_bit_worker = false
 
+    ip_restriction_default_action = var.front_door_id != "" ? "Deny" : "Allow"
+
     ip_restriction {
       virtual_network_subnet_id = var.subnet_id
     }
@@ -42,6 +44,19 @@ resource "azurerm_windows_web_app" "webapp_service" {
       for_each = var.allowed_ips
       content {
           ip_address  = length(split("/",ip_restriction.value)) > 1 ? ip_restriction.value : "${ip_restriction.value}/32"
+      }
+    }
+
+    dynamic "ip_restriction" {
+      for_each = var.front_door_id != "" ? [var.front_door_id] : []
+      content {
+        name        = "AllowFrontDoor"
+        service_tag = "AzureFrontDoor.Backend"
+        priority    = 100
+        action      = "Allow"
+        headers {
+          x_azure_fdid = [ip_restriction.value]
+        }
       }
     }
   }
@@ -80,6 +95,8 @@ resource "azurerm_windows_web_app_slot" "staging" {
     ftps_state        = "Disabled"
     use_32_bit_worker = false
 
+    ip_restriction_default_action = var.front_door_id != "" ? "Deny" : "Allow"
+
     ip_restriction {
       virtual_network_subnet_id = var.subnet_id
     }
@@ -88,6 +105,19 @@ resource "azurerm_windows_web_app_slot" "staging" {
       for_each = var.allowed_ips
       content {
           ip_address  = length(split("/",ip_restriction.value)) > 1 ? ip_restriction.value : "${ip_restriction.value}/32"
+      }
+    }
+
+    dynamic "ip_restriction" {
+      for_each = var.front_door_id != "" ? [var.front_door_id] : []
+      content {
+        name        = "AllowFrontDoor"
+        service_tag = "AzureFrontDoor.Backend"
+        priority    = 100
+        action      = "Allow"
+        headers {
+          x_azure_fdid = [ip_restriction.value]
+        }
       }
     }
   }

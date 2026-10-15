@@ -76,6 +76,7 @@ module "webapp_service" {
   }
   tags                      = local.tags
   allowed_ips               = var.allowed_ips
+  front_door_id             = local.front_door_deployed ? data.azurerm_cdn_frontdoor_profile.shared[0].resource_guid : ""
 }
 
 module "fulfilment_webapp" {
