@@ -111,7 +111,8 @@ module "fulfilment_webapp" {
     "ELASTIC_APM_SERVICE_NAME"                             = "ESS Fulfilment Service"
     "ELASTIC_APM_API_KEY"                                  = var.elastic_apm_api_key
   }
-  tags = local.tags
+  tags              = local.tags
+  agent_prd_subnet  = var.agent_prd_subnet
 }
 
 module "fulfilment_storage" {

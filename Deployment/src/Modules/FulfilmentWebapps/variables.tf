@@ -65,3 +65,7 @@ variable "as_name_lxs" {
 variable "suffix" {
   default = ""
 }
+
+variable "agent_prd_subnet" {
+  type = string
+}

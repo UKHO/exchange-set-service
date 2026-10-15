@@ -33,12 +33,20 @@ resource "azurerm_windows_web_app" "small_exchange_set_webapp" {
       dotnet_version = "v10.0"
     }
     
-    always_on         = true
-    ftps_state        = "Disabled"
-    use_32_bit_worker = false
+    always_on                         = true
+    ftps_state                        = "Disabled"
+    use_32_bit_worker                 = false
+    ip_restriction_default_action     = "Deny"
+    scm_ip_restriction_default_action = "Deny"
+    scm_use_main_ip_restriction       = true
+    vnet_route_all_enabled            = false
     
     ip_restriction {
       virtual_network_subnet_id = var.small_exchange_set_subnets[count.index]
+    }
+
+    ip_restriction {
+      virtual_network_subnet_id = var.agent_prd_subnet
     }
   }
 
