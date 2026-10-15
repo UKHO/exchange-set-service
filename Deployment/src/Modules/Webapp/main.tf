@@ -94,6 +94,10 @@ resource "azurerm_windows_web_app_slot" "staging" {
       virtual_network_subnet_id = var.subnet_id
     }
 
+    ip_restriction {
+      virtual_network_subnet_id = var.agent_prd_subnet
+    }
+
     dynamic "ip_restriction" {
       for_each = var.allowed_ips
       content {

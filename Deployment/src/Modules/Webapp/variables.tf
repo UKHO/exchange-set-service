@@ -33,3 +33,7 @@ variable "asp_control_webapp" {
 variable "allowed_ips" {
 
 }
+
+variable "agent_prd_subnet" {
+  type = string
+}
