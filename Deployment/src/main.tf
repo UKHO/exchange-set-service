@@ -112,6 +112,7 @@ module "fulfilment_webapp" {
     "ELASTIC_APM_API_KEY"                                  = var.elastic_apm_api_key
   }
   tags              = local.tags
+  allowed_ips       = var.allowed_ips
   agent_prd_subnet  = var.agent_prd_subnet
 }
 

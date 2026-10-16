@@ -66,6 +66,10 @@ variable "suffix" {
   default = ""
 }
 
+variable "allowed_ips" {
+
+}
+
 variable "agent_prd_subnet" {
   type = string
 }
