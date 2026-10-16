@@ -43,7 +43,7 @@ module "front_door_delivery" {
     }
   }
 
-  # Public App Service origin (like-for-like with FortiWeb); ingress is locked down by App Service access restrictions.
+  # Private Link creates a pending private endpoint connection on the web app that must be approved after apply.
   origins = {
     ess_webapp = {
       name                           = "${local.front_door_name_prefix}-origin"
@@ -56,6 +56,12 @@ module "front_door_delivery" {
       priority                       = 1
       weight                         = 1000
       certificate_name_check_enabled = true
+      private_link = {
+        request_message        = "ESS ${local.env_name} ${local.front_door_instance} Front Door private link request"
+        target_type            = "sites"
+        location               = module.webapp_service.webapp_service.location
+        private_link_target_id = module.webapp_service.webapp_service.id
+      }
     }
   }
 
