@@ -1,8 +1,8 @@
-# The same Terraform runs twice per environment: suffix "" deploys the API web app, suffix "-v2" deploys the UI web app.
+# The same Terraform runs twice per environment: suffix "" deploys the API web app, suffix "-v2" deploys the v2 web app.
 locals {
-  front_door_instance               = var.suffix == "-v2" ? "ui" : "api"
+  front_door_instance               = var.suffix == "-v2" ? "v2" : "api"
   front_door_name_prefix            = "ess-${local.env_name}-${local.front_door_instance}"
-  front_door_custom_domain_hostname = local.front_door_instance == "ui" ? var.front_door_ui_custom_domain_hostname : var.front_door_api_custom_domain_hostname
+  front_door_custom_domain_hostname = local.front_door_instance == "v2" ? var.front_door_v2_custom_domain_hostname : var.front_door_api_custom_domain_hostname
   front_door_deployed               = var.front_door_enabled && local.front_door_custom_domain_hostname != ""
 }
 

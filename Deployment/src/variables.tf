@@ -149,8 +149,8 @@ variable "front_door_api_custom_domain_hostname" {
   default     = ""
 }
 
-variable "front_door_ui_custom_domain_hostname" {
-  description = "The public hostname for the UI instance (suffix \"-v2\"). Leave empty to skip Front Door for this instance."
+variable "front_door_v2_custom_domain_hostname" {
+  description = "The public hostname for the v2 instance (suffix \"-v2\"), only deployed in route-to-live environments. Leave empty to skip Front Door for this instance."
   type        = string
   default     = ""
 }
