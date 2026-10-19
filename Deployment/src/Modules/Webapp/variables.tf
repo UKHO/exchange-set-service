@@ -33,9 +33,3 @@ variable "asp_control_webapp" {
 variable "allowed_ips" {
 
 }
-
-variable "front_door_id" {
-  description = "The shared Front Door profile resource GUID (X-Azure-FDID). When set, Front Door traffic is allowed and all unmatched traffic is denied."
-  type        = string
-  default     = ""
-}

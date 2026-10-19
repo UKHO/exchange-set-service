@@ -66,7 +66,3 @@ output "web_app_slot_name" {
 output "web_app_slot_default_site_hostname" {
   value = module.webapp_service.slot_default_site_hostname
 }
-
-output "front_door_custom_domain_validation_tokens" {
-  value = local.front_door_deployed ? module.front_door_delivery[0].custom_domain_validation_tokens : {}
-}
