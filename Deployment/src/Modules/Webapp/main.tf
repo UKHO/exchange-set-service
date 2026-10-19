@@ -62,14 +62,14 @@ resource "azurerm_windows_web_app" "webapp_service" {
     }
 
     dynamic "ip_restriction" {
-      for_each = range(var.exchange_set_config.medium_exchange_set_subnets)
+      for_each = range(var.exchange_set_config.MediumExchangeSetInstance)
       content {
         virtual_network_subnet_id = var.medium_exchange_set_subnets[ip_restriction.key]
       }
     }
 
     dynamic "ip_restriction" {
-      for_each = range(var.exchange_set_config.large_exchange_set_subnets)
+      for_each = range(var.exchange_set_config.LargeExchangeSetInstance)
       content {
         virtual_network_subnet_id = var.large_exchange_set_subnets[ip_restriction.key]
       }
