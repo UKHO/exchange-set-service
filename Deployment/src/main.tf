@@ -63,7 +63,7 @@ module "webapp_service" {
   location                  = azurerm_resource_group.rg.location
   subnet_id                 = data.azurerm_subnet.main_subnet.id
   user_assigned_identity    = module.user_identity.ess_service_identity_id
-  asp_control_webapp        = var.asp_control_webapp
+  asp_control_webapp        = var.asp_control_webapp  
   app_settings = {
     "EventHubLoggingConfiguration:Environment"             = local.env_name
     "EventHubLoggingConfiguration:MinimumLoggingLevel"     = "Warning"
@@ -74,9 +74,13 @@ module "webapp_service" {
     "WEBSITE_ENABLE_SYNC_UPDATE_SITE"                      = "true"
     "WEBSITE_ADD_SITENAME_BINDINGS_IN_APPHOST_CONFIG"      = "1"
   }
-  tags                      = local.tags
-  allowed_ips               = var.allowed_ips
-  agent_prd_subnet          = var.agent_prd_subnet
+  tags                          = local.tags
+  allowed_ips                   = var.allowed_ips
+  agent_prd_subnet              = var.agent_prd_subnet
+  exchange_set_config           = local.config_data.ESSFulfilmentConfiguration
+  small_exchange_set_subnets    = data.azurerm_subnet.small_exchange_set_subnet[*].id
+  medium_exchange_set_subnets   = data.azurerm_subnet.medium_exchange_set_subnet[*].id
+  large_exchange_set_subnets    = data.azurerm_subnet.large_exchange_set_subnet[*].id
 }
 
 module "fulfilment_webapp" {
