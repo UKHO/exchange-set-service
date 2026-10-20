@@ -33,12 +33,31 @@ resource "azurerm_windows_web_app" "small_exchange_set_webapp" {
       dotnet_version = "v10.0"
     }
     
-    always_on         = true
-    ftps_state        = "Disabled"
-    use_32_bit_worker = false
+    always_on                         = true
+    ftps_state                        = "Disabled"
+    use_32_bit_worker                 = false
+    ip_restriction_default_action     = "Deny"
+    scm_ip_restriction_default_action = "Deny"
+    scm_use_main_ip_restriction       = true
+    vnet_route_all_enabled            = false
     
     ip_restriction {
       virtual_network_subnet_id = var.small_exchange_set_subnets[count.index]
+    }
+
+    ip_restriction {
+      virtual_network_subnet_id = var.agent_prd_subnet
+    }
+
+    ip_restriction {
+      virtual_network_subnet_id = var.main_subnet_id
+    }
+
+    dynamic "ip_restriction" {
+      for_each = var.allowed_ips
+      content {
+          ip_address  = length(split("/",ip_restriction.value)) > 1 ? ip_restriction.value : "${ip_restriction.value}/32"
+      }
     }
   }
 
@@ -73,12 +92,31 @@ resource "azurerm_windows_web_app_slot" "small_exchange_set_staging" {
       dotnet_version = "v10.0"
     }
     
-    always_on         = true
-    ftps_state        = "Disabled"
-    use_32_bit_worker = false
+    always_on                         = true
+    ftps_state                        = "Disabled"
+    use_32_bit_worker                 = false
+    ip_restriction_default_action     = "Deny"
+    scm_ip_restriction_default_action = "Deny"
+    scm_use_main_ip_restriction       = true
+    vnet_route_all_enabled            = false
 
     ip_restriction {
       virtual_network_subnet_id = var.small_exchange_set_subnets[count.index]
+    }
+
+    ip_restriction {
+      virtual_network_subnet_id = var.agent_prd_subnet
+    }
+
+    ip_restriction {
+      virtual_network_subnet_id = var.main_subnet_id
+    }
+
+    dynamic "ip_restriction" {
+      for_each = var.allowed_ips
+      content {
+          ip_address  = length(split("/",ip_restriction.value)) > 1 ? ip_restriction.value : "${ip_restriction.value}/32"
+      }
     }
   }
 
@@ -127,12 +165,31 @@ resource "azurerm_windows_web_app" "medium_exchange_set_webapp" {
       dotnet_version = "v10.0"
     }
     
-    always_on         = true
-    ftps_state        = "Disabled"
-    use_32_bit_worker = false
+    always_on                         = true
+    ftps_state                        = "Disabled"
+    use_32_bit_worker                 = false
+    ip_restriction_default_action     = "Deny"
+    scm_ip_restriction_default_action = "Deny"
+    scm_use_main_ip_restriction       = true
+    vnet_route_all_enabled            = false
     
     ip_restriction {
       virtual_network_subnet_id = var.medium_exchange_set_subnets[count.index]
+    }
+
+    ip_restriction {
+      virtual_network_subnet_id = var.agent_prd_subnet
+    }
+
+    ip_restriction {
+      virtual_network_subnet_id = var.main_subnet_id
+    }
+
+    dynamic "ip_restriction" {
+      for_each = var.allowed_ips
+      content {
+          ip_address  = length(split("/",ip_restriction.value)) > 1 ? ip_restriction.value : "${ip_restriction.value}/32"
+      }
     }
   }
 
@@ -167,12 +224,31 @@ resource "azurerm_windows_web_app_slot" "medium_exchange_set_staging" {
       dotnet_version = "v10.0"
     }
     
-    always_on         = true
-    ftps_state        = "Disabled"
-    use_32_bit_worker = false
+    always_on                         = true
+    ftps_state                        = "Disabled"
+    use_32_bit_worker                 = false
+    ip_restriction_default_action     = "Deny"
+    scm_ip_restriction_default_action = "Deny"
+    scm_use_main_ip_restriction       = true
+    vnet_route_all_enabled            = false
 
     ip_restriction {
       virtual_network_subnet_id = var.medium_exchange_set_subnets[count.index]
+    }
+
+    ip_restriction {
+      virtual_network_subnet_id = var.agent_prd_subnet
+    }
+
+    ip_restriction {
+      virtual_network_subnet_id = var.main_subnet_id
+    }
+
+    dynamic "ip_restriction" {
+      for_each = var.allowed_ips
+      content {
+          ip_address  = length(split("/",ip_restriction.value)) > 1 ? ip_restriction.value : "${ip_restriction.value}/32"
+      }
     }
   }
 
@@ -221,12 +297,31 @@ resource "azurerm_windows_web_app" "large_exchange_set_webapp" {
       dotnet_version = "v10.0"
     }
     
-    always_on         = true
-    ftps_state        = "Disabled"
-    use_32_bit_worker = false
+    always_on                         = true
+    ftps_state                        = "Disabled"
+    use_32_bit_worker                 = false
+    ip_restriction_default_action     = "Deny"
+    scm_ip_restriction_default_action = "Deny"
+    scm_use_main_ip_restriction       = true
+    vnet_route_all_enabled            = false
     
     ip_restriction {
       virtual_network_subnet_id = var.large_exchange_set_subnets[count.index]
+    }
+
+    ip_restriction {
+      virtual_network_subnet_id = var.agent_prd_subnet
+    }
+
+    ip_restriction {
+      virtual_network_subnet_id = var.main_subnet_id
+    }
+
+    dynamic "ip_restriction" {
+      for_each = var.allowed_ips
+      content {
+          ip_address  = length(split("/",ip_restriction.value)) > 1 ? ip_restriction.value : "${ip_restriction.value}/32"
+      }
     }
   }
 
@@ -264,9 +359,28 @@ resource "azurerm_windows_web_app_slot" "large_exchange_set_staging" {
     always_on         = true
     ftps_state        = "Disabled"
     use_32_bit_worker = false
+    ip_restriction_default_action     = "Deny"
+    scm_ip_restriction_default_action = "Deny"
+    scm_use_main_ip_restriction       = true
+    vnet_route_all_enabled            = false
 
     ip_restriction {
       virtual_network_subnet_id = var.large_exchange_set_subnets[count.index]
+    }
+
+    ip_restriction {
+      virtual_network_subnet_id = var.agent_prd_subnet
+    }
+
+    ip_restriction {
+      virtual_network_subnet_id = var.main_subnet_id
+    }
+
+    dynamic "ip_restriction" {
+      for_each = var.allowed_ips
+      content {
+          ip_address  = length(split("/",ip_restriction.value)) > 1 ? ip_restriction.value : "${ip_restriction.value}/32"
+      }
     }
   }
 
