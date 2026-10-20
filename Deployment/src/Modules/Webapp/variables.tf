@@ -38,15 +38,15 @@ variable "agent_prd_subnet" {
   type = string
 }
 
-variable "exchange_set_config" {
-}
+#variable "exchange_set_config" {
+#}
 
-variable "small_exchange_set_subnets" {
-}
+#variable "small_exchange_set_subnets" {
+#}
 
-variable "medium_exchange_set_subnets" {
-}
+#variable "medium_exchange_set_subnets" {
+#}
 
-variable "large_exchange_set_subnets" {
-}
+#variable "large_exchange_set_subnets" {
+#}
 
