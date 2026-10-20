@@ -77,10 +77,6 @@ module "webapp_service" {
   tags                          = local.tags
   allowed_ips                   = var.allowed_ips
   agent_prd_subnet              = var.agent_prd_subnet
-  #exchange_set_config           = local.config_data.ESSFulfilmentConfiguration
-  #small_exchange_set_subnets    = data.azurerm_subnet.small_exchange_set_subnet[*].id
-  #medium_exchange_set_subnets   = data.azurerm_subnet.medium_exchange_set_subnet[*].id
-  #large_exchange_set_subnets    = data.azurerm_subnet.large_exchange_set_subnet[*].id
 }
 
 module "fulfilment_webapp" {

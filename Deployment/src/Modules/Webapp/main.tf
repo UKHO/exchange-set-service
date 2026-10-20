@@ -52,28 +52,7 @@ resource "azurerm_windows_web_app" "webapp_service" {
       content {
           ip_address  = length(split("/",ip_restriction.value)) > 1 ? ip_restriction.value : "${ip_restriction.value}/32"
       }
-    }
-
-   # dynamic "ip_restriction" {
-   #   for_each = range(var.exchange_set_config.SmallExchangeSetInstance)
-   #  content {
-   #     virtual_network_subnet_id = var.small_exchange_set_subnets[ip_restriction.key]
-   #   }
-   # }
-
-   # dynamic "ip_restriction" {
-   #   for_each = range(var.exchange_set_config.MediumExchangeSetInstance)
-   #   content {
-   #     virtual_network_subnet_id = var.medium_exchange_set_subnets[ip_restriction.key]
-   #  }
-   #}
-
-   # dynamic "ip_restriction" {
-   #   for_each = range(var.exchange_set_config.LargeExchangeSetInstance)
-   #   content {
-   #     virtual_network_subnet_id = var.large_exchange_set_subnets[ip_restriction.key]
-   #   }
-   # }
+    }   
   }
 
   app_settings = var.app_settings
