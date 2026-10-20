@@ -119,6 +119,12 @@ variable "front_door_route_enabled" {
   default     = true
 }
 
+variable "front_door_ip_restriction_enabled" {
+  description = "Whether to restrict the Front Door route to the web app's IP allowlist via a rule set."
+  type        = bool
+  default     = false
+}
+
 variable "front_door_subscription_id" {
   description = "The subscription ID where the shared Azure Front Door profile is deployed."
   type        = string
@@ -144,13 +150,13 @@ variable "front_door_shared_endpoint_name" {
 }
 
 variable "front_door_api_custom_domain_hostname" {
-  description = "The public hostname for the API instance (suffix \"\"). Leave empty to skip Front Door for this instance."
+  description = "The public hostname for the API instance (suffix \"\"). Leave empty to use the shared endpoint's default domain instead."
   type        = string
   default     = ""
 }
 
 variable "front_door_v2_custom_domain_hostname" {
-  description = "The public hostname for the v2 instance (suffix \"-v2\"), only deployed in route-to-live environments. Leave empty to skip Front Door for this instance."
+  description = "The public hostname for the v2 instance (suffix \"-v2\"), only deployed in route-to-live environments. Leave empty to use the shared endpoint's default domain instead."
   type        = string
   default     = ""
 }
