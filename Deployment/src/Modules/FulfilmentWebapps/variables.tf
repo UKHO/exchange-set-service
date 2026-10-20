@@ -75,5 +75,5 @@ variable "agent_prd_subnet" {
 }
 
 variable "main_subnet_id" {
-  type = staging
+  type = string
 }
