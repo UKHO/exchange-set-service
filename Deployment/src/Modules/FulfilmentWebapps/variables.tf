@@ -73,3 +73,7 @@ variable "allowed_ips" {
 variable "agent_prd_subnet" {
   type = string
 }
+
+variable "main_subnet_id" {
+  type = staging
+}

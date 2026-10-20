@@ -49,6 +49,10 @@ resource "azurerm_windows_web_app" "small_exchange_set_webapp" {
       virtual_network_subnet_id = var.agent_prd_subnet
     }
 
+    ip_restriction {
+      virtual_network_subnet_id = var.main_subnet_id
+    }
+
     dynamic "ip_restriction" {
       for_each = var.allowed_ips
       content {
@@ -102,6 +106,10 @@ resource "azurerm_windows_web_app_slot" "small_exchange_set_staging" {
 
     ip_restriction {
       virtual_network_subnet_id = var.agent_prd_subnet
+    }
+
+    ip_restriction {
+      virtual_network_subnet_id = var.main_subnet_id
     }
 
     dynamic "ip_restriction" {
@@ -173,6 +181,10 @@ resource "azurerm_windows_web_app" "medium_exchange_set_webapp" {
       virtual_network_subnet_id = var.agent_prd_subnet
     }
 
+    ip_restriction {
+      virtual_network_subnet_id = var.main_subnet_id
+    }
+
     dynamic "ip_restriction" {
       for_each = var.allowed_ips
       content {
@@ -226,6 +238,10 @@ resource "azurerm_windows_web_app_slot" "medium_exchange_set_staging" {
 
     ip_restriction {
       virtual_network_subnet_id = var.agent_prd_subnet
+    }
+
+    ip_restriction {
+      virtual_network_subnet_id = var.main_subnet_id
     }
 
     dynamic "ip_restriction" {
@@ -297,6 +313,10 @@ resource "azurerm_windows_web_app" "large_exchange_set_webapp" {
       virtual_network_subnet_id = var.agent_prd_subnet
     }
 
+    ip_restriction {
+      virtual_network_subnet_id = var.main_subnet_id
+    }
+
     dynamic "ip_restriction" {
       for_each = var.allowed_ips
       content {
@@ -350,6 +370,10 @@ resource "azurerm_windows_web_app_slot" "large_exchange_set_staging" {
 
     ip_restriction {
       virtual_network_subnet_id = var.agent_prd_subnet
+    }
+
+    ip_restriction {
+      virtual_network_subnet_id = var.main_subnet_id
     }
 
     dynamic "ip_restriction" {

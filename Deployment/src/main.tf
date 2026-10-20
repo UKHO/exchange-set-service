@@ -118,6 +118,7 @@ module "fulfilment_webapp" {
   tags              = local.tags
   allowed_ips       = var.allowed_ips
   agent_prd_subnet  = var.agent_prd_subnet
+  main_subnet_id         = data.azurerm_subnet.main_subnet.id
 }
 
 module "fulfilment_storage" {
