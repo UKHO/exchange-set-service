@@ -34,8 +34,6 @@ resource "azurerm_windows_web_app" "webapp_service" {
     ftps_state        = "Disabled"
     use_32_bit_worker = false
 
-    ip_restriction_default_action = "Deny"
-
     ip_restriction {
       virtual_network_subnet_id = var.subnet_id
     }
@@ -60,6 +58,8 @@ resource "azurerm_windows_web_app" "webapp_service" {
   }
 
   https_only = true
+  # Approving a private endpoint disables public access unless this is set explicitly.
+  public_network_access_enabled = true
 }
 
 resource "azurerm_windows_web_app_slot" "staging" {
@@ -81,8 +81,6 @@ resource "azurerm_windows_web_app_slot" "staging" {
     always_on         = true
     ftps_state        = "Disabled"
     use_32_bit_worker = false
-
-    ip_restriction_default_action = "Deny"
 
     ip_restriction {
       virtual_network_subnet_id = var.subnet_id
