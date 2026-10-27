@@ -34,6 +34,8 @@ resource "azurerm_windows_web_app" "webapp_service" {
     ftps_state        = "Disabled"
     use_32_bit_worker = false
 
+    ip_restriction_default_action = "Deny"
+
     ip_restriction {
       virtual_network_subnet_id = var.subnet_id
     }
@@ -79,6 +81,8 @@ resource "azurerm_windows_web_app_slot" "staging" {
     always_on         = true
     ftps_state        = "Disabled"
     use_32_bit_worker = false
+
+    ip_restriction_default_action = "Deny"
 
     ip_restriction {
       virtual_network_subnet_id = var.subnet_id
