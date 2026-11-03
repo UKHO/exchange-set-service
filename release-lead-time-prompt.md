@@ -36,7 +36,7 @@ Calculate the release lead time for the GitHub release provided by the user.
 Validate calculations independently before finalizing:
 
 - Confirm the exact calendar-day difference for each PR.
-- Confirm the oldest commit date is truly the earliest commit in that PR branch lineage.
+- Confirm the Oldest Commit Date is the earliest committer date in the PR branch lineage; do not use the author date, PR creation date, or PR merge date.
 - Verify the average lead time formula is correct.
 - Check for arithmetic/logical errors and consistency.
 
@@ -61,6 +61,7 @@ A clean UI-style Markdown table with only these columns:
 - Do not use the PR merge date or PR created date.
 - Do not use the first commit visible on the PR page if a deeper ancestor exists in the branch lineage.
 - For all PRs, the date must reflect the actual earliest unique commit in that PR branch lineage.
+- Commit date definition: For every commit, use the Git committer timestamp (committer.date in GitHub’s commit data), not the author timestamp (author.date). Determine the Oldest Commit Date by comparing the committer dates of commits in the PR branch lineage. Use the UTC calendar date from the committer timestamp. Never substitute the author date.
 
 # Final Instruction
 
