@@ -32,6 +32,19 @@ Validate the result independently before finalizing:
 - Do not use author dates, PR creation dates, or PR merge dates.
 - Check for arithmetic/logical errors and consistency.
 
+# Hard stop—identify release PRs first
+
+- Extract PR links only from the release notes’ body. Do not infer PRs from the release title, nearby PRs, commit history, or the Full Changelog link.
+- If the release notes contain no explicit PR links, stop and ask the user for the relevant PR link(s). Do not calculate a lead time or substitute a tag, release, or commit date.
+- Do not use the previous release tag’s date or the date of any commit merely because it appears in the tag comparison. A commit is eligible only if it belongs to the branch lineage of an explicitly referenced PR.
+
+# Validate the selected date
+
+- For each linked PR, record its PR number, candidate commit SHA, committer.date, and parent/branch-lineage evidence.
+- Select the earliest relevant commit in that PR’s own branch lineage; exclude shared base-branch ancestry and merge commits that only bring in unrelated history.
+- Before calculating, verify that every selected commit is from a referenced PR and that none is from a prior release or unrelated PR.
+- If the required PR or lineage data cannot be verified, stop and ask for clarification rather than guessing.
+
 # Date Calculation Rules
 
 - Use exact calendar-day math.
