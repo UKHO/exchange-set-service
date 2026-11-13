@@ -58,6 +58,8 @@ resource "azurerm_windows_web_app" "webapp_service" {
   }
 
   https_only = true
+  # Approving a private endpoint disables public access unless this is set explicitly.
+  public_network_access_enabled = true
 }
 
 resource "azurerm_windows_web_app_slot" "staging" {

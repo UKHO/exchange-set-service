@@ -178,8 +178,16 @@ if (!$?) {
 
 Write-Output "Execute Terraform plan"
 
+$varFileArgs = @()
+$varFile = "config/$($workSpace.ToLower()).tfvars"
+if (Test-Path $varFile) {
+    Write-Output "Using var file $varFile"
+    $varFileArgs += "-var-file=$varFile"
+}
+
 terraform plan `
     -out "terraform.deployment.tfplan" `
+    @varFileArgs `
     -var elastic_apm_server_url=$elasticApmServerUrl `
     -var elastic_apm_api_key=$elasticApmApiKey `
     -var suffix="" `
