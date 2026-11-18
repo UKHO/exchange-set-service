@@ -56,7 +56,14 @@ namespace UKHO.ExchangeSetService.Common.HealthCheck
                             $"https://ess-{webHostEnvironment.EnvironmentName}-{exchangeSetType}-{instance}-webapp-v2.scm.azurewebsites.net/api/continuouswebjobs/ESSFulfilmentWebJob";
                     }
 
-                    var userPassword = webJobsAccessKeyProvider.GetWebJobsAccessKey(userNameKey) + ":" + webJobsAccessKeyProvider.GetWebJobsAccessKey(passwordKey);
+                    var userName = webJobsAccessKeyProvider.GetWebJobsAccessKey(userNameKey);
+                    var password = webJobsAccessKeyProvider.GetWebJobsAccessKey(passwordKey);
+                    if (string.IsNullOrWhiteSpace(userName) || string.IsNullOrWhiteSpace(password))
+                    {
+                        return HealthCheckResult.Unhealthy("Azure webjob is unhealthy", new Exception($"SCM credentials missing for webjob ess-{webHostEnvironment.EnvironmentName}-{exchangeSetType}-{instance}"));
+                    }
+
+                    var userPassword = userName + ":" + password;
                     userPassword = Convert.ToBase64String(Encoding.Default.GetBytes(userPassword));
                     var webJobDetails = new WebJobDetails
                     {

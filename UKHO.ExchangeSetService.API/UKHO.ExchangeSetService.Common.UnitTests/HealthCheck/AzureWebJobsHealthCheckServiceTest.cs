@@ -31,6 +31,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.HealthCheck
             _fakeEssFulfilmentStorageConfiguration = A.Fake<IOptions<EssFulfilmentStorageConfiguration>>();
             A.CallTo(() => _fakeEssFulfilmentStorageConfiguration.Value).ReturnsLazily(() => _essFulfilmentStorageConfiguration);
             _fakeWebJobsAccessKeyProvider = A.Fake<IWebJobsAccessKeyProvider>();
+            A.CallTo(() => _fakeWebJobsAccessKeyProvider.GetWebJobsAccessKey(A<string>.Ignored)).Returns("secret");
             _fakeWebHostEnvironment = A.Fake<IWebHostEnvironment>();
             _fakeAzureBlobStorageService = A.Fake<IAzureBlobStorageService>();
             _fakeAzureWebJobsHealthCheckClient = A.Fake<IAzureWebJobsHealthCheckClient>();
@@ -88,6 +89,19 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.HealthCheck
             var response = await _azureWebJobsHealthCheckService.CheckHealthAsync();
 
             Assert.That(response.Status, Is.EqualTo(HealthStatus.Healthy));
+        }
+
+        [Test]
+        public async Task WhenScmCredentialsAreMissing_ThenReturnUnhealthyWithoutCallingClient()
+        {
+            A.CallTo(() => _fakeWebJobsAccessKeyProvider.GetWebJobsAccessKey(A<string>.Ignored)).Returns(null);
+            A.CallTo(() => _fakeAzureBlobStorageService.GetInstanceCountBasedOnExchangeSetType(A<ExchangeSetType>.Ignored)).Returns(1);
+
+            var response = await _azureWebJobsHealthCheckService.CheckHealthAsync();
+
+            Assert.That(response.Status, Is.EqualTo(HealthStatus.Unhealthy));
+            Assert.That(response.Exception.Message, Does.Contain("SCM credentials missing"));
+            A.CallTo(() => _fakeAzureWebJobsHealthCheckClient.CheckAllWebJobsHealth(A<List<WebJobDetails>>.Ignored)).MustNotHaveHappened();
         }
 
         [Test]
