@@ -21,3 +21,9 @@ provider "azurerm" {
   alias = "build_agent"
   subscription_id = var.agent_subscription_id
 }
+
+provider "azurerm" {
+  features {}
+  alias           = "frontdoor"
+  subscription_id = var.front_door_subscription_id != "" ? var.front_door_subscription_id : null
+}
