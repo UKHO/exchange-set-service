@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.IdentityModel.Tokens.Jwt;
 using System.IO;
 using System.IO.Abstractions;
 using System.Linq;
@@ -8,7 +9,6 @@ using System.Net.Http.Headers;
 using System.Reflection;
 using System.Security.Claims;
 using Azure.Identity;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
@@ -79,33 +79,72 @@ namespace UKHO.ExchangeSetService.API
             var azureAdB2CConfiguration = new AzureAdB2CConfiguration();
             builder.Configuration.Bind("AzureAdB2CConfiguration", azureAdB2CConfiguration);
 
-            builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-                    .AddJwtBearer("AzureAD", options =>
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var azureB2CIssuer = $"{azureAdB2CConfiguration.Instance}{azureAdB2CConfiguration.Domain}/{azureAdB2CConfiguration.SignUpSignInPolicy}/v2.0/";
+            var azureADB2CIssuer = $"{essAzureADConfiguration.MicrosoftOnlineLoginUrl}{azureAdB2CConfiguration.TenantId}/v2.0";
+
+            builder.Services.AddAuthentication(options =>
+            {
+                options.DefaultAuthenticateScheme = "ESSAuthenticationScheme";
+                options.DefaultChallengeScheme = "ESSAuthenticationScheme";
+            })
+            .AddPolicyScheme("ESSAuthenticationScheme", "ESSAuthenticationScheme Selector", options =>
+            {
+                options.ForwardDefaultSelector = context =>
+                {
+                    var authorizationHeader = context.Request.Headers.Authorization.FirstOrDefault();
+
+                    if (AuthenticationHeaderValue.TryParse(authorizationHeader, out var bearerToken)
+                        && bearerToken.Scheme.Equals("Bearer", StringComparison.OrdinalIgnoreCase)
+                        && !string.IsNullOrWhiteSpace(bearerToken.Parameter)
+                        && tokenHandler.CanReadToken(bearerToken.Parameter))
                     {
-                        options.Audience = essAzureADConfiguration.ClientId;
-                        options.Authority = $"{essAzureADConfiguration.MicrosoftOnlineLoginUrl}{essAzureADConfiguration.TenantId}";
-                    })
-                    .AddJwtBearer("AzureB2C", jwtOptions =>
-                    {
-                        jwtOptions.Audience = azureAdB2CConfiguration.ClientId;
-                        jwtOptions.Authority = $"{azureAdB2CConfiguration.Instance}{azureAdB2CConfiguration.Domain}/{azureAdB2CConfiguration.SignUpSignInPolicy}/v2.0/";
-                    })
-                    .AddJwtBearer("AzureADB2C", options =>
-                    {
-                        options.Audience = azureAdB2CConfiguration.ClientId;
-                        options.Authority = $"{essAzureADConfiguration.MicrosoftOnlineLoginUrl}{azureAdB2CConfiguration.TenantId}";
-                        options.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
+                        try
                         {
-                            ValidAudience = azureAdB2CConfiguration.ClientId,
-                            ValidIssuer = $"{essAzureADConfiguration.MicrosoftOnlineLoginUrl}{azureAdB2CConfiguration.TenantId}/v2.0"
-                        };
-                    });
+                            var issuer = tokenHandler.ReadJwtToken(bearerToken.Parameter).Issuer;
+
+                            if (issuer.TrimEnd('/').Equals(azureB2CIssuer.TrimEnd('/'), StringComparison.OrdinalIgnoreCase))
+                            {
+                                return "AzureB2C";
+                            }
+
+                            if (issuer.TrimEnd('/').Equals(azureADB2CIssuer.TrimEnd('/'), StringComparison.OrdinalIgnoreCase))
+                            {
+                                return "AzureADB2C";
+                            }
+                        }
+                        catch (Exception)
+                        {
+                        }
+                    }
+                    return "AzureAD";
+                };
+            })
+            .AddJwtBearer("AzureAD", options =>
+            {
+                options.Audience = essAzureADConfiguration.ClientId;
+                options.Authority = $"{essAzureADConfiguration.MicrosoftOnlineLoginUrl}{essAzureADConfiguration.TenantId}";
+            })
+            .AddJwtBearer("AzureB2C", jwtOptions =>
+            {
+                jwtOptions.Audience = azureAdB2CConfiguration.ClientId;
+                jwtOptions.Authority = $"{azureAdB2CConfiguration.Instance}{azureAdB2CConfiguration.Domain}/{azureAdB2CConfiguration.SignUpSignInPolicy}/v2.0/";
+            })
+            .AddJwtBearer("AzureADB2C", options =>
+            {
+                options.Audience = azureAdB2CConfiguration.ClientId;
+                options.Authority = $"{essAzureADConfiguration.MicrosoftOnlineLoginUrl}{azureAdB2CConfiguration.TenantId}";
+                options.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
+                {
+                    ValidAudience = azureAdB2CConfiguration.ClientId,
+                    ValidIssuer = $"{essAzureADConfiguration.MicrosoftOnlineLoginUrl}{azureAdB2CConfiguration.TenantId}/v2.0"
+                };
+            });
 
             builder.Services.AddAuthorization(options =>
             {
                 options.DefaultPolicy = new AuthorizationPolicyBuilder()
                 .RequireAuthenticatedUser()
-                .AddAuthenticationSchemes("AzureAD", "AzureB2C", "AzureADB2C")
                 .Build();
             });
 
