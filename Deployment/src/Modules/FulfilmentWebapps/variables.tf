@@ -65,3 +65,15 @@ variable "as_name_lxs" {
 variable "suffix" {
   default = ""
 }
+
+variable "allowed_ips" {
+
+}
+
+variable "agent_prd_subnet" {
+  type = string
+}
+
+variable "main_subnet_id" {
+  type = string
+}
