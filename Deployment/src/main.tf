@@ -76,6 +76,7 @@ module "webapp_service" {
   }
   tags                      = local.tags
   allowed_ips               = var.allowed_ips
+  agent_prd_subnet          = var.agent_prd_subnet
 }
 
 module "fulfilment_webapp" {
