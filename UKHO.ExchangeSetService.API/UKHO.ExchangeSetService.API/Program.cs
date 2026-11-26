@@ -99,13 +99,39 @@ namespace UKHO.ExchangeSetService.API
                             ValidAudience = azureAdB2CConfiguration.ClientId,
                             ValidIssuer = $"{essAzureADConfiguration.MicrosoftOnlineLoginUrl}{azureAdB2CConfiguration.TenantId}/v2.0"
                         };
+                    })
+                    .AddPolicyScheme("MultiAuthSchemes", "MultiAuthSchemes", options =>
+                    {
+                        options.ForwardDefaultSelector = context =>
+                        {
+                            var authorization = context.Request.Headers.Authorization.ToString();
+                            if (!string.IsNullOrEmpty(authorization) && authorization.StartsWith("Bearer ", StringComparison.OrdinalIgnoreCase))
+                            {
+                                var token = authorization["Bearer ".Length..].Trim();
+                                var tokenHandler = new Microsoft.IdentityModel.JsonWebTokens.JsonWebTokenHandler();
+                                if (tokenHandler.CanReadToken(token))
+                                {
+                                    var issuer = tokenHandler.ReadJsonWebToken(token).Issuer ?? string.Empty;
+                                    if (!string.IsNullOrEmpty(essAzureADConfiguration.TenantId) && issuer.Contains(essAzureADConfiguration.TenantId, StringComparison.OrdinalIgnoreCase))
+                                    {
+                                        return "AzureAD";
+                                    }
+                                    if (!string.IsNullOrEmpty(essAzureADConfiguration.MicrosoftOnlineLoginUrl) && issuer.StartsWith(essAzureADConfiguration.MicrosoftOnlineLoginUrl, StringComparison.OrdinalIgnoreCase))
+                                    {
+                                        return "AzureADB2C";
+                                    }
+                                    return "AzureB2C";
+                                }
+                            }
+                            return "AzureAD";
+                        };
                     });
 
             builder.Services.AddAuthorization(options =>
             {
                 options.DefaultPolicy = new AuthorizationPolicyBuilder()
                 .RequireAuthenticatedUser()
-                .AddAuthenticationSchemes("AzureAD", "AzureB2C", "AzureADB2C")
+                .AddAuthenticationSchemes("MultiAuthSchemes")
                 .Build();
             });
 
