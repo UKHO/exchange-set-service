@@ -27,10 +27,7 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.HealthCheck
 
         private AzureWebJobsHealthCheckClient CreateClient(Func<HttpRequestMessage, HttpResponseMessage> responder)
         {
-            return new AzureWebJobsHealthCheckClient(new HttpClient(new StubHandler(responder)), _fakeWebHostEnvironment)
-            {
-                RetryDelay = TimeSpan.Zero
-            };
+            return new AzureWebJobsHealthCheckClient(new HttpClient(new StubHandler(responder)), _fakeWebHostEnvironment);
         }
 
         private static HttpResponseMessage Running() =>
@@ -55,28 +52,14 @@ namespace UKHO.ExchangeSetService.Common.UnitTests.HealthCheck
         }
 
         [Test]
-        public async Task WhenUnauthorizedIsTransient_ThenRetryAndReturnHealthy()
+        public async Task WhenUnauthorized_ThenReturnUnhealthyNamingTheWebJob()
         {
-            var calls = 0;
-            var client = CreateClient(_ => ++calls == 1 ? new HttpResponseMessage(HttpStatusCode.Unauthorized) : Running());
-
-            var result = await client.CheckAllWebJobsHealth([Job("sxs", 1, "a")]);
-
-            Assert.That(result.Status, Is.EqualTo(HealthStatus.Healthy));
-            Assert.That(calls, Is.EqualTo(2));
-        }
-
-        [Test]
-        public async Task WhenUnauthorizedPersists_ThenReturnUnhealthyNamingTheWebJob()
-        {
-            var calls = 0;
-            var client = CreateClient(_ => { calls++; return new HttpResponseMessage(HttpStatusCode.Unauthorized); });
+            var client = CreateClient(_ => new HttpResponseMessage(HttpStatusCode.Unauthorized));
 
             var result = await client.CheckAllWebJobsHealth([Job("sxs", 1, "a")]);
 
             Assert.That(result.Status, Is.EqualTo(HealthStatus.Unhealthy));
             Assert.That(result.Exception.Message, Does.Contain("Webjob ess-prod-sxs-1 status code is Unauthorized"));
-            Assert.That(calls, Is.EqualTo(3));
         }
 
         [Test]
