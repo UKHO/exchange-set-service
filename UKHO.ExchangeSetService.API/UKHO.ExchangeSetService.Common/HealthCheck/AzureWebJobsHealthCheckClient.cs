@@ -3,7 +3,6 @@ using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
@@ -12,49 +11,66 @@ using System.Threading.Tasks;
 
 namespace UKHO.ExchangeSetService.Common.HealthCheck
 {
-    [ExcludeFromCodeCoverage]
     public class AzureWebJobsHealthCheckClient : IAzureWebJobsHealthCheckClient
     {
-        static HttpClient httpClient = new HttpClient();
+        private readonly HttpClient httpClient;
         private readonly IWebHostEnvironment webHostEnvironment;
-        
-        public AzureWebJobsHealthCheckClient(IWebHostEnvironment webHostEnvironment)
+
+        public AzureWebJobsHealthCheckClient(HttpClient httpClient, IWebHostEnvironment webHostEnvironment)
         {
+            this.httpClient = httpClient;
             this.webHostEnvironment = webHostEnvironment;
         }
+
         public async Task<HealthCheckResult> CheckAllWebJobsHealth(List<WebJobDetails> webJobs)
         {
+            var failures = new List<string>();
+
+            foreach (var webJob in webJobs)
+            {
+                var failure = await CheckWebJobHealth(webJob);
+                if (failure != null)
+                {
+                    failures.Add(failure);
+                }
+            }
+
+            if (failures.Count > 0)
+            {
+                return HealthCheckResult.Unhealthy("Azure webjob is unhealthy", new Exception(string.Join("; ", failures)));
+            }
+
+            return HealthCheckResult.Healthy("Azure webjob is healthy");
+        }
+
+        private async Task<string> CheckWebJobHealth(WebJobDetails webJob)
+        {
+            var webJobName = $"Webjob ess-{webHostEnvironment.EnvironmentName}-{webJob.ExchangeSetType}-{webJob.Instance}";
+
             try
             {
-                string webJobDetail, webJobStatus = string.Empty;
-                foreach (var webJob in webJobs)
-                {
-                    using var httpRequestMessage = new HttpRequestMessage(HttpMethod.Get, webJob.WebJobUri);
-                    httpClient.DefaultRequestHeaders.Accept.Clear();
-                    httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-                    httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", webJob.UserPassword);
-                    var response = await httpClient.SendAsync(httpRequestMessage, HttpCompletionOption.ResponseHeadersRead, CancellationToken.None);
+                using var httpRequestMessage = new HttpRequestMessage(HttpMethod.Get, webJob.WebJobUri);
+                httpRequestMessage.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+                httpRequestMessage.Headers.Authorization = new AuthenticationHeaderValue("Basic", webJob.UserPassword);
+                using var response = await httpClient.SendAsync(httpRequestMessage, HttpCompletionOption.ResponseHeadersRead, CancellationToken.None);
 
-                    if (response.StatusCode == HttpStatusCode.OK)
-                    {
-                        var webJobDetails = JsonConvert.DeserializeObject<dynamic>(await response.Content.ReadAsStringAsync());
-                        webJobStatus = webJobDetails["status"];
-                        if (webJobStatus != "Running")
-                        {
-                            webJobDetail = $"Webjob ess-{webHostEnvironment.EnvironmentName}-{webJob.ExchangeSetType}-{webJob.Instance} status is {webJobStatus}";
-                            return HealthCheckResult.Unhealthy("Azure webjob is unhealthy", new Exception(webJobDetail));
-                        }
-                    }
-                    else
-                    {
-                        return HealthCheckResult.Unhealthy("Azure webjob is unhealthy", new Exception($"Webjob ess-{webHostEnvironment.EnvironmentName}-{webJob.ExchangeSetType}-{webJob.Instance} status code is {response.StatusCode}"));
-                    }
+                if (response.StatusCode != HttpStatusCode.OK)
+                {
+                    return $"{webJobName} status code is {response.StatusCode} ({response.ReasonPhrase})";
                 }
-                return HealthCheckResult.Healthy("Azure webjob is healthy");
+
+                var webJobDetails = JsonConvert.DeserializeObject<dynamic>(await response.Content.ReadAsStringAsync());
+                string webJobStatus = webJobDetails?["status"];
+                if (webJobStatus != "Running")
+                {
+                    return $"{webJobName} status is {webJobStatus}";
+                }
+
+                return null;
             }
             catch (Exception ex)
             {
-                return HealthCheckResult.Unhealthy("Azure webjob is unhealthy", new Exception(ex.Message));
+                return $"{webJobName} health check failed with error {ex.Message}";
             }
         }
     }
